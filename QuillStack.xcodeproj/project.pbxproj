@@ -6,17 +6,75 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2796C1862EEB552B00E05291 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1852EEB552B00E05291 /* ContentView.swift */; };
+		2796C1892EEB554000E05291 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1882EEB554000E05291 /* QuillStackApp.swift */; };
+		2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A42EF0B20100E05291 /* SpellCorrector.swift */; };
+		2796C1AA2EEB570000E05291 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18C2EEB558200E05291 /* CoreDataStack.swift */; };
+		2796C1AB2EEB570000E05291 /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18D2EEB558200E05291 /* Meeting.swift */; };
+		2796C1AC2EEB570000E05291 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18E2EEB558200E05291 /* Note.swift */; };
+		2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18F2EEB558200E05291 /* TodoItem.swift */; };
+		2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1902EEB55A300E05291 /* CameraManager.swift */; };
+		2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1912EEB55A300E05291 /* ImageProcessor.swift */; };
+		2796C1B02EEB570000E05291 /* MeetingParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1922EEB55A300E05291 /* MeetingParser.swift */; };
+		2796C1B12EEB570000E05291 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1932EEB55A300E05291 /* OCRService.swift */; };
+		2796C1B22EEB570000E05291 /* TextClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1942EEB55A300E05291 /* TextClassifier.swift */; };
+		2796C1B32EEB570000E05291 /* TodoParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1952EEB55A300E05291 /* TodoParser.swift */; };
+		2796C1B42EEB570000E05291 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1962EEB55B900E05291 /* Constants.swift */; };
+		2796C1B52EEB570000E05291 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1972EEB55B900E05291 /* Extensions.swift */; };
+		2796C1B62EEB570000E05291 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1982EEB55C700E05291 /* CameraViewModel.swift */; };
+		2796C1B82EEB570000E05291 /* MeetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */; };
+		2796C1B92EEB570000E05291 /* NoteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C19B2EEB55C700E05291 /* NoteViewModel.swift */; };
+		2796C1BA2EEB570000E05291 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C19C2EEB55EC00E05291 /* CameraPreviewView.swift */; };
+		2796C1BB2EEB570000E05291 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C19D2EEB55EC00E05291 /* CameraView.swift */; };
+		2796C1BC2EEB570000E05291 /* ImagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */; };
+		2796C1BD2EEB570000E05291 /* MeetingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A02EEB55F800E05291 /* MeetingListView.swift */; };
+		2796C1BE2EEB570000E05291 /* NoteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A12EEB560500E05291 /* NoteDetailView.swift */; };
+		2796C1C02EEB570000E05291 /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A32EEB560500E05291 /* NoteListView.swift */; };
+		2796C1C22EEB580000E05291 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2796C1C12EEB580000E05291 /* Assets.xcassets */; };
+		2796C1D02EEB600000E05291 /* QuillStack.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1CE2EEB600000E05291 /* QuillStack.xcdatamodeld */; };
+		2796C1E02EEB700000E05291 /* TodoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1DE2EEB700000E05291 /* TodoDetailView.swift */; };
+		2796C1E12EEB700000E05291 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1DF2EEB700000E05291 /* EmailDetailView.swift */; };
+		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
+		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
+		2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2796C1852EEB552B00E05291 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2796C1872EEB553000E05291 /* QuillStack-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuillStack-Bridging-Header.h"; sourceTree = "<group>"; };
+		2796C1882EEB554000E05291 /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
+		2796C18C2EEB558200E05291 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		2796C18D2EEB558200E05291 /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meeting.swift; sourceTree = "<group>"; };
+		2796C18E2EEB558200E05291 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		2796C18F2EEB558200E05291 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
+		2796C1902EEB55A300E05291 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		2796C1912EEB55A300E05291 /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		2796C1922EEB55A300E05291 /* MeetingParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingParser.swift; sourceTree = "<group>"; };
+		2796C1932EEB55A300E05291 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		2796C1942EEB55A300E05291 /* TextClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifier.swift; sourceTree = "<group>"; };
+		2796C1952EEB55A300E05291 /* TodoParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoParser.swift; sourceTree = "<group>"; };
+		2796C1962EEB55B900E05291 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		2796C1972EEB55B900E05291 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		2796C1982EEB55C700E05291 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingViewModel.swift; sourceTree = "<group>"; };
+		2796C19B2EEB55C700E05291 /* NoteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewModel.swift; sourceTree = "<group>"; };
+		2796C19C2EEB55EC00E05291 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		2796C19D2EEB55EC00E05291 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewView.swift; sourceTree = "<group>"; };
+		2796C1A02EEB55F800E05291 /* MeetingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingListView.swift; sourceTree = "<group>"; };
+		2796C1A12EEB560500E05291 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
+		2796C1A32EEB560500E05291 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
+		2796C1A42EF0B20100E05291 /* SpellCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpellCorrector.swift; sourceTree = "<group>"; };
+		2796C1C12EEB580000E05291 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2796C1CF2EEB600000E05291 /* QuillStack.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = QuillStack.xcdatamodel; sourceTree = "<group>"; };
+		2796C1DE2EEB700000E05291 /* TodoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoDetailView.swift; sourceTree = "<group>"; };
+		2796C1DF2EEB700000E05291 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailDetailView.swift; sourceTree = "<group>"; };
+		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
+		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidenceTextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		2796C1592EEB51D800E05291 /* QuillStack */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = QuillStack;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2796C1542EEB51D800E05291 /* Frameworks */ = {
@@ -32,7 +90,13 @@
 		2796C14E2EEB51D800E05291 = {
 			isa = PBXGroup;
 			children = (
-				2796C1592EEB51D800E05291 /* QuillStack */,
+				2796C1812EEB546300E05291 /* Utilities */,
+				2796C1802EEB545C00E05291 /* Services */,
+				2796C17F2EEB545600E05291 /* ViewModels */,
+				2796C17E2EEB545100E05291 /* Views */,
+				2796C17C2EEB542900E05291 /* Models */,
+				2796C17B2EEB542300E05291 /* App */,
+				2796C1C12EEB580000E05291 /* Assets.xcassets */,
 				2796C1582EEB51D800E05291 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +107,127 @@
 				2796C1572EEB51D800E05291 /* QuillStack.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2796C17B2EEB542300E05291 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1852EEB552B00E05291 /* ContentView.swift */,
+				2796C1872EEB553000E05291 /* QuillStack-Bridging-Header.h */,
+				2796C1882EEB554000E05291 /* QuillStackApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		2796C17C2EEB542900E05291 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1CE2EEB600000E05291 /* QuillStack.xcdatamodeld */,
+				2796C18C2EEB558200E05291 /* CoreDataStack.swift */,
+				2796C18D2EEB558200E05291 /* Meeting.swift */,
+				2796C18E2EEB558200E05291 /* Note.swift */,
+				2796C18F2EEB558200E05291 /* TodoItem.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2796C17E2EEB545100E05291 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1C52EEB590000E05291 /* Tasks */,
+				2796C1842EEB548300E05291 /* Meetings */,
+				2796C1832EEB547E00E05291 /* Notes */,
+				2796C1822EEB547500E05291 /* Capture */,
+				2796C1F42EEB800000E05291 /* Settings */,
+				2796C1F52EEB800000E05291 /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2796C17F2EEB545600E05291 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1982EEB55C700E05291 /* CameraViewModel.swift */,
+				2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */,
+				2796C19B2EEB55C700E05291 /* NoteViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		2796C1802EEB545C00E05291 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1A42EF0B20100E05291 /* SpellCorrector.swift */,
+				2796C1902EEB55A300E05291 /* CameraManager.swift */,
+				2796C1912EEB55A300E05291 /* ImageProcessor.swift */,
+				2796C1EE2EEB800000E05291 /* LLMService.swift */,
+				2796C1922EEB55A300E05291 /* MeetingParser.swift */,
+				2796C1932EEB55A300E05291 /* OCRService.swift */,
+				2796C1942EEB55A300E05291 /* TextClassifier.swift */,
+				2796C1952EEB55A300E05291 /* TodoParser.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		2796C1812EEB546300E05291 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1962EEB55B900E05291 /* Constants.swift */,
+				2796C1972EEB55B900E05291 /* Extensions.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		2796C1822EEB547500E05291 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				2796C19C2EEB55EC00E05291 /* CameraPreviewView.swift */,
+				2796C19D2EEB55EC00E05291 /* CameraView.swift */,
+				2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		2796C1832EEB547E00E05291 /* Notes */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1A12EEB560500E05291 /* NoteDetailView.swift */,
+				2796C1A32EEB560500E05291 /* NoteListView.swift */,
+				2796C1DE2EEB700000E05291 /* TodoDetailView.swift */,
+				2796C1DF2EEB700000E05291 /* EmailDetailView.swift */,
+			);
+			path = Notes;
+			sourceTree = "<group>";
+		};
+		2796C1842EEB548300E05291 /* Meetings */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1A02EEB55F800E05291 /* MeetingListView.swift */,
+			);
+			path = Meetings;
+			sourceTree = "<group>";
+		};
+		2796C1C52EEB590000E05291 /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tasks;
+			sourceTree = "<group>";
+		};
+		2796C1F42EEB800000E05291 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1EF2EEB800000E05291 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		2796C1F52EEB800000E05291 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +244,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				2796C1592EEB51D800E05291 /* QuillStack */,
 			);
 			name = QuillStack;
 			packageProductDependencies = (
@@ -82,6 +264,7 @@
 				TargetAttributes = {
 					2796C1562EEB51D800E05291 = {
 						CreatedOnToolsVersion = 26.1.1;
+						LastSwiftMigration = 2610;
 					};
 				};
 			};
@@ -109,6 +292,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2796C1C22EEB580000E05291 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +303,36 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2796C1892EEB554000E05291 /* QuillStackApp.swift in Sources */,
+				2796C1862EEB552B00E05291 /* ContentView.swift in Sources */,
+				2796C1AA2EEB570000E05291 /* CoreDataStack.swift in Sources */,
+				2796C1AB2EEB570000E05291 /* Meeting.swift in Sources */,
+				2796C1AC2EEB570000E05291 /* Note.swift in Sources */,
+				2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */,
+				2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */,
+				2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */,
+				2796C1B02EEB570000E05291 /* MeetingParser.swift in Sources */,
+				2796C1B12EEB570000E05291 /* OCRService.swift in Sources */,
+				2796C1B22EEB570000E05291 /* TextClassifier.swift in Sources */,
+				2796C1B32EEB570000E05291 /* TodoParser.swift in Sources */,
+				2796C1B42EEB570000E05291 /* Constants.swift in Sources */,
+				2796C1B52EEB570000E05291 /* Extensions.swift in Sources */,
+				2796C1B62EEB570000E05291 /* CameraViewModel.swift in Sources */,
+				2796C1B82EEB570000E05291 /* MeetingViewModel.swift in Sources */,
+				2796C1B92EEB570000E05291 /* NoteViewModel.swift in Sources */,
+				2796C1BA2EEB570000E05291 /* CameraPreviewView.swift in Sources */,
+				2796C1BB2EEB570000E05291 /* CameraView.swift in Sources */,
+				2796C1BC2EEB570000E05291 /* ImagePreviewView.swift in Sources */,
+				2796C1BD2EEB570000E05291 /* MeetingListView.swift in Sources */,
+				2796C1BE2EEB570000E05291 /* NoteDetailView.swift in Sources */,
+				2796C1C02EEB570000E05291 /* NoteListView.swift in Sources */,
+				2796C1D02EEB600000E05291 /* QuillStack.xcdatamodeld in Sources */,
+				2796C1E02EEB700000E05291 /* TodoDetailView.swift in Sources */,
+				2796C1E12EEB700000E05291 /* EmailDetailView.swift in Sources */,
+				2796C1F02EEB800000E05291 /* LLMService.swift in Sources */,
+				2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */,
+				2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */,
+				2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,10 +463,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -269,6 +487,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "App/QuillStack-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -280,10 +500,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -300,6 +524,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "App/QuillStack-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -328,6 +553,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2796C1CE2EEB600000E05291 /* QuillStack.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2796C1CF2EEB600000E05291 /* QuillStack.xcdatamodel */,
+			);
+			currentVersion = 2796C1CF2EEB600000E05291 /* QuillStack.xcdatamodel */;
+			path = QuillStack.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 2796C14F2EEB51D800E05291 /* Project object */;
 }

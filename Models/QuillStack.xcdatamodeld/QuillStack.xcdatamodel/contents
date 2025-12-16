@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="25B78" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Meeting" representedClassName="Meeting" syncable="YES">
+        <attribute name="actionItems" optional="YES" attributeType="String"/>
+        <attribute name="agenda" optional="YES" attributeType="String"/>
+        <attribute name="attendees" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" attributeType="Integer 16" defaultValueString="60" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="meetingDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String" defaultValueString=""/>
+        <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="meeting" inverseEntity="Note"/>
+    </entity>
+    <entity name="Note" representedClassName="Note" syncable="YES">
+        <attribute name="content" attributeType="String" defaultValueString=""/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isArchived" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="noteType" attributeType="String" defaultValueString="general"/>
+        <attribute name="ocrConfidence" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="ocrResultData" optional="YES" attributeType="Binary"/>
+        <attribute name="originalImageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="tags" optional="YES" attributeType="String"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>
+        <relationship name="todoItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TodoItem" inverseName="note" inverseEntity="TodoItem"/>
+    </entity>
+    <entity name="TodoItem" representedClassName="TodoItem" syncable="YES">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="priority" attributeType="String" defaultValueString="normal"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="status" attributeType="String" defaultValueString="todo"/>
+        <attribute name="text" attributeType="String" defaultValueString=""/>
+        <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="todoItems" inverseEntity="Note"/>
+    </entity>
+</model>
