@@ -22,6 +22,7 @@ final class CameraViewModel {
     private let imageProcessor = ImageProcessor()
     private let textClassifier = TextClassifier()
     private let spellCorrector = SpellCorrector()
+    private let settings = SettingsManager.shared
 
     enum CameraError: LocalizedError {
         case unauthorized
@@ -90,11 +91,25 @@ final class CameraViewModel {
                 }
             }
 
-            print("✏️ Final text: \(correctedText)")
+            // Step 5: Apply LLM enhancement if enabled
+            var finalText = correctedText
+            print("🔧 LLM Check - autoEnhanceOCR: \(settings.autoEnhanceOCR), hasAPIKey: \(settings.hasAPIKey)")
+            if settings.autoEnhanceOCR && settings.hasAPIKey {
+                print("🤖 Auto-enhance enabled, calling LLM for \(noteType.rawValue) note...")
+                do {
+                    let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: noteType.rawValue)
+                    finalText = result.enhancedText
+                    print("✨ LLM enhanced text: \(result.enhancedText)")
+                } catch {
+                    print("⚠️ LLM enhancement failed, using spell-corrected text: \(error.localizedDescription)")
+                }
+            }
 
-            // Step 5: Save to Core Data with OCR result
+            print("✏️ Final text: \(finalText)")
+
+            // Step 6: Save to Core Data with OCR result
             await saveNote(
-                text: correctedText,
+                text: finalText,
                 noteType: noteType,
                 ocrResult: ocrResult,
                 originalImage: image,
@@ -123,31 +138,41 @@ final class CameraViewModel {
     ) async {
         let context = CoreDataStack.shared.newBackgroundContext()
 
+        // Encode OCR result on main actor before entering background context
+        let ocrResultData = try? JSONEncoder().encode(ocrResult)
+        let imageData = originalImage.jpegData(compressionQuality: 0.8)
+        let thumbnailData = thumbnail?.jpegData(compressionQuality: 0.6)
+        let avgConfidence = ocrResult.averageConfidence
+        let lowConfidenceCount = ocrResult.lowConfidenceWords.count
+
         await context.perform {
             // Create note
             let note = Note.create(
                 in: context,
                 content: text,
                 noteType: noteType.rawValue,
-                originalImage: originalImage.jpegData(compressionQuality: 0.8)
+                originalImage: imageData
             )
 
-            note.ocrConfidence = ocrResult.averageConfidence
+            note.ocrConfidence = avgConfidence
+            note.ocrResultData = ocrResultData
 
-            // Store detailed OCR result for confidence highlighting
-            note.ocrResultData = try? JSONEncoder().encode(ocrResult)
-
-            if let thumbnailData = thumbnail?.jpegData(compressionQuality: 0.6) {
+            if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData
             }
 
             // Parse based on note type
             switch noteType {
             case .todo:
-                self.parseTodos(from: text, note: note, context: context)
+                let parser = TodoParser(context: context)
+                let todos = parser.parseTodos(from: text, note: note)
+                print("📝 Parsed \(todos.count) todo items from note")
 
             case .meeting:
-                self.parseMeeting(from: text, note: note, context: context)
+                let parser = MeetingParser(context: context)
+                if let meeting = parser.parseMeeting(from: text, note: note) {
+                    print("📅 Parsed meeting: \(meeting.title)")
+                }
 
             case .email, .general:
                 break // No special parsing needed
@@ -155,8 +180,7 @@ final class CameraViewModel {
 
             do {
                 try CoreDataStack.shared.save(context: context)
-                let lowConfidenceCount = ocrResult.lowConfidenceWords.count
-                print("✅ Note saved - Type: \(noteType.displayName), Confidence: \(Int(ocrResult.averageConfidence * 100))%, Low-confidence words: \(lowConfidenceCount)")
+                print("✅ Note saved - Type: \(noteType.displayName), Confidence: \(Int(avgConfidence * 100))%, Low-confidence words: \(lowConfidenceCount)")
 
                 // Post notification for UI refresh
                 NotificationCenter.default.post(
@@ -169,20 +193,6 @@ final class CameraViewModel {
                 }
                 print("❌ Failed to save note: \(error)")
             }
-        }
-    }
-
-    private nonisolated func parseTodos(from text: String, note: Note, context: NSManagedObjectContext) {
-        let parser = TodoParser(context: context)
-        let todos = parser.parseTodos(from: text, note: note)
-
-        print("📝 Parsed \(todos.count) todo items from note")
-    }
-
-    private nonisolated func parseMeeting(from text: String, note: Note, context: NSManagedObjectContext) {
-        let parser = MeetingParser(context: context)
-        if let meeting = parser.parseMeeting(from: text, note: note) {
-            print("📅 Parsed meeting: \(meeting.title)")
         }
     }
 }

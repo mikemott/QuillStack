@@ -16,7 +16,6 @@ struct EmailDetailView: View {
     @State private var bodyContent: String = ""
     @State private var showingMailComposer = false
     @State private var showingMailError = false
-    @State private var isEditingBody = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -43,34 +42,14 @@ struct EmailDetailView: View {
                         Divider()
                             .background(Color.forestDark.opacity(0.1))
 
-                        // Body - with confidence highlighting
-                        VStack(alignment: .leading, spacing: 8) {
-                            if isEditingBody {
-                                TextEditor(text: $bodyContent)
-                                    .font(.serifBody(16, weight: .regular))
-                                    .foregroundColor(.textDark)
-                                    .lineSpacing(6)
-                                    .scrollContentBackground(.hidden)
-                                    .frame(minHeight: 300)
-                            } else {
-                                // Show confidence highlighting when not editing
-                                ConfidenceTextView(
-                                    text: $bodyContent,
-                                    ocrResult: bodyOCRResult,
-                                    onTextChanged: {
-                                        saveChanges()
-                                    }
-                                )
-                                .frame(minHeight: 300, alignment: .topLeading)
-                                .onTapGesture {
-                                    // Enter edit mode if no OCR highlighting
-                                    if bodyOCRResult == nil || !settings.showLowConfidenceHighlights {
-                                        isEditingBody = true
-                                    }
-                                }
-                            }
-                        }
-                        .padding(16)
+                        // Body - always editable
+                        TextEditor(text: $bodyContent)
+                            .font(.serifBody(16, weight: .regular))
+                            .foregroundColor(.textDark)
+                            .lineSpacing(6)
+                            .scrollContentBackground(.hidden)
+                            .frame(minHeight: 300)
+                            .padding(16)
                     }
                 }
                 .background(
@@ -201,21 +180,6 @@ struct EmailDetailView: View {
 
     private var bottomBar: some View {
         HStack(spacing: 16) {
-            // Edit/Done toggle for body
-            Button(action: { isEditingBody.toggle() }) {
-                HStack(spacing: 6) {
-                    Image(systemName: isEditingBody ? "checkmark" : "pencil")
-                        .font(.system(size: 16, weight: .medium))
-                    Text(isEditingBody ? "Done" : "Edit")
-                        .font(.serifCaption(13, weight: .medium))
-                }
-                .foregroundColor(isEditingBody ? .forestDark : .textDark)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(isEditingBody ? Color.forestDark.opacity(0.15) : Color.clear)
-                .cornerRadius(6)
-            }
-
             Button(action: copyContent) {
                 Image(systemName: "doc.on.doc")
                     .font(.system(size: 20, weight: .medium))
@@ -257,24 +221,6 @@ struct EmailDetailView: View {
     }
 
     // MARK: - Helpers
-
-    /// Extract body-relevant OCR result from the full note OCR
-    private var bodyOCRResult: OCRResult? {
-        guard let fullResult = note.ocrResult else { return nil }
-
-        // Filter out lines that are part of To:/Subject: fields
-        // Keep only body content lines for confidence highlighting
-        let bodyLines = fullResult.lines.filter { line in
-            let text = line.fullText.lowercased().trimmingCharacters(in: .whitespaces)
-            let isToLine = text.hasPrefix("to:") || text.hasPrefix("to :")
-            let isSubjectLine = text.hasPrefix("subject:") || text.hasPrefix("subj:")
-            let isTrigger = text.contains("#email") || text.contains("# email")
-            return !isToLine && !isSubjectLine && !isTrigger
-        }
-
-        guard !bodyLines.isEmpty else { return nil }
-        return OCRResult(lines: bodyLines)
-    }
 
     private var formattedDate: String {
         let calendar = Calendar.current

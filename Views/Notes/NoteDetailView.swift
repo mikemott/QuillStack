@@ -11,7 +11,6 @@ import CoreData
 struct NoteDetailView: View {
     @ObservedObject var note: Note
     @State private var editedContent: String = ""
-    @State private var isEditing: Bool = false
     @State private var showingEnhanceSheet: Bool = false
     @State private var isEnhancing: Bool = false
     @State private var enhanceError: String?
@@ -27,36 +26,14 @@ struct NoteDetailView: View {
                 // Slim Header
                 slimHeader
 
-                // Content area - switches between confidence view and editor
-                if isEditing {
-                    // Editable content area - TextEditor handles its own scrolling
-                    TextEditor(text: $editedContent)
-                        .font(.serifBody(17, weight: .regular))
-                        .foregroundColor(.textDark)
-                        .lineSpacing(8)
-                        .scrollContentBackground(.hidden)
-                        .padding(20)
-                        .background(contentBackground)
-                } else {
-                    // Confidence text view with tappable words
-                    ScrollView {
-                        ConfidenceTextView(
-                            text: $editedContent,
-                            ocrResult: note.ocrResult,
-                            onTextChanged: {
-                                saveChanges()
-                            }
-                        )
-                        .padding(20)
-                    }
+                // Content area - always editable
+                TextEditor(text: $editedContent)
+                    .font(.serifBody(17, weight: .regular))
+                    .foregroundColor(.textDark)
+                    .lineSpacing(8)
+                    .scrollContentBackground(.hidden)
+                    .padding(20)
                     .background(contentBackground)
-                    .onTapGesture {
-                        // If tapping outside a word, enter edit mode
-                        if note.ocrResult == nil || !settings.showLowConfidenceHighlights {
-                            isEditing = true
-                        }
-                    }
-                }
 
                 // Bottom action bar
                 bottomBar
@@ -69,12 +46,6 @@ struct NoteDetailView: View {
         .onChange(of: editedContent) { _, newValue in
             // Auto-save on every change
             if newValue != note.content {
-                saveChanges()
-            }
-        }
-        .onChange(of: isEditing) { _, newEditing in
-            if !newEditing {
-                // Save when exiting edit mode
                 saveChanges()
             }
         }
@@ -166,21 +137,6 @@ struct NoteDetailView: View {
 
     private var bottomBar: some View {
         HStack(spacing: 16) {
-            // Edit/Done toggle
-            Button(action: { isEditing.toggle() }) {
-                HStack(spacing: 6) {
-                    Image(systemName: isEditing ? "checkmark" : "pencil")
-                        .font(.system(size: 16, weight: .medium))
-                    Text(isEditing ? "Done" : "Edit")
-                        .font(.serifCaption(13, weight: .medium))
-                }
-                .foregroundColor(isEditing ? .forestDark : .textDark)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(isEditing ? Color.forestDark.opacity(0.15) : Color.clear)
-                .cornerRadius(6)
-            }
-
             // AI Enhance button (only show if API key configured)
             if settings.hasAPIKey {
                 Button(action: { showingEnhanceSheet = true }) {
@@ -305,7 +261,7 @@ struct NoteDetailView: View {
 
         Task {
             do {
-                let result = try await LLMService.shared.enhanceOCRText(editedContent)
+                let result = try await LLMService.shared.enhanceOCRText(editedContent, noteType: note.noteType)
                 await MainActor.run {
                     editedContent = result.enhancedText
                     saveChanges()

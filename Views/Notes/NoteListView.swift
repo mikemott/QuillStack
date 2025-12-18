@@ -154,50 +154,51 @@ struct NoteListView: View {
     // MARK: - Note Grid
 
     private var noteGridContent: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(viewModel.notes, id: \.objectID) { note in
-                    NoteCardView(note: note)
-                        .onTapGesture {
-                            selectedNote = note
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button {
-                                withAnimation {
-                                    viewModel.archiveNote(note)
-                                }
-                            } label: {
-                                Label("Archive", systemImage: "archivebox")
-                            }
-                            .tint(.orange)
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                withAnimation {
-                                    viewModel.deleteNote(note)
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            .tint(.red)
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
+        List {
+            ForEach(viewModel.notes, id: \.objectID) { note in
+                NoteCardView(note: note)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .onTapGesture {
+                        selectedNote = note
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            withAnimation {
                                 viewModel.deleteNote(note)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
                             }
-
-                            Button {
-                                viewModel.archiveNote(note)
-                            } label: {
-                                Label("Archive", systemImage: "archivebox")
-                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
                         }
-                }
+                    }
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button {
+                            withAnimation {
+                                viewModel.archiveNote(note)
+                            }
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+                        .tint(.orange)
+                    }
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            viewModel.deleteNote(note)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+
+                        Button {
+                            viewModel.archiveNote(note)
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+                    }
             }
-            .padding(16)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 
     private func archiveNote(_ note: Note) {
@@ -211,6 +212,8 @@ struct NoteListView: View {
             TodoDetailView(note: note)
         case "email":
             EmailDetailView(note: note)
+        case "meeting":
+            MeetingDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }

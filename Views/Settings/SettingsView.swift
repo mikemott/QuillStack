@@ -68,7 +68,10 @@ struct SettingsView: View {
                                 SecureField("sk-ant-...", text: $apiKeyInput)
                             }
                         }
+                        .textFieldStyle(.plain)
                         .font(.system(size: 14, design: .monospaced))
+                        .foregroundStyle(Color.black)
+                        .tint(.black)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
 

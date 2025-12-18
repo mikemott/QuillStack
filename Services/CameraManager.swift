@@ -23,7 +23,7 @@ final class CameraManager: NSObject {
     // Using nonisolated(unsafe) because AVCaptureSession requires background queue access
     nonisolated(unsafe) private let session = AVCaptureSession()
     nonisolated(unsafe) private let photoOutput = AVCapturePhotoOutput()
-    nonisolated(unsafe) private var currentCameraPosition: AVCaptureDevice.Position = .back
+    @ObservationIgnored private var _currentCameraPosition: AVCaptureDevice.Position = .back
 
     private let sessionQueue = DispatchQueue(label: "camera.session.queue")
 
@@ -83,12 +83,13 @@ final class CameraManager: NSObject {
     // MARK: - Camera Setup
 
     private func setupAndStartSession() {
+        let position = _currentCameraPosition
         sessionQueue.async { [self] in
-            configureSessionOnQueue()
+            configureSessionOnQueue(cameraPosition: position)
         }
     }
 
-    private nonisolated func configureSessionOnQueue() {
+    private nonisolated func configureSessionOnQueue(cameraPosition: AVCaptureDevice.Position) {
         // Stop session if running (for reconfiguration)
         if session.isRunning {
             session.stopRunning()
@@ -104,7 +105,7 @@ final class CameraManager: NSObject {
         // Configure input
         guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                     for: .video,
-                                                    position: currentCameraPosition) else {
+                                                    position: cameraPosition) else {
             Task { @MainActor in
                 self.isCameraUnavailable = true
             }
@@ -211,7 +212,8 @@ final class CameraManager: NSObject {
     // MARK: - Camera Position
 
     func switchCamera() {
-        currentCameraPosition = currentCameraPosition == .back ? .front : .back
+        _currentCameraPosition = _currentCameraPosition == .back ? .front : .back
+        let position = _currentCameraPosition
 
         sessionQueue.async { [self] in
             // Stop and reconfigure
@@ -221,7 +223,7 @@ final class CameraManager: NSObject {
             }
 
             // Reconfigure with new camera position
-            configureSessionOnQueue()
+            configureSessionOnQueue(cameraPosition: position)
         }
     }
 

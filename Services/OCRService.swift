@@ -12,13 +12,13 @@ import UIKit
 
 /// Represents a single recognized word with confidence
 struct RecognizedWord: Identifiable, Codable, Sendable {
-    let id: UUID
-    let text: String
-    let confidence: Float
-    let alternatives: [String]
-    let boundingBox: CGRect?
+    nonisolated let id: UUID
+    nonisolated let text: String
+    nonisolated let confidence: Float
+    nonisolated let alternatives: [String]
+    nonisolated let boundingBox: CGRect?
 
-    init(text: String, confidence: Float, alternatives: [String] = [], boundingBox: CGRect? = nil) {
+    nonisolated init(text: String, confidence: Float, alternatives: [String] = [], boundingBox: CGRect? = nil) {
         self.id = UUID()
         self.text = text
         self.confidence = confidence
@@ -26,27 +26,27 @@ struct RecognizedWord: Identifiable, Codable, Sendable {
         self.boundingBox = boundingBox
     }
 
-    var isLowConfidence: Bool {
+    nonisolated var isLowConfidence: Bool {
         confidence < 0.7
     }
 
-    var isMediumConfidence: Bool {
+    nonisolated var isMediumConfidence: Bool {
         confidence >= 0.7 && confidence < 0.85
     }
 
-    var isHighConfidence: Bool {
+    nonisolated var isHighConfidence: Bool {
         confidence >= 0.85
     }
 }
 
 /// Represents a line of recognized text
 struct RecognizedLine: Identifiable, Codable, Sendable {
-    let id: UUID
-    let words: [RecognizedWord]
-    let fullText: String
-    let lineConfidence: Float
+    nonisolated let id: UUID
+    nonisolated let words: [RecognizedWord]
+    nonisolated let fullText: String
+    nonisolated let lineConfidence: Float
 
-    init(words: [RecognizedWord]) {
+    nonisolated init(words: [RecognizedWord]) {
         self.id = UUID()
         self.words = words
         self.fullText = words.map { $0.text }.joined(separator: " ")
@@ -56,12 +56,12 @@ struct RecognizedLine: Identifiable, Codable, Sendable {
 
 /// Complete OCR result with detailed word-level data
 struct OCRResult: Codable, Sendable {
-    let lines: [RecognizedLine]
-    let fullText: String
-    let averageConfidence: Float
-    let lowConfidenceWords: [RecognizedWord]
+    nonisolated let lines: [RecognizedLine]
+    nonisolated let fullText: String
+    nonisolated let averageConfidence: Float
+    nonisolated let lowConfidenceWords: [RecognizedWord]
 
-    init(lines: [RecognizedLine]) {
+    nonisolated init(lines: [RecognizedLine]) {
         self.lines = lines
         self.fullText = lines.map { $0.fullText }.joined(separator: "\n")
 
@@ -74,7 +74,7 @@ struct OCRResult: Codable, Sendable {
 // MARK: - OCR Service
 
 class OCRService {
-    enum OCRError: Error {
+    nonisolated enum OCRError: Error {
         case noTextDetected
         case processingFailed
         case lowConfidence
@@ -84,7 +84,7 @@ class OCRService {
     private let imageProcessor = ImageProcessor()
 
     // Common words in emails and handwritten notes to improve recognition
-    private let customVocabulary = [
+    private nonisolated let customVocabulary = [
         // Email-specific
         "To", "From", "Subject", "Dear", "Hi", "Hello", "Sincerely", "Regards",
         "Best", "Thanks", "Thank", "Please", "Reply", "Forward", "Sent", "Received",
@@ -171,7 +171,7 @@ class OCRService {
     }
 
     /// Parse words from a line and estimate per-word confidence
-    private func parseWordsFromLine(lineText: String, lineConfidence: Float, alternatives: [String]) -> [RecognizedWord] {
+    nonisolated private func parseWordsFromLine(lineText: String, lineConfidence: Float, alternatives: [String]) -> [RecognizedWord] {
         let words = lineText.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
 
         return words.enumerated().map { index, word in

@@ -27,8 +27,8 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var meeting: Meeting?
 
     /// Decoded OCR result for confidence highlighting
-    /// Note: Access from appropriate managed object context
-    var ocrResult: OCRResult? {
+    /// Note: Access from main actor context for UI display
+    @MainActor var ocrResult: OCRResult? {
         get {
             guard let data = ocrResultData else { return nil }
             return try? JSONDecoder().decode(OCRResult.self, from: data)
