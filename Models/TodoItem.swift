@@ -18,6 +18,7 @@ public class TodoItem: NSManagedObject, Identifiable {
     @NSManaged public var createdAt: Date
     @NSManaged public var status: String // "todo", "inProgress", "done"
     @NSManaged public var sortOrder: Int16
+    @NSManaged public var remindersIdentifier: String? // Links to exported EKReminder
 
     // Relationship
     @NSManaged public var note: Note?

@@ -12,7 +12,11 @@ struct TodoDetailView: View {
     @ObservedObject var note: Note
     @State private var tasks: [ParsedTask] = []
     @State private var newTaskText: String = ""
+    @State private var showingExportSheet: Bool = false
+    @State private var showingSummarySheet: Bool = false
+    @State private var showingRemindersSheet: Bool = false
     @FocusState private var isAddingTask: Bool
+    @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -50,6 +54,18 @@ struct TodoDetailView: View {
         .navigationBarHidden(true)
         .onAppear {
             parseTasks()
+        }
+        .sheet(isPresented: $showingExportSheet) {
+            ExportSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingSummarySheet) {
+            SummarySheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingRemindersSheet) {
+            ExportToRemindersSheet(tasks: tasks)
+                .presentationDetents([.medium, .large])
         }
     }
 
@@ -162,32 +178,61 @@ struct TodoDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 20) {
+            // AI menu (only show if API key configured)
+            if settings.hasAPIKey {
+                Menu {
+                    Button(action: { showingSummarySheet = true }) {
+                        Label("Summarize", systemImage: "text.quote")
+                    }
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.forestDark)
+                }
+            }
+
+            // Export
+            Button(action: { showingExportSheet = true }) {
+                Image(systemName: "arrow.up.doc")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+
+            // Share
             Button(action: shareNote) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
 
+            // Copy
             Button(action: copyContent) {
-                Image(systemName: "doc.on.doc")
+                Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
 
             Spacer()
 
-            // Sync status (placeholder for Trello integration)
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 14, weight: .medium))
-                Text("Not synced")
-                    .font(.serifCaption(12, weight: .regular))
+            // Export to Reminders
+            Button(action: { showingRemindersSheet = true }) {
+                Image(systemName: "checklist")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.badgeTodo, Color.badgeTodo.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(10)
             }
-            .foregroundColor(.textMedium.opacity(0.6))
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
             Rectangle()
@@ -211,16 +256,7 @@ struct TodoDetailView: View {
     }
 
     private var formattedDate: String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(note.createdAt) {
-            return "Today"
-        } else if calendar.isDateInYesterday(note.createdAt) {
-            return "Yesterday"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return formatter.string(from: note.createdAt)
-        }
+        note.createdAt.shortFormat
     }
 
     private var completedCount: Int {

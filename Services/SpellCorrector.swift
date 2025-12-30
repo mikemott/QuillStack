@@ -118,7 +118,7 @@ class SpellCorrector {
     ]
 
     /// Corrects spelling in the given text using on-device spell checker
-    func correctSpelling(_ text: String) -> CorrectionResult {
+    func correctSpelling(_ text: String, learnedCorrections: [String: String]? = nil) -> CorrectionResult {
         var correctedText = text
         var corrections: [SpellCorrection] = []
 
@@ -158,7 +158,30 @@ class SpellCorrector {
             }
         }
 
-        // Third pass: Use UITextChecker for remaining errors
+        // Third pass: Apply learned corrections from user edits
+        if let learnedCorrections = learnedCorrections {
+            for (wrong, right) in learnedCorrections {
+                // Use word boundary regex to avoid matching substrings
+                let pattern = "\\b\(NSRegularExpression.escapedPattern(for: wrong))\\b"
+                if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                    let nsText = correctedText as NSString
+                    let matches = regex.matches(in: correctedText, range: NSRange(location: 0, length: nsText.length))
+
+                    // Process matches in reverse order to preserve indices
+                    for match in matches.reversed() {
+                        let original = nsText.substring(with: match.range)
+                        correctedText = (correctedText as NSString).replacingCharacters(in: match.range, with: right)
+                        corrections.append(SpellCorrection(
+                            original: original,
+                            corrected: right,
+                            source: .learnedCorrection
+                        ))
+                    }
+                }
+            }
+        }
+
+        // Fourth pass: Use UITextChecker for remaining errors
         let textCheckerCorrections = correctWithTextChecker(correctedText)
         for correction in textCheckerCorrections {
             if let range = correctedText.range(of: correction.original) {
@@ -321,15 +344,16 @@ struct SpellCorrection {
 }
 
 enum CorrectionSource {
-    case ocrDictionary  // From our known OCR error dictionary
-    case textChecker    // From UITextChecker
+    case ocrDictionary      // From our known OCR error dictionary
+    case textChecker        // From UITextChecker
+    case learnedCorrection  // From user's learned corrections
 }
 
 // MARK: - Email-Specific Post-Processing
 
 extension SpellCorrector {
     /// Structure-aware correction for email content
-    func correctEmailContent(_ text: String) -> CorrectionResult {
+    func correctEmailContent(_ text: String, learnedCorrections: [String: String]? = nil) -> CorrectionResult {
         var lines = text.components(separatedBy: "\n")
         var allCorrections: [SpellCorrection] = []
 
@@ -365,8 +389,8 @@ extension SpellCorrector {
                 continue
             }
 
-            // General spell correction for body lines
-            let lineResult = correctSpelling(line)
+            // General spell correction for body lines (with learned corrections)
+            let lineResult = correctSpelling(line, learnedCorrections: learnedCorrections)
             if lineResult.hasCorrections {
                 lines[i] = lineResult.correctedText
                 allCorrections.append(contentsOf: lineResult.corrections)

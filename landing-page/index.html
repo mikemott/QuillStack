@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuillStack — Transform Handwriting Into Action</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* QuillStack Color Palette */
+            --forest-dark: #1e4d2f;
+            --forest-medium: #143d23;
+            --forest-light: #e8f0e8;
+            --cream-light: #f4f8f4;
+            --cream-medium: #eef5ee;
+            --paper-beige: #faf5f0;
+            --paper-tan: #f8f0e4;
+            --text-dark: #2d4a2f;
+            --text-medium: #4a6b4f;
+            --text-light: #d4e0d4;
+
+            /* Badge colors */
+            --badge-todo: #b8860b;
+            --badge-meeting: #146464;
+            --badge-email: #8b4577;
+            --badge-prompt: #5b4d99;
+
+            /* Typography */
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Crimson Pro', Georgia, serif;
+            --font-handwritten: 'Caveat', cursive;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 2rem;
+            --space-xl: 4rem;
+            --space-2xl: 8rem;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--cream-light);
+            overflow-x: hidden;
+        }
+
+        /* Paper Texture Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            z-index: 9999;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--forest-dark);
+        }
+
+        h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); }
+        h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+
+        p {
+            color: var(--text-medium);
+        }
+
+        .handwritten {
+            font-family: var(--font-handwritten);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        section {
+            padding: var(--space-2xl) 0;
+        }
+
+        /* Decorative Elements */
+        .flourish {
+            display: block;
+            width: 120px;
+            height: 30px;
+            margin: var(--space-lg) auto;
+            background: var(--forest-dark);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30'%3E%3Cpath d='M0 15 Q30 0 60 15 Q90 30 120 15' stroke='black' stroke-width='2' fill='none'/%3E%3Ccircle cx='60' cy='15' r='4'/%3E%3C/svg%3E");
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--space-md) 0;
+            background: linear-gradient(to bottom, var(--cream-light) 60%, transparent);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: var(--paper-beige);
+            box-shadow: 0 2px 20px rgba(30, 77, 47, 0.08);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--forest-dark);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 28px;
+            background: var(--paper-beige);
+            border-radius: 2px;
+            transform: rotate(-5deg);
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 22px;
+            background: var(--forest-dark);
+            transform: rotate(25deg) translateX(4px);
+            border-radius: 1px;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            letter-spacing: -0.02em;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        nav a {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--forest-dark);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--forest-dark);
+            color: var(--cream-light);
+        }
+
+        .btn-primary:hover {
+            background: var(--forest-medium);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(30, 77, 47, 0.25);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--forest-dark);
+            border: 2px solid var(--forest-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--forest-dark);
+            color: var(--cream-light);
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--forest-light) 0%, transparent 70%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .hero-text {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 0.5rem 1rem;
+            background: var(--paper-tan);
+            border-radius: 100px;
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--forest-dark);
+            margin-bottom: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+        }
+
+        .hero-badge::before {
+            content: '\2726';
+            color: var(--badge-todo);
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--forest-medium);
+            position: relative;
+        }
+
+        .hero h1 em::after {
+            content: '';
+            position: absolute;
+            bottom: 0.1em;
+            left: 0;
+            right: 0;
+            height: 0.15em;
+            background: var(--badge-todo);
+            opacity: 0.4;
+            transform: skewX(-5deg);
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xl);
+            max-width: 500px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        /* Phone Mockup */
+        .phone-mockup {
+            position: relative;
+            width: 320px;
+            height: 650px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .phone-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 45px;
+            padding: 12px;
+            box-shadow:
+                0 50px 100px rgba(30, 77, 47, 0.2),
+                0 20px 40px rgba(30, 77, 47, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: rotateY(-5deg) rotateX(2deg);
+            transition: transform 0.5s ease;
+        }
+
+        .phone-frame:hover {
+            transform: rotateY(0deg) rotateX(0deg);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--cream-light);
+            border-radius: 35px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 34px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen-content {
+            padding: 50px 20px 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+        }
+
+        .app-icon-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--forest-dark);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cream-light);
+            font-size: 1.25rem;
+        }
+
+        .note-card {
+            background: var(--paper-beige);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(30, 77, 47, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-card:hover {
+            transform: translateX(4px);
+            box-shadow: -4px 4px 0 var(--forest-light);
+        }
+
+        .note-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .note-type-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-todo { background: var(--badge-todo); color: white; }
+        .badge-meeting { background: var(--badge-meeting); color: white; }
+        .badge-email { background: var(--badge-email); color: white; }
+        .badge-prompt { background: var(--badge-prompt); color: white; }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+        }
+
+        .note-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            margin-bottom: 4px;
+        }
+
+        .note-preview {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+        }
+
+        .confidence-word {
+            border-bottom: 2px dotted #e6a23c;
+            cursor: help;
+        }
+
+        /* Floating annotations */
+        .annotation {
+            position: absolute;
+            font-family: var(--font-handwritten);
+            font-size: 1.1rem;
+            color: var(--forest-dark);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .annotation-1 {
+            top: 10%;
+            right: -20%;
+            transform: rotate(8deg);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .annotation-2 {
+            bottom: 20%;
+            left: -25%;
+            transform: rotate(-5deg);
+            animation: float 4s ease-in-out infinite 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(8deg); }
+            50% { transform: translateY(-10px) rotate(8deg); }
+        }
+
+        .annotation-arrow {
+            display: block;
+            width: 60px;
+            height: 30px;
+            margin-top: 5px;
+        }
+
+        /* ===== TOUR SECTION ===== */
+        .tour-section {
+            background: var(--paper-beige);
+            position: relative;
+        }
+
+        .tour-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--cream-light), var(--paper-beige));
+        }
+
+        .tour-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+
+        .tour-header h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .tour-subtitle {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Interactive Tour */
+        .tour-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tour-manuscript {
+            background: var(--paper-tan);
+            border-radius: 8px;
+            padding: var(--space-xl);
+            box-shadow:
+                0 20px 60px rgba(30, 77, 47, 0.1),
+                inset 0 0 100px rgba(30, 77, 47, 0.03);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+            position: relative;
+            min-height: 600px;
+        }
+
+        .manuscript-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 35px,
+                rgba(30, 77, 47, 0.05) 35px,
+                rgba(30, 77, 47, 0.05) 36px
+            );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        .tour-progress {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-light);
+            border: 2px solid var(--forest-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--forest-dark);
+            transform: scale(1.3);
+        }
+
+        .progress-dot:hover {
+            background: var(--forest-medium);
+        }
+
+        /* Tour Slides */
+        .tour-slides {
+            position: relative;
+            min-height: 450px;
+        }
+
+        .tour-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .tour-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .slide-text {
+            padding-right: var(--space-lg);
+        }
+
+        .slide-chapter {
+            font-family: var(--font-handwritten);
+            font-size: 1.5rem;
+            color: var(--badge-todo);
+            margin-bottom: var(--space-sm);
+        }
+
+        .slide-title {
+            font-size: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .slide-description {
+            font-size: 1.1rem;
+            margin-bottom: var(--space-lg);
+        }
+
+        .slide-features {
+            list-style: none;
+        }
+
+        .slide-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            font-size: 1rem;
+        }
+
+        .slide-features li::before {
+            content: '\2713';
+            color: var(--forest-dark);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .slide-visual {
+            position: relative;
+        }
+
+        .feature-illustration {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 4/3;
+            background: var(--cream-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(30, 77, 47, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Feature-specific illustrations */
+        .illustration-camera {
+            background: linear-gradient(135deg, var(--forest-light) 0%, var(--cream-light) 100%);
+        }
+
+        .camera-icon {
+            width: 120px;
+            height: 100px;
+            background: var(--forest-dark);
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-lens {
+            width: 50px;
+            height: 50px;
+            background: var(--cream-light);
+            border-radius: 50%;
+            border: 4px solid var(--forest-medium);
+        }
+
+        .flash-indicator {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background: var(--badge-todo);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .illustration-ocr {
+            background: var(--paper-beige);
+            padding: 30px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ocr-line {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ocr-word {
+            font-family: var(--font-handwritten);
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+        }
+
+        .ocr-word.low-confidence {
+            border-bottom: 3px dotted #e6a23c;
+            position: relative;
+        }
+
+        .ocr-word.low-confidence::after {
+            content: '?';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            font-size: 0.75rem;
+            background: #e6a23c;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+        }
+
+        .illustration-classify {
+            background: var(--cream-light);
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 30px;
+        }
+
+        .classify-badge {
+            padding: 12px 20px;
+            border-radius: 100px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .classify-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .illustration-enhance {
+            background: linear-gradient(135deg, var(--badge-prompt) 0%, var(--forest-dark) 100%);
+            color: white;
+            flex-direction: column;
+            padding: 30px;
+        }
+
+        .enhance-before, .enhance-after {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .enhance-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .enhance-text {
+            font-family: var(--font-handwritten);
+            font-size: 1.1rem;
+        }
+
+        .enhance-arrow {
+            font-size: 2rem;
+            margin: 10px 0;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        .illustration-github {
+            background: var(--forest-dark);
+            color: white;
+            flex-direction: column;
+            padding: 30px;
+        }
+
+        .github-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .github-icon svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .github-issue {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 280px;
+            text-align: left;
+        }
+
+        .issue-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .issue-labels {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .issue-label {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tour Navigation */
+        .tour-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px dashed rgba(30, 77, 47, 0.2);
+        }
+
+        .tour-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 12px 24px;
+            background: transparent;
+            border: 2px solid var(--forest-dark);
+            border-radius: 100px;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tour-nav-btn:hover {
+            background: var(--forest-dark);
+            color: white;
+        }
+
+        .tour-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .tour-nav-btn:disabled:hover {
+            background: transparent;
+            color: var(--forest-dark);
+        }
+
+        /* ===== FEATURES GRID ===== */
+        .features-section {
+            background: var(--cream-light);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .feature-card {
+            background: var(--paper-beige);
+            border-radius: 20px;
+            padding: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--forest-dark);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(30, 77, 47, 0.12);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--forest-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: var(--forest-dark);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            color: white;
+            margin-bottom: var(--space-md);
+        }
+
+        .cta-section p {
+            color: var(--text-light);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .btn-cta-primary {
+            background: white;
+            color: var(--forest-dark);
+        }
+
+        .btn-cta-primary:hover {
+            background: var(--paper-beige);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-cta-secondary:hover {
+            background: white;
+            color: var(--forest-dark);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--forest-medium);
+            color: var(--text-light);
+            padding: var(--space-xl) 0 var(--space-lg);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .footer-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .footer-logo .logo-text {
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
+        }
+
+        /* ===== HOTSPOT MARKERS ===== */
+        .hotspot {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .hotspot-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--badge-todo);
+            border-radius: 50%;
+            animation: hotspot-pulse 2s ease-in-out infinite;
+        }
+
+        .hotspot-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: var(--badge-todo);
+            border-radius: 50%;
+        }
+
+        @keyframes hotspot-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0.5;
+            }
+        }
+
+        .hotspot-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--forest-dark);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(30, 77, 47, 0.3);
+        }
+
+        .hotspot-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--forest-dark);
+        }
+
+        .hotspot:hover .hotspot-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-15px);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text {
+                order: 1;
+            }
+
+            .hero-visual {
+                order: 0;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                width: 280px;
+                height: 570px;
+            }
+
+            .annotation {
+                display: none;
+            }
+
+            .slide-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .slide-text {
+                padding-right: 0;
+                order: 1;
+            }
+
+            .slide-visual {
+                order: 0;
+                margin-bottom: var(--space-lg);
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .phone-mockup {
+                width: 250px;
+                height: 510px;
+            }
+
+            .tour-manuscript {
+                padding: var(--space-lg);
+            }
+
+            .feature-illustration {
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <div class="header-inner">
+                <a href="#" class="logo">
+                    <div class="logo-icon"></div>
+                    <span class="logo-text">QuillStack</span>
+                </a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#tour">Tour</a>
+                    <a href="#download">Download</a>
+                </nav>
+                <a href="#download" class="btn btn-primary">Get the App</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">Now with Handwriting Learning</div>
+                    <h1>Transform <em>Handwriting</em> Into Action</h1>
+                    <p class="hero-description">
+                        Capture your handwritten notes with your camera, and watch as QuillStack transforms them into organized, searchable, and actionable digital content.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#download" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            Download for iOS
+                        </a>
+                        <a href="#tour" class="btn btn-secondary">Take the Tour</a>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="annotation annotation-1">
+                        <span>Smart OCR</span>
+                        <svg class="annotation-arrow" viewBox="0 0 60 30">
+                            <path d="M50 5 Q30 15 10 25" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4 2"/>
+                            <path d="M15 20 L10 25 L8 18" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+
+                    <div class="phone-mockup">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <div class="phone-notch"></div>
+                                <div class="screen-content">
+                                    <div class="app-header">
+                                        <span class="app-title">Notes</span>
+                                        <div class="app-icon-btn">+</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-todo">Todo</span>
+                                            <span class="note-date">Today</span>
+                                        </div>
+                                        <div class="note-title">Project Tasks</div>
+                                        <div class="note-preview">
+                                            <span>&#9745; Review </span><span class="confidence-word">designs</span><br>
+                                            <span>&#9744; Update documentation</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-meeting">Meeting</span>
+                                            <span class="note-date">Yesterday</span>
+                                        </div>
+                                        <div class="note-title">Sprint Planning</div>
+                                        <div class="note-preview">Attendees: Sarah, Mike, Alex...</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-prompt">Prompt</span>
+                                            <span class="note-date">Dec 28</span>
+                                        </div>
+                                        <div class="note-title">Add dark mode toggle</div>
+                                        <div class="note-preview">Feature request for settings...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotspots on phone -->
+                        <div class="hotspot" style="top: 15%; right: 5%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">Tap to capture new note</div>
+                        </div>
+
+                        <div class="hotspot" style="top: 38%; left: 15%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">Auto-classified note types</div>
+                        </div>
+
+                        <div class="hotspot" style="top: 45%; right: 25%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">Low-confidence words highlighted</div>
+                        </div>
+                    </div>
+
+                    <div class="annotation annotation-2">
+                        <svg class="annotation-arrow" viewBox="0 0 60 30" style="transform: scaleX(-1);">
+                            <path d="M50 25 Q30 15 10 5" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4 2"/>
+                            <path d="M15 10 L10 5 L8 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        <span>Auto-classify!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Tour Section -->
+    <section class="tour-section" id="tour">
+        <div class="container">
+            <div class="tour-header">
+                <span class="flourish"></span>
+                <h2>Discover QuillStack</h2>
+                <p class="tour-subtitle">
+                    Take a guided tour through the features that make capturing and organizing handwritten notes effortless.
+                </p>
+            </div>
+
+            <div class="tour-container">
+                <div class="tour-manuscript">
+                    <div class="manuscript-lines"></div>
+
+                    <div class="tour-progress">
+                        <button class="progress-dot active" data-slide="0" aria-label="Slide 1"></button>
+                        <button class="progress-dot" data-slide="1" aria-label="Slide 2"></button>
+                        <button class="progress-dot" data-slide="2" aria-label="Slide 3"></button>
+                        <button class="progress-dot" data-slide="3" aria-label="Slide 4"></button>
+                        <button class="progress-dot" data-slide="4" aria-label="Slide 5"></button>
+                    </div>
+
+                    <div class="tour-slides">
+                        <!-- Slide 1: Camera Capture -->
+                        <div class="tour-slide active" data-index="0">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter I</div>
+                                    <h3 class="slide-title">Capture with Precision</h3>
+                                    <p class="slide-description">
+                                        Point your camera at any handwritten note. QuillStack's intelligent capture system automatically detects and enhances your handwriting for optimal OCR accuracy.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Flash toggle for any lighting condition</li>
+                                        <li>Import from your photo library</li>
+                                        <li>Real-time preview and crop</li>
+                                        <li>Multi-page document support</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-camera">
+                                        <div class="camera-icon">
+                                            <div class="camera-lens"></div>
+                                            <div class="flash-indicator">&#9889;</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: OCR with Confidence -->
+                        <div class="tour-slide" data-index="1">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter II</div>
+                                    <h3 class="slide-title">OCR with Confidence</h3>
+                                    <p class="slide-description">
+                                        Our three-pronged OCR system combines Apple's latest Vision framework, intelligent spell correction, and word-level confidence tracking to deliver exceptional accuracy.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Per-word confidence scores</li>
+                                        <li>Low-confidence words highlighted</li>
+                                        <li>Tap to see alternatives</li>
+                                        <li>Learns from your corrections</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-ocr">
+                                        <div class="ocr-line">
+                                            <span class="ocr-word">Meeting</span>
+                                            <span class="ocr-word">with</span>
+                                            <span class="ocr-word low-confidence">Sarah</span>
+                                        </div>
+                                        <div class="ocr-line">
+                                            <span class="ocr-word">at</span>
+                                            <span class="ocr-word">2pm</span>
+                                            <span class="ocr-word low-confidence">tomorrow</span>
+                                        </div>
+                                        <div class="ocr-line">
+                                            <span class="ocr-word">Bring</span>
+                                            <span class="ocr-word low-confidence">designs</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Smart Classification -->
+                        <div class="tour-slide" data-index="2">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter III</div>
+                                    <h3 class="slide-title">Smart Classification</h3>
+                                    <p class="slide-description">
+                                        Simply write a hashtag trigger like #todo# or #email#, and QuillStack automatically routes your note to the right view with purpose-built features.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li><strong>Todo</strong> — Checkable tasks with progress</li>
+                                        <li><strong>Email</strong> — Parse To/Subject, open in Mail</li>
+                                        <li><strong>Meeting</strong> — Attendees, agenda, action items</li>
+                                        <li><strong>Claude Prompt</strong> — Refine and export to GitHub</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-classify">
+                                        <div class="classify-badge" style="background: var(--badge-todo);">
+                                            &#10003; Todo
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-meeting);">
+                                            &#128197; Meeting
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-email);">
+                                            &#9993; Email
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-prompt);">
+                                            &#10024; Prompt
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: LLM Enhancement -->
+                        <div class="tour-slide" data-index="3">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter IV</div>
+                                    <h3 class="slide-title">AI Enhancement</h3>
+                                    <p class="slide-description">
+                                        Tap "Enhance" to have Claude clean up your OCR text, fix remaining errors, and improve formatting—all while preserving your original intent.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Powered by Claude API</li>
+                                        <li>Context-aware corrections</li>
+                                        <li>Works offline (queues for later)</li>
+                                        <li>Your API key, your control</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-enhance">
+                                        <div class="enhance-before">
+                                            <div class="enhance-label">Before</div>
+                                            <div class="enhance-text">mtg w/ sarah tmrw @ 2 - bring dsigns</div>
+                                        </div>
+                                        <div class="enhance-arrow">&#8595;</div>
+                                        <div class="enhance-after">
+                                            <div class="enhance-label">After</div>
+                                            <div class="enhance-text">Meeting with Sarah tomorrow at 2pm — bring designs</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: GitHub Integration -->
+                        <div class="tour-slide" data-index="4">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter V</div>
+                                    <h3 class="slide-title">Handwriting to GitHub Issues</h3>
+                                    <p class="slide-description">
+                                        Write a feature idea with #claude# or #feature#, and QuillStack transforms your rough notes into a well-structured GitHub Issue with one tap.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>LLM refines your prompt</li>
+                                        <li>Suggests labels automatically</li>
+                                        <li>Pick any repository</li>
+                                        <li>Perfect for Claude Code workflows</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-github">
+                                        <div class="github-icon">
+                                            <svg viewBox="0 0 24 24" fill="var(--forest-dark)">
+                                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="github-issue">
+                                            <div class="issue-title">Add dark mode toggle to settings</div>
+                                            <div class="issue-labels">
+                                                <span class="issue-label">enhancement</span>
+                                                <span class="issue-label">ui</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tour-nav">
+                        <button class="tour-nav-btn" id="prevBtn" disabled>
+                            <span class="btn-icon-left">&#8592;</span> Previous
+                        </button>
+                        <button class="tour-nav-btn" id="nextBtn">
+                            Next <span class="btn-icon-right">&#8594;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="features-header">
+                <span class="flourish"></span>
+                <h2>Everything You Need</h2>
+                <p class="tour-subtitle">
+                    Built for people who love writing by hand but need digital organization.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">&#128248;</div>
+                    <h3>Smart Capture</h3>
+                    <p>Flash toggle, photo library import, and real-time preview ensure you get the perfect shot every time.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#128269;</div>
+                    <h3>Confidence Highlighting</h3>
+                    <p>Low-confidence words are underlined so you can review and correct them with a tap.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#129504;</div>
+                    <h3>Handwriting Learning</h3>
+                    <p>QuillStack learns from your corrections and gets better at reading your unique handwriting over time.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#128244;</div>
+                    <h3>Offline Mode</h3>
+                    <p>Capture and save notes without internet. AI enhancement queues up and syncs when you're back online.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#128274;</div>
+                    <h3>Your Keys, Your Data</h3>
+                    <p>Bring your own Claude API key. Your data stays on your device with optional iCloud sync.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#9889;</div>
+                    <h3>Developer Workflow</h3>
+                    <p>Write feature ideas on paper, export them as structured GitHub Issues for Claude Code.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="download">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Notes?</h2>
+                <p>
+                    Join thousands of writers, developers, and note-takers who bridge the analog-digital divide with QuillStack.
+                </p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-cta-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                        </svg>
+                        Download on App Store
+                    </a>
+                    <a href="https://github.com/yourusername/quillstack" class="btn btn-cta-secondary">
+                        View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-icon"></div>
+                    <span class="logo-text">QuillStack</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Support</a>
+                    <a href="#">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 QuillStack. Crafted with care for handwriting lovers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Tour functionality
+        const slides = document.querySelectorAll('.tour-slide');
+        const dots = document.querySelectorAll('.progress-dot');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentSlide = 0;
+
+        function updateButtonText(btn, text, arrowLeft, arrowRight) {
+            // Clear existing content safely
+            while (btn.firstChild) {
+                btn.removeChild(btn.firstChild);
+            }
+
+            if (arrowLeft) {
+                const leftSpan = document.createElement('span');
+                leftSpan.className = 'btn-icon-left';
+                leftSpan.textContent = arrowLeft;
+                btn.appendChild(leftSpan);
+                btn.appendChild(document.createTextNode(' '));
+            }
+
+            btn.appendChild(document.createTextNode(text));
+
+            if (arrowRight) {
+                btn.appendChild(document.createTextNode(' '));
+                const rightSpan = document.createElement('span');
+                rightSpan.className = 'btn-icon-right';
+                rightSpan.textContent = arrowRight;
+                btn.appendChild(rightSpan);
+            }
+        }
+
+        function showSlide(index) {
+            // Clamp index
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+
+            currentSlide = index;
+
+            // Update slides
+            slides.forEach(function(slide, i) {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update dots
+            dots.forEach(function(dot, i) {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Update buttons
+            prevBtn.disabled = index === 0;
+
+            // Update button text on last slide
+            if (index === slides.length - 1) {
+                updateButtonText(nextBtn, 'Start Using', null, '\u2192');
+                nextBtn.disabled = false;
+                nextBtn.onclick = function() {
+                    document.getElementById('download').scrollIntoView({ behavior: 'smooth' });
+                };
+            } else {
+                updateButtonText(nextBtn, 'Next', null, '\u2192');
+                nextBtn.disabled = false;
+                nextBtn.onclick = function() {
+                    showSlide(currentSlide + 1);
+                };
+            }
+        }
+
+        // Event listeners
+        prevBtn.addEventListener('click', function() {
+            showSlide(currentSlide - 1);
+        });
+
+        nextBtn.addEventListener('click', function() {
+            showSlide(currentSlide + 1);
+        });
+
+        dots.forEach(function(dot, index) {
+            dot.addEventListener('click', function() {
+                showSlide(index);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // Only when tour is in viewport
+            const tourSection = document.getElementById('tour');
+            const rect = tourSection.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+            if (isVisible) {
+                if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+                if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add entrance animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach(function(card, index) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease ' + (index * 0.1) + 's';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

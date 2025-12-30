@@ -63,58 +63,88 @@ final class CameraViewModel {
             let noteType = textClassifier.classifyNote(content: ocrResult.fullText)
             print("📋 Classified as: \(noteType.displayName)")
 
-            // Step 4: Apply on-device spell correction
+            // Step 4: Apply on-device spell correction (including learned corrections)
+            let learnedCorrections = HandwritingLearningService.shared.getLearnedCorrections()
+            let learnedCount = learnedCorrections.count
+            if learnedCount > 0 {
+                print("📚 Using \(learnedCount) learned corrections")
+            }
+
             let correctedText: String
             if noteType == .email {
                 // Use email-specific correction for email notes
-                let correction = spellCorrector.correctEmailContent(ocrResult.fullText)
+                // Note: correctEmailContent calls correctSpelling internally, so we pass learned corrections there
+                let correction = spellCorrector.correctEmailContent(ocrResult.fullText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections (email mode):")
                     for c in correction.corrections {
-                        print("   '\(c.original)' → '\(c.corrected)'")
+                        print("   '\(c.original)' → '\(c.corrected)' [\(c.source)]")
                     }
                 } else {
                     print("📝 No spell corrections needed")
                 }
             } else {
                 // Use general spell correction
-                let correction = spellCorrector.correctSpelling(ocrResult.fullText)
+                let correction = spellCorrector.correctSpelling(ocrResult.fullText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections:")
                     for c in correction.corrections {
-                        print("   '\(c.original)' → '\(c.corrected)'")
+                        print("   '\(c.original)' → '\(c.corrected)' [\(c.source)]")
                     }
                 } else {
                     print("📝 No spell corrections needed")
                 }
             }
 
-            // Step 5: Apply LLM enhancement if enabled
+            // Step 5: Apply LLM enhancement if enabled (with offline support)
             var finalText = correctedText
-            print("🔧 LLM Check - autoEnhanceOCR: \(settings.autoEnhanceOCR), hasAPIKey: \(settings.hasAPIKey)")
+            var shouldQueueEnhancement = false
+            let offlineQueue = OfflineQueueService.shared
+
+            print("🔧 LLM Check - autoEnhanceOCR: \(settings.autoEnhanceOCR), hasAPIKey: \(settings.hasAPIKey), isOnline: \(offlineQueue.isOnline)")
+
             if settings.autoEnhanceOCR && settings.hasAPIKey {
-                print("🤖 Auto-enhance enabled, calling LLM for \(noteType.rawValue) note...")
-                do {
-                    let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: noteType.rawValue)
-                    finalText = result.enhancedText
-                    print("✨ LLM enhanced text: \(result.enhancedText)")
-                } catch {
-                    print("⚠️ LLM enhancement failed, using spell-corrected text: \(error.localizedDescription)")
+                if offlineQueue.isOnline {
+                    // Online - try enhancement now
+                    print("🤖 Auto-enhance enabled, calling LLM for \(noteType.rawValue) note...")
+                    do {
+                        let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: noteType.rawValue)
+                        finalText = result.enhancedText
+                        print("✨ LLM enhanced text: \(result.enhancedText)")
+                    } catch {
+                        print("⚠️ LLM enhancement failed, using spell-corrected text: \(error.localizedDescription)")
+                        // Queue for retry if it was a network error
+                        shouldQueueEnhancement = true
+                    }
+                } else {
+                    // Offline - queue for later
+                    print("📴 Offline - queueing enhancement for later")
+                    shouldQueueEnhancement = true
                 }
             }
 
             print("✏️ Final text: \(finalText)")
 
             // Step 6: Save to Core Data with OCR result
-            await saveNote(
+            let noteId = await saveNote(
                 text: finalText,
                 noteType: noteType,
                 ocrResult: ocrResult,
                 originalImage: image,
                 thumbnail: imageProcessor.generateThumbnail(from: image)
             )
+
+            // Step 7: Queue enhancement if needed (offline or failed)
+            if shouldQueueEnhancement, let noteId = noteId {
+                await offlineQueue.enqueue(
+                    noteId: noteId,
+                    text: correctedText,
+                    noteType: noteType.rawValue
+                )
+                print("📥 Enhancement queued for note \(noteId)")
+            }
 
             isProcessing = false
         } catch OCRService.OCRError.noTextDetected {
@@ -135,7 +165,7 @@ final class CameraViewModel {
         ocrResult: OCRResult,
         originalImage: UIImage,
         thumbnail: UIImage?
-    ) async {
+    ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
         // Encode OCR result on main actor before entering background context
@@ -145,7 +175,7 @@ final class CameraViewModel {
         let avgConfidence = ocrResult.averageConfidence
         let lowConfidenceCount = ocrResult.lowConfidenceWords.count
 
-        await context.perform {
+        return await context.perform {
             // Create note
             let note = Note.create(
                 in: context,
@@ -153,6 +183,8 @@ final class CameraViewModel {
                 noteType: noteType.rawValue,
                 originalImage: imageData
             )
+
+            let noteId = note.id
 
             note.ocrConfidence = avgConfidence
             note.ocrResultData = ocrResultData
@@ -174,7 +206,7 @@ final class CameraViewModel {
                     print("📅 Parsed meeting: \(meeting.title)")
                 }
 
-            case .email, .general:
+            case .email, .general, .claudePrompt:
                 break // No special parsing needed
             }
 
@@ -187,11 +219,14 @@ final class CameraViewModel {
                     name: AppConstants.Notifications.noteCreated,
                     object: nil
                 )
+
+                return noteId
             } catch {
                 Task { @MainActor in
                     self.error = .saveFailed
                 }
                 print("❌ Failed to save note: \(error)")
+                return nil
             }
         }
     }

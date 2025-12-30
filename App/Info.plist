@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Camera Usage -->
+	<key>NSCameraUsageDescription</key>
+	<string>QuillStack uses your camera to capture photos of handwritten notes for text recognition.</string>
+
+	<!-- Photo Library (for future import feature) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>QuillStack can import photos of handwritten notes from your library for text recognition.</string>
+
+	<!-- Calendar Access -->
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>QuillStack can create calendar events from your meeting notes.</string>
+
+	<!-- Reminders Access -->
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>QuillStack can export your to-do items to the Reminders app.</string>
+</dict>
+</plist>

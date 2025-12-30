@@ -54,13 +54,37 @@ struct ConfidenceTextView: View {
 
     // MARK: - Corrected Text Display
 
-    /// Shows the corrected text from the binding
-    /// Spell corrections have already been applied, so we just display the text
+    /// Shows the text with low-confidence words highlighted and tappable
     private func correctedTextWithHighlighting(ocrResult: OCRResult) -> some View {
-        Text(text)
-            .font(.serifBody(17, weight: .regular))
-            .foregroundColor(.textDark)
-            .lineSpacing(8)
+        let threshold = settings.lowConfidenceThreshold
+
+        // Build attributed string with highlighted low-confidence words
+        return FlowLayout(spacing: 4) {
+            ForEach(Array(ocrResult.lines.enumerated()), id: \.offset) { lineIndex, line in
+                ForEach(Array(line.words.enumerated()), id: \.offset) { wordIndex, word in
+                    let isLowConfidence = word.confidence < threshold
+
+                    Text(word.text + (wordIndex < line.words.count - 1 ? " " : ""))
+                        .font(.serifBody(17, weight: .regular))
+                        .foregroundColor(isLowConfidence ? .orange : .textDark)
+                        .underline(isLowConfidence, color: .orange.opacity(0.6))
+                        .onTapGesture {
+                            if isLowConfidence {
+                                selectedWord = word
+                                customCorrection = word.text
+                                showingCorrection = true
+                            }
+                        }
+                }
+
+                // Add line break after each line except the last
+                if lineIndex < ocrResult.lines.count - 1 {
+                    Text("\n")
+                        .font(.serifBody(17, weight: .regular))
+                }
+            }
+        }
+        .lineSpacing(8)
     }
 
     // MARK: - Correction
@@ -194,6 +218,7 @@ struct CorrectionSheet: View {
 /// A custom layout that wraps content to the next line when needed
 struct FlowLayout: Layout {
     var spacing: CGFloat = 4
+    var verticalSpacing: CGFloat? = nil
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
@@ -215,11 +240,12 @@ struct FlowLayout: Layout {
         var currentY: CGFloat = 0
         var lineHeight: CGFloat = 0
         var maxWidth: CGFloat = 0
+        let vSpacing = verticalSpacing ?? spacing
 
         for size in sizes {
             if currentX + size.width > containerWidth && currentX > 0 {
                 currentX = 0
-                currentY += lineHeight + spacing
+                currentY += lineHeight + vSpacing
                 lineHeight = 0
             }
 

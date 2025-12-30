@@ -135,6 +135,10 @@ struct MeetingDetailView: View {
     @State private var showingCalendarError = false
     @State private var calendarErrorMessage = ""
     @State private var showingSuccessToast = false
+    @State private var showingExportSheet = false
+    @State private var showingCreateEventSheet = false
+    @State private var showingEventPicker = false
+    @State private var showingSummarySheet = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -193,6 +197,26 @@ struct MeetingDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(calendarErrorMessage)
+        }
+        .sheet(isPresented: $showingExportSheet) {
+            ExportSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingCreateEventSheet) {
+            if let meeting = note.meeting {
+                CreateEventSheet(meeting: meeting)
+                    .presentationDetents([.large])
+            }
+        }
+        .sheet(isPresented: $showingEventPicker) {
+            if let meeting = note.meeting {
+                EventPickerView(meeting: meeting)
+                    .presentationDetents([.large])
+            }
+        }
+        .sheet(isPresented: $showingSummarySheet) {
+            SummarySheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 
@@ -431,38 +455,69 @@ struct MeetingDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 20) {
+            // AI menu (only show if API key configured)
+            if settings.hasAPIKey {
+                Menu {
+                    Button(action: { showingSummarySheet = true }) {
+                        Label("Summarize", systemImage: "text.quote")
+                    }
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.forestDark)
+                }
+            }
+
+            // Export
+            Button(action: { showingExportSheet = true }) {
+                Image(systemName: "arrow.up.doc")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+
+            // Copy
             Button(action: copyContent) {
-                Image(systemName: "doc.on.doc")
+                Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
 
             Spacer()
 
-            // Add to Calendar button
-            Button(action: addToCalendar) {
-                HStack(spacing: 8) {
-                    Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Add to Calendar")
-                        .font(.serifBody(15, weight: .semibold))
+            // Calendar menu
+            Menu {
+                Button(action: { showingCreateEventSheet = true }) {
+                    Label("Create New Event", systemImage: "calendar.badge.plus")
                 }
-                .foregroundColor(.forestLight)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeMeeting, Color.badgeMeeting.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                Button(action: { showingEventPicker = true }) {
+                    Label("Link to Existing Event", systemImage: "link")
+                }
+                if note.meeting?.calendarEventIdentifier != nil {
+                    Divider()
+                    Button(role: .destructive, action: unlinkCalendarEvent) {
+                        Label("Unlink Event", systemImage: "link.badge.minus")
+                    }
+                }
+            } label: {
+                Image(systemName: note.meeting?.calendarEventIdentifier != nil ? "calendar.badge.checkmark" : "calendar.badge.plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        LinearGradient(
+                            colors: note.meeting?.calendarEventIdentifier != nil
+                                ? [Color.green, Color.green.opacity(0.8)]
+                                : [Color.badgeMeeting, Color.badgeMeeting.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
-                .cornerRadius(8)
+                    .cornerRadius(10)
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
             Rectangle()
@@ -558,6 +613,11 @@ struct MeetingDetailView: View {
         }
         text += "\n\(details.notes)"
         UIPasteboard.general.string = text
+    }
+
+    private func unlinkCalendarEvent() {
+        note.meeting?.calendarEventIdentifier = nil
+        try? CoreDataStack.shared.saveViewContext()
     }
 }
 

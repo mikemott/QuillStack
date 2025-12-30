@@ -74,6 +74,8 @@ struct OCRResult: Codable, Sendable {
 // MARK: - OCR Service
 
 class OCRService {
+    static let shared = OCRService()
+
     nonisolated enum OCRError: Error {
         case noTextDetected
         case processingFailed

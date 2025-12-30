@@ -16,6 +16,8 @@ struct EmailDetailView: View {
     @State private var bodyContent: String = ""
     @State private var showingMailComposer = false
     @State private var showingMailError = false
+    @State private var showingExportSheet = false
+    @State private var showingSummarySheet = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -82,6 +84,14 @@ struct EmailDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Mail is not configured on this device. Please set up a mail account in Settings.")
+        }
+        .sheet(isPresented: $showingExportSheet) {
+            ExportSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingSummarySheet) {
+            SummarySheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 
@@ -179,38 +189,54 @@ struct EmailDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 20) {
+            // AI menu (only show if API key configured)
+            if settings.hasAPIKey {
+                Menu {
+                    Button(action: { showingSummarySheet = true }) {
+                        Label("Summarize", systemImage: "text.quote")
+                    }
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.forestDark)
+                }
+            }
+
+            // Export
+            Button(action: { showingExportSheet = true }) {
+                Image(systemName: "arrow.up.doc")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+
+            // Copy
             Button(action: copyContent) {
-                Image(systemName: "doc.on.doc")
+                Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
 
             Spacer()
 
-            // Open in Mail button
+            // Open in Mail
             Button(action: openInMail) {
-                HStack(spacing: 8) {
-                    Image(systemName: "paperplane.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Open in Mail")
-                        .font(.serifBody(15, weight: .semibold))
-                }
-                .foregroundColor(.forestLight)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeEmail, Color.badgeEmail.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                Image(systemName: "paperplane.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.badgeEmail, Color.badgeEmail.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
-                .cornerRadius(8)
+                    .cornerRadius(10)
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
             Rectangle()

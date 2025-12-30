@@ -25,6 +25,10 @@ class CoreDataStack {
             forKey: NSPersistentStoreFileProtectionKey
         )
 
+        // Enable automatic lightweight migration
+        description?.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
+        description?.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
                 // In production, handle this more gracefully

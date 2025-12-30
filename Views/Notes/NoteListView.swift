@@ -10,6 +10,7 @@ import SwiftUI
 struct NoteListView: View {
     @StateObject private var viewModel = NoteViewModel()
     @State private var showingCamera = false
+    @State private var showingSearch = false
     @State private var selectedNote: Note?
 
     var body: some View {
@@ -33,6 +34,9 @@ struct NoteListView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingCamera) {
                 CameraView()
+            }
+            .fullScreenCover(isPresented: $showingSearch) {
+                NoteSearchView()
             }
             .navigationDestination(item: $selectedNote) { note in
                 destinationView(for: note)
@@ -60,23 +64,43 @@ struct NoteListView: View {
 
                 Spacer()
 
-                // Camera button
-                Button(action: { showingCamera = true }) {
-                    Image(systemName: "camera")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.forestLight)
-                        .frame(width: 44, height: 44)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                HStack(spacing: 12) {
+                    // Search button
+                    Button(action: { showingSearch = true }) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.forestLight)
+                            .frame(width: 44, height: 44)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .cornerRadius(10)
-                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                            .cornerRadius(10)
+                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                    }
+                    .accessibilityLabel("Search notes")
+
+                    // Camera button
+                    Button(action: { showingCamera = true }) {
+                        Image(systemName: "camera")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.forestLight)
+                            .frame(width: 44, height: 44)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .cornerRadius(10)
+                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                    }
+                    .accessibilityLabel("Capture new note")
                 }
-                .accessibilityLabel("Capture new note")
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 12)
@@ -214,6 +238,8 @@ struct NoteListView: View {
             EmailDetailView(note: note)
         case "meeting":
             MeetingDetailView(note: note)
+        case "claudeprompt":
+            ClaudePromptDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }
@@ -345,6 +371,7 @@ struct NoteCardView: View {
         case "todo": return "checkmark.square"
         case "meeting": return "calendar"
         case "email": return "envelope"
+        case "claudeprompt": return "sparkles"
         default: return "doc.text"
         }
     }
@@ -354,6 +381,7 @@ struct NoteCardView: View {
         case "todo": return .badgeTodo
         case "meeting": return .badgeMeeting
         case "email": return .badgeEmail
+        case "claudeprompt": return .badgePrompt
         default: return .badgeGeneral
         }
     }
@@ -392,6 +420,8 @@ struct NoteCardView: View {
             return "person.2"
         case "email":
             return "paperplane"
+        case "claudeprompt":
+            return "arrow.up.circle"
         default:
             return "text.alignleft"
         }
@@ -407,6 +437,8 @@ struct NoteCardView: View {
             return "\(count) attendee\(count == 1 ? "" : "s")"
         case "email":
             return "Draft"
+        case "claudeprompt":
+            return note.summary != nil ? "Issue created" : "Ready to export"
         default:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"

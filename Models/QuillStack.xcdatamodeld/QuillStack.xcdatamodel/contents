@@ -4,6 +4,7 @@
         <attribute name="actionItems" optional="YES" attributeType="String"/>
         <attribute name="agenda" optional="YES" attributeType="String"/>
         <attribute name="attendees" optional="YES" attributeType="String"/>
+        <attribute name="calendarEventIdentifier" optional="YES" attributeType="String"/>
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="duration" attributeType="Integer 16" defaultValueString="60" usesScalarValueType="YES"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
@@ -20,11 +21,25 @@
         <attribute name="ocrConfidence" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="ocrResultData" optional="YES" attributeType="Binary"/>
         <attribute name="originalImageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="summary" optional="YES" attributeType="String"/>
+        <attribute name="summaryGeneratedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="tags" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>
+        <relationship name="pages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NotePage" inverseName="note" inverseEntity="NotePage"/>
         <relationship name="todoItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TodoItem" inverseName="note" inverseEntity="TodoItem"/>
+    </entity>
+    <entity name="NotePage" representedClassName="NotePage" syncable="YES">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="ocrConfidence" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="ocrResultData" optional="YES" attributeType="Binary"/>
+        <attribute name="ocrText" optional="YES" attributeType="String"/>
+        <attribute name="pageNumber" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="thumbnailData" optional="YES" attributeType="Binary"/>
+        <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="pages" inverseEntity="Note"/>
     </entity>
     <entity name="TodoItem" representedClassName="TodoItem" syncable="YES">
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
@@ -32,9 +47,28 @@
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="priority" attributeType="String" defaultValueString="normal"/>
+        <attribute name="remindersIdentifier" optional="YES" attributeType="String"/>
         <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="status" attributeType="String" defaultValueString="todo"/>
         <attribute name="text" attributeType="String" defaultValueString=""/>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="todoItems" inverseEntity="Note"/>
+    </entity>
+    <entity name="QueuedEnhancement" representedClassName="QueuedEnhancement" syncable="YES">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastAttemptAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="noteId" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="noteType" attributeType="String" defaultValueString="general"/>
+        <attribute name="originalText" attributeType="String" defaultValueString=""/>
+        <attribute name="retryCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="status" attributeType="String" defaultValueString="pending"/>
+    </entity>
+    <entity name="OCRCorrection" representedClassName="OCRCorrection" syncable="YES">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="correctedWord" attributeType="String" defaultValueString=""/>
+        <attribute name="frequency" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastUsedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="originalWord" attributeType="String" defaultValueString="" spotlightIndexingEnabled="YES"/>
     </entity>
 </model>

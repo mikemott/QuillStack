@@ -11,9 +11,15 @@ import CoreData
 struct NoteDetailView: View {
     @ObservedObject var note: Note
     @State private var editedContent: String = ""
+    @State private var originalContent: String = "" // Track original for learning
     @State private var showingEnhanceSheet: Bool = false
+    @State private var showingExportSheet: Bool = false
+    @State private var showingSummarySheet: Bool = false
+    @State private var showingAddPageSheet: Bool = false
+    @State private var showingPageNavigator: Bool = false
     @State private var isEnhancing: Bool = false
     @State private var enhanceError: String?
+    @State private var hasPendingEnhancement: Bool = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -42,6 +48,18 @@ struct NoteDetailView: View {
         .navigationBarHidden(true)
         .onAppear {
             editedContent = note.content
+            originalContent = note.content // Track for learning
+            checkPendingEnhancement()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NoteEnhancementCompleted"))) { notification in
+            // Refresh content when enhancement completes
+            if let noteId = notification.userInfo?["noteId"] as? UUID,
+               noteId == note.id {
+                // Refresh the note content from Core Data
+                note.managedObjectContext?.refresh(note, mergeChanges: true)
+                editedContent = note.content
+                hasPendingEnhancement = false
+            }
         }
         .onChange(of: editedContent) { _, newValue in
             // Auto-save on every change
@@ -51,6 +69,20 @@ struct NoteDetailView: View {
         }
         .sheet(isPresented: $showingEnhanceSheet) {
             enhanceSheet
+        }
+        .sheet(isPresented: $showingExportSheet) {
+            ExportSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingSummarySheet) {
+            SummarySheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
+        .fullScreenCover(isPresented: $showingAddPageSheet) {
+            AddPageSheet(note: note)
+        }
+        .fullScreenCover(isPresented: $showingPageNavigator) {
+            PageNavigatorView(note: note)
         }
     }
 
@@ -63,9 +95,25 @@ struct NoteDetailView: View {
     }
 
     private func saveChanges() {
+        // Detect corrections for handwriting learning before saving
+        if editedContent != originalContent {
+            HandwritingLearningService.shared.detectCorrections(
+                original: originalContent,
+                edited: editedContent
+            )
+            // Update original to current for next comparison
+            originalContent = editedContent
+        }
+
         note.content = editedContent
         note.updatedAt = Date()
         try? CoreDataStack.shared.saveViewContext()
+    }
+
+    private func checkPendingEnhancement() {
+        Task {
+            hasPendingEnhancement = await OfflineQueueService.shared.hasPendingEnhancement(for: note.id)
+        }
     }
 
     // MARK: - Slim Header
@@ -88,6 +136,21 @@ struct NoteDetailView: View {
                     .lineLimit(1)
 
                 Spacer()
+
+                // Pending enhancement indicator
+                if hasPendingEnhancement {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 12))
+                        Text("Enhancing...")
+                            .font(.serifCaption(11, weight: .medium))
+                    }
+                    .foregroundColor(.orange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.orange.opacity(0.15))
+                    .cornerRadius(8)
+                }
 
                 // Badge
                 noteTypeBadge
@@ -136,38 +199,64 @@ struct NoteDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 16) {
-            // AI Enhance button (only show if API key configured)
+        HStack(spacing: 20) {
+            // AI menu (only show if API key configured)
             if settings.hasAPIKey {
-                Button(action: { showingEnhanceSheet = true }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 16, weight: .medium))
-                        Text("Enhance")
-                            .font(.serifCaption(13, weight: .medium))
+                Menu {
+                    Button(action: { showingEnhanceSheet = true }) {
+                        Label("Enhance Text", systemImage: "wand.and.stars")
                     }
-                    .foregroundColor(.forestDark)
+                    Button(action: { showingSummarySheet = true }) {
+                        Label("Summarize", systemImage: "text.quote")
+                    }
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.forestDark)
                 }
+            }
+
+            // Multi-page menu
+            Menu {
+                Button(action: { showingAddPageSheet = true }) {
+                    Label("Add Page", systemImage: "plus.rectangle.on.rectangle")
+                }
+                if note.pageCount > 0 {
+                    Button(action: { showingPageNavigator = true }) {
+                        Label("View Pages (\(note.pageCount))", systemImage: "doc.on.doc")
+                    }
+                }
+            } label: {
+                Image(systemName: note.pageCount > 1 ? "doc.on.doc.fill" : "doc.on.doc")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.forestDark)
             }
 
             Spacer()
 
-            // Share button
+            // Export
+            Button(action: { showingExportSheet = true }) {
+                Image(systemName: "arrow.up.doc")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+
+            // Share
             Button(action: shareNote) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
 
-            // Copy button
+            // Copy
             Button(action: copyContent) {
-                Image(systemName: "doc.on.doc")
+                Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
             Rectangle()
@@ -309,18 +398,7 @@ struct NoteDetailView: View {
     }
 
     private var formattedDate: String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(note.createdAt) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "h:mm a"
-            return "Today, \(formatter.string(from: note.createdAt))"
-        } else if calendar.isDateInYesterday(note.createdAt) {
-            return "Yesterday"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d, yyyy"
-            return formatter.string(from: note.createdAt)
-        }
+        note.createdAt.formattedForNotes()
     }
 
     private var badgeColor: Color {

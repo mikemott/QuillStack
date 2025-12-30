@@ -38,6 +38,49 @@
 		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
 		2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */; };
+		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
+		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
+		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
+		E001000000000004 /* AppleNotesExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000004 /* AppleNotesExporter.swift */; };
+		E001000000000005 /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000005 /* ObsidianExporter.swift */; };
+		E001000000000006 /* NotionExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000006 /* NotionExporter.swift */; };
+		E001000000000007 /* ExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000007 /* ExportSheet.swift */; };
+		E001000000000008 /* ObsidianSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000008 /* ObsidianSetupView.swift */; };
+		E001000000000009 /* NotionSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000009 /* NotionSetupView.swift */; };
+		E00100000000000A /* MeetingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200000000000A /* MeetingDetailView.swift */; };
+		F00100000000000B /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000B /* SearchService.swift */; };
+		F00100000000000C /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000C /* RemindersService.swift */; };
+		F00100000000000D /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000D /* CalendarService.swift */; };
+		F00100000000000E /* MultiPageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000E /* MultiPageService.swift */; };
+		F00100000000000F /* NotePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000F /* NotePage.swift */; };
+		F001000000000010 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000010 /* SearchViewModel.swift */; };
+		F001000000000011 /* NoteSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000011 /* NoteSearchView.swift */; };
+		F001000000000012 /* SearchFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000012 /* SearchFilterSheet.swift */; };
+		F001000000000013 /* SummarySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000013 /* SummarySheet.swift */; };
+		F001000000000014 /* AddPageSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000014 /* AddPageSheet.swift */; };
+		F001000000000015 /* CreateEventSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000015 /* CreateEventSheet.swift */; };
+		F001000000000016 /* EventPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000016 /* EventPickerView.swift */; };
+		F001000000000017 /* ExportToRemindersSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000017 /* ExportToRemindersSheet.swift */; };
+		F001000000000018 /* BatchCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000018 /* BatchCaptureView.swift */; };
+		F001000000000019 /* PageNavigatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002000000000019 /* PageNavigatorView.swift */; };
+		F00100000000001A /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001A /* KeychainService.swift */; };
+		F00100000000001B /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001B /* SettingsManager.swift */; };
+		F00100000000001C /* OfflineQueueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001C /* OfflineQueueService.swift */; };
+		F00100000000001D /* HandwritingLearningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001D /* HandwritingLearningService.swift */; };
+		F00100000000001E /* OCRCorrection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001E /* OCRCorrection.swift */; };
+		G00100000000001F /* PromptRefinerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G00200000000001F /* PromptRefinerService.swift */; };
+		G001000000000020 /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G002000000000020 /* GitHubService.swift */; };
+		G001000000000022 /* LabelChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = G002000000000022 /* LabelChip.swift */; };
+		G001000000000023 /* ClaudePromptDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G002000000000023 /* ClaudePromptDetailView.swift */; };
+		H001000000000024 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000024 /* OnboardingView.swift */; };
+		H001000000000025 /* OnboardingWelcomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000025 /* OnboardingWelcomePage.swift */; };
+		H001000000000026 /* OnboardingUseCasePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000026 /* OnboardingUseCasePage.swift */; };
+		H001000000000027 /* OnboardingClaudePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000027 /* OnboardingClaudePage.swift */; };
+		H001000000000028 /* OnboardingGitHubPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000028 /* OnboardingGitHubPage.swift */; };
+		H001000000000029 /* OnboardingObsidianPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H002000000000029 /* OnboardingObsidianPage.swift */; };
+		H00100000000002A /* OnboardingNotionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00200000000002A /* OnboardingNotionPage.swift */; };
+		H00100000000002B /* OnboardingCalendarPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00200000000002B /* OnboardingCalendarPage.swift */; };
+		H00100000000002C /* OnboardingCompletePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00200000000002C /* OnboardingCompletePage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +117,49 @@
 		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidenceTextView.swift; sourceTree = "<group>"; };
+		E002000000000001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		E002000000000002 /* ExportDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDestination.swift; sourceTree = "<group>"; };
+		E002000000000003 /* TagRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRouter.swift; sourceTree = "<group>"; };
+		E002000000000004 /* AppleNotesExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNotesExporter.swift; sourceTree = "<group>"; };
+		E002000000000005 /* ObsidianExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporter.swift; sourceTree = "<group>"; };
+		E002000000000006 /* NotionExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionExporter.swift; sourceTree = "<group>"; };
+		E002000000000007 /* ExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSheet.swift; sourceTree = "<group>"; };
+		E002000000000008 /* ObsidianSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianSetupView.swift; sourceTree = "<group>"; };
+		E002000000000009 /* NotionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionSetupView.swift; sourceTree = "<group>"; };
+		E00200000000000A /* MeetingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDetailView.swift; sourceTree = "<group>"; };
+		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
+		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
+		F00200000000000D /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
+		F00200000000000E /* MultiPageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPageService.swift; sourceTree = "<group>"; };
+		F00200000000000F /* NotePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePage.swift; sourceTree = "<group>"; };
+		F002000000000010 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		F002000000000011 /* NoteSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSearchView.swift; sourceTree = "<group>"; };
+		F002000000000012 /* SearchFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterSheet.swift; sourceTree = "<group>"; };
+		F002000000000013 /* SummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarySheet.swift; sourceTree = "<group>"; };
+		F002000000000014 /* AddPageSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPageSheet.swift; sourceTree = "<group>"; };
+		F002000000000015 /* CreateEventSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEventSheet.swift; sourceTree = "<group>"; };
+		F002000000000016 /* EventPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventPickerView.swift; sourceTree = "<group>"; };
+		F002000000000017 /* ExportToRemindersSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportToRemindersSheet.swift; sourceTree = "<group>"; };
+		F002000000000018 /* BatchCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchCaptureView.swift; sourceTree = "<group>"; };
+		F002000000000019 /* PageNavigatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNavigatorView.swift; sourceTree = "<group>"; };
+		F00200000000001A /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		F00200000000001B /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		F00200000000001C /* OfflineQueueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineQueueService.swift; sourceTree = "<group>"; };
+		F00200000000001D /* HandwritingLearningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingLearningService.swift; sourceTree = "<group>"; };
+		F00200000000001E /* OCRCorrection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRCorrection.swift; sourceTree = "<group>"; };
+		G00200000000001F /* PromptRefinerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRefinerService.swift; sourceTree = "<group>"; };
+		G002000000000020 /* GitHubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubService.swift; sourceTree = "<group>"; };
+		G002000000000022 /* LabelChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelChip.swift; sourceTree = "<group>"; };
+		G002000000000023 /* ClaudePromptDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudePromptDetailView.swift; sourceTree = "<group>"; };
+		H002000000000024 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		H002000000000025 /* OnboardingWelcomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomePage.swift; sourceTree = "<group>"; };
+		H002000000000026 /* OnboardingUseCasePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUseCasePage.swift; sourceTree = "<group>"; };
+		H002000000000027 /* OnboardingClaudePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingClaudePage.swift; sourceTree = "<group>"; };
+		H002000000000028 /* OnboardingGitHubPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingGitHubPage.swift; sourceTree = "<group>"; };
+		H002000000000029 /* OnboardingObsidianPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingObsidianPage.swift; sourceTree = "<group>"; };
+		H00200000000002A /* OnboardingNotionPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNotionPage.swift; sourceTree = "<group>"; };
+		H00200000000002B /* OnboardingCalendarPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCalendarPage.swift; sourceTree = "<group>"; };
+		H00200000000002C /* OnboardingCompletePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCompletePage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +212,8 @@
 				2796C18C2EEB558200E05291 /* CoreDataStack.swift */,
 				2796C18D2EEB558200E05291 /* Meeting.swift */,
 				2796C18E2EEB558200E05291 /* Note.swift */,
+				F00200000000000F /* NotePage.swift */,
+				F00200000000001E /* OCRCorrection.swift */,
 				2796C18F2EEB558200E05291 /* TodoItem.swift */,
 			);
 			path = Models;
@@ -140,6 +228,9 @@
 				2796C1822EEB547500E05291 /* Capture */,
 				2796C1F42EEB800000E05291 /* Settings */,
 				2796C1F52EEB800000E05291 /* Components */,
+				E003000000000003 /* Export */,
+				F003000000000004 /* Calendar */,
+				H003000000000024 /* Onboarding */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -150,6 +241,7 @@
 				2796C1982EEB55C700E05291 /* CameraViewModel.swift */,
 				2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */,
 				2796C19B2EEB55C700E05291 /* NoteViewModel.swift */,
+				F002000000000010 /* SearchViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -157,12 +249,23 @@
 		2796C1802EEB545C00E05291 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				2796C1A42EF0B20100E05291 /* SpellCorrector.swift */,
+				E003000000000001 /* Export */,
+				F00200000000000D /* CalendarService.swift */,
 				2796C1902EEB55A300E05291 /* CameraManager.swift */,
+				G002000000000020 /* GitHubService.swift */,
+				F00200000000001D /* HandwritingLearningService.swift */,
 				2796C1912EEB55A300E05291 /* ImageProcessor.swift */,
+				F00200000000001A /* KeychainService.swift */,
 				2796C1EE2EEB800000E05291 /* LLMService.swift */,
 				2796C1922EEB55A300E05291 /* MeetingParser.swift */,
+				F00200000000000E /* MultiPageService.swift */,
 				2796C1932EEB55A300E05291 /* OCRService.swift */,
+				F00200000000001C /* OfflineQueueService.swift */,
+				G00200000000001F /* PromptRefinerService.swift */,
+				F00200000000000C /* RemindersService.swift */,
+				F00200000000000B /* SearchService.swift */,
+				F00200000000001B /* SettingsManager.swift */,
+				2796C1A42EF0B20100E05291 /* SpellCorrector.swift */,
 				2796C1942EEB55A300E05291 /* TextClassifier.swift */,
 				2796C1952EEB55A300E05291 /* TodoParser.swift */,
 			);
@@ -181,9 +284,11 @@
 		2796C1822EEB547500E05291 /* Capture */ = {
 			isa = PBXGroup;
 			children = (
+				F002000000000018 /* BatchCaptureView.swift */,
 				2796C19C2EEB55EC00E05291 /* CameraPreviewView.swift */,
 				2796C19D2EEB55EC00E05291 /* CameraView.swift */,
 				2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */,
+				F002000000000019 /* PageNavigatorView.swift */,
 			);
 			path = Capture;
 			sourceTree = "<group>";
@@ -191,10 +296,16 @@
 		2796C1832EEB547E00E05291 /* Notes */ = {
 			isa = PBXGroup;
 			children = (
+				F002000000000014 /* AddPageSheet.swift */,
+				G002000000000023 /* ClaudePromptDetailView.swift */,
+				2796C1DF2EEB700000E05291 /* EmailDetailView.swift */,
+				E00200000000000A /* MeetingDetailView.swift */,
 				2796C1A12EEB560500E05291 /* NoteDetailView.swift */,
 				2796C1A32EEB560500E05291 /* NoteListView.swift */,
+				F002000000000011 /* NoteSearchView.swift */,
+				F002000000000012 /* SearchFilterSheet.swift */,
+				F002000000000013 /* SummarySheet.swift */,
 				2796C1DE2EEB700000E05291 /* TodoDetailView.swift */,
-				2796C1DF2EEB700000E05291 /* EmailDetailView.swift */,
 			);
 			path = Notes;
 			sourceTree = "<group>";
@@ -226,8 +337,66 @@
 			isa = PBXGroup;
 			children = (
 				2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */,
+				G002000000000022 /* LabelChip.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		E003000000000001 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				E003000000000002 /* Exporters */,
+				E002000000000001 /* ExportService.swift */,
+				E002000000000002 /* ExportDestination.swift */,
+				E002000000000003 /* TagRouter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		E003000000000002 /* Exporters */ = {
+			isa = PBXGroup;
+			children = (
+				E002000000000004 /* AppleNotesExporter.swift */,
+				E002000000000005 /* ObsidianExporter.swift */,
+				E002000000000006 /* NotionExporter.swift */,
+			);
+			path = Exporters;
+			sourceTree = "<group>";
+		};
+		E003000000000003 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				E002000000000007 /* ExportSheet.swift */,
+				F002000000000017 /* ExportToRemindersSheet.swift */,
+				E002000000000009 /* NotionSetupView.swift */,
+				E002000000000008 /* ObsidianSetupView.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		F003000000000004 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				F002000000000015 /* CreateEventSheet.swift */,
+				F002000000000016 /* EventPickerView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		H003000000000024 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				H002000000000024 /* OnboardingView.swift */,
+				H002000000000025 /* OnboardingWelcomePage.swift */,
+				H002000000000026 /* OnboardingUseCasePage.swift */,
+				H002000000000027 /* OnboardingClaudePage.swift */,
+				H002000000000028 /* OnboardingGitHubPage.swift */,
+				H002000000000029 /* OnboardingObsidianPage.swift */,
+				H00200000000002A /* OnboardingNotionPage.swift */,
+				H00200000000002B /* OnboardingCalendarPage.swift */,
+				H00200000000002C /* OnboardingCompletePage.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -333,6 +502,49 @@
 				2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */,
 				2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */,
 				2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */,
+				E001000000000001 /* ExportService.swift in Sources */,
+				E001000000000002 /* ExportDestination.swift in Sources */,
+				E001000000000003 /* TagRouter.swift in Sources */,
+				E001000000000004 /* AppleNotesExporter.swift in Sources */,
+				E001000000000005 /* ObsidianExporter.swift in Sources */,
+				E001000000000006 /* NotionExporter.swift in Sources */,
+				E001000000000007 /* ExportSheet.swift in Sources */,
+				E001000000000008 /* ObsidianSetupView.swift in Sources */,
+				E001000000000009 /* NotionSetupView.swift in Sources */,
+				E00100000000000A /* MeetingDetailView.swift in Sources */,
+				F00100000000000B /* SearchService.swift in Sources */,
+				F00100000000000C /* RemindersService.swift in Sources */,
+				F00100000000000D /* CalendarService.swift in Sources */,
+				F00100000000000E /* MultiPageService.swift in Sources */,
+				F00100000000000F /* NotePage.swift in Sources */,
+				F001000000000010 /* SearchViewModel.swift in Sources */,
+				F001000000000011 /* NoteSearchView.swift in Sources */,
+				F001000000000012 /* SearchFilterSheet.swift in Sources */,
+				F001000000000013 /* SummarySheet.swift in Sources */,
+				F001000000000014 /* AddPageSheet.swift in Sources */,
+				F001000000000015 /* CreateEventSheet.swift in Sources */,
+				F001000000000016 /* EventPickerView.swift in Sources */,
+				F001000000000017 /* ExportToRemindersSheet.swift in Sources */,
+				F001000000000018 /* BatchCaptureView.swift in Sources */,
+				F001000000000019 /* PageNavigatorView.swift in Sources */,
+				F00100000000001A /* KeychainService.swift in Sources */,
+				F00100000000001B /* SettingsManager.swift in Sources */,
+				F00100000000001C /* OfflineQueueService.swift in Sources */,
+				F00100000000001D /* HandwritingLearningService.swift in Sources */,
+				F00100000000001E /* OCRCorrection.swift in Sources */,
+				G00100000000001F /* PromptRefinerService.swift in Sources */,
+				G001000000000020 /* GitHubService.swift in Sources */,
+				G001000000000022 /* LabelChip.swift in Sources */,
+				G001000000000023 /* ClaudePromptDetailView.swift in Sources */,
+				H001000000000024 /* OnboardingView.swift in Sources */,
+				H001000000000025 /* OnboardingWelcomePage.swift in Sources */,
+				H001000000000026 /* OnboardingUseCasePage.swift in Sources */,
+				H001000000000027 /* OnboardingClaudePage.swift in Sources */,
+				H001000000000028 /* OnboardingGitHubPage.swift in Sources */,
+				H001000000000029 /* OnboardingObsidianPage.swift in Sources */,
+				H00100000000002A /* OnboardingNotionPage.swift in Sources */,
+				H00100000000002B /* OnboardingCalendarPage.swift in Sources */,
+				H00100000000002C /* OnboardingCompletePage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,7 +603,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -471,6 +683,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -509,6 +722,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

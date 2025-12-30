@@ -18,6 +18,7 @@ public class Meeting: NSManagedObject, Identifiable {
     @NSManaged public var agenda: String?
     @NSManaged public var actionItems: String? // Newline-separated action items
     @NSManaged public var createdAt: Date
+    @NSManaged public var calendarEventIdentifier: String? // Links to EKEvent
 
     // Relationship
     @NSManaged public var note: Note?

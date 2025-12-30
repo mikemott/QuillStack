@@ -7,13 +7,17 @@
 
 import SwiftUI
 import AVFoundation
+import PhotosUI
 
 struct CameraView: View {
+    // Use @State for @Observable classes (not @StateObject which requires ObservableObject)
     @State private var viewModel = CameraViewModel()
     @State private var cameraManager = CameraManager()
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingImagePreview = false
+    @State private var showingPhotoPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
 
     var body: some View {
         ZStack {
@@ -88,6 +92,22 @@ struct CameraView: View {
         }
         .onDisappear {
             cameraManager.stopSession()
+        }
+        .photosPicker(
+            isPresented: $showingPhotoPicker,
+            selection: $selectedPhotoItem,
+            matching: .images
+        )
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            Task {
+                guard let newItem else { return }
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    cameraManager.capturedImage = image
+                    // This triggers the existing ImagePreviewView flow via onChange above
+                }
+                selectedPhotoItem = nil  // Reset for next selection
+            }
         }
     }
 
@@ -168,7 +188,7 @@ struct CameraView: View {
         HStack(spacing: 40) {
             // Gallery button
             Button(action: {
-                // TODO: Open photo library
+                showingPhotoPicker = true
             }) {
                 ZStack {
                     Circle()
@@ -226,23 +246,50 @@ struct CameraView: View {
 
             // Flash button
             Button(action: {
-                // TODO: Toggle flash
+                cameraManager.toggleFlash()
             }) {
                 ZStack {
                     Circle()
-                        .fill(Color.forestDark.opacity(0.3))
+                        .fill(flashButtonColor)
                         .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
                                 .stroke(Color.forestMedium.opacity(0.3), lineWidth: 1)
                         )
 
-                    Image(systemName: "bolt.fill")
+                    Image(systemName: flashIconName)
                         .font(.system(size: 24, weight: .regular))
                         .foregroundColor(.forestLight)
                 }
             }
             .accessibilityLabel("Toggle flash")
+            .accessibilityValue(flashAccessibilityValue)
+        }
+    }
+
+    // MARK: - Flash State Computed Properties
+
+    private var flashIconName: String {
+        switch cameraManager.flashMode {
+        case .auto: return "bolt.badge.a"
+        case .on: return "bolt.fill"
+        case .off: return "bolt.slash"
+        @unknown default: return "bolt.badge.a"
+        }
+    }
+
+    private var flashButtonColor: Color {
+        cameraManager.flashMode == .on
+            ? Color.yellow.opacity(0.3)
+            : Color.forestDark.opacity(0.3)
+    }
+
+    private var flashAccessibilityValue: String {
+        switch cameraManager.flashMode {
+        case .auto: return "Auto"
+        case .on: return "On"
+        case .off: return "Off"
+        @unknown default: return "Auto"
         }
     }
 

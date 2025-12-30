@@ -18,6 +18,7 @@ final class CameraManager: NSObject {
     var capturedImage: UIImage?
     var error: CameraError?
     var isSessionRunning = false
+    var flashMode: AVCaptureDevice.FlashMode = .auto
 
     // AVFoundation objects - must be accessed from sessionQueue
     // Using nonisolated(unsafe) because AVCaptureSession requires background queue access
@@ -188,7 +189,8 @@ final class CameraManager: NSObject {
 
     // MARK: - Photo Capture
 
-    nonisolated func capturePhoto() {
+    func capturePhoto() {
+        let currentFlashMode = flashMode
         sessionQueue.async { [self] in
             guard session.isRunning else {
                 Task { @MainActor in
@@ -200,8 +202,10 @@ final class CameraManager: NSObject {
             let settings = AVCapturePhotoSettings()
             settings.photoQualityPrioritization = .quality
 
-            // Enable flash if available
-            if photoOutput.supportedFlashModes.contains(.auto) {
+            // Apply user's flash mode if supported, otherwise fall back gracefully
+            if photoOutput.supportedFlashModes.contains(currentFlashMode) {
+                settings.flashMode = currentFlashMode
+            } else if photoOutput.supportedFlashModes.contains(.auto) {
                 settings.flashMode = .auto
             }
 
@@ -224,6 +228,17 @@ final class CameraManager: NSObject {
 
             // Reconfigure with new camera position
             configureSessionOnQueue(cameraPosition: position)
+        }
+    }
+
+    // MARK: - Flash Control
+
+    func toggleFlash() {
+        switch flashMode {
+        case .auto: flashMode = .on
+        case .on: flashMode = .off
+        case .off: flashMode = .auto
+        @unknown default: flashMode = .auto
         }
     }
 

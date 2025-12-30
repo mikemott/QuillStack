@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject private var settings = SettingsManager.shared
     @State private var selectedTab = 0
+    @State private var showingOnboarding = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -32,6 +34,11 @@ struct ContentView: View {
         }
         .tint(.forestDark) // Tab bar accent color
         .onAppear {
+            // Show onboarding if not completed
+            if !settings.hasCompletedOnboarding {
+                showingOnboarding = true
+            }
+
             // Customize tab bar appearance
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
@@ -52,6 +59,9 @@ struct ContentView: View {
 
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+        .fullScreenCover(isPresented: $showingOnboarding) {
+            OnboardingView()
         }
     }
 }

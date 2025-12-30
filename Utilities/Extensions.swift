@@ -31,6 +31,42 @@ extension Date {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: self, relativeTo: Date())
     }
+
+    /// Formats date for note display with smart relative formatting
+    /// Returns "Today, 2:30 PM", "Yesterday", or "Dec 30, 2025"
+    func formattedForNotes(includeTime: Bool = true) -> String {
+        let calendar = Calendar.current
+
+        if calendar.isDateInToday(self) {
+            if includeTime {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "h:mm a"
+                return "Today, \(formatter.string(from: self))"
+            }
+            return "Today"
+        } else if calendar.isDateInYesterday(self) {
+            return "Yesterday"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d, yyyy"
+            return formatter.string(from: self)
+        }
+    }
+
+    /// Short format for compact displays: "Today", "Yesterday", or "Dec 30"
+    var shortFormat: String {
+        let calendar = Calendar.current
+
+        if calendar.isDateInToday(self) {
+            return "Today"
+        } else if calendar.isDateInYesterday(self) {
+            return "Yesterday"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d"
+            return formatter.string(from: self)
+        }
+    }
 }
 
 // MARK: - String Extensions
@@ -87,6 +123,7 @@ extension Color {
     static let badgeMeeting = Color(red: 20/255, green: 100/255, blue: 100/255)    // #146464 - teal
     static let badgeGeneral = Color(red: 30/255, green: 77/255, blue: 47/255)      // #1e4d2f - forest
     static let badgeEmail = Color(red: 139/255, green: 69/255, blue: 119/255)      // #8b4577 - plum
+    static let badgePrompt = Color(red: 91/255, green: 77/255, blue: 153/255)      // #5b4d99 - purple
 
     // App-wide theme colors (for compatibility)
     static let appPrimary = forestDark

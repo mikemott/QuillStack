@@ -47,6 +47,14 @@ class TextClassifier {
 
     /// Exact trigger matching (original behavior)
     private func detectExactTrigger(_ prefix: String) -> NoteType? {
+        // Claude prompt triggers (check first - more specific)
+        let claudeTriggers = ["#claude#", "#feature#", "#prompt#", "#request#", "#issue#"]
+        for trigger in claudeTriggers {
+            if prefix.contains(trigger) {
+                return .claudePrompt
+            }
+        }
+
         // Todo triggers
         let todoTriggers = ["#todo#", "#to-do#", "#tasks#", "#task#"]
         for trigger in todoTriggers {
@@ -82,6 +90,21 @@ class TextClassifier {
             .replacingOccurrences(of: " ", with: "")  // Remove spaces
             .replacingOccurrences(of: ".", with: "#") // Period often misread for #
             .replacingOccurrences(of: ",", with: "")  // Remove stray commas
+
+        // Claude prompt patterns - check first (more specific)
+        let claudePatterns = [
+            "#claude#", "#c1aude#", "#ciaude#", "#claudee#", "#claube#",
+            "#feature#", "#featur#", "#featuer#", "#featuree#", "#f3ature#",
+            "#prompt#", "#prompl#", "#prornpt#", "#promptt#",
+            "#request#", "#requesl#", "#requesi#", "#requestt#",
+            "#issue#", "#issu3#", "#issuse#", "#issuee#",
+            "#claude", "claude#", "#feature", "feature#", "#prompt", "prompt#"
+        ]
+        for pattern in claudePatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .claudePrompt
+            }
+        }
 
         // Todo patterns - handle common OCR errors
         let todoPatterns = [
@@ -122,6 +145,9 @@ class TextClassifier {
 
         // Last resort: check for hashtag followed by keyword within a few characters
         // This catches "# email" or "#email tt" type errors
+        if matchesLoosePattern(normalized, keywords: ["claude", "feature", "prompt", "request", "issue"]) {
+            return .claudePrompt
+        }
         if matchesLoosePattern(normalized, keywords: ["email", "mail", "emai", "ernail"]) {
             return .email
         }
@@ -211,6 +237,7 @@ class TextClassifier {
     /// Extracts the trigger tag from content (for display/removal purposes)
     func extractTriggerTag(from content: String) -> (tag: String, cleanedContent: String)? {
         let patterns = [
+            "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
             "#todo#", "#to-do#", "#tasks#", "#task#",
             "#email#", "#mail#",
             "#meeting#", "#notes#", "#minutes#"
@@ -242,6 +269,7 @@ enum NoteType: String {
     case todo = "todo"
     case meeting = "meeting"
     case email = "email"
+    case claudePrompt = "claudePrompt"
 
     var displayName: String {
         switch self {
@@ -249,6 +277,7 @@ enum NoteType: String {
         case .todo: return "To-Do"
         case .meeting: return "Meeting"
         case .email: return "Email"
+        case .claudePrompt: return "Prompt"
         }
     }
 
@@ -258,6 +287,7 @@ enum NoteType: String {
         case .todo: return "checkmark.square"
         case .meeting: return "calendar"
         case .email: return "envelope"
+        case .claudePrompt: return "sparkles"
         }
     }
 
@@ -267,6 +297,7 @@ enum NoteType: String {
         case .todo: return "badgeTodo"
         case .meeting: return "badgeMeeting"
         case .email: return "badgeEmail"
+        case .claudePrompt: return "badgePrompt"
         }
     }
 }
