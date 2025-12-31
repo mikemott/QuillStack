@@ -19,6 +19,8 @@ struct ExpenseDetailView: View {
     @State private var showingExportSheet = false
     @State private var showingShareSheet = false
     @State private var csvData: String = ""
+    @State private var showingSaveError = false
+    @State private var saveErrorMessage = ""
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -73,6 +75,11 @@ struct ExpenseDetailView: View {
         }
         .sheet(isPresented: $showingShareSheet) {
             ShareSheet(items: [generateCSV()])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -559,7 +566,13 @@ struct ExpenseDetailView: View {
 
         note.content = lines.joined(separator: "\n")
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            print("ExpenseDetailView: Failed to save expense changes - \(error)")
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func generateCSV() -> String {
