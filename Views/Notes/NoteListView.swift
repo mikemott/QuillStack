@@ -427,6 +427,16 @@ struct NoteListView: View {
             ReminderDetailView(note: note)
         case "contact":
             ContactDetailView(note: note)
+        case "expense":
+            ExpenseDetailView(note: note)
+        case "shopping":
+            ShoppingDetailView(note: note)
+        case "recipe":
+            RecipeDetailView(note: note)
+        case "event":
+            EventDetailView(note: note)
+        case "idea":
+            IdeaDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }
@@ -564,6 +574,11 @@ struct NoteCardView: View {
         case "claudeprompt": return "sparkles"
         case "reminder": return "bell"
         case "contact": return "person.crop.circle"
+        case "expense": return "dollarsign.circle"
+        case "shopping": return "cart"
+        case "recipe": return "fork.knife"
+        case "event": return "calendar.badge.plus"
+        case "idea": return "lightbulb"
         default: return "doc.text"
         }
     }
@@ -576,6 +591,11 @@ struct NoteCardView: View {
         case "claudeprompt": return .badgePrompt
         case "reminder": return .badgeReminder
         case "contact": return .badgeContact
+        case "expense": return .badgeExpense
+        case "shopping": return .badgeShopping
+        case "recipe": return .badgeRecipe
+        case "event": return .badgeEvent
+        case "idea": return .badgeIdea
         default: return .badgeGeneral
         }
     }
@@ -620,6 +640,16 @@ struct NoteCardView: View {
             return "clock"
         case "contact":
             return "person"
+        case "expense":
+            return "creditcard"
+        case "shopping":
+            return "bag"
+        case "recipe":
+            return "list.bullet"
+        case "event":
+            return "clock"
+        case "idea":
+            return "brain"
         default:
             return "text.alignleft"
         }
@@ -641,6 +671,16 @@ struct NoteCardView: View {
             return "Reminder"
         case "contact":
             return "Contact"
+        case "expense":
+            return "Expense"
+        case "shopping":
+            return "Shopping list"
+        case "recipe":
+            return "Recipe"
+        case "event":
+            return "Event"
+        case "idea":
+            return "Idea"
         default:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"

@@ -71,6 +71,46 @@ class TextClassifier {
             }
         }
 
+        // Expense triggers
+        let expenseTriggers = ["#expense#", "#receipt#", "#spent#", "#paid#"]
+        for trigger in expenseTriggers {
+            if prefix.contains(trigger) {
+                return .expense
+            }
+        }
+
+        // Shopping triggers
+        let shoppingTriggers = ["#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#"]
+        for trigger in shoppingTriggers {
+            if prefix.contains(trigger) {
+                return .shopping
+            }
+        }
+
+        // Recipe triggers
+        let recipeTriggers = ["#recipe#", "#cook#", "#bake#"]
+        for trigger in recipeTriggers {
+            if prefix.contains(trigger) {
+                return .recipe
+            }
+        }
+
+        // Event triggers
+        let eventTriggers = ["#event#", "#appointment#", "#schedule#", "#appt#"]
+        for trigger in eventTriggers {
+            if prefix.contains(trigger) {
+                return .event
+            }
+        }
+
+        // Idea triggers
+        let ideaTriggers = ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"]
+        for trigger in ideaTriggers {
+            if prefix.contains(trigger) {
+                return .idea
+            }
+        }
+
         // Todo triggers
         let todoTriggers = ["#todo#", "#to-do#", "#tasks#", "#task#"]
         for trigger in todoTriggers {
@@ -148,6 +188,74 @@ class TextClassifier {
             }
         }
 
+        // Expense patterns
+        let expensePatterns = [
+            "#expense#", "#expens3#", "#expanse#", "#expensee#",
+            "#receipt#", "#recipt#", "#reciept#", "#recelpt#",
+            "#spent#", "#spentt#", "#sp3nt#",
+            "#paid#", "#pald#", "#pa1d#",
+            "#expense", "expense#", "#receipt", "receipt#"
+        ]
+        for pattern in expensePatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .expense
+            }
+        }
+
+        // Shopping patterns
+        let shoppingPatterns = [
+            "#shopping#", "#shoppinq#", "#shopplng#", "#shoppingg#",
+            "#shop#", "#shopp#",
+            "#grocery#", "#groceries#", "#grocer1es#", "#qrocery#",
+            "#list#", "#listt#",
+            "#shopping", "shopping#", "#grocery", "grocery#"
+        ]
+        for pattern in shoppingPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .shopping
+            }
+        }
+
+        // Recipe patterns
+        let recipePatterns = [
+            "#recipe#", "#recipee#", "#recip3#", "#reclpe#",
+            "#cook#", "#cookk#", "#c00k#",
+            "#bake#", "#bakee#", "#bak3#",
+            "#recipe", "recipe#", "#cook", "cook#"
+        ]
+        for pattern in recipePatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .recipe
+            }
+        }
+
+        // Event patterns
+        let eventPatterns = [
+            "#event#", "#eventt#", "#evnt#", "#3vent#",
+            "#appointment#", "#appointrnent#", "#apointment#", "#appointmentt#",
+            "#schedule#", "#schedu1e#", "#schedulle#",
+            "#appt#", "#apptt#",
+            "#event", "event#", "#appointment", "appointment#"
+        ]
+        for pattern in eventPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .event
+            }
+        }
+
+        // Idea patterns
+        let ideaPatterns = [
+            "#idea#", "#ideaa#", "#1dea#", "#ldea#",
+            "#thought#", "#thoughtt#", "#thouqht#", "#thoughl#",
+            "#note-to-self#", "#notetoself#", "#note2self#",
+            "#idea", "idea#", "#thought", "thought#"
+        ]
+        for pattern in ideaPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .idea
+            }
+        }
+
         // Todo patterns - handle common OCR errors
         let todoPatterns = [
             "#todo#", "#tod0#", "#todoo#", "#toDo#",
@@ -195,6 +303,21 @@ class TextClassifier {
         }
         if matchesLoosePattern(normalized, keywords: ["contact", "person", "phone"]) {
             return .contact
+        }
+        if matchesLoosePattern(normalized, keywords: ["expense", "receipt", "spent", "paid"]) {
+            return .expense
+        }
+        if matchesLoosePattern(normalized, keywords: ["shopping", "shop", "grocery", "groceries"]) {
+            return .shopping
+        }
+        if matchesLoosePattern(normalized, keywords: ["recipe", "cook", "bake"]) {
+            return .recipe
+        }
+        if matchesLoosePattern(normalized, keywords: ["event", "appointment", "schedule", "appt"]) {
+            return .event
+        }
+        if matchesLoosePattern(normalized, keywords: ["idea", "thought", "notetoself"]) {
+            return .idea
         }
         if matchesLoosePattern(normalized, keywords: ["email", "mail", "emai", "ernail"]) {
             return .email
@@ -288,6 +411,11 @@ class TextClassifier {
             "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
             "#reminder#", "#remind#", "#remindme#",
             "#contact#", "#person#", "#phone#",
+            "#expense#", "#receipt#", "#spent#", "#paid#",
+            "#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#",
+            "#recipe#", "#cook#", "#bake#",
+            "#event#", "#appointment#", "#schedule#", "#appt#",
+            "#idea#", "#thought#", "#note-to-self#", "#notetoself#",
             "#todo#", "#to-do#", "#tasks#", "#task#",
             "#email#", "#mail#",
             "#meeting#", "#notes#", "#minutes#"
@@ -326,6 +454,16 @@ class TextClassifier {
             patternsToRemove = ["#reminder#", "#remind#", "#remindme#"]
         case .contact:
             patternsToRemove = ["#contact#", "#person#", "#phone#"]
+        case .expense:
+            patternsToRemove = ["#expense#", "#receipt#", "#spent#", "#paid#"]
+        case .shopping:
+            patternsToRemove = ["#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#"]
+        case .recipe:
+            patternsToRemove = ["#recipe#", "#cook#", "#bake#"]
+        case .event:
+            patternsToRemove = ["#event#", "#appointment#", "#schedule#", "#appt#"]
+        case .idea:
+            patternsToRemove = ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"]
         case .todo:
             patternsToRemove = ["#todo#", "#to-do#", "#tasks#", "#task#"]
         case .email:
@@ -370,6 +508,11 @@ enum NoteType: String {
     case claudePrompt = "claudePrompt"
     case reminder = "reminder"
     case contact = "contact"
+    case expense = "expense"
+    case shopping = "shopping"
+    case recipe = "recipe"
+    case event = "event"
+    case idea = "idea"
 
     var displayName: String {
         switch self {
@@ -380,6 +523,11 @@ enum NoteType: String {
         case .claudePrompt: return "Feature"
         case .reminder: return "Reminder"
         case .contact: return "Contact"
+        case .expense: return "Expense"
+        case .shopping: return "Shopping"
+        case .recipe: return "Recipe"
+        case .event: return "Event"
+        case .idea: return "Idea"
         }
     }
 
@@ -392,6 +540,11 @@ enum NoteType: String {
         case .claudePrompt: return "sparkles"
         case .reminder: return "bell"
         case .contact: return "person.crop.circle"
+        case .expense: return "dollarsign.circle"
+        case .shopping: return "cart"
+        case .recipe: return "fork.knife"
+        case .event: return "calendar.badge.plus"
+        case .idea: return "lightbulb"
         }
     }
 
@@ -404,6 +557,11 @@ enum NoteType: String {
         case .claudePrompt: return "badgePrompt"
         case .reminder: return "badgeReminder"
         case .contact: return "badgeContact"
+        case .expense: return "badgeExpense"
+        case .shopping: return "badgeShopping"
+        case .recipe: return "badgeRecipe"
+        case .event: return "badgeEvent"
+        case .idea: return "badgeIdea"
         }
     }
 }
