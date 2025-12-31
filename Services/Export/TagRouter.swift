@@ -82,6 +82,8 @@ class TagRouter {
             return SettingsManager.shared.obsidianDefaultFolder
         case .notion:
             return "" // Notion uses default database
+        case .pdf:
+            return "" // PDF exports directly to share sheet
         }
     }
 
@@ -138,6 +140,8 @@ class TagRouter {
             return "/" // Notion doesn't use paths, but we can use for display
         case .appleNotes:
             return "/" // Apple Notes folders
+        case .pdf:
+            return "/" // Not used for PDF but included for completeness
         }
     }
 

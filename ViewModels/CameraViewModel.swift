@@ -44,7 +44,7 @@ final class CameraViewModel {
         }
     }
 
-    func processImage(_ image: UIImage) async {
+    func processImage(_ image: UIImage, template: NoteTemplate = .freeform) async {
         isProcessing = true
         error = nil
 
@@ -56,11 +56,21 @@ final class CameraViewModel {
             // OCRService internally applies full preprocessing pipeline
             let ocrResult = try await ocrService.recognizeTextWithConfidence(from: correctedImage)
 
+            // Step 2.5: Prepend template hashtag if using a template (ensures correct classification)
+            var processedText = ocrResult.fullText
+            if let triggerHashtag = template.triggerHashtag {
+                // Only prepend if the trigger isn't already present
+                if !processedText.lowercased().contains(triggerHashtag.lowercased()) {
+                    processedText = triggerHashtag + "\n" + processedText
+                    print("📋 Prepended template hashtag: \(triggerHashtag)")
+                }
+            }
+
             print("🔍 Raw OCR result: \(ocrResult.fullText)")
             print("🔍 Average confidence: \(Int(ocrResult.averageConfidence * 100))%")
 
             // Step 3: Classify note type (before spell correction to catch trigger)
-            let noteType = textClassifier.classifyNote(content: ocrResult.fullText)
+            let noteType = textClassifier.classifyNote(content: processedText)
             print("📋 Classified as: \(noteType.displayName)")
 
             // Step 4: Apply on-device spell correction (including learned corrections)
@@ -74,7 +84,7 @@ final class CameraViewModel {
             if noteType == .email {
                 // Use email-specific correction for email notes
                 // Note: correctEmailContent calls correctSpelling internally, so we pass learned corrections there
-                let correction = spellCorrector.correctEmailContent(ocrResult.fullText, learnedCorrections: learnedCorrections)
+                let correction = spellCorrector.correctEmailContent(processedText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections (email mode):")
@@ -86,7 +96,7 @@ final class CameraViewModel {
                 }
             } else {
                 // Use general spell correction
-                let correction = spellCorrector.correctSpelling(ocrResult.fullText, learnedCorrections: learnedCorrections)
+                let correction = spellCorrector.correctSpelling(processedText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections:")
@@ -143,7 +153,11 @@ final class CameraViewModel {
                     text: correctedText,
                     noteType: noteType.rawValue
                 )
-                print("📥 Enhancement queued for note \(noteId)")
+            }
+
+            // Step 8: Apply image retention policy
+            if let noteId = noteId {
+                await applyImageRetentionPolicy(noteId: noteId)
             }
 
             isProcessing = false
@@ -212,7 +226,6 @@ final class CameraViewModel {
 
             do {
                 try CoreDataStack.shared.save(context: context)
-                print("✅ Note saved - Type: \(noteType.displayName), Confidence: \(Int(avgConfidence * 100))%, Low-confidence words: \(lowConfidenceCount)")
 
                 // Post notification for UI refresh
                 NotificationCenter.default.post(
@@ -225,9 +238,24 @@ final class CameraViewModel {
                 Task { @MainActor in
                     self.error = .saveFailed
                 }
-                print("❌ Failed to save note: \(error)")
                 return nil
             }
+        }
+    }
+
+    /// Applies the image retention policy after OCR processing
+    private func applyImageRetentionPolicy(noteId: UUID) async {
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        let request = NSFetchRequest<Note>(entityName: "Note")
+        request.predicate = NSPredicate(format: "id == %@", noteId as CVarArg)
+        request.fetchLimit = 1
+
+        do {
+            if let note = try context.fetch(request).first {
+                await ImageRetentionService.shared.processAfterOCR(note: note)
+            }
+        } catch {
+            // Non-critical error - don't fail the capture
         }
     }
 }

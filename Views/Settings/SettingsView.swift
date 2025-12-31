@@ -19,6 +19,12 @@ struct SettingsView: View {
     @State private var showingGitHubDeviceCode = false
     @State private var isPollingGitHub = false
 
+    // Storage management state
+    @State private var storageUsed: Int64 = 0
+    @State private var notesWithImages: Int = 0
+    @State private var showingClearImagesConfirmation = false
+    @State private var isCalculatingStorage = false
+
     enum APITestResult {
         case success
         case failure(String)
@@ -42,6 +48,9 @@ struct SettingsView: View {
                         // OCR Settings Section
                         ocrSettingsSection
 
+                        // Storage & Privacy Section
+                        storagePrivacySection
+
                         // Handwriting Learning Section
                         handwritingLearningSection
 
@@ -62,6 +71,7 @@ struct SettingsView: View {
             .onAppear {
                 apiKeyInput = settings.claudeAPIKey ?? ""
                 learnedCorrectionCount = HandwritingLearningService.shared.correctionCount()
+                loadStorageInfo()
             }
             .confirmationDialog(
                 "Clear Learned Corrections",
@@ -75,6 +85,21 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("This will remove all corrections you've taught the app. This action cannot be undone.")
+            }
+            .confirmationDialog(
+                "Clear Original Images",
+                isPresented: $showingClearImagesConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Clear All Images", role: .destructive) {
+                    Task {
+                        await ImageRetentionService.shared.clearAllOriginalImages()
+                        loadStorageInfo()
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This will permanently delete all original images while keeping thumbnails. This frees up storage but you won't be able to view full-resolution images. This action cannot be undone.")
             }
             .sheet(isPresented: $showingDisclosureSheet) {
                 AIDisclosureSheet(
@@ -282,6 +307,116 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Storage & Privacy Section
+
+    private var storagePrivacySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader(title: "Storage & Privacy", icon: "externaldrive")
+
+            VStack(spacing: 0) {
+                // Image Retention Policy
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Image Retention")
+                        .font(.serifBody(15, weight: .medium))
+                        .foregroundColor(.textDark)
+
+                    Text("Control how long original images are kept after OCR processing")
+                        .font(.serifCaption(12, weight: .regular))
+                        .foregroundColor(.textMedium)
+
+                    Picker("Retention Policy", selection: $settings.imageRetentionPolicy) {
+                        ForEach(ImageRetentionPolicy.allCases, id: \.self) { policy in
+                            HStack {
+                                Image(systemName: policy.icon)
+                                Text(policy.displayName)
+                            }
+                            .tag(policy)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.forestDark)
+                }
+                .padding(16)
+
+                // Days picker (only shown for deleteAfterDays policy)
+                if settings.imageRetentionPolicy == .deleteAfterDays {
+                    Divider()
+
+                    HStack {
+                        Text("Keep images for")
+                            .font(.serifBody(15, weight: .medium))
+                            .foregroundColor(.textDark)
+
+                        Spacer()
+
+                        Picker("Days", selection: $settings.imageRetentionDays) {
+                            Text("7 days").tag(7)
+                            Text("14 days").tag(14)
+                            Text("30 days").tag(30)
+                            Text("60 days").tag(60)
+                            Text("90 days").tag(90)
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.forestDark)
+                    }
+                    .padding(16)
+                }
+
+                Divider()
+
+                // Storage usage display
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Original Images")
+                            .font(.serifBody(15, weight: .medium))
+                            .foregroundColor(.textDark)
+                        Text("\(notesWithImages) notes with images stored")
+                            .font(.serifCaption(12, weight: .regular))
+                            .foregroundColor(.textMedium)
+                    }
+
+                    Spacer()
+
+                    if isCalculatingStorage {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Text(ImageRetentionService.formatStorageSize(storageUsed))
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundColor(.forestDark)
+                    }
+                }
+                .padding(16)
+
+                if notesWithImages > 0 {
+                    Divider()
+
+                    // Clear all images button
+                    Button(action: { showingClearImagesConfirmation = true }) {
+                        HStack {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                            Text("Clear All Original Images")
+                                .font(.serifBody(15, weight: .medium))
+                                .foregroundColor(.red)
+                            Spacer()
+                        }
+                        .padding(16)
+                    }
+                }
+            }
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+
+            // Privacy note
+            Text("Thumbnails are always kept for display. Only full-resolution originals are affected.")
+                .font(.serifCaption(11, weight: .regular))
+                .foregroundColor(.textMedium)
+                .padding(.horizontal, 4)
+        }
+    }
+
     // MARK: - Handwriting Learning Section
 
     private var handwritingLearningSection: some View {
@@ -468,7 +603,7 @@ struct SettingsView: View {
                             .font(.serifCaption(12, weight: .semibold))
                             .foregroundColor(.forestDark)
                     }
-                    Text("Write #feature# or #claude# on paper, capture it with the camera, and QuillStack will transform your handwritten notes into a structured GitHub issue.")
+                    Text("Write #feature# or #issue# on paper, capture it with the camera, and QuillStack will transform your handwritten notes into a structured GitHub issue.")
                         .font(.serifCaption(12, weight: .regular))
                         .foregroundColor(.textMedium)
                         .fixedSize(horizontal: false, vertical: true)
@@ -729,6 +864,17 @@ struct SettingsView: View {
         settings.claudeAPIKey = nil
         settings.hasAcceptedAIDisclosure = false
         apiTestResult = nil
+    }
+
+    private func loadStorageInfo() {
+        isCalculatingStorage = true
+        Task {
+            let storage = await ImageRetentionService.shared.calculateStorageUsed()
+            let count = await ImageRetentionService.shared.notesWithImagesCount()
+            storageUsed = storage
+            notesWithImages = count
+            isCalculatingStorage = false
+        }
     }
 }
 

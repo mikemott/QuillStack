@@ -55,6 +55,22 @@ class TextClassifier {
             }
         }
 
+        // Reminder triggers
+        let reminderTriggers = ["#reminder#", "#remind#", "#remindme#"]
+        for trigger in reminderTriggers {
+            if prefix.contains(trigger) {
+                return .reminder
+            }
+        }
+
+        // Contact triggers
+        let contactTriggers = ["#contact#", "#person#", "#phone#"]
+        for trigger in contactTriggers {
+            if prefix.contains(trigger) {
+                return .contact
+            }
+        }
+
         // Todo triggers
         let todoTriggers = ["#todo#", "#to-do#", "#tasks#", "#task#"]
         for trigger in todoTriggers {
@@ -106,6 +122,32 @@ class TextClassifier {
             }
         }
 
+        // Reminder patterns
+        let reminderPatterns = [
+            "#reminder#", "#reminde#", "#rerinder#", "#rerninder#",
+            "#remind#", "#rernind#", "#rernlnd#",
+            "#remindme#", "#remindm3#",
+            "#reminder", "reminder#", "#remind", "remind#"
+        ]
+        for pattern in reminderPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .reminder
+            }
+        }
+
+        // Contact patterns
+        let contactPatterns = [
+            "#contact#", "#contacl#", "#contaci#", "#coniact#",
+            "#person#", "#pers0n#", "#persun#",
+            "#phone#", "#phon3#", "#fone#",
+            "#contact", "contact#", "#person", "person#"
+        ]
+        for pattern in contactPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .contact
+            }
+        }
+
         // Todo patterns - handle common OCR errors
         let todoPatterns = [
             "#todo#", "#tod0#", "#todoo#", "#toDo#",
@@ -147,6 +189,12 @@ class TextClassifier {
         // This catches "# email" or "#email tt" type errors
         if matchesLoosePattern(normalized, keywords: ["claude", "feature", "prompt", "request", "issue"]) {
             return .claudePrompt
+        }
+        if matchesLoosePattern(normalized, keywords: ["reminder", "remind", "remindme"]) {
+            return .reminder
+        }
+        if matchesLoosePattern(normalized, keywords: ["contact", "person", "phone"]) {
+            return .contact
         }
         if matchesLoosePattern(normalized, keywords: ["email", "mail", "emai", "ernail"]) {
             return .email
@@ -238,6 +286,8 @@ class TextClassifier {
     func extractTriggerTag(from content: String) -> (tag: String, cleanedContent: String)? {
         let patterns = [
             "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
+            "#reminder#", "#remind#", "#remindme#",
+            "#contact#", "#person#", "#phone#",
             "#todo#", "#to-do#", "#tasks#", "#task#",
             "#email#", "#mail#",
             "#meeting#", "#notes#", "#minutes#"
@@ -262,6 +312,54 @@ class TextClassifier {
 
         return nil
     }
+
+    /// Removes ALL occurrences of matched trigger tags from content
+    /// Returns the cleaned content with all tags stripped
+    func extractAllTriggerTags(from content: String, for noteType: NoteType) -> String {
+        // Get the patterns that match this note type
+        let patternsToRemove: [String]
+
+        switch noteType {
+        case .claudePrompt:
+            patternsToRemove = ["#claude#", "#feature#", "#prompt#", "#request#", "#issue#"]
+        case .reminder:
+            patternsToRemove = ["#reminder#", "#remind#", "#remindme#"]
+        case .contact:
+            patternsToRemove = ["#contact#", "#person#", "#phone#"]
+        case .todo:
+            patternsToRemove = ["#todo#", "#to-do#", "#tasks#", "#task#"]
+        case .email:
+            patternsToRemove = ["#email#", "#mail#"]
+        case .meeting:
+            patternsToRemove = ["#meeting#", "#notes#", "#minutes#"]
+        case .general:
+            return content  // No tags to remove for general notes
+        }
+
+        var cleaned = content
+
+        // Remove all occurrences of each pattern (case-insensitive)
+        for pattern in patternsToRemove {
+            if let regex = try? NSRegularExpression(
+                pattern: NSRegularExpression.escapedPattern(for: pattern),
+                options: .caseInsensitive
+            ) {
+                cleaned = regex.stringByReplacingMatches(
+                    in: cleaned,
+                    options: [],
+                    range: NSRange(cleaned.startIndex..., in: cleaned),
+                    withTemplate: ""
+                )
+            }
+        }
+
+        // Clean up extra whitespace and newlines created by removal
+        cleaned = cleaned
+            .replacingOccurrences(of: "\\n{3,}", with: "\n\n", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return cleaned
+    }
 }
 
 enum NoteType: String {
@@ -270,6 +368,8 @@ enum NoteType: String {
     case meeting = "meeting"
     case email = "email"
     case claudePrompt = "claudePrompt"
+    case reminder = "reminder"
+    case contact = "contact"
 
     var displayName: String {
         switch self {
@@ -277,7 +377,9 @@ enum NoteType: String {
         case .todo: return "To-Do"
         case .meeting: return "Meeting"
         case .email: return "Email"
-        case .claudePrompt: return "Prompt"
+        case .claudePrompt: return "Feature"
+        case .reminder: return "Reminder"
+        case .contact: return "Contact"
         }
     }
 
@@ -288,6 +390,8 @@ enum NoteType: String {
         case .meeting: return "calendar"
         case .email: return "envelope"
         case .claudePrompt: return "sparkles"
+        case .reminder: return "bell"
+        case .contact: return "person.crop.circle"
         }
     }
 
@@ -298,6 +402,8 @@ enum NoteType: String {
         case .meeting: return "badgeMeeting"
         case .email: return "badgeEmail"
         case .claudePrompt: return "badgePrompt"
+        case .reminder: return "badgeReminder"
+        case .contact: return "badgeContact"
         }
     }
 }

@@ -14,6 +14,7 @@ enum ExportDestinationType: String, CaseIterable, Identifiable {
     case appleNotes = "apple_notes"
     case obsidian = "obsidian"
     case notion = "notion"
+    case pdf = "pdf"
 
     var id: String { rawValue }
 
@@ -22,6 +23,7 @@ enum ExportDestinationType: String, CaseIterable, Identifiable {
         case .appleNotes: return "Apple Notes"
         case .obsidian: return "Obsidian"
         case .notion: return "Notion"
+        case .pdf: return "PDF Document"
         }
     }
 
@@ -30,6 +32,7 @@ enum ExportDestinationType: String, CaseIterable, Identifiable {
         case .appleNotes: return "note.text"
         case .obsidian: return "doc.text.fill"
         case .notion: return "book.closed.fill"
+        case .pdf: return "doc.richtext"
         }
     }
 
@@ -38,6 +41,7 @@ enum ExportDestinationType: String, CaseIterable, Identifiable {
         case .appleNotes: return "Native iOS notes app"
         case .obsidian: return "Local markdown vault"
         case .notion: return "Cloud workspace"
+        case .pdf: return "Save or share as PDF"
         }
     }
 }

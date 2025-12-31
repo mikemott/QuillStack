@@ -7,12 +7,15 @@
 
 import Foundation
 import CoreData
+import os.log
 
 // MARK: - Search Service
 
 /// Service for searching notes with filters
 class SearchService {
     static let shared = SearchService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Search")
 
     private init() {}
 
@@ -27,7 +30,7 @@ class SearchService {
         do {
             return try context.fetch(request)
         } catch {
-            print("Search error: \(error)")
+            Self.logger.error("Search error: \(error.localizedDescription)")
             return []
         }
     }

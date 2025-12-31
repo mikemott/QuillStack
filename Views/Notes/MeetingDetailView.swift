@@ -147,8 +147,13 @@ struct MeetingDetailView: View {
             Color.creamLight.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
-                slimHeader
+                // Header using shared component
+                DetailHeader(
+                    title: "Meeting",
+                    date: note.createdAt,
+                    noteType: "meeting",
+                    onBack: { dismiss() }
+                )
 
                 // Content
                 if isLoading {
@@ -218,70 +223,6 @@ struct MeetingDetailView: View {
             SummarySheet(note: note)
                 .presentationDetents([.medium, .large])
         }
-    }
-
-    // MARK: - Header
-
-    private var slimHeader: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.forestLight)
-                }
-
-                Text("Meeting")
-                    .font(.serifBody(17, weight: .semibold))
-                    .foregroundColor(.forestLight)
-                    .lineLimit(1)
-
-                Spacer()
-
-                // Badge
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 10, weight: .bold))
-                    Text("MEETING")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(0.5)
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeMeeting, Color.badgeMeeting.opacity(0.85)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .cornerRadius(4)
-                .shadow(color: Color.badgeMeeting.opacity(0.3), radius: 2, x: 0, y: 1)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-
-            // Date row
-            HStack(spacing: 12) {
-                Text(formattedNoteDate)
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
-        }
-        .background(
-            LinearGradient(
-                colors: [Color.forestMedium, Color.forestDark],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-        )
     }
 
     // MARK: - Loading View
@@ -529,19 +470,6 @@ struct MeetingDetailView: View {
 
     // MARK: - Helpers
 
-    private var formattedNoteDate: String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(note.createdAt) {
-            return "Captured today"
-        } else if calendar.isDateInYesterday(note.createdAt) {
-            return "Captured yesterday"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return "Captured \(formatter.string(from: note.createdAt))"
-        }
-    }
-
     private func extractMeetingDetails() {
         guard settings.hasAPIKey else {
             errorMessage = "No API key configured. Add your Claude API key in Settings to extract meeting details."
@@ -555,6 +483,11 @@ struct MeetingDetailView: View {
                 await MainActor.run {
                     self.meetingDetails = details
                     self.isLoading = false
+
+                    // Persist extracted details to Meeting entity
+                    if let meeting = note.meeting {
+                        persistMeetingDetails(details, to: meeting)
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -563,6 +496,98 @@ struct MeetingDetailView: View {
                 }
             }
         }
+    }
+
+    /// Persists LLM-extracted meeting details to the Core Data Meeting entity
+    private func persistMeetingDetails(_ details: MeetingDetails, to meeting: Meeting) {
+        // Update title from subject (removes #meeting# tag issue)
+        if !details.subject.isEmpty {
+            meeting.title = details.subject
+        }
+
+        // Update attendees
+        if !details.attendees.isEmpty {
+            meeting.attendees = details.attendees.joined(separator: ", ")
+        }
+
+        // Update date/time
+        if let parsedDate = details.parsedDate {
+            var finalDate = parsedDate
+
+            // Apply time if available
+            if let timeStr = details.time {
+                let timeFormats = ["h:mm a", "H:mm", "h:mma", "ha", "h a", "HH:mm"]
+                for format in timeFormats {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = format
+                    if let time = timeFormatter.date(from: timeStr) {
+                        let calendar = Calendar.current
+                        let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
+                        if let hour = timeComponents.hour, let minute = timeComponents.minute {
+                            finalDate = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: parsedDate) ?? parsedDate
+                        }
+                        break
+                    }
+                }
+            }
+            meeting.meetingDate = finalDate
+        }
+
+        // Update agenda/notes
+        if !details.notes.isEmpty {
+            meeting.agenda = details.notes
+        }
+
+        // Extract action items from notes if present
+        let actionItems = extractActionItems(from: details.notes)
+        if !actionItems.isEmpty {
+            meeting.actionItems = actionItems.joined(separator: "\n")
+        }
+
+        // Save to Core Data
+        do {
+            try note.managedObjectContext?.save()
+        } catch {
+            print("Failed to save meeting details: \(error)")
+        }
+    }
+
+    /// Extracts action items from meeting notes text
+    private func extractActionItems(from text: String) -> [String] {
+        var items: [String] = []
+        let lines = text.components(separatedBy: .newlines)
+
+        var inActionSection = false
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            let lowercased = trimmed.lowercased()
+
+            // Check if we're entering an action items section
+            if lowercased.contains("action item") || lowercased.contains("action:") ||
+               lowercased.contains("todo") || lowercased.contains("to-do") ||
+               lowercased.contains("next step") || lowercased.contains("follow up") {
+                inActionSection = true
+                continue
+            }
+
+            // Check if we're leaving action section (new section header)
+            if inActionSection && (lowercased.hasSuffix(":") && !lowercased.contains("action")) {
+                inActionSection = false
+            }
+
+            // Extract items that look like action items
+            if inActionSection || trimmed.hasPrefix("- [ ]") || trimmed.hasPrefix("[ ]") ||
+               trimmed.hasPrefix("•") || trimmed.hasPrefix("-") {
+                let cleaned = trimmed
+                    .replacingOccurrences(of: "^[-•*]\\s*\\[?\\s*\\]?\\s*", with: "", options: .regularExpression)
+                    .trimmingCharacters(in: .whitespaces)
+                if !cleaned.isEmpty && cleaned.count > 3 {
+                    items.append(cleaned)
+                }
+            }
+        }
+
+        return items
     }
 
     private func addToCalendar() {

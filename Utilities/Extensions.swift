@@ -124,6 +124,8 @@ extension Color {
     static let badgeGeneral = Color(red: 30/255, green: 77/255, blue: 47/255)      // #1e4d2f - forest
     static let badgeEmail = Color(red: 139/255, green: 69/255, blue: 119/255)      // #8b4577 - plum
     static let badgePrompt = Color(red: 91/255, green: 77/255, blue: 153/255)      // #5b4d99 - purple
+    static let badgeReminder = Color(red: 220/255, green: 88/255, blue: 88/255)    // #dc5858 - coral red
+    static let badgeContact = Color(red: 52/255, green: 120/255, blue: 180/255)    // #3478b4 - blue
 
     // App-wide theme colors (for compatibility)
     static let appPrimary = forestDark

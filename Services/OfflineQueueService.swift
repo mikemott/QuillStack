@@ -9,6 +9,7 @@ import Foundation
 import Network
 import CoreData
 import Combine
+import os.log
 
 // MARK: - Offline Queue Service
 
@@ -17,6 +18,8 @@ import Combine
 @MainActor
 final class OfflineQueueService: ObservableObject {
     static let shared = OfflineQueueService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "OfflineQueue")
 
     @Published private(set) var pendingCount: Int = 0
     @Published private(set) var isOnline: Bool = true
@@ -51,7 +54,7 @@ final class OfflineQueueService: ObservableObject {
 
                 // If we just came online, process the queue
                 if wasOffline && self.isOnline {
-                    print("📶 Network restored - processing offline queue")
+                    Self.logger.info("Network restored - processing offline queue")
                     await self.processQueue()
                 }
             }
@@ -86,9 +89,9 @@ final class OfflineQueueService: ObservableObject {
 
             do {
                 try context.save()
-                print("📥 Queued enhancement for note \(noteId)")
+                Self.logger.info("Queued enhancement for note \(noteId.uuidString, privacy: .private)")
             } catch {
-                print("❌ Failed to queue enhancement: \(error)")
+                Self.logger.error("Failed to queue enhancement: \(error.localizedDescription)")
             }
         }
 
@@ -118,7 +121,7 @@ final class OfflineQueueService: ObservableObject {
 
         for item in pendingItems {
             guard isOnline else {
-                print("📴 Lost connectivity - pausing queue processing")
+                Self.logger.info("Lost connectivity - pausing queue processing")
                 break
             }
 
@@ -157,7 +160,7 @@ final class OfflineQueueService: ObservableObject {
             do {
                 return try context.fetch(request)
             } catch {
-                print("❌ Failed to fetch pending items: \(error)")
+                Self.logger.error("Failed to fetch pending items: \(error.localizedDescription)")
                 return []
             }
         }
@@ -178,7 +181,7 @@ final class OfflineQueueService: ObservableObject {
             try? context.save()
         }
 
-        print("⚙️ Processing queued enhancement for note \(noteId)")
+        Self.logger.info("Processing queued enhancement for note \(noteId.uuidString, privacy: .private)")
 
         do {
             // Call LLM service
@@ -193,10 +196,10 @@ final class OfflineQueueService: ObservableObject {
                 try? context.save()
             }
 
-            print("✅ Successfully processed queued enhancement for note \(noteId)")
+            Self.logger.info("Successfully processed queued enhancement for note \(noteId.uuidString, privacy: .private)")
 
         } catch {
-            print("⚠️ Enhancement failed for note \(noteId): \(error)")
+            Self.logger.warning("Enhancement failed for note \(noteId.uuidString, privacy: .private): \(error.localizedDescription)")
             await handleRetry(item, in: context, error: error)
         }
     }
@@ -225,7 +228,7 @@ final class OfflineQueueService: ObservableObject {
                     }
                 }
             } catch {
-                print("❌ Failed to update note: \(error)")
+                Self.logger.error("Failed to update note: \(error.localizedDescription)")
             }
         }
     }
@@ -239,12 +242,12 @@ final class OfflineQueueService: ObservableObject {
                 item.setValue(currentRetries + 1, forKey: "retryCount")
                 item.setValue("pending", forKey: "status")
                 try? context.save()
-                print("🔄 Will retry (attempt \(currentRetries + 1)/\(self.maxRetries))")
+                Self.logger.info("Will retry enhancement (attempt \(currentRetries + 1)/\(self.maxRetries))")
             } else {
                 // Max retries exceeded - mark as failed
                 item.setValue("failed", forKey: "status")
                 try? context.save()
-                print("❌ Max retries exceeded - marking as failed")
+                Self.logger.error("Max retries exceeded - marking enhancement as failed")
             }
         }
     }
@@ -284,9 +287,9 @@ final class OfflineQueueService: ObservableObject {
                     item.setValue(Int16(0), forKey: "retryCount")
                 }
                 try context.save()
-                print("🔄 Reset \(failedItems.count) failed items for retry")
+                Self.logger.info("Reset \(failedItems.count) failed items for retry")
             } catch {
-                print("❌ Failed to reset failed items: \(error)")
+                Self.logger.error("Failed to reset failed items: \(error.localizedDescription)")
             }
         }
 
@@ -310,9 +313,9 @@ final class OfflineQueueService: ObservableObject {
                     context.delete(item)
                 }
                 try context.save()
-                print("🗑️ Cleared \(items.count) items from queue")
+                Self.logger.info("Cleared \(items.count) items from queue")
             } catch {
-                print("❌ Failed to clear queue: \(error)")
+                Self.logger.error("Failed to clear queue: \(error.localizedDescription)")
             }
         }
 

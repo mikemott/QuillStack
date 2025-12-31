@@ -104,6 +104,11 @@ struct ClaudePromptDetailView: View {
         }
         .task {
             await refinePrompt()
+
+            // Fetch repositories if already authenticated (won't trigger onChange)
+            if gitHubService.isAuthenticated && gitHubService.repositories.isEmpty {
+                try? await gitHubService.fetchRepositories()
+            }
         }
         .sheet(isPresented: $showingDeviceCodeSheet) {
             DeviceCodeSheet()

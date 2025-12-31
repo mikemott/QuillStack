@@ -415,7 +415,8 @@ struct CreateEventSheet: View {
 
         Task {
             do {
-                let notes = meeting.agenda ?? meeting.note?.content
+                // Build comprehensive notes including agenda and action items
+                let notes = buildEventNotes()
 
                 let eventId = try CalendarService.shared.createEvent(
                     title: eventTitle,
@@ -442,6 +443,38 @@ struct CreateEventSheet: View {
                 }
             }
         }
+    }
+
+    /// Builds comprehensive event notes including agenda and action items
+    private func buildEventNotes() -> String? {
+        var parts: [String] = []
+
+        // Add agenda/notes
+        if let agenda = meeting.agenda, !agenda.isEmpty {
+            parts.append("📋 Agenda:\n\(agenda)")
+        }
+
+        // Add action items
+        if let actionItems = meeting.actionItems, !actionItems.isEmpty {
+            let formattedItems = actionItems
+                .components(separatedBy: "\n")
+                .filter { !$0.isEmpty }
+                .map { "• \($0)" }
+                .joined(separator: "\n")
+            parts.append("✅ Action Items:\n\(formattedItems)")
+        }
+
+        // Add attendees
+        if !meeting.attendeesList.isEmpty {
+            parts.append("👥 Attendees: \(meeting.attendeesList.joined(separator: ", "))")
+        }
+
+        // Fallback to original note content if nothing else
+        if parts.isEmpty, let content = meeting.note?.content {
+            return content
+        }
+
+        return parts.isEmpty ? nil : parts.joined(separator: "\n\n")
     }
 
     private func openSettings() {

@@ -8,6 +8,43 @@
 import Foundation
 import Combine
 
+// MARK: - Image Retention Policy
+
+/// Policy options for retaining original images after OCR processing
+enum ImageRetentionPolicy: String, CaseIterable, Codable {
+    case keepForever = "keep_forever"
+    case deleteAfterOCR = "delete_after_ocr"
+    case deleteAfterDays = "delete_after_days"
+    case deleteAfterExport = "delete_after_export"
+
+    var displayName: String {
+        switch self {
+        case .keepForever: return "Keep Forever"
+        case .deleteAfterOCR: return "Delete After OCR"
+        case .deleteAfterDays: return "Delete After Time"
+        case .deleteAfterExport: return "Delete After Export"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .keepForever: return "Original images are stored indefinitely"
+        case .deleteAfterOCR: return "Delete original images once text is extracted"
+        case .deleteAfterDays: return "Keep images for a set number of days"
+        case .deleteAfterExport: return "Delete after exporting to another app"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .keepForever: return "photo.badge.checkmark"
+        case .deleteAfterOCR: return "text.viewfinder"
+        case .deleteAfterDays: return "calendar.badge.clock"
+        case .deleteAfterExport: return "square.and.arrow.up"
+        }
+    }
+}
+
 // MARK: - Onboarding Feature
 
 /// Features that can be configured during onboarding
@@ -84,6 +121,11 @@ final class SettingsManager: ObservableObject {
         // Onboarding
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
         static let selectedOnboardingFeatures = "selectedOnboardingFeatures"
+
+        // Image Retention
+        static let imageRetentionPolicy = "imageRetentionPolicy"
+        static let autoDeleteOriginalImages = "autoDeleteOriginalImages"
+        static let imageRetentionDays = "imageRetentionDays"
     }
 
     // MARK: - Initialization
@@ -202,6 +244,29 @@ final class SettingsManager: ObservableObject {
         }
     }
 
+    // MARK: - Image Retention Settings
+
+    /// Policy for retaining original images after OCR
+    @Published var imageRetentionPolicy: ImageRetentionPolicy = .keepForever {
+        didSet {
+            defaults.set(imageRetentionPolicy.rawValue, forKey: Keys.imageRetentionPolicy)
+        }
+    }
+
+    /// Whether to automatically delete original images after OCR completes
+    @Published var autoDeleteOriginalImages: Bool = false {
+        didSet {
+            defaults.set(autoDeleteOriginalImages, forKey: Keys.autoDeleteOriginalImages)
+        }
+    }
+
+    /// Number of days to retain original images (used with .deleteAfterDays policy)
+    @Published var imageRetentionDays: Int = 30 {
+        didSet {
+            defaults.set(imageRetentionDays, forKey: Keys.imageRetentionDays)
+        }
+    }
+
     // MARK: - Computed Properties
 
     var hasAPIKey: Bool {
@@ -255,6 +320,14 @@ final class SettingsManager: ObservableObject {
         if let rawFeatures = defaults.array(forKey: Keys.selectedOnboardingFeatures) as? [String] {
             selectedOnboardingFeatures = Set(rawFeatures.compactMap { OnboardingFeature(rawValue: $0) })
         }
+
+        // Load image retention settings
+        if let rawPolicy = defaults.string(forKey: Keys.imageRetentionPolicy),
+           let policy = ImageRetentionPolicy(rawValue: rawPolicy) {
+            imageRetentionPolicy = policy
+        }
+        autoDeleteOriginalImages = defaults.bool(forKey: Keys.autoDeleteOriginalImages)
+        imageRetentionDays = defaults.object(forKey: Keys.imageRetentionDays) as? Int ?? 30
     }
 
     // MARK: - Migration
@@ -278,34 +351,12 @@ final class SettingsManager: ObservableObject {
     // MARK: - API Key Validation
 
     /// Tests if the Claude API key is valid by making a minimal API call
+    /// Uses LLMService's pinned session for secure communication
     func validateClaudeAPIKey() async -> Bool {
         guard let apiKey = claudeAPIKey, !apiKey.isEmpty else {
             return false
         }
 
-        // Minimal test request
-        var request = URLRequest(url: URL(string: "https://api.anthropic.com/v1/messages")!)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
-
-        let body: [String: Any] = [
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": 1,
-            "messages": [["role": "user", "content": "Hi"]]
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse {
-                // 200 = valid, 401 = invalid key, other codes still mean key format is valid
-                return httpResponse.statusCode != 401
-            }
-            return false
-        } catch {
-            return false
-        }
+        return await LLMService.shared.validateAPIKey(apiKey)
     }
 }

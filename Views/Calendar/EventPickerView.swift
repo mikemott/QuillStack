@@ -232,20 +232,64 @@ struct EventPickerView: View {
     }
 
     private func linkEvent(_ event: EKEvent) {
+        // Store the link
         meeting.calendarEventIdentifier = event.eventIdentifier
 
-        // Update meeting title if empty
+        // Update meeting data from event if not already set
         if meeting.title.isEmpty {
             meeting.title = event.title
         }
-
-        // Update meeting date if not set
         if meeting.meetingDate == nil {
             meeting.meetingDate = event.startDate
         }
 
+        // Update the calendar event with meeting notes and action items
+        updateCalendarEvent(event)
+
         try? CoreDataStack.shared.saveViewContext()
         dismiss()
+    }
+
+    /// Updates the linked calendar event with meeting notes, agenda, and action items
+    private func updateCalendarEvent(_ event: EKEvent) {
+        // Build notes to append
+        var meetingNotes: [String] = []
+
+        if let agenda = meeting.agenda, !agenda.isEmpty {
+            meetingNotes.append("📋 Agenda:\n\(agenda)")
+        }
+
+        if let actionItems = meeting.actionItems, !actionItems.isEmpty {
+            let formattedItems = actionItems
+                .components(separatedBy: "\n")
+                .filter { !$0.isEmpty }
+                .map { "• \($0)" }
+                .joined(separator: "\n")
+            meetingNotes.append("✅ Action Items:\n\(formattedItems)")
+        }
+
+        if !meeting.attendeesList.isEmpty {
+            meetingNotes.append("👥 Attendees: \(meeting.attendeesList.joined(separator: ", "))")
+        }
+
+        // If we have meeting notes to add
+        if !meetingNotes.isEmpty {
+            let newNotes = meetingNotes.joined(separator: "\n\n")
+
+            // Append to existing notes or set new notes
+            if let existingNotes = event.notes, !existingNotes.isEmpty {
+                event.notes = existingNotes + "\n\n---\n📝 Meeting Notes:\n\n" + newNotes
+            } else {
+                event.notes = newNotes
+            }
+
+            // Save the updated event
+            do {
+                try CalendarService.shared.updateEvent(event)
+            } catch {
+                print("Failed to update calendar event: \(error)")
+            }
+        }
     }
 
     private func unlinkEvent() {

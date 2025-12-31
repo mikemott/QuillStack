@@ -8,10 +8,12 @@
 
 import AVFoundation
 import UIKit
+import os.log
 
 @MainActor
 @Observable
 final class CameraManager: NSObject {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Camera")
     // Observable state (main actor)
     var isAuthorized = false
     var isCameraUnavailable = false
@@ -263,7 +265,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
             Task { @MainActor in
                 self.error = .captureSessionError
             }
-            print("Photo capture error: \(error.localizedDescription)")
+            Self.logger.error("Photo capture error: \(error.localizedDescription)")
             return
         }
 

@@ -7,11 +7,14 @@
 
 import Foundation
 import EventKit
+import os.log
 
 // MARK: - Reminders Service
 
 class RemindersService {
     static let shared = RemindersService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Reminders")
 
     private let eventStore = EKEventStore()
 
@@ -53,7 +56,7 @@ class RemindersService {
                 return try await eventStore.requestAccess(to: .reminder)
             }
         } catch {
-            print("Reminders access request failed: \(error)")
+            Self.logger.error("Reminders access request failed: \(error.localizedDescription)")
             return false
         }
     }

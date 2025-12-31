@@ -26,11 +26,17 @@ struct ContentView: View {
                 }
                 .tag(1)
 
+            StatisticsView()
+                .tabItem {
+                    Label("Statistics", systemImage: "chart.bar.fill")
+                }
+                .tag(2)
+
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
-                .tag(2)
+                .tag(3)
         }
         .tint(.forestDark) // Tab bar accent color
         .onAppear {

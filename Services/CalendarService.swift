@@ -7,11 +7,14 @@
 
 import Foundation
 import EventKit
+import os.log
 
 // MARK: - Calendar Service
 
 class CalendarService {
     static let shared = CalendarService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Calendar")
 
     private let eventStore = EKEventStore()
 
@@ -53,7 +56,7 @@ class CalendarService {
                 return try await eventStore.requestAccess(to: .event)
             }
         } catch {
-            print("Calendar access request failed: \(error)")
+            Self.logger.error("Calendar access request failed: \(error.localizedDescription)")
             return false
         }
     }
@@ -179,6 +182,11 @@ class CalendarService {
         }
         event.notes = notes
         try eventStore.save(event, span: .thisEvent)
+    }
+
+    /// Update an existing event (saves any modifications made to the event object)
+    func updateEvent(_ event: EKEvent) throws {
+        try eventStore.save(event, span: .thisEvent, commit: true)
     }
 }
 

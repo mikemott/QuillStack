@@ -7,6 +7,7 @@
 
 import Foundation
 import Security
+import os.log
 
 // MARK: - Keychain Service
 
@@ -14,6 +15,8 @@ import Security
 /// Provides encrypted storage for API keys and sensitive data
 final class KeychainService {
     static let shared = KeychainService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Keychain")
 
     private init() {}
 
@@ -146,7 +149,7 @@ final class KeychainService {
             defaults.removeObject(forKey: userDefaultsKey)
             return true
         } catch {
-            print("Keychain migration failed for \(userDefaultsKey): \(error)")
+            Self.logger.error("Keychain migration failed: \(error.localizedDescription)")
             return false
         }
     }

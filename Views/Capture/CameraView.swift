@@ -19,6 +19,11 @@ struct CameraView: View {
     @State private var showingPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
 
+    // Template state
+    @State private var showingTemplatePicker = true
+    @State private var selectedTemplate: NoteTemplate = .freeform
+    @State private var hasSelectedTemplate = false
+
     var body: some View {
         ZStack {
             // Dark background
@@ -69,7 +74,7 @@ struct CameraView: View {
                     onConfirm: {
                         showingImagePreview = false
                         Task {
-                            await viewModel.processImage(image)
+                            await viewModel.processImage(image, template: selectedTemplate)
                             dismiss()
                         }
                     },
@@ -86,12 +91,22 @@ struct CameraView: View {
             }
         }
         .onAppear {
-            if cameraManager.isAuthorized && !cameraManager.isCameraUnavailable {
+            // Don't start camera until template is selected
+            if hasSelectedTemplate && cameraManager.isAuthorized && !cameraManager.isCameraUnavailable {
                 cameraManager.startSession()
             }
         }
         .onDisappear {
             cameraManager.stopSession()
+        }
+        .sheet(isPresented: $showingTemplatePicker) {
+            TemplatePickerSheet(selectedTemplate: $selectedTemplate) {
+                hasSelectedTemplate = true
+                if cameraManager.isAuthorized && !cameraManager.isCameraUnavailable {
+                    cameraManager.startSession()
+                }
+            }
+            .interactiveDismissDisabled(!hasSelectedTemplate)
         }
         .photosPicker(
             isPresented: $showingPhotoPicker,
@@ -132,10 +147,10 @@ struct CameraView: View {
 
             Spacer()
 
-            // Title
-            Text("Capture Note")
-                .font(.serifBody(17, weight: .semibold))
-                .foregroundColor(.forestLight)
+            // Template badge (tappable to change)
+            TemplateBadge(template: selectedTemplate) {
+                showingTemplatePicker = true
+            }
 
             Spacer()
 
@@ -157,17 +172,29 @@ struct CameraView: View {
                         .stroke(Color.forestDark.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
                 )
                 .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                .overlay(
+                    // Template guide overlay (only for non-freeform templates)
+                    Group {
+                        if selectedTemplate != .freeform {
+                            TemplateOverlayView(template: selectedTemplate)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .allowsHitTesting(false)
+                        }
+                    }
+                )
 
-            // Guide overlay
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.forestDark.opacity(0.4), lineWidth: 2)
-                .frame(width: 200, height: 200)
-                .shadow(color: .forestDark.opacity(0.2), radius: 10, x: 0, y: 0)
+            // Simple guide overlay for freeform
+            if selectedTemplate == .freeform {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.4), lineWidth: 2)
+                    .frame(width: 200, height: 200)
+                    .shadow(color: .forestDark.opacity(0.2), radius: 10, x: 0, y: 0)
+            }
 
             // Instruction text
             VStack {
                 Spacer()
-                Text("Point camera at your handwritten notes\nWe'll convert them to text instantly")
+                Text(selectedTemplate.instructionText)
                     .font(.serifCaption(15, weight: .regular))
                     .foregroundColor(.forestLight.opacity(0.8))
                     .italic()

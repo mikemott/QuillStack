@@ -20,8 +20,12 @@ struct NoteDetailView: View {
     @State private var isEnhancing: Bool = false
     @State private var enhanceError: String?
     @State private var hasPendingEnhancement: Bool = false
+    @State private var saveTask: Task<Void, Never>?
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
+
+    /// Debounce delay for auto-save (in nanoseconds)
+    private let saveDebounceDelay: UInt64 = 500_000_000 // 500ms
 
     var body: some View {
         ZStack {
@@ -29,8 +33,16 @@ struct NoteDetailView: View {
             Color.creamLight.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Slim Header
-                slimHeader
+                // Header using shared component
+                DetailHeader(
+                    title: noteTitle,
+                    date: note.createdAt,
+                    noteType: note.noteType,
+                    onBack: { dismiss() },
+                    wordCount: wordCount,
+                    ocrConfidence: note.ocrConfidence,
+                    hasPendingEnhancement: hasPendingEnhancement
+                )
 
                 // Content area - always editable
                 TextEditor(text: $editedContent)
@@ -62,8 +74,15 @@ struct NoteDetailView: View {
             }
         }
         .onChange(of: editedContent) { _, newValue in
-            // Auto-save on every change
+            // Debounced auto-save to prevent excessive saves on every keystroke
             if newValue != note.content {
+                debouncedSave()
+            }
+        }
+        .onDisappear {
+            // Cancel pending save and save immediately on dismiss
+            saveTask?.cancel()
+            if editedContent != note.content {
                 saveChanges()
             }
         }
@@ -94,6 +113,26 @@ struct NoteDetailView: View {
         )
     }
 
+    /// Debounced save - waits for user to stop typing before saving
+    private func debouncedSave() {
+        // Cancel any pending save
+        saveTask?.cancel()
+
+        // Schedule new save with debounce delay
+        saveTask = Task {
+            do {
+                try await Task.sleep(nanoseconds: saveDebounceDelay)
+                // Check if cancelled during sleep
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    saveChanges()
+                }
+            } catch {
+                // Task was cancelled - no action needed
+            }
+        }
+    }
+
     private func saveChanges() {
         // Detect corrections for handwriting learning before saving
         if editedContent != originalContent {
@@ -114,86 +153,6 @@ struct NoteDetailView: View {
         Task {
             hasPendingEnhancement = await OfflineQueueService.shared.hasPendingEnhancement(for: note.id)
         }
-    }
-
-    // MARK: - Slim Header
-
-    private var slimHeader: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
-                // Back button
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.forestLight)
-                }
-                .accessibilityLabel("Back to notes")
-
-                // Title
-                Text(noteTitle)
-                    .font(.serifBody(17, weight: .semibold))
-                    .foregroundColor(.forestLight)
-                    .lineLimit(1)
-
-                Spacer()
-
-                // Pending enhancement indicator
-                if hasPendingEnhancement {
-                    HStack(spacing: 4) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.system(size: 12))
-                        Text("Enhancing...")
-                            .font(.serifCaption(11, weight: .medium))
-                    }
-                    .foregroundColor(.orange)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.orange.opacity(0.15))
-                    .cornerRadius(8)
-                }
-
-                // Badge
-                noteTypeBadge
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-
-            // Metadata row
-            HStack(spacing: 12) {
-                Text(formattedDate)
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Text("•")
-                    .foregroundColor(.textLight.opacity(0.5))
-
-                Text("\(wordCount) words")
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                if note.ocrConfidence > 0 {
-                    Text("•")
-                        .foregroundColor(.textLight.opacity(0.5))
-
-                    Text("\(Int(note.ocrConfidence * 100))%")
-                        .font(.serifCaption(12, weight: .regular))
-                        .foregroundColor(.textLight.opacity(0.8))
-                }
-
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
-        }
-        .background(
-            LinearGradient(
-                colors: [Color.forestMedium, Color.forestDark],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-        )
     }
 
     // MARK: - Bottom Bar
@@ -366,26 +325,6 @@ struct NoteDetailView: View {
         }
     }
 
-    // MARK: - Badge
-
-    private var noteTypeBadge: some View {
-        Text(note.noteType.uppercased())
-            .font(.system(size: 10, weight: .bold))
-            .foregroundColor(.white)
-            .tracking(0.5)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                LinearGradient(
-                    colors: [badgeColor, badgeColor.opacity(0.85)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .cornerRadius(4)
-            .shadow(color: badgeColor.opacity(0.3), radius: 2, x: 0, y: 1)
-    }
-
     // MARK: - Helpers
 
     private var noteTitle: String {
@@ -395,18 +334,6 @@ struct NoteDetailView: View {
 
     private var wordCount: Int {
         editedContent.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
-    }
-
-    private var formattedDate: String {
-        note.createdAt.formattedForNotes()
-    }
-
-    private var badgeColor: Color {
-        switch note.noteType.lowercased() {
-        case "todo": return .badgeTodo
-        case "meeting": return .badgeMeeting
-        default: return .badgeGeneral
-        }
     }
 
     private func shareNote() {

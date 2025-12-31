@@ -86,11 +86,15 @@ final class LLMService: NSObject {
             throw LLMError.noAPIKey
         }
 
+        // Sanitize content to remove sensitive information before sending to API
+        let sanitizer = await ContentSanitizer.shared
+        let sanitizedPrompt = await sanitizer.sanitize(prompt)
+
         let requestBody: [String: Any] = [
             "model": model,
             "max_tokens": maxTokens,
             "messages": [
-                ["role": "user", "content": prompt]
+                ["role": "user", "content": sanitizedPrompt]
             ]
         ]
 
@@ -129,6 +133,48 @@ final class LLMService: NSObject {
 
     // MARK: - Public API
 
+    /// Perform a raw API request with a custom prompt
+    /// This allows other services to leverage the pinned session for secure API calls
+    /// - Parameters:
+    ///   - prompt: The prompt to send to the LLM
+    ///   - maxTokens: Maximum tokens in the response (default 2048)
+    /// - Returns: The raw text response from the LLM
+    func performRequest(prompt: String, maxTokens: Int = 2048) async throws -> String {
+        return try await performAPIRequest(prompt: prompt, maxTokens: maxTokens)
+    }
+
+    /// Validates an API key by making a minimal test request
+    /// Uses the pinned session for security
+    /// - Parameter apiKey: The API key to validate
+    /// - Returns: True if the API key is valid
+    func validateAPIKey(_ apiKey: String) async -> Bool {
+        guard !apiKey.isEmpty else { return false }
+
+        let requestBody: [String: Any] = [
+            "model": model,
+            "max_tokens": 1,
+            "messages": [["role": "user", "content": "Hi"]]
+        ]
+
+        var request = URLRequest(url: apiURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody)
+
+        do {
+            let (_, response) = try await pinnedSession.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                // 200 = valid, 401 = invalid key, other codes still mean key format is valid
+                return httpResponse.statusCode != 401
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+
     /// Clean up OCR text using Claude API
     func enhanceOCRText(_ text: String, noteType: String = "general") async throws -> EnhancedTextResult {
         let prompt = buildPrompt(for: text, noteType: noteType)
@@ -147,26 +193,33 @@ final class LLMService: NSObject {
     /// Extract structured meeting details from text using LLM
     func extractMeetingDetails(from text: String) async throws -> MeetingDetails {
         let prompt = """
-        Extract meeting details from this handwritten note that was scanned with OCR. The text may have some recognition errors.
+        Extract meeting details from this handwritten note that was scanned with OCR. The text may have recognition errors.
 
         Please extract the following information and return it as JSON:
         - subject: The main topic or purpose of the meeting (string)
-        - attendees: List of people attending, use first names only when possible (array of strings)
+        - attendees: List of people attending with FULL NAMES (array of strings)
         - date: The meeting date if mentioned, in YYYY-MM-DD format if possible, or natural language like "tomorrow" (string or null)
         - time: The meeting time if mentioned, e.g. "2:00 PM" or "14:00" (string or null)
         - location: Where the meeting is held if mentioned (string or null)
         - notes: Any additional details, agenda items, or discussion points as plain text (string)
 
-        For attendees:
-        - Extract just first names when you see full names (e.g., "John Smith" → "John")
-        - If you see email addresses, extract the name part (e.g., "john.smith@company.com" → "John")
-        - Clean up any OCR errors in names
+        CRITICAL - For attendees, follow these rules exactly:
+        1. Each person = ONE array entry with their FULL NAME (first + last)
+        2. OCR often puts first and last names on separate lines - COMBINE THEM
+           Example: If you see "Mike" on one line and "Mott" on the next, output ["Mike Mott"]
+        3. Fix obvious OCR errors in names (e.g., "Matt" is likely "Mott", similar-looking letters get confused)
+        4. If you see what looks like 2 capitalized words near each other, they are likely FirstName LastName
+        5. NEVER output ["Mike", "Mott"] - always output ["Mike Mott"]
+        6. Common OCR errors to fix:
+           - "Matt" near "Mike" is probably "Mott" (Mike Mott)
+           - Roman numerals often misread: 111 → III, 11 → II, 1 → I
+           - Letters confused: l/1/I, O/0, rn/m, cl/d
 
         Original text:
         \(text)
 
         Return ONLY valid JSON, no markdown code blocks, no explanations. Example format:
-        {"subject":"Q4 Planning","attendees":["Mike","Sarah"],"date":"2024-12-20","time":"2:00 PM","location":"Conference Room A","notes":"Review budget\\nDiscuss timeline"}
+        {"subject":"Q4 Planning","attendees":["Mike Mott","Kyle Simard"],"date":"2024-12-20","time":"2:00 PM","location":"Conference Room A","notes":"Review budget\\nDiscuss timeline"}
         """
 
         let jsonText = try await performAPIRequest(prompt: prompt, maxTokens: 1024)
@@ -234,11 +287,44 @@ final class LLMService: NSObject {
             4. Merge lines that were incorrectly split mid-sentence
             5. Keep bullet points and numbered lists intact
             6. Preserve names and proper nouns carefully
+            7. For attendee names: combine first and last names that appear on separate lines
+            8. Fix common OCR errors:
+               - Roman numerals: 111 → III, 11 → II, 1 → I (when context suggests Roman numerals)
+               - Similar letters: l/1/I confusion, O/0 confusion, rn→m
+               - Names: if "Matt" appears near "Mike", it's likely "Mott" (Mike Mott)
 
             Original OCR text:
             \(text)
 
             Return ONLY the corrected text. No explanations.
+            """
+
+        case "claudeprompt":
+            return """
+            You are helping format handwritten feature requests or ideas that were scanned with OCR.
+
+            This text may contain multiple #feature# tags (or similar like #claude#, #prompt#, #request#, #issue#), each marking a separate feature idea or request.
+
+            Please:
+            1. Fix OCR errors (misspellings, wrong characters)
+            2. Remove ALL occurrences of trigger tags like #feature#, #claude#, #prompt#, #request#, #issue#
+            3. Identify each distinct feature/idea in the text
+            4. Format as a structured list where each feature has:
+               - A clear, concise title in imperative mood
+               - A brief description if additional context exists
+            5. Use consistent formatting:
+               ## Feature 1: [Title]
+               [Description if any]
+
+               ## Feature 2: [Title]
+               [Description if any]
+            6. Keep the original intent - don't add scope or over-engineer
+            7. If only one feature is present, still use the structured format
+
+            Original OCR text:
+            \(text)
+
+            Return ONLY the formatted features. No explanations.
             """
 
         default:

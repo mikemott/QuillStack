@@ -67,18 +67,23 @@ final class PromptRefinerService {
         return """
         You are helping transform handwritten feature requests or bug reports into well-structured GitHub issues.
 
-        Given rough handwritten notes (which may contain OCR errors), produce a structured GitHub issue with:
+        Given rough handwritten notes (which may contain OCR errors and possibly multiple #feature# or similar tags), produce a structured GitHub issue with:
 
-        1. **Title**: A clear, concise title in imperative mood (e.g., "Add dark mode toggle", "Fix login timeout issue")
-        2. **Description**: A clear explanation of the feature or bug
-        3. **Acceptance Criteria**: A bulleted checklist of requirements (if applicable)
+        1. **Title**: A clear, concise title in imperative mood
+           - If multiple features are present, use a grouping title like "Add [theme] features" or pick the primary feature
+        2. **Description**: A clear explanation of the feature(s) or bug(s)
+           - If multiple items exist, organize as a checklist or numbered sections
+        3. **Acceptance Criteria**: A bulleted checklist of requirements
+           - Include each distinct feature as a separate criterion if multiple are present
         4. **Technical Notes**: Any implementation hints from the notes (if present)
         5. **Labels**: Suggest 1-3 appropriate labels from: enhancement, bug, documentation, ui, performance, refactor, security, testing
 
         Guidelines:
+        - Remove ALL trigger tags (#feature#, #claude#, #prompt#, #request#, #issue#, etc.) from the output
         - Keep the original intent - don't over-engineer or add scope
         - Fix obvious OCR errors in the text
         - Use Markdown formatting suitable for GitHub
+        - If multiple features are detected, organize them clearly in the body
         - If the note is vague, create reasonable acceptance criteria based on common patterns
         - For bugs, include "Steps to Reproduce" if mentioned
         \(contextSection)
@@ -100,65 +105,8 @@ final class PromptRefinerService {
     }
 
     private func performRefinement(prompt: String) async throws -> String {
-        // Check network connectivity first
-        let offlineQueue = OfflineQueueService.shared
-        guard offlineQueue.isOnline else {
-            throw LLMService.LLMError.offline
-        }
-
-        // Check for API key
-        let settings = SettingsManager.shared
-        guard settings.hasAcceptedAIDisclosure || !settings.needsAIDisclosure else {
-            throw LLMService.LLMError.consentRequired
-        }
-
-        guard let apiKey = settings.claudeAPIKey, !apiKey.isEmpty else {
-            throw LLMService.LLMError.noAPIKey
-        }
-
-        // Build request
-        let apiURL = URL(string: "https://api.anthropic.com/v1/messages")!
-        let model = "claude-sonnet-4-20250514"
-        let anthropicVersion = "2023-06-01"
-
-        let requestBody: [String: Any] = [
-            "model": model,
-            "max_tokens": 2048,
-            "messages": [
-                ["role": "user", "content": prompt]
-            ]
-        ]
-
-        var request = URLRequest(url: apiURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
-        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw LLMService.LLMError.invalidResponse
-        }
-
-        switch httpResponse.statusCode {
-        case 200:
-            break
-        case 429:
-            throw LLMService.LLMError.rateLimited
-        default:
-            throw LLMService.LLMError.networkError("Request failed with status \(httpResponse.statusCode)")
-        }
-
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let content = json["content"] as? [[String: Any]],
-              let firstContent = content.first,
-              let text = firstContent["text"] as? String else {
-            throw LLMService.LLMError.invalidResponse
-        }
-
-        return text
+        // Use LLMService's pinned session for secure API communication
+        return try await llmService.performRequest(prompt: prompt, maxTokens: 2048)
     }
 
     private func parseRefinedPrompt(from response: String, originalText: String) throws -> RefinedPrompt {

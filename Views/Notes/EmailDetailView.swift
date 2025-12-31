@@ -26,8 +26,14 @@ struct EmailDetailView: View {
             Color.creamLight.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
-                slimHeader
+                // Header using shared component
+                DetailHeader(
+                    title: "Email Draft",
+                    date: note.createdAt,
+                    noteType: "email",
+                    onBack: { dismiss() },
+                    customLabel: "Draft"
+                )
 
                 // Email fields
                 ScrollView {
@@ -93,77 +99,6 @@ struct EmailDetailView: View {
             SummarySheet(note: note)
                 .presentationDetents([.medium, .large])
         }
-    }
-
-    // MARK: - Header
-
-    private var slimHeader: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.forestLight)
-                }
-
-                Text("Email Draft")
-                    .font(.serifBody(17, weight: .semibold))
-                    .foregroundColor(.forestLight)
-                    .lineLimit(1)
-
-                Spacer()
-
-                // Badge
-                HStack(spacing: 4) {
-                    Image(systemName: "envelope")
-                        .font(.system(size: 10, weight: .bold))
-                    Text("EMAIL")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(0.5)
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeEmail, Color.badgeEmail.opacity(0.85)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .cornerRadius(4)
-                .shadow(color: Color.badgeEmail.opacity(0.3), radius: 2, x: 0, y: 1)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-
-            // Date row
-            HStack(spacing: 12) {
-                Text(formattedDate)
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Text("•")
-                    .foregroundColor(.textLight.opacity(0.5))
-
-                Text("Draft")
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
-        }
-        .background(
-            LinearGradient(
-                colors: [Color.forestMedium, Color.forestDark],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-        )
     }
 
     // MARK: - Email Field
@@ -247,19 +182,6 @@ struct EmailDetailView: View {
     }
 
     // MARK: - Helpers
-
-    private var formattedDate: String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(note.createdAt) {
-            return "Today"
-        } else if calendar.isDateInYesterday(note.createdAt) {
-            return "Yesterday"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return formatter.string(from: note.createdAt)
-        }
-    }
 
     private func parseEmailContent() {
         let classifier = TextClassifier()

@@ -11,6 +11,9 @@
         <attribute name="meetingDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="title" attributeType="String" defaultValueString=""/>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="meeting" inverseEntity="Note"/>
+        <fetchIndex name="byMeetingDateIndex">
+            <fetchIndexElement property="meetingDate" type="Binary" order="descending"/>
+        </fetchIndex>
     </entity>
     <entity name="Note" representedClassName="Note" syncable="YES">
         <attribute name="content" attributeType="String" defaultValueString=""/>
@@ -29,6 +32,16 @@
         <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>
         <relationship name="pages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NotePage" inverseName="note" inverseEntity="NotePage"/>
         <relationship name="todoItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TodoItem" inverseName="note" inverseEntity="TodoItem"/>
+        <fetchIndex name="byCreatedAtIndex">
+            <fetchIndexElement property="createdAt" type="Binary" order="descending"/>
+        </fetchIndex>
+        <fetchIndex name="byArchivedAndCreatedAtIndex">
+            <fetchIndexElement property="isArchived" type="Binary" order="ascending"/>
+            <fetchIndexElement property="createdAt" type="Binary" order="descending"/>
+        </fetchIndex>
+        <fetchIndex name="byNoteTypeIndex">
+            <fetchIndexElement property="noteType" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="NotePage" representedClassName="NotePage" syncable="YES">
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
@@ -52,6 +65,13 @@
         <attribute name="status" attributeType="String" defaultValueString="todo"/>
         <attribute name="text" attributeType="String" defaultValueString=""/>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="todoItems" inverseEntity="Note"/>
+        <fetchIndex name="byDueDateIndex">
+            <fetchIndexElement property="dueDate" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="byStatusAndDueDateIndex">
+            <fetchIndexElement property="isCompleted" type="Binary" order="ascending"/>
+            <fetchIndexElement property="dueDate" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="QueuedEnhancement" representedClassName="QueuedEnhancement" syncable="YES">
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>

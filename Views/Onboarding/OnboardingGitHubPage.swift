@@ -262,7 +262,7 @@ struct OnboardingGitHubPage: View {
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                tipRow("1", "Write #feature# or #claude# on paper")
+                tipRow("1", "Write #feature# or #issue# on paper")
                 tipRow("2", "Capture with QuillStack camera")
                 tipRow("3", "Review and create GitHub issue")
             }

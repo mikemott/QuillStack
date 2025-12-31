@@ -18,6 +18,7 @@ class ExportService {
     private let appleNotesExporter = AppleNotesExporter()
     private lazy var obsidianExporter = ObsidianExporter()
     private lazy var notionExporter = NotionExporter()
+    private lazy var pdfExporter = PDFExporter()
 
     private init() {}
 
@@ -95,6 +96,8 @@ class ExportService {
             return obsidianExporter
         case .notion:
             return notionExporter
+        case .pdf:
+            return pdfExporter
         }
     }
 

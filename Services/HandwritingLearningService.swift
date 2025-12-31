@@ -7,10 +7,13 @@
 
 import Foundation
 import CoreData
+import os.log
 
 @MainActor
 final class HandwritingLearningService {
     static let shared = HandwritingLearningService()
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "HandwritingLearning")
 
     private let context: NSManagedObjectContext
 
@@ -70,7 +73,7 @@ final class HandwritingLearningService {
             try context.execute(deleteRequest)
             try context.save()
         } catch {
-            print("Failed to clear OCR corrections: \(error)")
+            Self.logger.error("Failed to clear OCR corrections: \(error.localizedDescription)")
         }
     }
 
@@ -167,7 +170,7 @@ final class HandwritingLearningService {
         do {
             try context.save()
         } catch {
-            print("Failed to save OCR corrections: \(error)")
+            Self.logger.error("Failed to save OCR corrections: \(error.localizedDescription)")
         }
     }
 

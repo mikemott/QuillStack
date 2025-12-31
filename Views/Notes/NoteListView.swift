@@ -13,6 +13,12 @@ struct NoteListView: View {
     @State private var showingSearch = false
     @State private var selectedNote: Note?
 
+    // Multi-select state
+    @State private var isEditing = false
+    @State private var selectedNotes: Set<Note> = []
+    @State private var showingBulkExport = false
+    @State private var showingDeleteConfirmation = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -29,6 +35,11 @@ struct NoteListView: View {
                     } else {
                         noteGridContent
                     }
+
+                    // Bulk action toolbar (shown during edit mode with selections)
+                    if isEditing {
+                        bulkActionToolbar
+                    }
                 }
             }
             .navigationBarHidden(true)
@@ -38,10 +49,35 @@ struct NoteListView: View {
             .fullScreenCover(isPresented: $showingSearch) {
                 NoteSearchView()
             }
+            .sheet(isPresented: $showingBulkExport) {
+                BulkExportSheet(notes: Array(selectedNotes)) {
+                    exitEditMode()
+                }
+            }
             .navigationDestination(item: $selectedNote) { note in
                 destinationView(for: note)
             }
+            .confirmationDialog(
+                "Delete \(selectedNotes.count) note\(selectedNotes.count == 1 ? "" : "s")?",
+                isPresented: $showingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    withAnimation {
+                        viewModel.deleteNotes(selectedNotes)
+                        exitEditMode()
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This action cannot be undone.")
+            }
         }
+    }
+
+    private func exitEditMode() {
+        isEditing = false
+        selectedNotes.removeAll()
     }
 
     // MARK: - Custom Navigation Bar
@@ -57,49 +93,105 @@ struct NoteListView: View {
             .ignoresSafeArea(edges: .top)
 
             HStack(alignment: .bottom) {
-                // Title
-                Text("Notes")
-                    .font(.serifTitle(34, weight: .bold))
+                // Edit/Done button (left side in edit mode)
+                if isEditing {
+                    Button("Done") {
+                        withAnimation {
+                            exitEditMode()
+                        }
+                    }
+                    .font(.serifBody(17, weight: .semibold))
                     .foregroundColor(.forestLight)
+                }
+
+                // Logo + Title
+                if isEditing {
+                    Text("\(selectedNotes.count) Selected")
+                        .font(.serifTitle(24, weight: .bold))
+                        .foregroundColor(.forestLight)
+                } else {
+                    HStack(spacing: 12) {
+                        // Logo
+                        Image("Logo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 44, height: 44)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+
+                        // App name
+                        Text("QuillStack")
+                            .font(.serifTitle(28, weight: .bold))
+                            .foregroundColor(.forestLight)
+                    }
+                }
 
                 Spacer()
 
                 HStack(spacing: 12) {
-                    // Search button
-                    Button(action: { showingSearch = true }) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.forestLight)
-                            .frame(width: 44, height: 44)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .cornerRadius(10)
-                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
-                    }
-                    .accessibilityLabel("Search notes")
+                    if isEditing {
+                        // Select All button
+                        Button(action: {
+                            if selectedNotes.count == viewModel.notes.count {
+                                selectedNotes.removeAll()
+                            } else {
+                                selectedNotes = Set(viewModel.notes)
+                            }
+                        }) {
+                            Text(selectedNotes.count == viewModel.notes.count ? "Deselect All" : "Select All")
+                                .font(.serifBody(15, weight: .medium))
+                                .foregroundColor(.forestLight)
+                        }
+                    } else {
+                        // Edit button
+                        if !viewModel.notes.isEmpty {
+                            Button(action: {
+                                withAnimation {
+                                    isEditing = true
+                                }
+                            }) {
+                                Text("Edit")
+                                    .font(.serifBody(17, weight: .medium))
+                                    .foregroundColor(.forestLight)
+                            }
+                        }
 
-                    // Camera button
-                    Button(action: { showingCamera = true }) {
-                        Image(systemName: "camera")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.forestLight)
-                            .frame(width: 44, height: 44)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                        // Search button
+                        Button(action: { showingSearch = true }) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.forestLight)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
-                            )
-                            .cornerRadius(10)
-                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                        }
+                        .accessibilityLabel("Search notes")
+
+                        // Camera button
+                        Button(action: { showingCamera = true }) {
+                            Image(systemName: "camera")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.forestLight)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                        }
+                        .accessibilityLabel("Capture new note")
                     }
-                    .accessibilityLabel("Capture new note")
                 }
             }
             .padding(.horizontal, 20)
@@ -112,27 +204,13 @@ struct NoteListView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 24) {
-            // Icon
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.forestDark.opacity(0.15), Color.forestMedium.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.forestDark.opacity(0.25), lineWidth: 2)
-                    )
-                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-
-                Image(systemName: "pencil.line")
-                    .font(.system(size: 60, weight: .regular))
-                    .foregroundColor(.forestDark)
-            }
+            // Logo
+            Image("Logo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
 
             // Text
             VStack(spacing: 12) {
@@ -180,14 +258,47 @@ struct NoteListView: View {
     private var noteGridContent: some View {
         List {
             ForEach(viewModel.notes, id: \.objectID) { note in
-                NoteCardView(note: note)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                    .onTapGesture {
+                HStack(spacing: 12) {
+                    // Selection indicator (shown in edit mode)
+                    if isEditing {
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                if selectedNotes.contains(note) {
+                                    selectedNotes.remove(note)
+                                } else {
+                                    selectedNotes.insert(note)
+                                }
+                            }
+                        }) {
+                            Image(systemName: selectedNotes.contains(note) ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 24))
+                                .foregroundColor(selectedNotes.contains(note) ? .forestDark : .textLight)
+                        }
+                        .buttonStyle(.plain)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+
+                    NoteCardView(note: note, isSelected: isEditing && selectedNotes.contains(note))
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if isEditing {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            if selectedNotes.contains(note) {
+                                selectedNotes.remove(note)
+                            } else {
+                                selectedNotes.insert(note)
+                            }
+                        }
+                    } else {
                         selectedNote = note
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: !isEditing) {
+                    if !isEditing {
                         Button(role: .destructive) {
                             withAnimation {
                                 viewModel.deleteNote(note)
@@ -196,7 +307,9 @@ struct NoteListView: View {
                             Label("Delete", systemImage: "trash")
                         }
                     }
-                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: !isEditing) {
+                    if !isEditing {
                         Button {
                             withAnimation {
                                 viewModel.archiveNote(note)
@@ -206,7 +319,9 @@ struct NoteListView: View {
                         }
                         .tint(.orange)
                     }
-                    .contextMenu {
+                }
+                .contextMenu {
+                    if !isEditing {
                         Button(role: .destructive) {
                             viewModel.deleteNote(note)
                         } label: {
@@ -219,10 +334,78 @@ struct NoteListView: View {
                             Label("Archive", systemImage: "archivebox")
                         }
                     }
+                }
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .animation(.easeInOut(duration: 0.2), value: isEditing)
+    }
+
+    // MARK: - Bulk Action Toolbar
+
+    private var bulkActionToolbar: some View {
+        HStack(spacing: 0) {
+            // Export button
+            Button(action: {
+                if !selectedNotes.isEmpty {
+                    showingBulkExport = true
+                }
+            }) {
+                VStack(spacing: 4) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20))
+                    Text("Export")
+                        .font(.serifCaption(11, weight: .medium))
+                }
+                .foregroundColor(selectedNotes.isEmpty ? .textLight : .forestDark)
+                .frame(maxWidth: .infinity)
+            }
+            .disabled(selectedNotes.isEmpty)
+
+            // Archive button
+            Button(action: {
+                if !selectedNotes.isEmpty {
+                    withAnimation {
+                        viewModel.archiveNotes(selectedNotes)
+                        exitEditMode()
+                    }
+                }
+            }) {
+                VStack(spacing: 4) {
+                    Image(systemName: "archivebox")
+                        .font(.system(size: 20))
+                    Text("Archive")
+                        .font(.serifCaption(11, weight: .medium))
+                }
+                .foregroundColor(selectedNotes.isEmpty ? .textLight : .orange)
+                .frame(maxWidth: .infinity)
+            }
+            .disabled(selectedNotes.isEmpty)
+
+            // Delete button
+            Button(action: {
+                if !selectedNotes.isEmpty {
+                    showingDeleteConfirmation = true
+                }
+            }) {
+                VStack(spacing: 4) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 20))
+                    Text("Delete")
+                        .font(.serifCaption(11, weight: .medium))
+                }
+                .foregroundColor(selectedNotes.isEmpty ? .textLight : .red)
+                .frame(maxWidth: .infinity)
+            }
+            .disabled(selectedNotes.isEmpty)
+        }
+        .padding(.vertical, 12)
+        .background(
+            Color.paperBeige
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: -2)
+        )
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func archiveNote(_ note: Note) {
@@ -240,6 +423,10 @@ struct NoteListView: View {
             MeetingDetailView(note: note)
         case "claudeprompt":
             ClaudePromptDetailView(note: note)
+        case "reminder":
+            ReminderDetailView(note: note)
+        case "contact":
+            ContactDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }
@@ -250,6 +437,7 @@ struct NoteListView: View {
 
 struct NoteCardView: View {
     let note: Note
+    var isSelected: Bool = false
     @State private var isPressed = false
 
     var body: some View {
@@ -320,17 +508,19 @@ struct NoteCardView: View {
                     endPoint: .bottomTrailing
                 )
 
-                // Left border (appears on press)
+                // Left border (appears on press or selection)
                 Rectangle()
                     .fill(badgeColor)
-                    .frame(width: isPressed ? 4 : 0)
+                    .frame(width: (isPressed || isSelected) ? 4 : 0)
                     .animation(.easeInOut(duration: 0.2), value: isPressed)
+                    .animation(.easeInOut(duration: 0.15), value: isSelected)
             }
         )
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+                .stroke(isSelected ? Color.forestDark : Color.forestDark.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                .animation(.easeInOut(duration: 0.15), value: isSelected)
         )
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         .scaleEffect(isPressed ? 0.98 : 1.0)
@@ -372,6 +562,8 @@ struct NoteCardView: View {
         case "meeting": return "calendar"
         case "email": return "envelope"
         case "claudeprompt": return "sparkles"
+        case "reminder": return "bell"
+        case "contact": return "person.crop.circle"
         default: return "doc.text"
         }
     }
@@ -382,6 +574,8 @@ struct NoteCardView: View {
         case "meeting": return .badgeMeeting
         case "email": return .badgeEmail
         case "claudeprompt": return .badgePrompt
+        case "reminder": return .badgeReminder
+        case "contact": return .badgeContact
         default: return .badgeGeneral
         }
     }
@@ -422,6 +616,10 @@ struct NoteCardView: View {
             return "paperplane"
         case "claudeprompt":
             return "arrow.up.circle"
+        case "reminder":
+            return "clock"
+        case "contact":
+            return "person"
         default:
             return "text.alignleft"
         }
@@ -439,6 +637,10 @@ struct NoteCardView: View {
             return "Draft"
         case "claudeprompt":
             return note.summary != nil ? "Issue created" : "Ready to export"
+        case "reminder":
+            return "Reminder"
+        case "contact":
+            return "Contact"
         default:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"

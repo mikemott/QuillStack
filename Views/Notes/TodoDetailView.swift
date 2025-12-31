@@ -24,8 +24,15 @@ struct TodoDetailView: View {
             Color.creamLight.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
-                slimHeader
+                // Header using shared component
+                DetailHeader(
+                    title: noteTitle,
+                    date: note.createdAt,
+                    noteType: "todo",
+                    onBack: { dismiss() },
+                    completedCount: completedCount,
+                    totalCount: tasks.count
+                )
 
                 // Task list
                 ScrollView {
@@ -67,91 +74,6 @@ struct TodoDetailView: View {
             ExportToRemindersSheet(tasks: tasks)
                 .presentationDetents([.medium, .large])
         }
-    }
-
-    // MARK: - Header
-
-    private var slimHeader: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.forestLight)
-                }
-
-                Text(noteTitle)
-                    .font(.serifBody(17, weight: .semibold))
-                    .foregroundColor(.forestLight)
-                    .lineLimit(1)
-
-                Spacer()
-
-                // Badge
-                HStack(spacing: 4) {
-                    Image(systemName: "checkmark.square")
-                        .font(.system(size: 10, weight: .bold))
-                    Text("TO-DO")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(0.5)
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeTodo, Color.badgeTodo.opacity(0.85)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .cornerRadius(4)
-                .shadow(color: Color.badgeTodo.opacity(0.3), radius: 2, x: 0, y: 1)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-
-            // Progress row
-            HStack(spacing: 12) {
-                Text(formattedDate)
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Text("•")
-                    .foregroundColor(.textLight.opacity(0.5))
-
-                Text("\(completedCount)/\(tasks.count) complete")
-                    .font(.serifCaption(12, weight: .regular))
-                    .foregroundColor(.textLight.opacity(0.8))
-
-                Spacer()
-
-                // Progress bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.forestLight.opacity(0.3))
-                            .frame(height: 4)
-
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.forestLight)
-                            .frame(width: geo.size.width * progressPercent, height: 4)
-                    }
-                }
-                .frame(width: 60, height: 4)
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
-        }
-        .background(
-            LinearGradient(
-                colors: [Color.forestMedium, Color.forestDark],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-        )
     }
 
     // MARK: - Add Task Row
@@ -255,17 +177,8 @@ struct TodoDetailView: View {
         return firstLine.truncated(to: 30)
     }
 
-    private var formattedDate: String {
-        note.createdAt.shortFormat
-    }
-
     private var completedCount: Int {
         tasks.filter { $0.isCompleted }.count
-    }
-
-    private var progressPercent: CGFloat {
-        guard !tasks.isEmpty else { return 0 }
-        return CGFloat(completedCount) / CGFloat(tasks.count)
     }
 
     private func parseTasks() {
