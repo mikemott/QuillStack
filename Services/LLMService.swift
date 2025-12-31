@@ -129,9 +129,63 @@ final class LLMService: NSObject {
 
     // MARK: - Public API
 
+    /// Infer note type from content when no explicit tag is present
+    /// Returns the inferred type or nil if no strong match
+    func inferNoteType(from text: String) -> String? {
+        let lowercased = text.lowercased()
+
+        // Check for expense/receipt indicators
+        let expenseIndicators = [
+            // Dollar amounts
+            #"\$\d+\.?\d*"#,
+            // Common receipt words
+            "receipt", "total", "subtotal", "tax", "paid", "change",
+            "visa", "mastercard", "amex", "debit", "credit card",
+            // Store/vendor patterns
+            "store", "purchase", "transaction",
+            // Date + amount pattern typical of receipts
+            "amount", "price", "cost"
+        ]
+
+        var expenseScore = 0
+
+        // Check for dollar amount (strong indicator)
+        if lowercased.range(of: #"\$\d+\.?\d*"#, options: .regularExpression) != nil {
+            expenseScore += 3
+        }
+
+        // Check for receipt-specific words
+        for indicator in expenseIndicators {
+            if indicator.hasPrefix("#") {
+                // Regex pattern
+                if lowercased.range(of: indicator, options: .regularExpression) != nil {
+                    expenseScore += 2
+                }
+            } else if lowercased.contains(indicator) {
+                expenseScore += 1
+            }
+        }
+
+        // If strong expense signals, return expense type
+        if expenseScore >= 3 {
+            return "expense"
+        }
+
+        return nil
+    }
+
     /// Clean up OCR text using Claude API
+    /// If noteType is "general", attempts to infer the type from content
     func enhanceOCRText(_ text: String, noteType: String = "general") async throws -> EnhancedTextResult {
-        let prompt = buildPrompt(for: text, noteType: noteType)
+        // Try to infer type if general
+        let effectiveType: String
+        if noteType == "general", let inferred = inferNoteType(from: text) {
+            effectiveType = inferred
+        } else {
+            effectiveType = noteType
+        }
+
+        let prompt = buildPrompt(for: text, noteType: effectiveType)
         let enhancedText = try await performAPIRequest(prompt: prompt, maxTokens: 2048)
 
         // Calculate what changed
@@ -239,6 +293,27 @@ final class LLMService: NSObject {
             \(text)
 
             Return ONLY the corrected text. No explanations.
+            """
+
+        case "expense":
+            return """
+            You are helping format a handwritten expense or receipt note that was scanned with OCR.
+
+            Please:
+            1. Fix OCR errors (misspellings, wrong characters, garbled amounts)
+            2. Extract and format: amount (with $ prefix), vendor/store name, category, date
+            3. Format as structured fields:
+               - Amount: $XX.XX
+               - Vendor: [store/business name]
+               - Category: [Food, Transport, Office, Travel, Utilities, Entertainment, or Other]
+               - Date: [MMM d, yyyy format]
+            4. Keep any additional notes or item details after the structured fields
+            5. If an #expense# or #receipt# tag is not present, add #expense# at the start
+
+            Original OCR text:
+            \(text)
+
+            Return ONLY the formatted expense text. No explanations.
             """
 
         default:

@@ -9,7 +9,7 @@ import Foundation
 
 class TextClassifier {
     /// Classifies the type of note based on content
-    /// Priority: explicit hashtag triggers > content analysis
+    /// Priority: explicit hashtag triggers > content analysis > inference
     func classifyNote(content: String) -> NoteType {
         let lowercased = content.lowercased()
 
@@ -25,6 +25,11 @@ class TextClassifier {
 
         if isTodoNote(lowercased) {
             return .todo
+        }
+
+        // Check for expense/receipt content without explicit tag
+        if isExpenseNote(lowercased) {
+            return .expense
         }
 
         return .general
@@ -257,6 +262,44 @@ class TextClassifier {
         ]
 
         return todoIndicators.contains { text.contains($0) }
+    }
+
+    /// Detects expense/receipt content without explicit tags
+    /// Uses scoring to avoid false positives
+    private func isExpenseNote(_ text: String) -> Bool {
+        var score = 0
+
+        // Strong indicators (dollar amounts)
+        if text.range(of: #"\$\d+\.?\d*"#, options: .regularExpression) != nil {
+            score += 3
+        }
+
+        // Receipt-specific terms
+        let strongTerms = ["receipt", "total", "subtotal", "tax"]
+        for term in strongTerms {
+            if text.contains(term) {
+                score += 2
+            }
+        }
+
+        // Payment method indicators
+        let paymentTerms = ["visa", "mastercard", "amex", "debit", "credit card", "cash", "change"]
+        for term in paymentTerms {
+            if text.contains(term) {
+                score += 2
+            }
+        }
+
+        // Weaker indicators
+        let weakTerms = ["paid", "purchase", "amount", "price", "store"]
+        for term in weakTerms {
+            if text.contains(term) {
+                score += 1
+            }
+        }
+
+        // Need at least a dollar amount + one other indicator, or multiple strong indicators
+        return score >= 4
     }
 
     /// Extracts the trigger tag from content (for display/removal purposes)
