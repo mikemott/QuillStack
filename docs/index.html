@@ -1835,9 +1835,7 @@
             showSlide(currentSlide - 1);
         });
 
-        nextBtn.addEventListener('click', function() {
-            showSlide(currentSlide + 1);
-        });
+        // Note: nextBtn.onclick is set dynamically in showSlide()
 
         dots.forEach(function(dot, index) {
             dot.addEventListener('click', function() {
