@@ -15,6 +15,8 @@ struct ReminderDetailView: View {
     @State private var hasDueDate: Bool = false
     @State private var showingExportSheet: Bool = false
     @State private var showingDatePicker: Bool = false
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -111,6 +113,11 @@ struct ReminderDetailView: View {
                 dueDate: hasDueDate ? dueDate : nil
             )
             .presentationDetents([.medium])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -225,7 +232,13 @@ struct ReminderDetailView: View {
 
         note.content = newContent
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            print("ReminderDetailView: Failed to save changes - \(error.localizedDescription)")
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func shareNote() {
