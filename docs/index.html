@@ -28,11 +28,19 @@
             --text-medium: #4a6b4f;
             --text-light: #d4e0d4;
 
-            /* Badge colors */
+            /* Badge colors - all 12 note types */
+            --badge-general: #1e4d2f;
             --badge-todo: #b8860b;
             --badge-meeting: #146464;
             --badge-email: #8b4577;
             --badge-prompt: #5b4d99;
+            --badge-reminder: #dc5858;
+            --badge-contact: #3478b4;
+            --badge-expense: #2e8b57;
+            --badge-shopping: #ff8c00;
+            --badge-recipe: #cd5c5c;
+            --badge-event: #4682b4;
+            --badge-idea: #ffd700;
 
             /* Typography */
             --font-display: 'Cormorant Garamond', Georgia, serif;
@@ -447,10 +455,18 @@
             letter-spacing: 0.05em;
         }
 
+        .badge-general { background: var(--badge-general); color: white; }
         .badge-todo { background: var(--badge-todo); color: white; }
         .badge-meeting { background: var(--badge-meeting); color: white; }
         .badge-email { background: var(--badge-email); color: white; }
         .badge-prompt { background: var(--badge-prompt); color: white; }
+        .badge-reminder { background: var(--badge-reminder); color: white; }
+        .badge-contact { background: var(--badge-contact); color: white; }
+        .badge-expense { background: var(--badge-expense); color: white; }
+        .badge-shopping { background: var(--badge-shopping); color: white; }
+        .badge-recipe { background: var(--badge-recipe); color: white; }
+        .badge-event { background: var(--badge-event); color: white; }
+        .badge-idea { background: var(--badge-idea); color: #2d4a2f; }
 
         .note-date {
             font-size: 0.75rem;
@@ -785,26 +801,54 @@
 
         .illustration-classify {
             background: var(--cream-light);
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 24px;
+            align-content: center;
         }
 
         .classify-badge {
-            padding: 12px 20px;
-            border-radius: 100px;
+            padding: 10px 12px;
+            border-radius: 12px;
             font-family: var(--font-display);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: white;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .classify-badge svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
 
         .classify-badge:hover {
-            transform: scale(1.05);
+            transform: scale(1.08);
+        }
+
+        @media (max-width: 600px) {
+            .illustration-classify {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 16px;
+            }
+            .classify-badge {
+                padding: 8px;
+                font-size: 0.65rem;
+            }
+            .classify-badge svg {
+                width: 16px;
+                height: 16px;
+            }
         }
 
         .illustration-enhance {
@@ -1040,6 +1084,144 @@
         .tour-nav-btn:disabled:hover {
             background: transparent;
             color: var(--forest-dark);
+        }
+
+        /* ===== NOTE TYPES SECTION ===== */
+        .note-types-section {
+            background: linear-gradient(180deg, var(--paper-beige) 0%, var(--cream-light) 100%);
+            padding: var(--space-2xl) 0;
+        }
+
+        .note-types-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .note-types-header h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .note-types-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .note-types-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .note-types-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .note-types-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .note-type-card {
+            background: white;
+            border-radius: 16px;
+            padding: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-type-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-accent-color, var(--forest-dark));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: top;
+        }
+
+        .note-type-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(30, 77, 47, 0.15);
+        }
+
+        .note-type-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .note-type-card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .note-type-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .note-type-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .note-type-name {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+        }
+
+        .note-type-trigger {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            background: var(--cream-medium);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .note-type-description {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .note-type-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .note-type-feature {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: var(--cream-light);
+            color: var(--text-dark);
+            border: 1px solid rgba(30, 77, 47, 0.1);
         }
 
         /* ===== FEATURES GRID ===== */
@@ -1388,8 +1570,9 @@
                     <span class="logo-text">QuillStack</span>
                 </a>
                 <nav>
-                    <a href="#features">Features</a>
                     <a href="#tour">Tour</a>
+                    <a href="#note-types">Note Types</a>
+                    <a href="#features">Features</a>
                     <a href="#download">Download</a>
                 </nav>
                 <a href="#download" class="btn btn-primary">Get the App</a>
@@ -1445,32 +1628,38 @@
 
                                     <div class="note-card">
                                         <div class="note-card-header">
-                                            <span class="note-type-badge badge-todo">Todo</span>
+                                            <span class="note-type-badge badge-expense">Expense</span>
                                             <span class="note-date">Today</span>
                                         </div>
-                                        <div class="note-title">Project Tasks</div>
-                                        <div class="note-preview">
-                                            <span>&#9745; Review </span><span class="confidence-word">designs</span><br>
-                                            <span>&#9744; Update documentation</span>
-                                        </div>
+                                        <div class="note-title">Coffee Meeting</div>
+                                        <div class="note-preview">$24.50 • Business • <span class="confidence-word">Starbucks</span></div>
                                     </div>
 
                                     <div class="note-card">
                                         <div class="note-card-header">
-                                            <span class="note-type-badge badge-meeting">Meeting</span>
+                                            <span class="note-type-badge badge-recipe">Recipe</span>
+                                            <span class="note-date">Today</span>
+                                        </div>
+                                        <div class="note-title">Mom's Pasta Sauce</div>
+                                        <div class="note-preview">Tomatoes, basil, garlic...</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-reminder">Reminder</span>
                                             <span class="note-date">Yesterday</span>
                                         </div>
-                                        <div class="note-title">Sprint Planning</div>
-                                        <div class="note-preview">Attendees: Sarah, Mike, Alex...</div>
+                                        <div class="note-title">Call dentist</div>
+                                        <div class="note-preview">Tomorrow at 9am</div>
                                     </div>
 
                                     <div class="note-card">
                                         <div class="note-card-header">
-                                            <span class="note-type-badge badge-prompt">GitHub</span>
-                                            <span class="note-date">Dec 28</span>
+                                            <span class="note-type-badge badge-idea">Idea</span>
+                                            <span class="note-date">Dec 29</span>
                                         </div>
-                                        <div class="note-title">Add dark mode toggle</div>
-                                        <div class="note-preview">Ready to export as Issue...</div>
+                                        <div class="note-title">App feature idea</div>
+                                        <div class="note-preview">Voice memos to text...</div>
                                     </div>
                                 </div>
                             </div>
@@ -1486,7 +1675,7 @@
                         <div class="hotspot" style="top: 38%; left: 15%;">
                             <div class="hotspot-ring"></div>
                             <div class="hotspot-dot"></div>
-                            <div class="hotspot-tooltip">Auto-classified note types</div>
+                            <div class="hotspot-tooltip">12 auto-classified note types</div>
                         </div>
 
                         <div class="hotspot" style="top: 45%; right: 25%;">
@@ -1606,25 +1795,61 @@
                                         Simply write a hashtag trigger like #todo# or #email#, and QuillStack automatically routes your note to the right view with purpose-built features.
                                     </p>
                                     <ul class="slide-features">
-                                        <li><strong>Todo</strong> — Checkable tasks with progress</li>
-                                        <li><strong>Email</strong> — Parse To/Subject, open in Mail</li>
-                                        <li><strong>Meeting</strong> — Attendees, agenda, action items</li>
-                                        <li><strong>GitHub</strong> — Refine and export as Issue</li>
+                                        <li>12 specialized note types with unique features</li>
+                                        <li>Hashtag triggers like #todo#, #recipe#, #expense#</li>
+                                        <li>Each type routes to a purpose-built view</li>
+                                        <li>Export to Calendar, Reminders, GitHub, Mail</li>
                                     </ul>
                                 </div>
                                 <div class="slide-visual">
                                     <div class="feature-illustration illustration-classify">
                                         <div class="classify-badge" style="background: var(--badge-todo);">
+                                            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                                             Todo
                                         </div>
                                         <div class="classify-badge" style="background: var(--badge-meeting);">
+                                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                             Meeting
                                         </div>
                                         <div class="classify-badge" style="background: var(--badge-email);">
+                                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                             Email
                                         </div>
                                         <div class="classify-badge" style="background: var(--badge-prompt);">
-                                            GitHub
+                                            <svg viewBox="0 0 24 24"><path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z"/></svg>
+                                            Feature
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-reminder);">
+                                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                            Reminder
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-contact);">
+                                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Contact
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-expense);">
+                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15.5 9.5a3 3 0 0 0-3-2.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-2.5a3 3 0 0 1-3-2.5"/></svg>
+                                            Expense
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-shopping);">
+                                            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                            Shopping
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-recipe);">
+                                            <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+                                            Recipe
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-event);">
+                                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2 4-4"/></svg>
+                                            Event
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-idea);">
+                                            <svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                                            Idea
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-general);">
+                                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                            Note
                                         </div>
                                     </div>
                                 </div>
@@ -1744,6 +1969,244 @@
                         <button class="tour-nav-btn" id="nextBtn">
                             Next <span class="btn-icon-right">&#8594;</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Note Types Section -->
+    <section class="note-types-section" id="note-types">
+        <div class="container">
+            <div class="note-types-header">
+                <span class="flourish"></span>
+                <h2>12 Specialized Note Types</h2>
+                <p class="tour-subtitle">
+                    Each note type unlocks purpose-built features. Just write a hashtag trigger and let QuillStack do the rest.
+                </p>
+            </div>
+
+            <div class="note-types-grid">
+                <!-- Todo -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-todo);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-todo);">
+                            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">To-Do</div>
+                            <div class="note-type-trigger">#todo#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Checkable task lists with progress tracking. Never lose a handwritten to-do again.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Checkboxes</span>
+                        <span class="note-type-feature">Progress bar</span>
+                        <span class="note-type-feature">Reminders</span>
+                    </div>
+                </div>
+
+                <!-- Meeting -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-meeting);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-meeting);">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Meeting</div>
+                            <div class="note-type-trigger">#meeting#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Parse attendees, agenda items, and action items automatically from your notes.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Attendees</span>
+                        <span class="note-type-feature">Agenda</span>
+                        <span class="note-type-feature">Action items</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-email);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-email);">
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Email</div>
+                            <div class="note-type-trigger">#email#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Draft emails with parsed To, Subject, and Body fields. Open directly in Mail.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">To/Subject</span>
+                        <span class="note-type-feature">Open in Mail</span>
+                    </div>
+                </div>
+
+                <!-- Feature/GitHub -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-prompt);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-prompt);">
+                            <svg viewBox="0 0 24 24"><path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Feature</div>
+                            <div class="note-type-trigger">#feature#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Transform rough ideas into structured GitHub Issues with AI refinement.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">GitHub export</span>
+                        <span class="note-type-feature">AI refine</span>
+                        <span class="note-type-feature">Labels</span>
+                    </div>
+                </div>
+
+                <!-- Reminder -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-reminder);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-reminder);">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Reminder</div>
+                            <div class="note-type-trigger">#reminder#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Quick reminders that export directly to Apple Reminders with due dates.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Due dates</span>
+                        <span class="note-type-feature">Reminders app</span>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-contact);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-contact);">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Contact</div>
+                            <div class="note-type-trigger">#contact#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture contact info from business cards or notes. Add to Contacts with one tap.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Phone/Email</span>
+                        <span class="note-type-feature">Add to Contacts</span>
+                    </div>
+                </div>
+
+                <!-- Expense -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-expense);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-expense);">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15.5 9.5a3 3 0 0 0-3-2.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-2.5a3 3 0 0 1-3-2.5"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Expense</div>
+                            <div class="note-type-trigger">#expense#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Track expenses and receipts. Parse amounts, dates, and categories automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Amount</span>
+                        <span class="note-type-feature">Category</span>
+                        <span class="note-type-feature">Receipt scan</span>
+                    </div>
+                </div>
+
+                <!-- Shopping -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-shopping);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-shopping);">
+                            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Shopping</div>
+                            <div class="note-type-trigger">#shopping#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Shopping lists that sync to Reminders. Check items off as you shop.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Checklist</span>
+                        <span class="note-type-feature">Reminders sync</span>
+                    </div>
+                </div>
+
+                <!-- Recipe -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-recipe);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-recipe);">
+                            <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Recipe</div>
+                            <div class="note-type-trigger">#recipe#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture handwritten recipes with ingredients and steps parsed automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Ingredients</span>
+                        <span class="note-type-feature">Steps</span>
+                        <span class="note-type-feature">Servings</span>
+                    </div>
+                </div>
+
+                <!-- Event -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-event);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-event);">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2 4-4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Event</div>
+                            <div class="note-type-trigger">#event#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Create calendar events from notes. Parse date, time, and location automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Date/Time</span>
+                        <span class="note-type-feature">Location</span>
+                        <span class="note-type-feature">Calendar</span>
+                    </div>
+                </div>
+
+                <!-- Idea -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-idea);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-idea);">
+                            <svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Idea</div>
+                            <div class="note-type-trigger">#idea#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture fleeting thoughts and brainstorms. Tag and organize for later review.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Quick capture</span>
+                        <span class="note-type-feature">Tags</span>
+                    </div>
+                </div>
+
+                <!-- General Note -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-general);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-general);">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">General Note</div>
+                            <div class="note-type-trigger">default</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">For everything else. Full OCR with confidence highlighting and AI enhancement.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">OCR</span>
+                        <span class="note-type-feature">AI enhance</span>
+                        <span class="note-type-feature">Search</span>
                     </div>
                 </div>
             </div>
