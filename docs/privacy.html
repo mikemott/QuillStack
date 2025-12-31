@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - QuillStack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest-dark: #1e4d2f;
+            --forest-medium: #143d23;
+            --cream-light: #f4f8f4;
+            --text-dark: #2d4a2f;
+            --text-medium: #4a6b4f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--cream-light);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--forest-dark);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+        }
+
+        .logo span {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--forest-dark);
+            margin-bottom: 10px;
+        }
+
+        .updated {
+            color: var(--text-medium);
+            font-style: italic;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--forest-dark);
+            margin-top: 40px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--forest-medium);
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-medium);
+        }
+
+        .highlight {
+            background: #e8f0e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--forest-dark);
+        }
+
+        .highlight p {
+            margin: 0;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        ul {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--text-medium);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: var(--forest-dark);
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        a {
+            color: var(--forest-dark);
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--forest-dark);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="logo">
+                <img src="logo.png" alt="QuillStack">
+                <span>QuillStack</span>
+            </a>
+            <h1>Privacy Policy</h1>
+            <p class="updated">Last Updated: December 31, 2024</p>
+        </header>
+
+        <main>
+            <div class="highlight">
+                <p><strong>The short version:</strong> QuillStack does not collect, store, or transmit your personal data to our servers. All your notes and data remain on your device or in your personal iCloud account.</p>
+            </div>
+
+            <h2>Information We Do NOT Collect</h2>
+            <p>QuillStack does not collect:</p>
+            <ul>
+                <li>Personal identification information</li>
+                <li>Usage analytics or telemetry</li>
+                <li>Location data</li>
+                <li>Device identifiers</li>
+                <li>Crash reports sent to us</li>
+                <li>Any content from your notes</li>
+            </ul>
+
+            <h2>Data Storage</h2>
+            <h3>Local Storage</h3>
+            <p>All notes, images, and settings are stored locally on your device using Core Data, local file storage, and the iOS Keychain for sensitive data like API keys.</p>
+
+            <h3>iCloud Sync (Optional)</h3>
+            <p>If you enable iCloud sync on your device, your QuillStack data may sync across your Apple devices through your personal iCloud account. This sync is handled entirely by Apple's CloudKit framework, and we have no access to your iCloud data.</p>
+
+            <h2>Third-Party Services</h2>
+            <p>QuillStack allows you to optionally connect to third-party services. When you choose to use these integrations, your data is sent directly from your device to these services:</p>
+
+            <table>
+                <tr>
+                    <th>Service</th>
+                    <th>Purpose</th>
+                    <th>Your Control</th>
+                </tr>
+                <tr>
+                    <td>Claude API (Anthropic)</td>
+                    <td>AI text enhancement</td>
+                    <td>You provide your own API key</td>
+                </tr>
+                <tr>
+                    <td>GitHub</td>
+                    <td>Export notes as Issues</td>
+                    <td>You authenticate with your account</td>
+                </tr>
+                <tr>
+                    <td>Notion</td>
+                    <td>Export notes to Notion</td>
+                    <td>You provide your integration token</td>
+                </tr>
+                <tr>
+                    <td>Obsidian</td>
+                    <td>Export to local vault</td>
+                    <td>Files saved locally only</td>
+                </tr>
+            </table>
+
+            <h2>Device Permissions</h2>
+            <table>
+                <tr>
+                    <th>Permission</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Camera</td>
+                    <td>Capture photos of handwritten notes</td>
+                </tr>
+                <tr>
+                    <td>Photo Library</td>
+                    <td>Import existing photos of notes</td>
+                </tr>
+                <tr>
+                    <td>Calendar</td>
+                    <td>Create events from meeting notes</td>
+                </tr>
+                <tr>
+                    <td>Reminders</td>
+                    <td>Export todo items to Reminders app</td>
+                </tr>
+            </table>
+            <p>You can revoke any permission at any time through iOS Settings.</p>
+
+            <h2>Data Security</h2>
+            <ul>
+                <li>API keys are stored in the iOS Keychain with hardware encryption</li>
+                <li>Core Data store uses iOS file protection</li>
+                <li>No data is transmitted to our servers</li>
+                <li>All third-party API calls use HTTPS encryption</li>
+            </ul>
+
+            <h2>Children's Privacy</h2>
+            <p>QuillStack does not knowingly collect information from children under 13. The app does not contain ads, in-app purchases, or social features.</p>
+
+            <h2>Your Rights</h2>
+            <p>Since QuillStack does not collect personal data, your privacy rights are automatically satisfied:</p>
+            <ul>
+                <li><strong>Right to Access:</strong> All your data is already on your device</li>
+                <li><strong>Right to Deletion:</strong> Delete the app to remove all local data</li>
+                <li><strong>Right to Portability:</strong> Export your notes using built-in features</li>
+            </ul>
+
+            <h2>Contact Us</h2>
+            <p>If you have questions about this Privacy Policy, please contact us via GitHub Issues or email.</p>
+        </main>
+
+        <footer>
+            <p><a href="/">&larr; Back to QuillStack</a></p>
+            <p>&copy; 2024 QuillStack. Your notes are yours alone.</p>
+        </footer>
+    </div>
+</body>
+</html>

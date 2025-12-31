@@ -154,33 +154,15 @@
         .logo-icon {
             width: 44px;
             height: 44px;
-            background: var(--forest-dark);
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(30, 77, 47, 0.2);
         }
 
-        .logo-icon::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 28px;
-            background: var(--paper-beige);
-            border-radius: 2px;
-            transform: rotate(-5deg);
-        }
-
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 22px;
-            background: var(--forest-dark);
-            transform: rotate(25deg) translateX(4px);
-            border-radius: 1px;
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .logo-text {
@@ -413,7 +395,7 @@
 
         .app-title {
             font-family: var(--font-display);
-            font-size: 1.75rem;
+            font-size: 1.4rem;
             font-weight: 600;
             color: var(--forest-dark);
         }
@@ -1292,7 +1274,9 @@
         <div class="container">
             <div class="header-inner">
                 <a href="#" class="logo">
-                    <div class="logo-icon"></div>
+                    <div class="logo-icon">
+                        <img src="logo.png" alt="QuillStack Logo">
+                    </div>
                     <span class="logo-text">QuillStack</span>
                 </a>
                 <nav>
@@ -1344,7 +1328,10 @@
                                 <div class="phone-notch"></div>
                                 <div class="screen-content">
                                     <div class="app-header">
-                                        <span class="app-title">Notes</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="logo.png" alt="QuillStack" style="width: 28px; height: 28px; border-radius: 6px;">
+                                            <span class="app-title">QuillStack</span>
+                                        </div>
                                         <div class="app-icon-btn">+</div>
                                     </div>
 
@@ -1696,7 +1683,9 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <div class="logo-icon"></div>
+                    <div class="logo-icon">
+                        <img src="logo.png" alt="QuillStack Logo">
+                    </div>
                     <span class="logo-text">QuillStack</span>
                 </div>
                 <div class="footer-links">
