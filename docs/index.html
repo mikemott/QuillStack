@@ -889,32 +889,91 @@
             background: var(--forest-dark);
             color: white;
             flex-direction: column;
-            padding: 30px;
+            padding: 24px;
+            gap: 12px;
         }
 
-        .github-icon {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .github-before {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 320px;
         }
 
-        .github-icon svg {
-            width: 50px;
-            height: 50px;
+        .github-before-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .github-before-text {
+            font-family: var(--font-handwritten);
+            font-size: 1.05rem;
+        }
+
+        .github-arrow {
+            font-size: 1.5rem;
+            opacity: 0.8;
         }
 
         .github-issue {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 14px;
+            border-radius: 10px;
             width: 100%;
-            max-width: 280px;
+            max-width: 320px;
             text-align: left;
+        }
+
+        .github-issue-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .github-issue-header svg {
+            width: 18px;
+            height: 18px;
+            opacity: 0.8;
+        }
+
+        .github-issue-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+        }
+
+        .github-issue-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .github-issue-body {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .github-issue-section {
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+        }
+
+        .github-issue-section strong {
+            opacity: 0.7;
+        }
+
+        .github-issue-checklist {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin-left: 4px;
         }
 
         .issue-title {
@@ -1639,14 +1698,29 @@
                                 </div>
                                 <div class="slide-visual">
                                     <div class="feature-illustration illustration-github">
-                                        <div class="github-icon">
-                                            <svg viewBox="0 0 24 24" fill="var(--forest-dark)">
-                                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                                            </svg>
+                                        <div class="github-before">
+                                            <div class="github-before-label">Your Note</div>
+                                            <div class="github-before-text">#feature# add dark mode - save eye strain at night</div>
                                         </div>
+                                        <div class="github-arrow">&#8595;</div>
                                         <div class="github-issue">
-                                            <div class="issue-title">Add dark mode toggle to settings</div>
-                                            <div class="issue-labels">
+                                            <div class="github-issue-header">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                                </svg>
+                                                <span class="github-issue-label">Generated Issue</span>
+                                            </div>
+                                            <div class="github-issue-title">Add dark mode toggle to settings</div>
+                                            <div class="github-issue-body">Implement a dark mode option to reduce eye strain during nighttime usage and improve accessibility.</div>
+                                            <div class="github-issue-section"><strong>Acceptance Criteria:</strong></div>
+                                            <div class="github-issue-checklist">
+                                                &#9744; Toggle in Settings view<br>
+                                                &#9744; Persists across sessions<br>
+                                                &#9744; Respects system preference
+                                            </div>
+                                            <div class="issue-labels" style="margin-top: 10px;">
                                                 <span class="issue-label">enhancement</span>
                                                 <span class="issue-label">ui</span>
                                             </div>
