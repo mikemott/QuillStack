@@ -14,6 +14,8 @@ struct ShoppingDetailView: View {
     @State private var newItemText: String = ""
     @State private var showingRemindersSheet: Bool = false
     @State private var showingExportSheet: Bool = false
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @FocusState private var isAddingItem: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -56,6 +58,11 @@ struct ShoppingDetailView: View {
         .sheet(isPresented: $showingExportSheet) {
             ExportSheet(note: note)
                 .presentationDetents([.medium, .large])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -297,7 +304,13 @@ struct ShoppingDetailView: View {
 
         note.content = lines.joined(separator: "\n")
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            print("ShoppingDetailView: Failed to save changes - \(error.localizedDescription)")
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func addItem() {
