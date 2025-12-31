@@ -819,7 +819,7 @@
             padding: 16px;
             border-radius: 12px;
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
         }
 
         .enhance-label {
@@ -839,6 +839,45 @@
             font-size: 2rem;
             margin: 10px 0;
             animation: bounce 1s ease-in-out infinite;
+        }
+
+        .parsed-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .parsed-field {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .parsed-field-label {
+            font-weight: 600;
+            opacity: 0.8;
+            min-width: 70px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .parsed-field-value {
+            flex: 1;
+        }
+
+        .attendee-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .attendee-chip {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 0.8rem;
         }
 
         @keyframes bounce {
@@ -1546,13 +1585,36 @@
                                 <div class="slide-visual">
                                     <div class="feature-illustration illustration-enhance">
                                         <div class="enhance-before">
-                                            <div class="enhance-label">Before</div>
-                                            <div class="enhance-text">mtg w/ sarah tmrw @ 2 - bring dsigns</div>
+                                            <div class="enhance-label">Handwritten Note</div>
+                                            <div class="enhance-text">#meeting# sprint planning w/ sarah mike alex jan 15 2pm - review Q1 goals, assign tasks</div>
                                         </div>
                                         <div class="enhance-arrow">&#8595;</div>
                                         <div class="enhance-after">
-                                            <div class="enhance-label">After</div>
-                                            <div class="enhance-text">Meeting with Sarah tomorrow at 2pm — bring designs</div>
+                                            <div class="enhance-label">Parsed &amp; Structured</div>
+                                            <div class="parsed-fields">
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Title</span>
+                                                    <span class="parsed-field-value">Sprint Planning</span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Date</span>
+                                                    <span class="parsed-field-value">Jan 15, 2025 at 2:00 PM</span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Attendees</span>
+                                                    <span class="parsed-field-value">
+                                                        <span class="attendee-chips">
+                                                            <span class="attendee-chip">Sarah</span>
+                                                            <span class="attendee-chip">Mike</span>
+                                                            <span class="attendee-chip">Alex</span>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Agenda</span>
+                                                    <span class="parsed-field-value">Review Q1 goals, assign tasks</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
