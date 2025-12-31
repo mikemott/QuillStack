@@ -79,6 +79,14 @@ class TextClassifier {
             }
         }
 
+        // Expense triggers
+        let expenseTriggers = ["#expense#", "#receipt#", "#spent#", "#paid#"]
+        for trigger in expenseTriggers {
+            if prefix.contains(trigger) {
+                return .expense
+            }
+        }
+
         return nil
     }
 
@@ -143,6 +151,20 @@ class TextClassifier {
             }
         }
 
+        // Expense patterns - handle OCR errors
+        let expensePatterns = [
+            "#expense#", "#expens#", "#expensee#", "#exp3nse#",
+            "#receipt#", "#reciept#", "#recipt#", "#recei1pt#",
+            "#spent#", "#spentt#", "#sp3nt#",
+            "#paid#", "#pald#", "#pa1d#",
+            "#expense", "expense#", "#receipt", "receipt#"
+        ]
+        for pattern in expensePatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .expense
+            }
+        }
+
         // Last resort: check for hashtag followed by keyword within a few characters
         // This catches "# email" or "#email tt" type errors
         if matchesLoosePattern(normalized, keywords: ["claude", "feature", "prompt", "request", "issue"]) {
@@ -156,6 +178,9 @@ class TextClassifier {
         }
         if matchesLoosePattern(normalized, keywords: ["meeting", "notes", "minutes"]) {
             return .meeting
+        }
+        if matchesLoosePattern(normalized, keywords: ["expense", "receipt", "spent", "paid"]) {
+            return .expense
         }
 
         return nil
@@ -240,7 +265,8 @@ class TextClassifier {
             "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
             "#todo#", "#to-do#", "#tasks#", "#task#",
             "#email#", "#mail#",
-            "#meeting#", "#notes#", "#minutes#"
+            "#meeting#", "#notes#", "#minutes#",
+            "#expense#", "#receipt#", "#spent#", "#paid#"
         ]
 
         let lowercased = content.lowercased()
@@ -270,6 +296,7 @@ enum NoteType: String {
     case meeting = "meeting"
     case email = "email"
     case claudePrompt = "claudePrompt"
+    case expense = "expense"
 
     var displayName: String {
         switch self {
@@ -278,6 +305,7 @@ enum NoteType: String {
         case .meeting: return "Meeting"
         case .email: return "Email"
         case .claudePrompt: return "Prompt"
+        case .expense: return "Expense"
         }
     }
 
@@ -288,6 +316,7 @@ enum NoteType: String {
         case .meeting: return "calendar"
         case .email: return "envelope"
         case .claudePrompt: return "sparkles"
+        case .expense: return "dollarsign.circle"
         }
     }
 
@@ -298,6 +327,7 @@ enum NoteType: String {
         case .meeting: return "badgeMeeting"
         case .email: return "badgeEmail"
         case .claudePrompt: return "badgePrompt"
+        case .expense: return "badgeExpense"
         }
     }
 }

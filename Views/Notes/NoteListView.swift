@@ -240,6 +240,8 @@ struct NoteListView: View {
             MeetingDetailView(note: note)
         case "claudeprompt":
             ClaudePromptDetailView(note: note)
+        case "expense":
+            ExpenseDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }
@@ -372,6 +374,7 @@ struct NoteCardView: View {
         case "meeting": return "calendar"
         case "email": return "envelope"
         case "claudeprompt": return "sparkles"
+        case "expense": return "dollarsign.circle"
         default: return "doc.text"
         }
     }
@@ -382,6 +385,7 @@ struct NoteCardView: View {
         case "meeting": return .badgeMeeting
         case "email": return .badgeEmail
         case "claudeprompt": return .badgePrompt
+        case "expense": return .badgeExpense
         default: return .badgeGeneral
         }
     }
@@ -422,6 +426,8 @@ struct NoteCardView: View {
             return "paperplane"
         case "claudeprompt":
             return "arrow.up.circle"
+        case "expense":
+            return "receipt"
         default:
             return "text.alignleft"
         }
@@ -439,10 +445,28 @@ struct NoteCardView: View {
             return "Draft"
         case "claudeprompt":
             return note.summary != nil ? "Issue created" : "Ready to export"
+        case "expense":
+            return extractExpenseAmount()
         default:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"
         }
+    }
+
+    private func extractExpenseAmount() -> String {
+        let content = note.content.lowercased()
+        // Look for amount line
+        for line in content.components(separatedBy: .newlines) {
+            if line.hasPrefix("amount:") {
+                let value = line.replacingOccurrences(of: "amount:", with: "").trimmingCharacters(in: .whitespaces)
+                return value.isEmpty ? "No amount" : value
+            }
+        }
+        // Try to find dollar amount in content
+        if let range = content.range(of: #"\$\d+\.?\d*"#, options: .regularExpression) {
+            return String(content[range])
+        }
+        return "No amount"
     }
 }
 
