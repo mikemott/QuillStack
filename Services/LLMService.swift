@@ -261,6 +261,31 @@ final class LLMService: NSObject {
         }
     }
 
+    /// Expand a brief idea/thought into a fuller developed concept
+    func expandIdea(_ idea: String) async throws -> String {
+        let prompt = """
+        You are helping expand a brief handwritten note or idea into a fuller thought. The user quickly jotted this down and wants help developing it.
+
+        Please:
+        1. Expand the idea into 2-3 well-developed paragraphs
+        2. Keep the original intent and meaning
+        3. Add context, implications, or potential applications
+        4. Use clear, accessible language
+        5. Don't add unnecessary filler - focus on substance
+        6. If it's a question, explore possible answers
+        7. If it's a concept, explain it more fully
+        8. If it's a task idea, elaborate on potential approaches
+
+        Original idea:
+        \(idea)
+
+        Return ONLY the expanded thought. No explanations, headers, or meta-commentary.
+        """
+
+        let expandedText = try await performAPIRequest(prompt: prompt, maxTokens: 1024)
+        return expandedText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     /// Generate a summary of the note content
     func summarizeNote(_ content: String, noteType: String, length: SummaryLength) async throws -> String {
         let prompt = buildSummaryPrompt(for: content, noteType: noteType, length: length)

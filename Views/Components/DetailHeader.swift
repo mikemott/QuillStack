@@ -155,6 +155,8 @@ struct DetailHeader: View {
         case "todo": return .badgeTodo
         case "meeting": return .badgeMeeting
         case "email": return .badgeEmail
+        case "idea": return .badgeIdea
+        case "claudeprompt": return .badgePrompt
         default: return .badgeGeneral
         }
     }

@@ -55,6 +55,14 @@ class TextClassifier {
             }
         }
 
+        // Idea triggers
+        let ideaTriggers = ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"]
+        for trigger in ideaTriggers {
+            if prefix.contains(trigger) {
+                return .idea
+            }
+        }
+
         // Todo triggers
         let todoTriggers = ["#todo#", "#to-do#", "#tasks#", "#task#"]
         for trigger in todoTriggers {
@@ -106,6 +114,19 @@ class TextClassifier {
             }
         }
 
+        // Idea patterns - handle OCR errors
+        let ideaPatterns = [
+            "#idea#", "#ideaa#", "#1dea#", "#ldea#",
+            "#thought#", "#thoughtt#", "#thouqht#", "#thoughl#",
+            "#note-to-self#", "#notetoself#", "#note2self#",
+            "#idea", "idea#", "#thought", "thought#"
+        ]
+        for pattern in ideaPatterns {
+            if normalized.contains(pattern.replacingOccurrences(of: " ", with: "")) {
+                return .idea
+            }
+        }
+
         // Todo patterns - handle common OCR errors
         let todoPatterns = [
             "#todo#", "#tod0#", "#todoo#", "#toDo#",
@@ -147,6 +168,9 @@ class TextClassifier {
         // This catches "# email" or "#email tt" type errors
         if matchesLoosePattern(normalized, keywords: ["claude", "feature", "prompt", "request", "issue"]) {
             return .claudePrompt
+        }
+        if matchesLoosePattern(normalized, keywords: ["idea", "thought", "notetoself"]) {
+            return .idea
         }
         if matchesLoosePattern(normalized, keywords: ["email", "mail", "emai", "ernail"]) {
             return .email
@@ -238,6 +262,7 @@ class TextClassifier {
     func extractTriggerTag(from content: String) -> (tag: String, cleanedContent: String)? {
         let patterns = [
             "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
+            "#idea#", "#thought#", "#note-to-self#", "#notetoself#",
             "#todo#", "#to-do#", "#tasks#", "#task#",
             "#email#", "#mail#",
             "#meeting#", "#notes#", "#minutes#"
@@ -270,6 +295,7 @@ enum NoteType: String {
     case meeting = "meeting"
     case email = "email"
     case claudePrompt = "claudePrompt"
+    case idea = "idea"
 
     var displayName: String {
         switch self {
@@ -278,6 +304,7 @@ enum NoteType: String {
         case .meeting: return "Meeting"
         case .email: return "Email"
         case .claudePrompt: return "Prompt"
+        case .idea: return "Idea"
         }
     }
 
@@ -288,6 +315,7 @@ enum NoteType: String {
         case .meeting: return "calendar"
         case .email: return "envelope"
         case .claudePrompt: return "sparkles"
+        case .idea: return "lightbulb"
         }
     }
 
@@ -298,6 +326,7 @@ enum NoteType: String {
         case .meeting: return "badgeMeeting"
         case .email: return "badgeEmail"
         case .claudePrompt: return "badgePrompt"
+        case .idea: return "badgeIdea"
         }
     }
 }

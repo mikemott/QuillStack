@@ -240,6 +240,8 @@ struct NoteListView: View {
             MeetingDetailView(note: note)
         case "claudeprompt":
             ClaudePromptDetailView(note: note)
+        case "idea":
+            IdeaDetailView(note: note)
         default:
             NoteDetailView(note: note)
         }
@@ -372,6 +374,7 @@ struct NoteCardView: View {
         case "meeting": return "calendar"
         case "email": return "envelope"
         case "claudeprompt": return "sparkles"
+        case "idea": return "lightbulb"
         default: return "doc.text"
         }
     }
@@ -382,6 +385,7 @@ struct NoteCardView: View {
         case "meeting": return .badgeMeeting
         case "email": return .badgeEmail
         case "claudeprompt": return .badgePrompt
+        case "idea": return .badgeIdea
         default: return .badgeGeneral
         }
     }
@@ -422,6 +426,8 @@ struct NoteCardView: View {
             return "paperplane"
         case "claudeprompt":
             return "arrow.up.circle"
+        case "idea":
+            return "sparkles"
         default:
             return "text.alignleft"
         }
@@ -439,6 +445,8 @@ struct NoteCardView: View {
             return "Draft"
         case "claudeprompt":
             return note.summary != nil ? "Issue created" : "Ready to export"
+        case "idea":
+            return note.summary != nil ? "Expanded" : "Quick capture"
         default:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"
