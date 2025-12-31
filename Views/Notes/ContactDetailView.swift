@@ -54,7 +54,7 @@ struct ContactDetailView: View {
         .alert("Contact Saved", isPresented: $saveSuccess) {
             Button("OK") { }
         } message: {
-            Text("\(parsedContact.displayName) has been added to your contacts.")
+            Text("Contact saved to your Contacts app")
         }
         .alert("Error", isPresented: .init(
             get: { errorMessage != nil },
@@ -337,9 +337,19 @@ struct ContactDetailView: View {
 
         do {
             try store.execute(saveRequest)
+
+            // Store the saved contact's identifier in the Note for future reference
+            note.savedContactIdentifier = contact.identifier
+            note.updatedAt = Date()
+
+            // Save the Core Data context
+            if let context = note.managedObjectContext {
+                try context.save()
+            }
+
             saveSuccess = true
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "Failed to save contact: \(error.localizedDescription)"
         }
     }
 
