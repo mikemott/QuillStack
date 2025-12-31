@@ -24,6 +24,8 @@ struct EventDetailView: View {
     @State private var availableCalendars: [EKCalendar] = []
     @State private var eventCreated = false
     @State private var createdEventId: String?
+    @State private var calendarPermissionDenied = false
+    @State private var showingPermissionDeniedAlert = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -129,6 +131,7 @@ struct EventDetailView: View {
         .navigationBarHidden(true)
         .onAppear {
             parseEventContent()
+            checkCalendarPermission()
             loadCalendars()
         }
         .onChange(of: eventTitle) { _, _ in saveChanges() }
@@ -145,6 +148,16 @@ struct EventDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(calendarErrorMessage)
+        }
+        .alert("Calendar Access Denied", isPresented: $showingPermissionDeniedAlert) {
+            Button("Open Settings") {
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsUrl)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Calendar access is required to export events. Please enable it in Settings.")
         }
     }
 
@@ -236,33 +249,52 @@ struct EventDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            Spacer()
-
-            // Add to Calendar button
-            Button(action: { showingCalendarPicker = true }) {
-                HStack(spacing: 8) {
-                    Image(systemName: eventCreated ? "checkmark.circle.fill" : "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text(eventCreated ? "Added" : "Add to Calendar")
-                        .font(.serifBody(15, weight: .semibold))
+        VStack(spacing: 8) {
+            if calendarPermissionDenied {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 12, weight: .medium))
+                    Text("Calendar access required to export events")
+                        .font(.serifCaption(13, weight: .medium))
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(
-                    LinearGradient(
-                        colors: eventCreated
-                            ? [Color.green, Color.green.opacity(0.8)]
-                            : [Color.badgeEvent, Color.badgeEvent.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .cornerRadius(10)
+                .foregroundColor(.orange)
+                .padding(.top, 8)
             }
-            .disabled(eventTitle.isEmpty)
-            .opacity(eventTitle.isEmpty ? 0.5 : 1)
+
+            HStack(spacing: 20) {
+                Spacer()
+
+                // Add to Calendar button
+                Button(action: {
+                    if calendarPermissionDenied {
+                        showingPermissionDeniedAlert = true
+                    } else {
+                        showingCalendarPicker = true
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: eventCreated ? "checkmark.circle.fill" : "calendar.badge.plus")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text(eventCreated ? "Added" : "Add to Calendar")
+                            .font(.serifBody(15, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(
+                        LinearGradient(
+                            colors: eventCreated
+                                ? [Color.green, Color.green.opacity(0.8)]
+                                : [Color.badgeEvent, Color.badgeEvent.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(10)
+                }
+                .disabled(eventTitle.isEmpty || calendarPermissionDenied)
+                .opacity((eventTitle.isEmpty || calendarPermissionDenied) ? 0.5 : 1)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -330,23 +362,35 @@ struct EventDetailView: View {
         }
     }
 
+    private func checkCalendarPermission() {
+        let status = calendarService.authorizationStatus
+        calendarPermissionDenied = (status == .denied || status == .restricted)
+    }
+
     private func loadCalendars() {
         Task {
             let status = calendarService.authorizationStatus
             if status == .notDetermined {
                 let granted = await calendarService.requestAccess()
-                if !granted {
-                    calendarErrorMessage = "Calendar access is required to create events."
-                    showingCalendarError = true
-                    return
+                await MainActor.run {
+                    if !granted {
+                        calendarPermissionDenied = true
+                        showingPermissionDeniedAlert = true
+                    } else {
+                        calendarPermissionDenied = false
+                    }
                 }
+                if !granted { return }
             } else if status == .denied || status == .restricted {
-                calendarErrorMessage = "Please enable Calendar access in Settings."
-                showingCalendarError = true
+                await MainActor.run {
+                    calendarPermissionDenied = true
+                    showingPermissionDeniedAlert = true
+                }
                 return
             }
 
             await MainActor.run {
+                calendarPermissionDenied = false
                 availableCalendars = calendarService.getCalendars().filter { $0.allowsContentModifications }
                 selectedCalendar = calendarService.getDefaultCalendar()
             }
