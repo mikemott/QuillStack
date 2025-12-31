@@ -15,6 +15,8 @@ struct ReminderDetailView: View {
     @State private var hasDueDate: Bool = false
     @State private var showingExportSheet: Bool = false
     @State private var showingDatePicker: Bool = false
+    @State private var remindersPermissionDenied: Bool = false
+    @State private var showingPermissionAlert: Bool = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -104,7 +106,20 @@ struct ReminderDetailView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear { parseContent() }
+        .onAppear {
+            parseContent()
+            checkRemindersPermission()
+        }
+        .alert("Reminders Access Denied", isPresented: $showingPermissionAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable Reminders access in Settings to export reminders from QuillStack.")
+        }
         .sheet(isPresented: $showingExportSheet) {
             ExportToRemindersSheet(
                 reminderText: reminderText,
@@ -117,43 +132,65 @@ struct ReminderDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            Button(action: shareNote) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Spacer()
-
-            // Export to Reminders
-            Button(action: { showingExportSheet = true }) {
+        VStack(spacing: 8) {
+            if remindersPermissionDenied {
                 HStack(spacing: 6) {
-                    Image(systemName: "bell.badge")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Add to Reminders")
-                        .font(.serifBody(14, weight: .semibold))
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 12))
+                    Text("Reminders access required to export")
+                        .font(.serifCaption(12, weight: .medium))
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient(
-                        colors: [Color.badgeReminder, Color.badgeReminder.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .cornerRadius(10)
+                .foregroundColor(.orange)
+                .padding(.horizontal, 20)
             }
+
+            HStack(spacing: 20) {
+                Button(action: shareNote) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.textDark)
+                }
+
+                Button(action: copyContent) {
+                    Image(systemName: "doc.on.clipboard")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.textDark)
+                }
+
+                Spacer()
+
+                // Export to Reminders
+                Button(action: {
+                    if remindersPermissionDenied {
+                        showingPermissionAlert = true
+                    } else {
+                        showingExportSheet = true
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "bell.badge")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Add to Reminders")
+                            .font(.serifBody(14, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        LinearGradient(
+                            colors: remindersPermissionDenied
+                                ? [Color.gray, Color.gray.opacity(0.8)]
+                                : [Color.badgeReminder, Color.badgeReminder.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(10)
+                }
+                .disabled(remindersPermissionDenied)
+            }
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
@@ -254,6 +291,11 @@ struct ReminderDetailView: View {
             text += "\nDue: \(formatter.string(from: date))"
         }
         UIPasteboard.general.string = text
+    }
+
+    private func checkRemindersPermission() {
+        let status = RemindersService.shared.authorizationStatus
+        remindersPermissionDenied = (status == .denied || status == .restricted)
     }
 }
 

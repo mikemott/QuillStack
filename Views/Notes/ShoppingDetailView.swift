@@ -14,6 +14,8 @@ struct ShoppingDetailView: View {
     @State private var newItemText: String = ""
     @State private var showingRemindersSheet: Bool = false
     @State private var showingExportSheet: Bool = false
+    @State private var remindersPermissionDenied: Bool = false
+    @State private var showingPermissionAlert: Bool = false
     @FocusState private var isAddingItem: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -48,6 +50,17 @@ struct ShoppingDetailView: View {
         .navigationBarHidden(true)
         .onAppear {
             parseItems()
+            checkRemindersPermission()
+        }
+        .alert("Reminders Access Denied", isPresented: $showingPermissionAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable Reminders access in Settings to export your shopping list from QuillStack.")
         }
         .sheet(isPresented: $showingRemindersSheet) {
             ShoppingExportSheet(items: items)
@@ -165,43 +178,65 @@ struct ShoppingDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
+        VStack(spacing: 8) {
+            if remindersPermissionDenied {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 12))
+                    Text("Reminders access required to export")
+                        .font(.serifCaption(12, weight: .medium))
+                }
+                .foregroundColor(.orange)
+                .padding(.horizontal, 20)
             }
 
-            Button(action: shareList) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
+            HStack(spacing: 20) {
+                Button(action: { showingExportSheet = true }) {
+                    Image(systemName: "arrow.up.doc")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.textDark)
+                }
 
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
+                Button(action: shareList) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.textDark)
+                }
 
-            Spacer()
+                Button(action: copyContent) {
+                    Image(systemName: "doc.on.clipboard")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.textDark)
+                }
 
-            Button(action: { showingRemindersSheet = true }) {
-                Image(systemName: "checklist")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.badgeShopping, Color.badgeShopping.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                Spacer()
+
+                Button(action: {
+                    if remindersPermissionDenied {
+                        showingPermissionAlert = true
+                    } else {
+                        showingRemindersSheet = true
+                    }
+                }) {
+                    Image(systemName: "checklist")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            LinearGradient(
+                                colors: remindersPermissionDenied
+                                    ? [Color.gray, Color.gray.opacity(0.8)]
+                                    : [Color.badgeShopping, Color.badgeShopping.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .cornerRadius(10)
+                        .cornerRadius(10)
+                }
+                .disabled(remindersPermissionDenied)
             }
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
         .padding(.vertical, 14)
         .background(Color.creamLight)
         .overlay(
@@ -322,6 +357,11 @@ struct ShoppingDetailView: View {
     private func copyContent() {
         let text = items.map { ($0.isChecked ? "☑" : "☐") + " " + $0.text }.joined(separator: "\n")
         UIPasteboard.general.string = text
+    }
+
+    private func checkRemindersPermission() {
+        let status = RemindersService.shared.authorizationStatus
+        remindersPermissionDenied = (status == .denied || status == .restricted)
     }
 }
 
