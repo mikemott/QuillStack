@@ -9,9 +9,10 @@ import Foundation
 
 // MARK: - LLM Service
 
-/// Service for AI-powered text enhancement using Claude API
-/// Uses certificate pinning for secure communication
-final class LLMService: NSObject {
+/// Service for AI-powered text enhancement using Claude API.
+/// Uses certificate pinning for secure communication.
+/// Conforms to LLMServiceProtocol for testability and dependency injection.
+final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
     static let shared = LLMService()
 
     private let apiURL = URL(string: "https://api.anthropic.com/v1/messages")!
@@ -415,6 +416,27 @@ final class LLMService: NSObject {
             Return ONLY the summary, no explanations or prefixes.
             """
         }
+    }
+
+    /// Expand an idea into a more detailed explanation
+    func expandIdea(_ idea: String) async throws -> String {
+        let prompt = """
+        You are a creative thinking assistant. Take this brief idea or concept and expand it into a more developed explanation.
+
+        Please:
+        1. Elaborate on the core concept
+        2. Suggest potential applications or implications
+        3. Identify related ideas or connections
+        4. Keep the tone thoughtful but accessible
+        5. Structure the response with clear paragraphs
+
+        Idea:
+        \(idea)
+
+        Return ONLY the expanded explanation, no prefixes like "Here's an expansion" - just start with the content directly.
+        """
+
+        return try await performAPIRequest(prompt: prompt, maxTokens: 1024)
     }
 
     /// Find word-level changes between original and enhanced text

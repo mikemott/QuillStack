@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
+import CoreData
 
-struct RecipeDetailView: View {
+struct RecipeDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var recipe: ParsedRecipe = ParsedRecipe()
     @State private var checkedIngredients: Set<UUID> = []
@@ -256,21 +257,36 @@ struct RecipeDetailView: View {
     }
 
     private func formatQuantity(_ value: Double) -> String {
-        if value == floor(value) {
-            return String(Int(value))
-        } else if value == 0.25 {
-            return "¼"
-        } else if value == 0.5 {
-            return "½"
-        } else if value == 0.75 {
-            return "¾"
-        } else if value == 0.33 || value == 1.0/3.0 {
-            return "⅓"
-        } else if value == 0.67 || value == 2.0/3.0 {
-            return "⅔"
-        } else {
-            return String(format: "%.1f", value)
+        let whole = Int(value)
+        let frac = value - Double(whole)
+
+        // Define fraction thresholds with tolerance for floating point
+        let fractionDisplay: [(range: ClosedRange<Double>, display: String)] = [
+            (0.115...0.135, "⅛"),   // ~0.125
+            (0.240...0.260, "¼"),   // 0.25
+            (0.320...0.345, "⅓"),   // ~0.33
+            (0.365...0.385, "⅜"),   // 0.375
+            (0.490...0.510, "½"),   // 0.5
+            (0.615...0.635, "⅝"),   // 0.625
+            (0.660...0.680, "⅔"),   // ~0.67
+            (0.740...0.760, "¾"),   // 0.75
+            (0.865...0.885, "⅞"),   // 0.875
+        ]
+
+        // Whole number (no fractional part)
+        if frac < 0.05 {
+            return whole == 0 ? "0" : "\(whole)"
         }
+
+        // Check if fractional part matches a known fraction
+        for (range, display) in fractionDisplay {
+            if range.contains(frac) {
+                return whole > 0 ? "\(whole)\(display)" : display
+            }
+        }
+
+        // Fallback to decimal for non-standard values
+        return String(format: "%.1f", value)
     }
 
     // MARK: - Steps Card
@@ -355,6 +371,12 @@ struct RecipeDetailView: View {
                 .frame(height: 1),
             alignment: .top
         )
+    }
+
+    // MARK: - NoteDetailViewProtocol
+
+    func saveChanges() {
+        // RecipeDetailView is read-only from parsed content
     }
 
     // MARK: - Parsing
@@ -454,7 +476,8 @@ struct RecipeDetailView: View {
         }
 
         // Starts with fraction
-        let fractions = ["½", "¼", "¾", "⅓", "⅔", "1/2", "1/4", "3/4", "1/3", "2/3"]
+        let fractions = ["½", "¼", "¾", "⅓", "⅔", "⅛", "⅜", "⅝", "⅞",
+                         "1/2", "1/4", "3/4", "1/3", "2/3", "1/8", "3/8", "5/8", "7/8"]
         for f in fractions {
             if line.hasPrefix(f) { return true }
         }
@@ -498,7 +521,9 @@ struct RecipeDetailView: View {
         // Check for fraction at start
         let fractionMap: [(String, Double)] = [
             ("½", 0.5), ("¼", 0.25), ("¾", 0.75), ("⅓", 0.33), ("⅔", 0.67),
-            ("1/2", 0.5), ("1/4", 0.25), ("3/4", 0.75), ("1/3", 0.33), ("2/3", 0.67)
+            ("⅛", 0.125), ("⅜", 0.375), ("⅝", 0.625), ("⅞", 0.875),
+            ("1/2", 0.5), ("1/4", 0.25), ("3/4", 0.75), ("1/3", 0.33), ("2/3", 0.67),
+            ("1/8", 0.125), ("3/8", 0.375), ("5/8", 0.625), ("7/8", 0.875)
         ]
 
         for (frac, val) in fractionMap {

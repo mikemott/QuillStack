@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct NoteDetailView: View {
+struct NoteDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var editedContent: String = ""
     @State private var originalContent: String = "" // Track original for learning
@@ -133,7 +133,7 @@ struct NoteDetailView: View {
         }
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         // Detect corrections for handwriting learning before saving
         if editedContent != originalContent {
             HandwritingLearningService.shared.detectCorrections(

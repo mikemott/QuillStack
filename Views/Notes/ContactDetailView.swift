@@ -7,10 +7,11 @@
 
 import SwiftUI
 import Contacts
+import CoreData
 
-struct ContactDetailView: View {
+struct ContactDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
-    @State private var parsedContact: ParsedContact = ParsedContact()
+    @State private var contact: ParsedContact = ParsedContact()
     @State private var showingSaveSheet = false
     @State private var saveSuccess = false
     @State private var errorMessage: String?
@@ -22,7 +23,7 @@ struct ContactDetailView: View {
 
             VStack(spacing: 0) {
                 DetailHeader(
-                    title: parsedContact.displayName.isEmpty ? "Contact" : parsedContact.displayName,
+                    title: contact.displayName.isEmpty ? "Contact" : contact.displayName,
                     date: note.createdAt,
                     noteType: "contact",
                     onBack: { dismiss() }
@@ -54,7 +55,7 @@ struct ContactDetailView: View {
         .alert("Contact Saved", isPresented: $saveSuccess) {
             Button("OK") { }
         } message: {
-            Text("\(parsedContact.displayName) has been added to your contacts.")
+            Text("\(contact.displayName) has been added to your contacts.")
         }
         .alert("Error", isPresented: .init(
             get: { errorMessage != nil },
@@ -82,19 +83,26 @@ struct ContactDetailView: View {
                     )
                     .frame(width: 80, height: 80)
 
-                Text(parsedContact.initials)
+                Text(contact.initials)
                     .font(.system(size: 32, weight: .medium, design: .rounded))
                     .foregroundColor(.white)
             }
 
             // Name
-            Text(parsedContact.displayName.isEmpty ? "New Contact" : parsedContact.displayName)
+            Text(contact.displayName.isEmpty ? "New Contact" : contact.displayName)
                 .font(.serifHeadline(22, weight: .semibold))
                 .foregroundColor(.textDark)
 
+            // Job Title
+            if !contact.jobTitle.isEmpty {
+                Text(contact.jobTitle)
+                    .font(.serifBody(14, weight: .medium))
+                    .foregroundColor(.textMedium)
+            }
+
             // Company
-            if !parsedContact.company.isEmpty {
-                Text(parsedContact.company)
+            if !contact.company.isEmpty {
+                Text(contact.company)
                     .font(.serifBody(15, weight: .regular))
                     .foregroundColor(.textMedium)
             }
@@ -112,27 +120,91 @@ struct ContactDetailView: View {
     // MARK: - Editable Fields
 
     private var editableFields: some View {
-        VStack(spacing: 12) {
-            ContactFieldRow(icon: "person", label: "First Name", text: $parsedContact.firstName)
-            ContactFieldRow(icon: "person", label: "Last Name", text: $parsedContact.lastName)
-            ContactFieldRow(icon: "building.2", label: "Company", text: $parsedContact.company)
-            ContactFieldRow(icon: "phone", label: "Phone", text: $parsedContact.phone, keyboardType: .phonePad)
-            ContactFieldRow(icon: "envelope", label: "Email", text: $parsedContact.email, keyboardType: .emailAddress)
-            ContactFieldRow(icon: "note.text", label: "Notes", text: $parsedContact.notes, isMultiline: true)
+        VStack(spacing: 0) {
+            // Name section
+            VStack(spacing: 12) {
+                ContactFieldRow(icon: "person", label: "First Name", text: $contact.firstName)
+                ContactFieldRow(icon: "person", label: "Last Name", text: $contact.lastName)
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+            )
+
+            Spacer().frame(height: 12)
+
+            // Work section
+            VStack(spacing: 12) {
+                ContactFieldRow(icon: "briefcase", label: "Job Title", text: $contact.jobTitle)
+                ContactFieldRow(icon: "building.2", label: "Company", text: $contact.company)
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+            )
+
+            Spacer().frame(height: 12)
+
+            // Contact info section
+            VStack(spacing: 12) {
+                ContactFieldRow(icon: "phone", label: "Phone", text: $contact.phone, keyboardType: .phonePad)
+                ContactFieldRow(icon: "envelope", label: "Email", text: $contact.email, keyboardType: .emailAddress)
+                ContactFieldRow(icon: "globe", label: "Website", text: $contact.website, keyboardType: .URL)
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+            )
+
+            Spacer().frame(height: 12)
+
+            // Address section
+            VStack(spacing: 12) {
+                ContactFieldRow(icon: "mappin.and.ellipse", label: "Street Address", text: $contact.streetAddress)
+                HStack(spacing: 12) {
+                    ContactFieldRow(icon: "building", label: "City", text: $contact.city)
+                    ContactFieldRow(icon: "map", label: "State", text: $contact.state)
+                        .frame(width: 80)
+                }
+                ContactFieldRow(icon: "number", label: "ZIP Code", text: $contact.zipCode, keyboardType: .numberPad)
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+            )
+
+            Spacer().frame(height: 12)
+
+            // Notes section
+            VStack(spacing: 12) {
+                ContactFieldRow(icon: "note.text", label: "Notes", text: $contact.notes, isMultiline: true)
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
+            )
         }
-        .padding(16)
-        .background(Color.white.opacity(0.6))
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
-        )
     }
 
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 16) {
             Button(action: shareContact) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))
@@ -143,6 +215,14 @@ struct ContactDetailView: View {
                 Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
+            }
+
+            if !contact.website.isEmpty {
+                Button(action: openWebsite) {
+                    Image(systemName: "safari")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.badgeContact)
+                }
             }
 
             Spacer()
@@ -167,7 +247,7 @@ struct ContactDetailView: View {
                 )
                 .cornerRadius(10)
             }
-            .disabled(parsedContact.displayName.isEmpty)
+            .disabled(contact.displayName.isEmpty)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -178,6 +258,12 @@ struct ContactDetailView: View {
                 .frame(height: 1),
             alignment: .top
         )
+    }
+
+    // MARK: - NoteDetailViewProtocol
+
+    func saveChanges() {
+        // ContactDetailView is read-only; contacts are saved via saveToContacts()
     }
 
     // MARK: - Parsing
@@ -191,104 +277,7 @@ struct ContactDetailView: View {
             content = note.content
         }
 
-        parsedContact = parseContactContent(content)
-    }
-
-    private func parseContactContent(_ content: String) -> ParsedContact {
-        var contact = ParsedContact()
-        let lines = content.components(separatedBy: .newlines).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-
-        // Phone regex
-        let phonePattern = #"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}"#
-        let phoneRegex = try? NSRegularExpression(pattern: phonePattern, options: [])
-
-        // Email detection
-        let emailDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-
-        var remainingLines: [String] = []
-
-        for line in lines {
-            let range = NSRange(line.startIndex..., in: line)
-
-            // Check for phone
-            if contact.phone.isEmpty,
-               let match = phoneRegex?.firstMatch(in: line, options: [], range: range),
-               let matchRange = Range(match.range, in: line) {
-                contact.phone = String(line[matchRange])
-                // If line is mostly phone, skip it
-                if String(line[matchRange]).count > line.count / 2 {
-                    continue
-                }
-            }
-
-            // Check for email
-            if contact.email.isEmpty,
-               let matches = emailDetector?.matches(in: line, options: [], range: range) {
-                for match in matches {
-                    if let url = match.url, url.scheme == "mailto" {
-                        contact.email = url.absoluteString.replacingOccurrences(of: "mailto:", with: "")
-                        break
-                    } else if let url = match.url, url.absoluteString.contains("@") {
-                        contact.email = url.absoluteString
-                        break
-                    }
-                }
-                // Check plain email pattern
-                if contact.email.isEmpty && line.contains("@") && line.contains(".") {
-                    let emailPattern = #"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"#
-                    if let emailRegex = try? NSRegularExpression(pattern: emailPattern, options: []),
-                       let match = emailRegex.firstMatch(in: line, options: [], range: range),
-                       let matchRange = Range(match.range, in: line) {
-                        contact.email = String(line[matchRange])
-                        if contact.email.count > line.count / 2 {
-                            continue
-                        }
-                    }
-                }
-            }
-
-            remainingLines.append(line)
-        }
-
-        // First remaining line is likely the name
-        if let firstLine = remainingLines.first {
-            let nameParts = firstLine.components(separatedBy: " ").filter { !$0.isEmpty }
-            if nameParts.count >= 2 {
-                contact.firstName = nameParts[0]
-                contact.lastName = nameParts.dropFirst().joined(separator: " ")
-            } else if nameParts.count == 1 {
-                contact.firstName = nameParts[0]
-            }
-            remainingLines.removeFirst()
-        }
-
-        // Check for company (often second line, or contains company keywords)
-        let companyKeywords = ["inc", "llc", "corp", "company", "co.", "ltd", "group", "solutions", "consulting"]
-        for (index, line) in remainingLines.enumerated() {
-            let lower = line.lowercased()
-            if companyKeywords.contains(where: { lower.contains($0) }) || (index == 0 && !line.contains("@") && !line.contains(where: { $0.isNumber })) {
-                contact.company = line
-                remainingLines.remove(at: index)
-                break
-            }
-        }
-
-        // If no company found but there are remaining lines, first one might be company
-        if contact.company.isEmpty && !remainingLines.isEmpty {
-            let firstRemaining = remainingLines[0]
-            // If it doesn't look like notes (short, no sentences)
-            if firstRemaining.count < 40 && !firstRemaining.contains(".") {
-                contact.company = firstRemaining
-                remainingLines.removeFirst()
-            }
-        }
-
-        // Rest is notes
-        if !remainingLines.isEmpty {
-            contact.notes = remainingLines.joined(separator: "\n")
-        }
-
-        return contact
+        contact = ContactParser.parse(content)
     }
 
     // MARK: - Actions
@@ -308,38 +297,75 @@ struct ContactDetailView: View {
     }
 
     private func createContact(store: CNContactStore) {
-        let contact = CNMutableContact()
+        let cnContact = CNMutableContact()
 
-        contact.givenName = parsedContact.firstName
-        contact.familyName = parsedContact.lastName
-        contact.organizationName = parsedContact.company
+        cnContact.givenName = contact.firstName
+        cnContact.familyName = contact.lastName
+        cnContact.organizationName = contact.company
+        cnContact.jobTitle = contact.jobTitle
 
-        if !parsedContact.phone.isEmpty {
-            contact.phoneNumbers = [CNLabeledValue(
+        if !contact.phone.isEmpty {
+            cnContact.phoneNumbers = [CNLabeledValue(
                 label: CNLabelPhoneNumberMain,
-                value: CNPhoneNumber(stringValue: parsedContact.phone)
+                value: CNPhoneNumber(stringValue: contact.phone)
             )]
         }
 
-        if !parsedContact.email.isEmpty {
-            contact.emailAddresses = [CNLabeledValue(
-                label: CNLabelHome,
-                value: parsedContact.email as NSString
+        if !contact.email.isEmpty {
+            cnContact.emailAddresses = [CNLabeledValue(
+                label: CNLabelWork,
+                value: contact.email as NSString
             )]
         }
 
-        if !parsedContact.notes.isEmpty {
-            contact.note = parsedContact.notes
+        if !contact.website.isEmpty {
+            var urlString = contact.website
+            if !urlString.hasPrefix("http://") && !urlString.hasPrefix("https://") {
+                urlString = "https://" + urlString
+            }
+            cnContact.urlAddresses = [CNLabeledValue(
+                label: CNLabelWork,
+                value: urlString as NSString
+            )]
+        }
+
+        // Add postal address if any address fields are filled
+        if contact.hasAddress {
+            let address = CNMutablePostalAddress()
+            address.street = contact.streetAddress
+            address.city = contact.city
+            address.state = contact.state
+            address.postalCode = contact.zipCode
+            address.country = "USA"
+
+            cnContact.postalAddresses = [CNLabeledValue(
+                label: CNLabelWork,
+                value: address
+            )]
+        }
+
+        if !contact.notes.isEmpty {
+            cnContact.note = contact.notes
         }
 
         let saveRequest = CNSaveRequest()
-        saveRequest.add(contact, toContainerWithIdentifier: nil)
+        saveRequest.add(cnContact, toContainerWithIdentifier: nil)
 
         do {
             try store.execute(saveRequest)
             saveSuccess = true
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func openWebsite() {
+        var urlString = contact.website
+        if !urlString.hasPrefix("http://") && !urlString.hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
         }
     }
 
@@ -359,44 +385,33 @@ struct ContactDetailView: View {
 
     private func formatContactText() -> String {
         var lines: [String] = []
-        if !parsedContact.displayName.isEmpty {
-            lines.append(parsedContact.displayName)
+        if !contact.displayName.isEmpty {
+            lines.append(contact.displayName)
         }
-        if !parsedContact.company.isEmpty {
-            lines.append(parsedContact.company)
+        if !contact.jobTitle.isEmpty {
+            lines.append(contact.jobTitle)
         }
-        if !parsedContact.phone.isEmpty {
-            lines.append("Phone: \(parsedContact.phone)")
+        if !contact.company.isEmpty {
+            lines.append(contact.company)
         }
-        if !parsedContact.email.isEmpty {
-            lines.append("Email: \(parsedContact.email)")
+        if !contact.phone.isEmpty {
+            lines.append("Phone: \(contact.phone)")
         }
-        if !parsedContact.notes.isEmpty {
+        if !contact.email.isEmpty {
+            lines.append("Email: \(contact.email)")
+        }
+        if !contact.website.isEmpty {
+            lines.append("Web: \(contact.website)")
+        }
+        if contact.hasAddress {
             lines.append("")
-            lines.append(parsedContact.notes)
+            lines.append(contact.formattedAddress)
+        }
+        if !contact.notes.isEmpty {
+            lines.append("")
+            lines.append(contact.notes)
         }
         return lines.joined(separator: "\n")
-    }
-}
-
-// MARK: - Parsed Contact Model
-
-struct ParsedContact {
-    var firstName: String = ""
-    var lastName: String = ""
-    var company: String = ""
-    var phone: String = ""
-    var email: String = ""
-    var notes: String = ""
-
-    var displayName: String {
-        [firstName, lastName].filter { !$0.isEmpty }.joined(separator: " ")
-    }
-
-    var initials: String {
-        let first = firstName.first.map { String($0).uppercased() } ?? ""
-        let last = lastName.first.map { String($0).uppercased() } ?? ""
-        return first + last
     }
 }
 

@@ -7,8 +7,9 @@
 
 import SwiftUI
 import EventKit
+import CoreData
 
-struct EventDetailView: View {
+struct EventDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var eventTitle: String = ""
     @State private var eventDate: Date = Date()
@@ -24,6 +25,9 @@ struct EventDetailView: View {
     @State private var availableCalendars: [EKCalendar] = []
     @State private var eventCreated = false
     @State private var createdEventId: String?
+    @State private var calendarAccessDenied: Bool = false
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -142,9 +146,23 @@ struct EventDetailView: View {
             calendarPickerSheet
         }
         .alert("Calendar Error", isPresented: $showingCalendarError) {
-            Button("OK", role: .cancel) {}
+            if calendarAccessDenied {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } else {
+                Button("OK", role: .cancel) {}
+            }
         } message: {
             Text(calendarErrorMessage)
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK") { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -261,8 +279,8 @@ struct EventDetailView: View {
                 )
                 .cornerRadius(10)
             }
-            .disabled(eventTitle.isEmpty)
-            .opacity(eventTitle.isEmpty ? 0.5 : 1)
+            .disabled(eventTitle.isEmpty || calendarAccessDenied)
+            .opacity(eventTitle.isEmpty || calendarAccessDenied ? 0.5 : 1)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -336,17 +354,24 @@ struct EventDetailView: View {
             if status == .notDetermined {
                 let granted = await calendarService.requestAccess()
                 if !granted {
-                    calendarErrorMessage = "Calendar access is required to create events."
-                    showingCalendarError = true
+                    await MainActor.run {
+                        calendarAccessDenied = true
+                        calendarErrorMessage = "Calendar access is required to create events."
+                        showingCalendarError = true
+                    }
                     return
                 }
             } else if status == .denied || status == .restricted {
-                calendarErrorMessage = "Please enable Calendar access in Settings."
-                showingCalendarError = true
+                await MainActor.run {
+                    calendarAccessDenied = true
+                    calendarErrorMessage = "Calendar access is required to create events. Please enable it in Settings."
+                    showingCalendarError = true
+                }
                 return
             }
 
             await MainActor.run {
+                calendarAccessDenied = false
                 availableCalendars = calendarService.getCalendars().filter { $0.allowsContentModifications }
                 selectedCalendar = calendarService.getDefaultCalendar()
             }
@@ -456,7 +481,7 @@ struct EventDetailView: View {
         }
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         var lines: [String] = ["#event#"]
 
         if !eventTitle.isEmpty {
@@ -485,7 +510,12 @@ struct EventDetailView: View {
 
         note.content = lines.joined(separator: "\n")
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func createCalendarEvent(in calendar: EKCalendar) {
@@ -517,7 +547,7 @@ struct EventDetailView: View {
 
             // Store event ID in note summary for reference
             note.summary = eventId
-            try? CoreDataStack.shared.saveViewContext()
+            try CoreDataStack.shared.saveViewContext()
         } catch {
             calendarErrorMessage = error.localizedDescription
             showingCalendarError = true

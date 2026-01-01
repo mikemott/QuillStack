@@ -9,6 +9,9 @@ import SwiftUI
 import CoreData
 import EventKit
 import EventKitUI
+import OSLog
+
+private let logger = Logger(subsystem: "com.quillstack", category: "Meeting")
 
 // Keep event store alive as a singleton
 final class CalendarManager: @unchecked Sendable {
@@ -59,14 +62,14 @@ final class CalendarManager: @unchecked Sendable {
                                                      second: 0,
                                                      of: parsedDate) ?? parsedDate
                             timeParsed = true
-                            print("⏰ Parsed time '\(timeStr)' with format '\(format)' -> hour: \(hour)")
+                            logger.info("Parsed time '\(timeStr)' with format '\(format)' -> hour: \(hour)")
                             break
                         }
                     }
                 }
 
                 if !timeParsed {
-                    print("⚠️ Could not parse time: '\(timeStr)'")
+                    logger.warning("Could not parse time: '\(timeStr)'")
                 }
             }
         } else {
@@ -86,14 +89,14 @@ final class CalendarManager: @unchecked Sendable {
 
         // Get calendar
         let allCalendars = eventStore.calendars(for: .event)
-        print("📅 Available calendars: \(allCalendars.map { "\($0.title) (writable: \($0.allowsContentModifications))" })")
+        logger.info("Available calendars: \(allCalendars.map { "\($0.title) (writable: \($0.allowsContentModifications))" })")
 
         guard let calendar = eventStore.defaultCalendarForNewEvents ??
               allCalendars.first(where: { $0.allowsContentModifications }) else {
             throw NSError(domain: "CalendarManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "No writable calendar found"])
         }
 
-        print("📅 Using calendar: \(calendar.title)")
+        logger.info("Using calendar: \(calendar.title)")
         event.calendar = calendar
 
         // Save with commit
@@ -107,26 +110,21 @@ final class CalendarManager: @unchecked Sendable {
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
 
-        print("✅ Calendar event saved:")
-        print("   Title: \(event.title ?? "nil")")
-        print("   Calendar: \(calendar.title)")
-        print("   Start: \(dateFormatter.string(from: event.startDate))")
-        print("   End: \(dateFormatter.string(from: event.endDate))")
-        print("   Event ID: \(event.eventIdentifier ?? "nil")")
+        logger.info("Calendar event saved - Title: \(event.title ?? "nil"), Calendar: \(calendar.title), Start: \(dateFormatter.string(from: event.startDate)), End: \(dateFormatter.string(from: event.endDate)), Event ID: \(event.eventIdentifier ?? "nil")")
 
         // Verify by fetching the event back
         if let eventId = event.eventIdentifier,
            let fetchedEvent = eventStore.event(withIdentifier: eventId) {
-            print("✅ Verified: Event exists in calendar with title '\(fetchedEvent.title ?? "nil")'")
+            logger.info("Verified: Event exists in calendar with title '\(fetchedEvent.title ?? "nil")'")
         } else {
-            print("⚠️ Warning: Could not fetch event back from calendar")
+            logger.warning("Could not fetch event back from calendar")
         }
 
         return calendar.title
     }
 }
 
-struct MeetingDetailView: View {
+struct MeetingDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var meetingDetails: MeetingDetails?
     @State private var isLoading = true
@@ -393,6 +391,13 @@ struct MeetingDetailView: View {
         )
     }
 
+    // MARK: - NoteDetailViewProtocol
+
+    func saveChanges() {
+        // MeetingDetailView updates content through structured fields
+        // Saving is handled by editMeeting() and updateMeetingContent()
+    }
+
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
@@ -548,7 +553,7 @@ struct MeetingDetailView: View {
         do {
             try note.managedObjectContext?.save()
         } catch {
-            print("Failed to save meeting details: \(error)")
+            logger.error("Failed to save meeting details: \(error)")
         }
     }
 
@@ -617,12 +622,12 @@ struct MeetingDetailView: View {
                     }
                 }
 
-                print("✅ Event added to '\(calendarName)' calendar")
+                logger.info("Event added to '\(calendarName)' calendar")
 
             } catch {
                 calendarErrorMessage = "Failed to create calendar event: \(error.localizedDescription)"
                 showingCalendarError = true
-                print("❌ Calendar error: \(error)")
+                logger.error("Calendar error: \(error)")
             }
         }
     }

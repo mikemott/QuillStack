@@ -17,5 +17,9 @@
 	<!-- Reminders Access -->
 	<key>NSRemindersFullAccessUsageDescription</key>
 	<string>QuillStack can export your to-do items to the Reminders app.</string>
+
+	<!-- Contacts Access -->
+	<key>NSContactsUsageDescription</key>
+	<string>QuillStack can save contacts from scanned business cards to your Contacts app.</string>
 </dict>
 </plist>

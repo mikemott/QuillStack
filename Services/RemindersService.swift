@@ -11,7 +11,9 @@ import os.log
 
 // MARK: - Reminders Service
 
-class RemindersService {
+/// Service for reminders integration via EventKit.
+/// Conforms to RemindersServiceProtocol for testability and dependency injection.
+final class RemindersService: RemindersServiceProtocol, @unchecked Sendable {
     static let shared = RemindersService()
 
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Reminders")

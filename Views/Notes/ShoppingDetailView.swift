@@ -7,13 +7,16 @@
 
 import SwiftUI
 import EventKit
+import CoreData
 
-struct ShoppingDetailView: View {
+struct ShoppingDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var items: [ShoppingItem] = []
     @State private var newItemText: String = ""
     @State private var showingRemindersSheet: Bool = false
     @State private var showingExportSheet: Bool = false
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @FocusState private var isAddingItem: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -56,6 +59,11 @@ struct ShoppingDetailView: View {
         .sheet(isPresented: $showingExportSheet) {
             ExportSheet(note: note)
                 .presentationDetents([.medium, .large])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK") { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -282,7 +290,7 @@ struct ShoppingDetailView: View {
         items = parsedItems
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         var lines: [String] = []
 
         let classifier = TextClassifier()
@@ -297,7 +305,12 @@ struct ShoppingDetailView: View {
 
         note.content = lines.joined(separator: "\n")
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func addItem() {

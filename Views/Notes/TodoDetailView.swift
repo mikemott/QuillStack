@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct TodoDetailView: View {
+struct TodoDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var tasks: [ParsedTask] = []
     @State private var newTaskText: String = ""
@@ -16,8 +16,13 @@ struct TodoDetailView: View {
     @State private var showingSummarySheet: Bool = false
     @State private var showingRemindersSheet: Bool = false
     @FocusState private var isAddingTask: Bool
-    @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
+
+    // MARK: - NoteDetailViewProtocol
+
+    var shareableContent: String {
+        tasks.map { ($0.isCompleted ? "☑" : "☐") + " " + $0.text }.joined(separator: "\n")
+    }
 
     var body: some View {
         ZStack {
@@ -100,67 +105,17 @@ struct TodoDetailView: View {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // AI menu (only show if API key configured)
-            if settings.hasAPIKey {
-                Menu {
-                    Button(action: { showingSummarySheet = true }) {
-                        Label("Summarize", systemImage: "text.quote")
-                    }
-                } label: {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.forestDark)
-                }
-            }
-
-            // Export
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Share
-            Button(action: shareNote) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Copy
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Spacer()
-
-            // Export to Reminders
-            Button(action: { showingRemindersSheet = true }) {
-                Image(systemName: "checklist")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.badgeTodo, Color.badgeTodo.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .cornerRadius(10)
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(Color.creamLight)
-        .overlay(
-            Rectangle()
-                .fill(Color.forestDark.opacity(0.1))
-                .frame(height: 1),
-            alignment: .top
+        DetailBottomBar(
+            onExport: { showingExportSheet = true },
+            onShare: { shareContent() },
+            onCopy: { copyToClipboard() },
+            aiActions: DetailBottomBar.summarizeOnlyAIActions(
+                onSummarize: { showingSummarySheet = true }
+            ),
+            primaryAction: DetailAction(
+                icon: "checklist",
+                color: .badgeTodo
+            ) { showingRemindersSheet = true }
         )
     }
 
@@ -228,7 +183,7 @@ struct TodoDetailView: View {
         tasks = parsedTasks
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         // Rebuild content from tasks
         var lines: [String] = []
 
@@ -256,21 +211,6 @@ struct TodoDetailView: View {
         saveChanges()
     }
 
-    private func shareNote() {
-        let text = tasks.map { ($0.isCompleted ? "☑" : "☐") + " " + $0.text }.joined(separator: "\n")
-        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootVC = window.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
-    }
-
-    private func copyContent() {
-        let text = tasks.map { ($0.isCompleted ? "☑" : "☐") + " " + $0.text }.joined(separator: "\n")
-        UIPasteboard.general.string = text
-    }
 }
 
 // MARK: - Parsed Task Model

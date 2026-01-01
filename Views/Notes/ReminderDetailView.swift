@@ -7,14 +7,17 @@
 
 import SwiftUI
 import EventKit
+import CoreData
 
-struct ReminderDetailView: View {
+struct ReminderDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var reminderText: String = ""
     @State private var dueDate: Date?
     @State private var hasDueDate: Bool = false
     @State private var showingExportSheet: Bool = false
     @State private var showingDatePicker: Bool = false
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -106,11 +109,16 @@ struct ReminderDetailView: View {
         .navigationBarHidden(true)
         .onAppear { parseContent() }
         .sheet(isPresented: $showingExportSheet) {
-            ExportToRemindersSheet(
+            SingleReminderExportSheet(
                 reminderText: reminderText,
                 dueDate: hasDueDate ? dueDate : nil
             )
             .presentationDetents([.medium])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK") { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -213,7 +221,7 @@ struct ReminderDetailView: View {
         return (textLines.joined(separator: "\n"), foundDate)
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         let classifier = TextClassifier()
         var newContent = ""
 
@@ -225,7 +233,12 @@ struct ReminderDetailView: View {
 
         note.content = newContent
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func shareNote() {
@@ -257,35 +270,21 @@ struct ReminderDetailView: View {
     }
 }
 
-// MARK: - Export to Reminders Sheet
+// MARK: - Single Reminder Export Sheet
 
-struct ExportToRemindersSheet: View {
+struct SingleReminderExportSheet: View {
     let reminderText: String
     let dueDate: Date?
-
-    // For todo tasks (existing functionality)
-    var tasks: [ParsedTask]?
 
     @State private var selectedList: EKCalendar?
     @State private var availableLists: [EKCalendar] = []
     @State private var isExporting = false
     @State private var exportSuccess = false
     @State private var errorMessage: String?
+    @State private var isAccessDenied = false
     @Environment(\.dismiss) private var dismiss
 
     private let remindersService = RemindersService.shared
-
-    init(reminderText: String, dueDate: Date?) {
-        self.reminderText = reminderText
-        self.dueDate = dueDate
-        self.tasks = nil
-    }
-
-    init(tasks: [ParsedTask]) {
-        self.reminderText = ""
-        self.dueDate = nil
-        self.tasks = tasks
-    }
 
     var body: some View {
         NavigationStack {
@@ -322,7 +321,7 @@ struct ExportToRemindersSheet: View {
                     .font(.serifCaption(12, weight: .medium))
                     .foregroundColor(.textMedium)
 
-                Text(tasks != nil ? "\(tasks!.count) tasks" : reminderText)
+                Text(reminderText)
                     .font(.serifBody(15, weight: .regular))
                     .foregroundColor(.textDark)
                     .lineLimit(3)
@@ -411,7 +410,7 @@ struct ExportToRemindersSheet: View {
 
     private func errorView(_ message: String) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle.fill")
+            Image(systemName: isAccessDenied ? "lock.circle" : "exclamationmark.triangle.fill")
                 .font(.system(size: 50))
                 .foregroundColor(.orange)
 
@@ -420,11 +419,25 @@ struct ExportToRemindersSheet: View {
                 .foregroundColor(.textDark)
                 .multilineTextAlignment(.center)
 
-            Button("Try Again") {
-                errorMessage = nil
+            if isAccessDenied {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .font(.serifBody(15, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 10)
+                .background(Color.forestDark)
+                .cornerRadius(8)
+            } else {
+                Button("Try Again") {
+                    errorMessage = nil
+                }
+                .font(.serifBody(15, weight: .medium))
+                .foregroundColor(.forestDark)
             }
-            .font(.serifBody(15, weight: .medium))
-            .foregroundColor(.forestDark)
         }
     }
 
@@ -432,11 +445,15 @@ struct ExportToRemindersSheet: View {
         Task {
             let authorized = await remindersService.requestAccess()
             guard authorized else {
-                errorMessage = "Please enable Reminders access in Settings."
+                await MainActor.run {
+                    isAccessDenied = true
+                    errorMessage = "Reminders access is required. Please enable it in Settings."
+                }
                 return
             }
 
             await MainActor.run {
+                isAccessDenied = false
                 availableLists = remindersService.getReminderLists()
                 selectedList = remindersService.getDefaultReminderList() ?? availableLists.first
             }
@@ -449,53 +466,35 @@ struct ExportToRemindersSheet: View {
 
         Task {
             do {
-                if let tasks = tasks {
-                    // Export multiple tasks
-                    _ = try await remindersService.exportTasks(tasks, toList: list)
+                let store = EKEventStore()
+                if #available(iOS 17.0, *) {
+                    _ = try await store.requestFullAccessToReminders()
                 } else {
-                    // Export single reminder
-                    let reminder = EKReminder(eventStore: EKEventStore())
-                    reminder.calendar = list
-                    reminder.title = reminderText.components(separatedBy: .newlines).first ?? reminderText
-
-                    if let date = dueDate {
-                        let calendar = Calendar.current
-                        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-                        components.timeZone = TimeZone.current
-                        reminder.dueDateComponents = components
-                        reminder.addAlarm(EKAlarm(absoluteDate: date))
-                    }
-
-                    let store = EKEventStore()
-                    if #available(iOS 17.0, *) {
-                        _ = try await store.requestFullAccessToReminders()
-                    } else {
-                        _ = try await store.requestAccess(to: .reminder)
-                    }
-
-                    // Re-fetch the calendar from the new store
-                    guard let targetList = store.calendars(for: .reminder).first(where: { $0.calendarIdentifier == list.calendarIdentifier }) else {
-                        throw RemindersError.exportFailed("Could not find selected list")
-                    }
-
-                    let newReminder = EKReminder(eventStore: store)
-                    newReminder.calendar = targetList
-                    newReminder.title = reminderText.components(separatedBy: .newlines).first ?? reminderText
-
-                    if reminderText.contains("\n") {
-                        newReminder.notes = reminderText
-                    }
-
-                    if let date = dueDate {
-                        let calendar = Calendar.current
-                        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-                        components.timeZone = TimeZone.current
-                        newReminder.dueDateComponents = components
-                        newReminder.addAlarm(EKAlarm(absoluteDate: date))
-                    }
-
-                    try store.save(newReminder, commit: true)
+                    _ = try await store.requestAccess(to: .reminder)
                 }
+
+                // Re-fetch the calendar from the new store
+                guard let targetList = store.calendars(for: .reminder).first(where: { $0.calendarIdentifier == list.calendarIdentifier }) else {
+                    throw RemindersError.exportFailed("Could not find selected list")
+                }
+
+                let newReminder = EKReminder(eventStore: store)
+                newReminder.calendar = targetList
+                newReminder.title = reminderText.components(separatedBy: .newlines).first ?? reminderText
+
+                if reminderText.contains("\n") {
+                    newReminder.notes = reminderText
+                }
+
+                if let date = dueDate {
+                    let calendar = Calendar.current
+                    var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                    components.timeZone = TimeZone.current
+                    newReminder.dueDateComponents = components
+                    newReminder.addAlarm(EKAlarm(absoluteDate: date))
+                }
+
+                try store.save(newReminder, commit: true)
 
                 await MainActor.run {
                     isExporting = false

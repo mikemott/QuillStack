@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		T001000000000001 /* TextClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000001 /* TextClassifierTests.swift */; };
+		T001000000000002 /* DetailBottomBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000002 /* DetailBottomBarTests.swift */; };
+		T001000000000003 /* NoteDetailViewProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000003 /* NoteDetailViewProtocolTests.swift */; };
+		04302BE7809C1CBD7CAF357B /* TemplateOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A7E19D27CEE0882033BA91 /* TemplateOverlayView.swift */; };
+		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
+		0ECFB430B500C0AA9EBA7983 /* TemplatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B032D255CCFDCA6A3F7216 /* TemplatePickerSheet.swift */; };
+		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
+		125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */; };
+		171D8FDF19DEB33AE9E56252 /* OCRServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */; };
 		2796C1862EEB552B00E05291 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1852EEB552B00E05291 /* ContentView.swift */; };
 		2796C1892EEB554000E05291 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1882EEB554000E05291 /* QuillStackApp.swift */; };
 		2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A42EF0B20100E05291 /* SpellCorrector.swift */; };
@@ -38,6 +47,16 @@
 		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
 		2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */; };
+		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
+		30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */; };
+		3E065E96161C05869F566CC7 /* LLMServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */; };
+		4BC316248EB1C88BABB17D1B /* NoteTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE452369AD0C34A57F80878 /* NoteTemplate.swift */; };
+		546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */; };
+		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
+		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
+		9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60271B88FC8F3E46581FB9B5 /* NoteType.swift */; };
+		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
+		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -48,6 +67,7 @@
 		E001000000000008 /* ObsidianSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000008 /* ObsidianSetupView.swift */; };
 		E001000000000009 /* NotionSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000009 /* NotionSetupView.swift */; };
 		E00100000000000A /* MeetingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200000000000A /* MeetingDetailView.swift */; };
+		ED1206ED355AC9727BD0638C /* DetailBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */; };
 		F00100000000000B /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000B /* SearchService.swift */; };
 		F00100000000000C /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000C /* RemindersService.swift */; };
 		F00100000000000D /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000D /* CalendarService.swift */; };
@@ -84,16 +104,29 @@
 		I00100000000002D /* ImageRetentionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002D /* ImageRetentionService.swift */; };
 		I00100000000002E /* ContentSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002E /* ContentSanitizer.swift */; };
 		I00100000000002F /* DetailHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002F /* DetailHeader.swift */; };
-		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
-		546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */; };
-		4BC316248EB1C88BABB17D1B /* NoteTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE452369AD0C34A57F80878 /* NoteTemplate.swift */; };
-		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
-		04302BE7809C1CBD7CAF357B /* TemplateOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A7E19D27CEE0882033BA91 /* TemplateOverlayView.swift */; };
-		0ECFB430B500C0AA9EBA7983 /* TemplatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B032D255CCFDCA6A3F7216 /* TemplatePickerSheet.swift */; };
-		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
+		J001000000000030 /* BusinessCardDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000030 /* BusinessCardDetector.swift */; };
+		J001000000000031 /* ContactParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000031 /* ContactParser.swift */; };
+		J001000000000032 /* ReminderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000032 /* ReminderDetailView.swift */; };
+		J001000000000033 /* ContactDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000033 /* ContactDetailView.swift */; };
+		J001000000000034 /* ExpenseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000034 /* ExpenseDetailView.swift */; };
+		J001000000000035 /* ShoppingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000035 /* ShoppingDetailView.swift */; };
+		J001000000000036 /* RecipeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000036 /* RecipeDetailView.swift */; };
+		J001000000000037 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000037 /* EventDetailView.swift */; };
+		J001000000000038 /* IdeaDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000038 /* IdeaDetailView.swift */; };
+		K001000000000039 /* IntegrationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = K002000000000039 /* IntegrationProvider.swift */; };
+		K00100000000003A /* IntegrationRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003A /* IntegrationRegistry.swift */; };
+		K00100000000003B /* NoteEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003B /* NoteEvent.swift */; };
+		K00100000000003C /* NoteEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003C /* NoteEventBus.swift */; };
+		K00100000000003D /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003D /* Tag.swift */; };
+		K00100000000003E /* TagMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003E /* TagMigrationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		T002000000000001 /* TextClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifierTests.swift; sourceTree = "<group>"; };
+		T002000000000002 /* DetailBottomBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBottomBarTests.swift; sourceTree = "<group>"; };
+		T002000000000003 /* NoteDetailViewProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocolTests.swift; sourceTree = "<group>"; };
+		T002000000000004 /* QuillStackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2796C1852EEB552B00E05291 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2796C1872EEB553000E05291 /* QuillStack-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuillStack-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -127,6 +160,19 @@
 		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidenceTextView.swift; sourceTree = "<group>"; };
+		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
+		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
+		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
+		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
+		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
+		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
+		97B032D255CCFDCA6A3F7216 /* TemplatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePickerSheet.swift; sourceTree = "<group>"; };
+		A7C04153EA7033D6D21E3919 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
+		B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
+		B70B286A2AC36CA436C77ACE /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		C1A7E19D27CEE0882033BA91 /* TemplateOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateOverlayView.swift; sourceTree = "<group>"; };
+		C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocol.swift; sourceTree = "<group>"; };
+		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
 		E002000000000001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
 		E002000000000002 /* ExportDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDestination.swift; sourceTree = "<group>"; };
 		E002000000000003 /* TagRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRouter.swift; sourceTree = "<group>"; };
@@ -137,6 +183,7 @@
 		E002000000000008 /* ObsidianSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianSetupView.swift; sourceTree = "<group>"; };
 		E002000000000009 /* NotionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionSetupView.swift; sourceTree = "<group>"; };
 		E00200000000000A /* MeetingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDetailView.swift; sourceTree = "<group>"; };
+		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		F00200000000000D /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
@@ -157,6 +204,8 @@
 		F00200000000001C /* OfflineQueueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineQueueService.swift; sourceTree = "<group>"; };
 		F00200000000001D /* HandwritingLearningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingLearningService.swift; sourceTree = "<group>"; };
 		F00200000000001E /* OCRCorrection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRCorrection.swift; sourceTree = "<group>"; };
+		F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarServiceProtocol.swift; path = Protocols/CalendarServiceProtocol.swift; sourceTree = "<group>"; };
+		FBE452369AD0C34A57F80878 /* NoteTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTemplate.swift; sourceTree = "<group>"; };
 		G00200000000001F /* PromptRefinerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRefinerService.swift; sourceTree = "<group>"; };
 		G002000000000020 /* GitHubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubService.swift; sourceTree = "<group>"; };
 		G002000000000022 /* LabelChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelChip.swift; sourceTree = "<group>"; };
@@ -173,17 +222,32 @@
 		I00200000000002D /* ImageRetentionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRetentionService.swift; sourceTree = "<group>"; };
 		I00200000000002E /* ContentSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSanitizer.swift; sourceTree = "<group>"; };
 		I00200000000002F /* DetailHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailHeader.swift; sourceTree = "<group>"; };
-		A7C04153EA7033D6D21E3919 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
-		B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
-		FBE452369AD0C34A57F80878 /* NoteTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTemplate.swift; sourceTree = "<group>"; };
-		B70B286A2AC36CA436C77ACE /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
-		C1A7E19D27CEE0882033BA91 /* TemplateOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateOverlayView.swift; sourceTree = "<group>"; };
-		97B032D255CCFDCA6A3F7216 /* TemplatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePickerSheet.swift; sourceTree = "<group>"; };
-		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
+		J002000000000030 /* BusinessCardDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardDetector.swift; sourceTree = "<group>"; };
+		J002000000000031 /* ContactParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactParser.swift; sourceTree = "<group>"; };
+		J002000000000032 /* ReminderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDetailView.swift; sourceTree = "<group>"; };
+		J002000000000033 /* ContactDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailView.swift; sourceTree = "<group>"; };
+		J002000000000034 /* ExpenseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseDetailView.swift; sourceTree = "<group>"; };
+		J002000000000035 /* ShoppingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingDetailView.swift; sourceTree = "<group>"; };
+		J002000000000036 /* RecipeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailView.swift; sourceTree = "<group>"; };
+		J002000000000037 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		J002000000000038 /* IdeaDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaDetailView.swift; sourceTree = "<group>"; };
+		K002000000000039 /* IntegrationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationProvider.swift; sourceTree = "<group>"; };
+		K00200000000003A /* IntegrationRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationRegistry.swift; sourceTree = "<group>"; };
+		K00200000000003B /* NoteEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEvent.swift; sourceTree = "<group>"; };
+		K00200000000003C /* NoteEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEventBus.swift; sourceTree = "<group>"; };
+		K00200000000003D /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		K00200000000003E /* TagMigrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagMigrationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2796C1542EEB51D800E05291 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		T008000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -202,6 +266,7 @@
 				2796C17E2EEB545100E05291 /* Views */,
 				2796C17C2EEB542900E05291 /* Models */,
 				2796C17B2EEB542300E05291 /* App */,
+				T003000000000001 /* Tests */,
 				2796C1C12EEB580000E05291 /* Assets.xcassets */,
 				2796C1582EEB51D800E05291 /* Products */,
 			);
@@ -211,8 +276,19 @@
 			isa = PBXGroup;
 			children = (
 				2796C1572EEB51D800E05291 /* QuillStack.app */,
+				T002000000000004 /* QuillStackTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		T003000000000001 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				T002000000000001 /* TextClassifierTests.swift */,
+				T002000000000002 /* DetailBottomBarTests.swift */,
+				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		2796C17B2EEB542300E05291 /* App */ = {
@@ -221,6 +297,7 @@
 				2796C1852EEB552B00E05291 /* ContentView.swift */,
 				2796C1872EEB553000E05291 /* QuillStack-Bridging-Header.h */,
 				2796C1882EEB554000E05291 /* QuillStackApp.swift */,
+				3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -235,7 +312,9 @@
 				2796C18E2EEB558200E05291 /* Note.swift */,
 				F00200000000000F /* NotePage.swift */,
 				F00200000000001E /* OCRCorrection.swift */,
+				K00200000000003D /* Tag.swift */,
 				2796C18F2EEB558200E05291 /* TodoItem.swift */,
+				60271B88FC8F3E46581FB9B5 /* NoteType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -257,14 +336,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		S003000000000001 /* Statistics */ = {
-			isa = PBXGroup;
-			children = (
-				B70B286A2AC36CA436C77ACE /* StatisticsView.swift */,
-			);
-			path = Statistics;
-			sourceTree = "<group>";
-		};
 		2796C17F2EEB545600E05291 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -281,8 +352,12 @@
 			isa = PBXGroup;
 			children = (
 				E003000000000001 /* Export */,
+				K003000000000039 /* Integration */,
+				K00300000000003B /* Events */,
+				J002000000000030 /* BusinessCardDetector.swift */,
 				F00200000000000D /* CalendarService.swift */,
 				2796C1902EEB55A300E05291 /* CameraManager.swift */,
+				J002000000000031 /* ContactParser.swift */,
 				I00200000000002E /* ContentSanitizer.swift */,
 				G002000000000020 /* GitHubService.swift */,
 				F00200000000001D /* HandwritingLearningService.swift */,
@@ -299,8 +374,11 @@
 				F00200000000000B /* SearchService.swift */,
 				F00200000000001B /* SettingsManager.swift */,
 				2796C1A42EF0B20100E05291 /* SpellCorrector.swift */,
+				K00200000000003E /* TagMigrationService.swift */,
 				2796C1942EEB55A300E05291 /* TextClassifier.swift */,
 				2796C1952EEB55A300E05291 /* TodoParser.swift */,
+				7C7AB6EA84595229C2256DD5 /* Protocols */,
+				135689AE59463E16DB510DA6 /* DetailViewFactory.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -333,14 +411,22 @@
 			children = (
 				F002000000000014 /* AddPageSheet.swift */,
 				G002000000000023 /* ClaudePromptDetailView.swift */,
+				J002000000000033 /* ContactDetailView.swift */,
 				2796C1DF2EEB700000E05291 /* EmailDetailView.swift */,
+				J002000000000037 /* EventDetailView.swift */,
+				J002000000000034 /* ExpenseDetailView.swift */,
+				J002000000000038 /* IdeaDetailView.swift */,
 				E00200000000000A /* MeetingDetailView.swift */,
 				2796C1A12EEB560500E05291 /* NoteDetailView.swift */,
 				2796C1A32EEB560500E05291 /* NoteListView.swift */,
 				F002000000000011 /* NoteSearchView.swift */,
+				J002000000000036 /* RecipeDetailView.swift */,
+				J002000000000032 /* ReminderDetailView.swift */,
 				F002000000000012 /* SearchFilterSheet.swift */,
+				J002000000000035 /* ShoppingDetailView.swift */,
 				F002000000000013 /* SummarySheet.swift */,
 				2796C1DE2EEB700000E05291 /* TodoDetailView.swift */,
+				C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */,
 			);
 			path = Notes;
 			sourceTree = "<group>";
@@ -374,8 +460,21 @@
 				2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */,
 				I00200000000002F /* DetailHeader.swift */,
 				G002000000000022 /* LabelChip.swift */,
+				87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		7C7AB6EA84595229C2256DD5 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */,
+				8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */,
+				73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */,
+				F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */,
+				E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */,
+			);
+			name = Protocols;
 			sourceTree = "<group>";
 		};
 		E003000000000001 /* Export */ = {
@@ -437,7 +536,51 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
+		S003000000000001 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				B70B286A2AC36CA436C77ACE /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		K003000000000039 /* Integration */ = {
+			isa = PBXGroup;
+			children = (
+				K002000000000039 /* IntegrationProvider.swift */,
+				K00200000000003A /* IntegrationRegistry.swift */,
+			);
+			path = Integration;
+			sourceTree = "<group>";
+		};
+		K00300000000003B /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				K00200000000003B /* NoteEvent.swift */,
+				K00200000000003C /* NoteEventBus.swift */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		T004000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2796C14F2EEB51D800E05291 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2796C1562EEB51D800E05291;
+			remoteInfo = QuillStack;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		T005000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2796C1562EEB51D800E05291 /* QuillStack */;
+			targetProxy = T004000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXNativeTarget section */
 		2796C1562EEB51D800E05291 /* QuillStack */ = {
@@ -453,11 +596,26 @@
 			dependencies = (
 			);
 			name = QuillStack;
-			packageProductDependencies = (
-			);
 			productName = QuillStack;
 			productReference = 2796C1572EEB51D800E05291 /* QuillStack.app */;
 			productType = "com.apple.product-type.application";
+		};
+		T006000000000001 /* QuillStackTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = T009000000000001 /* Build configuration list for PBXNativeTarget "QuillStackTests" */;
+			buildPhases = (
+				T007000000000001 /* Sources */,
+				T008000000000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				T005000000000001 /* PBXTargetDependency */,
+			);
+			name = QuillStackTests;
+			productName = QuillStackTests;
+			productReference = T002000000000004 /* QuillStackTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -472,6 +630,10 @@
 					2796C1562EEB51D800E05291 = {
 						CreatedOnToolsVersion = 26.1.1;
 						LastSwiftMigration = 2610;
+					};
+					T006000000000001 = {
+						CreatedOnToolsVersion = 26.1.1;
+						TestTargetID = 2796C1562EEB51D800E05291;
 					};
 				};
 			};
@@ -490,6 +652,7 @@
 			projectRoot = "";
 			targets = (
 				2796C1562EEB51D800E05291 /* QuillStack */,
+				T006000000000001 /* QuillStackTests */,
 			);
 		};
 /* End PBXProject section */
@@ -593,6 +756,41 @@
 				I00100000000002D /* ImageRetentionService.swift in Sources */,
 				I00100000000002E /* ContentSanitizer.swift in Sources */,
 				I00100000000002F /* DetailHeader.swift in Sources */,
+				J001000000000030 /* BusinessCardDetector.swift in Sources */,
+				J001000000000031 /* ContactParser.swift in Sources */,
+				J001000000000032 /* ReminderDetailView.swift in Sources */,
+				J001000000000033 /* ContactDetailView.swift in Sources */,
+				J001000000000034 /* ExpenseDetailView.swift in Sources */,
+				J001000000000035 /* ShoppingDetailView.swift in Sources */,
+				J001000000000036 /* RecipeDetailView.swift in Sources */,
+				J001000000000037 /* EventDetailView.swift in Sources */,
+				J001000000000038 /* IdeaDetailView.swift in Sources */,
+				9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */,
+				7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */,
+				171D8FDF19DEB33AE9E56252 /* OCRServiceProtocol.swift in Sources */,
+				0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */,
+				3E065E96161C05869F566CC7 /* LLMServiceProtocol.swift in Sources */,
+				30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */,
+				60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */,
+				125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */,
+				A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */,
+				ED1206ED355AC9727BD0638C /* DetailBottomBar.swift in Sources */,
+				K001000000000039 /* IntegrationProvider.swift in Sources */,
+				K00100000000003A /* IntegrationRegistry.swift in Sources */,
+				K00100000000003B /* NoteEvent.swift in Sources */,
+				K00100000000003C /* NoteEventBus.swift in Sources */,
+				K00100000000003D /* Tag.swift in Sources */,
+				K00100000000003E /* TagMigrationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		T007000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				T001000000000001 /* TextClassifierTests.swift in Sources */,
+				T001000000000002 /* DetailBottomBarTests.swift in Sources */,
+				T001000000000003 /* NoteDetailViewProtocolTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,14 +923,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
-				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -764,14 +964,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
-				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -795,6 +997,48 @@
 			};
 			name = Release;
 		};
+		T00A000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZQB6JS358;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QuillStack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QuillStack";
+			};
+			name = Debug;
+		};
+		T00A000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZQB6JS358;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QuillStack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QuillStack";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -812,6 +1056,15 @@
 			buildConfigurations = (
 				2796C1682EEB51D900E05291 /* Debug */,
 				2796C1692EEB51D900E05291 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		T009000000000001 /* Build configuration list for PBXNativeTarget "QuillStackTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				T00A000000000001 /* Debug */,
+				T00A000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

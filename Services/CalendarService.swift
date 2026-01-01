@@ -11,7 +11,9 @@ import os.log
 
 // MARK: - Calendar Service
 
-class CalendarService {
+/// Service for calendar integration via EventKit.
+/// Conforms to CalendarServiceProtocol for testability and dependency injection.
+final class CalendarService: CalendarServiceProtocol, @unchecked Sendable {
     static let shared = CalendarService()
 
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Calendar")

@@ -18,11 +18,36 @@ final class CameraViewModel {
     private(set) var error: CameraError?
     private(set) var isProcessing = false
 
-    private let ocrService = OCRService()
+    // Dependencies (protocol-based for testability)
+    private let ocrService: OCRServiceProtocol
+    private let textClassifier: TextClassifierProtocol
     private let imageProcessor = ImageProcessor()
-    private let textClassifier = TextClassifier()
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
+
+    /// Initialize with default shared services
+    init() {
+        self.ocrService = OCRService.shared
+        self.textClassifier = TextClassifier()
+    }
+
+    /// Initialize with custom services (for testing)
+    init(ocrService: OCRServiceProtocol, textClassifier: TextClassifierProtocol) {
+        self.ocrService = ocrService
+        self.textClassifier = textClassifier
+    }
+
+    /// Initialize with custom OCR service only (for testing)
+    init(ocrService: OCRServiceProtocol) {
+        self.ocrService = ocrService
+        self.textClassifier = TextClassifier()
+    }
+
+    /// Initialize with custom text classifier only (for testing)
+    init(textClassifier: TextClassifierProtocol) {
+        self.ocrService = OCRService.shared
+        self.textClassifier = textClassifier
+    }
 
     enum CameraError: LocalizedError {
         case unauthorized
@@ -220,8 +245,13 @@ final class CameraViewModel {
                     print("📅 Parsed meeting: \(meeting.title)")
                 }
 
-            case .email, .general, .claudePrompt:
-                break // No special parsing needed
+            case .contact:
+                // Contact parsing happens in ContactDetailView (on-the-fly)
+                let parsed = ContactParser.parse(text)
+                print("👤 Detected contact: \(parsed.displayName)")
+
+            case .email, .general, .claudePrompt, .reminder, .expense, .shopping, .recipe, .event, .idea:
+                break // No special parsing needed - handled in detail views
             }
 
             do {

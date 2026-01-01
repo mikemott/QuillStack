@@ -9,17 +9,31 @@ import SwiftUI
 import CoreData
 import MessageUI
 
-struct EmailDetailView: View {
+struct EmailDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var toField: String = ""
+    @State private var ccField: String = ""
+    @State private var bccField: String = ""
     @State private var subjectField: String = ""
     @State private var bodyContent: String = ""
+    @State private var showCcBcc: Bool = false
     @State private var showingMailComposer = false
     @State private var showingMailError = false
     @State private var showingExportSheet = false
     @State private var showingSummarySheet = false
-    @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
+
+    // MARK: - NoteDetailViewProtocol
+
+    var shareableContent: String {
+        var text = ""
+        if !toField.isEmpty { text += "To: \(toField)\n" }
+        if !ccField.isEmpty { text += "Cc: \(ccField)\n" }
+        if !bccField.isEmpty { text += "Bcc: \(bccField)\n" }
+        if !subjectField.isEmpty { text += "Subject: \(subjectField)\n\n" }
+        text += bodyContent
+        return text
+    }
 
     var body: some View {
         ZStack {
@@ -40,6 +54,32 @@ struct EmailDetailView: View {
                     VStack(spacing: 0) {
                         // To field
                         emailField(label: "To:", text: $toField, placeholder: "recipient@example.com")
+
+                        // CC/BCC toggle
+                        if !showCcBcc {
+                            Button(action: { withAnimation { showCcBcc = true } }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Add Cc/Bcc")
+                                        .font(.serifCaption(13, weight: .medium))
+                                        .foregroundColor(.badgeEmail)
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                            }
+                        }
+
+                        if showCcBcc {
+                            Divider()
+                                .background(Color.forestDark.opacity(0.1))
+
+                            emailField(label: "Cc:", text: $ccField, placeholder: "cc@example.com")
+
+                            Divider()
+                                .background(Color.forestDark.opacity(0.1))
+
+                            emailField(label: "Bcc:", text: $bccField, placeholder: "bcc@example.com")
+                        }
 
                         Divider()
                             .background(Color.forestDark.opacity(0.1))
@@ -77,11 +117,15 @@ struct EmailDetailView: View {
             parseEmailContent()
         }
         .onChange(of: toField) { _, _ in saveChanges() }
+        .onChange(of: ccField) { _, _ in saveChanges() }
+        .onChange(of: bccField) { _, _ in saveChanges() }
         .onChange(of: subjectField) { _, _ in saveChanges() }
         .onChange(of: bodyContent) { _, _ in saveChanges() }
         .sheet(isPresented: $showingMailComposer) {
             MailComposerView(
-                toRecipients: [toField],
+                toRecipients: parseRecipients(toField),
+                ccRecipients: parseRecipients(ccField),
+                bccRecipients: parseRecipients(bccField),
                 subject: subjectField,
                 body: bodyContent
             )
@@ -104,7 +148,9 @@ struct EmailDetailView: View {
     // MARK: - Email Field
 
     private func emailField(label: String, text: Binding<String>, placeholder: String) -> some View {
-        HStack(alignment: .center, spacing: 8) {
+        let isEmailField = label == "To:" || label == "Cc:" || label == "Bcc:"
+
+        return HStack(alignment: .center, spacing: 8) {
             Text(label)
                 .font(.serifBody(14, weight: .medium))
                 .foregroundColor(.textMedium)
@@ -114,70 +160,50 @@ struct EmailDetailView: View {
                 .font(.serifBody(16, weight: .regular))
                 .foregroundColor(.textDark)
                 .textInputAutocapitalization(.never)
-                .autocorrectionDisabled(label == "To:")
-                .keyboardType(label == "To:" ? .emailAddress : .default)
+                .autocorrectionDisabled(isEmailField)
+                .keyboardType(isEmailField ? .emailAddress : .default)
+
+            // Validation indicator for email fields
+            if isEmailField && !text.wrappedValue.isEmpty {
+                let emails = parseRecipients(text.wrappedValue)
+                let allValid = emails.allSatisfy { isValidEmail($0) }
+                Image(systemName: allValid ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                    .foregroundColor(allValid ? .green : .red)
+                    .font(.system(size: 16))
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
     }
 
+    // MARK: - Email Validation
+
+    private func isValidEmail(_ email: String) -> Bool {
+        let trimmed = email.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty { return true }  // Empty is valid (optional field)
+        let pattern = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        return trimmed.range(of: pattern, options: .regularExpression) != nil
+    }
+
+    private func parseRecipients(_ text: String) -> [String] {
+        text.components(separatedBy: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // AI menu (only show if API key configured)
-            if settings.hasAPIKey {
-                Menu {
-                    Button(action: { showingSummarySheet = true }) {
-                        Label("Summarize", systemImage: "text.quote")
-                    }
-                } label: {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.forestDark)
-                }
-            }
-
-            // Export
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Copy
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Spacer()
-
-            // Open in Mail
-            Button(action: openInMail) {
-                Image(systemName: "paperplane.fill")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.badgeEmail, Color.badgeEmail.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .cornerRadius(10)
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(Color.creamLight)
-        .overlay(
-            Rectangle()
-                .fill(Color.forestDark.opacity(0.1))
-                .frame(height: 1),
-            alignment: .top
+        DetailBottomBar(
+            onExport: { showingExportSheet = true },
+            onCopy: { copyToClipboard() },
+            aiActions: DetailBottomBar.summarizeOnlyAIActions(
+                onSummarize: { showingSummarySheet = true }
+            ),
+            primaryAction: DetailAction(
+                icon: "paperplane.fill",
+                color: .badgeEmail
+            ) { openInMail() }
         )
     }
 
@@ -202,6 +228,16 @@ struct EmailDetailView: View {
             if lowercased.hasPrefix("to:") {
                 toField = String(trimmed.dropFirst(3)).trimmingCharacters(in: .whitespaces)
             }
+            // Try to extract Cc: field
+            else if lowercased.hasPrefix("cc:") {
+                ccField = String(trimmed.dropFirst(3)).trimmingCharacters(in: .whitespaces)
+                showCcBcc = true
+            }
+            // Try to extract Bcc: field
+            else if lowercased.hasPrefix("bcc:") {
+                bccField = String(trimmed.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+                showCcBcc = true
+            }
             // Try to extract Subject: field
             else if lowercased.hasPrefix("subject:") || lowercased.hasPrefix("subj:") || lowercased.hasPrefix("re:") {
                 if lowercased.hasPrefix("re:") {
@@ -221,8 +257,10 @@ struct EmailDetailView: View {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             let lowercased = trimmed.lowercased()
 
-            // Skip To: and Subject: lines
-            if lowercased.hasPrefix("to:") || lowercased.hasPrefix("subject:") || lowercased.hasPrefix("subj:") {
+            // Skip email header lines
+            if lowercased.hasPrefix("to:") || lowercased.hasPrefix("cc:") ||
+               lowercased.hasPrefix("bcc:") || lowercased.hasPrefix("subject:") ||
+               lowercased.hasPrefix("subj:") {
                 foundBody = true
                 continue
             }
@@ -236,7 +274,7 @@ struct EmailDetailView: View {
         bodyContent = bodyLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         var lines: [String] = []
 
         // Add trigger tag
@@ -244,6 +282,12 @@ struct EmailDetailView: View {
 
         if !toField.isEmpty {
             lines.append("To: \(toField)")
+        }
+        if !ccField.isEmpty {
+            lines.append("Cc: \(ccField)")
+        }
+        if !bccField.isEmpty {
+            lines.append("Bcc: \(bccField)")
         }
         if !subjectField.isEmpty {
             lines.append("Subject: \(subjectField)")
@@ -268,6 +312,12 @@ struct EmailDetailView: View {
             components.path = toField
 
             var queryItems: [URLQueryItem] = []
+            if !ccField.isEmpty {
+                queryItems.append(URLQueryItem(name: "cc", value: ccField))
+            }
+            if !bccField.isEmpty {
+                queryItems.append(URLQueryItem(name: "bcc", value: bccField))
+            }
             if !subjectField.isEmpty {
                 queryItems.append(URLQueryItem(name: "subject", value: subjectField))
             }
@@ -286,19 +336,14 @@ struct EmailDetailView: View {
         }
     }
 
-    private func copyContent() {
-        var text = ""
-        if !toField.isEmpty { text += "To: \(toField)\n" }
-        if !subjectField.isEmpty { text += "Subject: \(subjectField)\n\n" }
-        text += bodyContent
-        UIPasteboard.general.string = text
-    }
 }
 
 // MARK: - Mail Composer View
 
 struct MailComposerView: UIViewControllerRepresentable {
     let toRecipients: [String]
+    let ccRecipients: [String]
+    let bccRecipients: [String]
     let subject: String
     let body: String
 
@@ -306,6 +351,8 @@ struct MailComposerView: UIViewControllerRepresentable {
         let composer = MFMailComposeViewController()
         composer.mailComposeDelegate = context.coordinator
         composer.setToRecipients(toRecipients.filter { !$0.isEmpty })
+        composer.setCcRecipients(ccRecipients.filter { !$0.isEmpty })
+        composer.setBccRecipients(bccRecipients.filter { !$0.isEmpty })
         composer.setSubject(subject)
         composer.setMessageBody(body, isHTML: false)
         return composer

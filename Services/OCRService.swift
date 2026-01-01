@@ -73,7 +73,9 @@ struct OCRResult: Codable, Sendable {
 
 // MARK: - OCR Service
 
-class OCRService {
+/// Vision framework-based OCR implementation.
+/// Conforms to OCRServiceProtocol for dependency injection.
+final class OCRService: OCRServiceProtocol, @unchecked Sendable {
     static let shared = OCRService()
 
     nonisolated enum OCRError: Error {

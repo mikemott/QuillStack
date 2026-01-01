@@ -7,15 +7,23 @@
 
 import Foundation
 
-class TextClassifier {
+/// Default implementation of text classification for note type detection.
+/// Uses hashtag triggers, business card detection, and content analysis.
+@MainActor
+final class TextClassifier: TextClassifierProtocol {
     /// Classifies the type of note based on content
-    /// Priority: explicit hashtag triggers > content analysis
+    /// Priority: explicit hashtag triggers > business card detection > content analysis
     func classifyNote(content: String) -> NoteType {
         let lowercased = content.lowercased()
 
         // First check for explicit hashtag triggers (highest priority)
         if let explicitType = detectExplicitTrigger(lowercased) {
             return explicitType
+        }
+
+        // Check for business card (auto-detect contact without hashtag)
+        if BusinessCardDetector.isBusinessCard(content) {
+            return .contact
         }
 
         // Fall back to content analysis
@@ -45,97 +53,10 @@ class TextClassifier {
         return detectFuzzyTrigger(prefix)
     }
 
-    /// Exact trigger matching (original behavior)
+    /// Exact trigger matching using NoteTypeRegistry
     private func detectExactTrigger(_ prefix: String) -> NoteType? {
-        // Claude prompt triggers (check first - more specific)
-        let claudeTriggers = ["#claude#", "#feature#", "#prompt#", "#request#", "#issue#"]
-        for trigger in claudeTriggers {
-            if prefix.contains(trigger) {
-                return .claudePrompt
-            }
-        }
-
-        // Reminder triggers
-        let reminderTriggers = ["#reminder#", "#remind#", "#remindme#"]
-        for trigger in reminderTriggers {
-            if prefix.contains(trigger) {
-                return .reminder
-            }
-        }
-
-        // Contact triggers
-        let contactTriggers = ["#contact#", "#person#", "#phone#"]
-        for trigger in contactTriggers {
-            if prefix.contains(trigger) {
-                return .contact
-            }
-        }
-
-        // Expense triggers
-        let expenseTriggers = ["#expense#", "#receipt#", "#spent#", "#paid#"]
-        for trigger in expenseTriggers {
-            if prefix.contains(trigger) {
-                return .expense
-            }
-        }
-
-        // Shopping triggers
-        let shoppingTriggers = ["#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#"]
-        for trigger in shoppingTriggers {
-            if prefix.contains(trigger) {
-                return .shopping
-            }
-        }
-
-        // Recipe triggers
-        let recipeTriggers = ["#recipe#", "#cook#", "#bake#"]
-        for trigger in recipeTriggers {
-            if prefix.contains(trigger) {
-                return .recipe
-            }
-        }
-
-        // Event triggers
-        let eventTriggers = ["#event#", "#appointment#", "#schedule#", "#appt#"]
-        for trigger in eventTriggers {
-            if prefix.contains(trigger) {
-                return .event
-            }
-        }
-
-        // Idea triggers
-        let ideaTriggers = ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"]
-        for trigger in ideaTriggers {
-            if prefix.contains(trigger) {
-                return .idea
-            }
-        }
-
-        // Todo triggers
-        let todoTriggers = ["#todo#", "#to-do#", "#tasks#", "#task#"]
-        for trigger in todoTriggers {
-            if prefix.contains(trigger) {
-                return .todo
-            }
-        }
-
-        // Email triggers
-        let emailTriggers = ["#email#", "#mail#"]
-        for trigger in emailTriggers {
-            if prefix.contains(trigger) {
-                return .email
-            }
-        }
-
-        // Meeting triggers
-        let meetingTriggers = ["#meeting#", "#notes#", "#minutes#"]
-        for trigger in meetingTriggers {
-            if prefix.contains(trigger) {
-                return .meeting
-            }
-        }
-
-        return nil
+        // Use the registry to detect type from exact triggers
+        return NoteTypeRegistry.shared.detectType(from: prefix)
     }
 
     /// Fuzzy trigger matching to handle common OCR errors
@@ -407,19 +328,8 @@ class TextClassifier {
 
     /// Extracts the trigger tag from content (for display/removal purposes)
     func extractTriggerTag(from content: String) -> (tag: String, cleanedContent: String)? {
-        let patterns = [
-            "#claude#", "#feature#", "#prompt#", "#request#", "#issue#",
-            "#reminder#", "#remind#", "#remindme#",
-            "#contact#", "#person#", "#phone#",
-            "#expense#", "#receipt#", "#spent#", "#paid#",
-            "#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#",
-            "#recipe#", "#cook#", "#bake#",
-            "#event#", "#appointment#", "#schedule#", "#appt#",
-            "#idea#", "#thought#", "#note-to-self#", "#notetoself#",
-            "#todo#", "#to-do#", "#tasks#", "#task#",
-            "#email#", "#mail#",
-            "#meeting#", "#notes#", "#minutes#"
-        ]
+        // Get all triggers from the registry
+        let patterns = NoteTypeRegistry.shared.allTriggers
 
         let lowercased = content.lowercased()
 
@@ -444,34 +354,12 @@ class TextClassifier {
     /// Removes ALL occurrences of matched trigger tags from content
     /// Returns the cleaned content with all tags stripped
     func extractAllTriggerTags(from content: String, for noteType: NoteType) -> String {
-        // Get the patterns that match this note type
-        let patternsToRemove: [String]
+        // Get the patterns that match this note type from the registry
+        let patternsToRemove = NoteTypeRegistry.shared.triggers(for: noteType)
 
-        switch noteType {
-        case .claudePrompt:
-            patternsToRemove = ["#claude#", "#feature#", "#prompt#", "#request#", "#issue#"]
-        case .reminder:
-            patternsToRemove = ["#reminder#", "#remind#", "#remindme#"]
-        case .contact:
-            patternsToRemove = ["#contact#", "#person#", "#phone#"]
-        case .expense:
-            patternsToRemove = ["#expense#", "#receipt#", "#spent#", "#paid#"]
-        case .shopping:
-            patternsToRemove = ["#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#"]
-        case .recipe:
-            patternsToRemove = ["#recipe#", "#cook#", "#bake#"]
-        case .event:
-            patternsToRemove = ["#event#", "#appointment#", "#schedule#", "#appt#"]
-        case .idea:
-            patternsToRemove = ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"]
-        case .todo:
-            patternsToRemove = ["#todo#", "#to-do#", "#tasks#", "#task#"]
-        case .email:
-            patternsToRemove = ["#email#", "#mail#"]
-        case .meeting:
-            patternsToRemove = ["#meeting#", "#notes#", "#minutes#"]
-        case .general:
-            return content  // No tags to remove for general notes
+        // No tags to remove if empty (e.g., general notes)
+        if patternsToRemove.isEmpty {
+            return content
         }
 
         var cleaned = content
@@ -500,68 +388,4 @@ class TextClassifier {
     }
 }
 
-enum NoteType: String {
-    case general = "general"
-    case todo = "todo"
-    case meeting = "meeting"
-    case email = "email"
-    case claudePrompt = "claudePrompt"
-    case reminder = "reminder"
-    case contact = "contact"
-    case expense = "expense"
-    case shopping = "shopping"
-    case recipe = "recipe"
-    case event = "event"
-    case idea = "idea"
-
-    var displayName: String {
-        switch self {
-        case .general: return "Note"
-        case .todo: return "To-Do"
-        case .meeting: return "Meeting"
-        case .email: return "Email"
-        case .claudePrompt: return "Feature"
-        case .reminder: return "Reminder"
-        case .contact: return "Contact"
-        case .expense: return "Expense"
-        case .shopping: return "Shopping"
-        case .recipe: return "Recipe"
-        case .event: return "Event"
-        case .idea: return "Idea"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .general: return "doc.text"
-        case .todo: return "checkmark.square"
-        case .meeting: return "calendar"
-        case .email: return "envelope"
-        case .claudePrompt: return "sparkles"
-        case .reminder: return "bell"
-        case .contact: return "person.crop.circle"
-        case .expense: return "dollarsign.circle"
-        case .shopping: return "cart"
-        case .recipe: return "fork.knife"
-        case .event: return "calendar.badge.plus"
-        case .idea: return "lightbulb"
-        }
-    }
-
-    var accentColor: String {
-        switch self {
-        case .general: return "badgeGeneral"
-        case .todo: return "badgeTodo"
-        case .meeting: return "badgeMeeting"
-        case .email: return "badgeEmail"
-        case .claudePrompt: return "badgePrompt"
-        case .reminder: return "badgeReminder"
-        case .contact: return "badgeContact"
-        case .expense: return "badgeExpense"
-        case .shopping: return "badgeShopping"
-        case .recipe: return "badgeRecipe"
-        case .event: return "badgeEvent"
-        case .idea: return "badgeIdea"
-        }
-    }
-}
+// NoteType enum is now defined in Models/NoteType.swift

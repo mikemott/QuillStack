@@ -412,34 +412,9 @@ struct NoteListView: View {
         viewModel.archiveNote(note)
     }
 
-    @ViewBuilder
+    /// Routes to the appropriate detail view using the factory pattern.
     private func destinationView(for note: Note) -> some View {
-        switch note.noteType.lowercased() {
-        case "todo":
-            TodoDetailView(note: note)
-        case "email":
-            EmailDetailView(note: note)
-        case "meeting":
-            MeetingDetailView(note: note)
-        case "claudeprompt":
-            ClaudePromptDetailView(note: note)
-        case "reminder":
-            ReminderDetailView(note: note)
-        case "contact":
-            ContactDetailView(note: note)
-        case "expense":
-            ExpenseDetailView(note: note)
-        case "shopping":
-            ShoppingDetailView(note: note)
-        case "recipe":
-            RecipeDetailView(note: note)
-        case "event":
-            EventDetailView(note: note)
-        case "idea":
-            IdeaDetailView(note: note)
-        default:
-            NoteDetailView(note: note)
-        }
+        DetailViewFactory.makeView(for: note)
     }
 }
 
@@ -567,37 +542,11 @@ struct NoteCardView: View {
     }
 
     private var badgeIcon: String {
-        switch note.noteType.lowercased() {
-        case "todo": return "checkmark.square"
-        case "meeting": return "calendar"
-        case "email": return "envelope"
-        case "claudeprompt": return "sparkles"
-        case "reminder": return "bell"
-        case "contact": return "person.crop.circle"
-        case "expense": return "dollarsign.circle"
-        case "shopping": return "cart"
-        case "recipe": return "fork.knife"
-        case "event": return "calendar.badge.plus"
-        case "idea": return "lightbulb"
-        default: return "doc.text"
-        }
+        note.type.icon
     }
 
     private var badgeColor: Color {
-        switch note.noteType.lowercased() {
-        case "todo": return .badgeTodo
-        case "meeting": return .badgeMeeting
-        case "email": return .badgeEmail
-        case "claudeprompt": return .badgePrompt
-        case "reminder": return .badgeReminder
-        case "contact": return .badgeContact
-        case "expense": return .badgeExpense
-        case "shopping": return .badgeShopping
-        case "recipe": return .badgeRecipe
-        case "event": return .badgeEvent
-        case "idea": return .badgeIdea
-        default: return .badgeGeneral
-        }
+        note.type.badgeColor
     }
 
     // MARK: - Date
@@ -627,61 +576,36 @@ struct NoteCardView: View {
     // MARK: - Footer
 
     private var footerIcon: String {
-        switch note.noteType.lowercased() {
-        case "todo":
-            return "checkmark.square"
-        case "meeting":
-            return "person.2"
-        case "email":
-            return "paperplane"
-        case "claudeprompt":
-            return "arrow.up.circle"
-        case "reminder":
-            return "clock"
-        case "contact":
-            return "person"
-        case "expense":
-            return "creditcard"
-        case "shopping":
-            return "bag"
-        case "recipe":
-            return "list.bullet"
-        case "event":
-            return "clock"
-        case "idea":
-            return "brain"
-        default:
-            return "text.alignleft"
-        }
+        note.type.footerIcon
     }
 
     private var footerText: String {
-        switch note.noteType.lowercased() {
-        case "todo":
+        switch note.type {
+        case .todo:
             let count = note.todoItems?.count ?? 0
             return "\(count) task\(count == 1 ? "" : "s")"
-        case "meeting":
+        case .meeting:
             let count = note.meeting?.attendees?.components(separatedBy: ",").count ?? 0
             return "\(count) attendee\(count == 1 ? "" : "s")"
-        case "email":
+        case .email:
             return "Draft"
-        case "claudeprompt":
+        case .claudePrompt:
             return note.summary != nil ? "Issue created" : "Ready to export"
-        case "reminder":
+        case .reminder:
             return "Reminder"
-        case "contact":
+        case .contact:
             return "Contact"
-        case "expense":
+        case .expense:
             return "Expense"
-        case "shopping":
+        case .shopping:
             return "Shopping list"
-        case "recipe":
+        case .recipe:
             return "Recipe"
-        case "event":
+        case .event:
             return "Event"
-        case "idea":
+        case .idea:
             return "Idea"
-        default:
+        case .general:
             let wordCount = note.content.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
             return "\(wordCount) words"
         }

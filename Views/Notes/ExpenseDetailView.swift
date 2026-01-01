@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct ExpenseDetailView: View {
+struct ExpenseDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var amount: String = ""
     @State private var vendor: String = ""
@@ -19,6 +19,8 @@ struct ExpenseDetailView: View {
     @State private var showingExportSheet = false
     @State private var showingShareSheet = false
     @State private var csvData: String = ""
+    @State private var showingSaveError: Bool = false
+    @State private var saveErrorMessage: String = ""
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -73,6 +75,11 @@ struct ExpenseDetailView: View {
         }
         .sheet(isPresented: $showingShareSheet) {
             ShareSheet(items: [generateCSV()])
+        }
+        .alert("Save Failed", isPresented: $showingSaveError) {
+            Button("OK") { }
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -357,7 +364,7 @@ struct ExpenseDetailView: View {
             }
 
             // Copy
-            Button(action: copyToClipboard) {
+            Button(action: copyExpenseToClipboard) {
                 Image(systemName: "doc.on.clipboard")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
@@ -535,7 +542,7 @@ struct ExpenseDetailView: View {
         return nil
     }
 
-    private func saveChanges() {
+    func saveChanges() {
         var lines: [String] = ["#expense#"]
 
         if !amount.isEmpty {
@@ -559,7 +566,12 @@ struct ExpenseDetailView: View {
 
         note.content = lines.joined(separator: "\n")
         note.updatedAt = Date()
-        try? CoreDataStack.shared.saveViewContext()
+        do {
+            try CoreDataStack.shared.saveViewContext()
+        } catch {
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
     }
 
     private func generateCSV() -> String {
@@ -575,7 +587,7 @@ struct ExpenseDetailView: View {
         return csv
     }
 
-    private func copyToClipboard() {
+    private func copyExpenseToClipboard() {
         var text = ""
         if !amount.isEmpty { text += "Amount: $\(amount)\n" }
         if !vendor.isEmpty { text += "Vendor: \(vendor)\n" }
