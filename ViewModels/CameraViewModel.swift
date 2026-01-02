@@ -69,7 +69,7 @@ final class CameraViewModel {
         }
     }
 
-    func processImage(_ image: UIImage, template: NoteTemplate = .freeform) async {
+    func processImage(_ image: UIImage) async {
         isProcessing = true
         error = nil
 
@@ -81,21 +81,11 @@ final class CameraViewModel {
             // OCRService internally applies full preprocessing pipeline
             let ocrResult = try await ocrService.recognizeTextWithConfidence(from: correctedImage)
 
-            // Step 2.5: Prepend template hashtag if using a template (ensures correct classification)
-            var processedText = ocrResult.fullText
-            if let triggerHashtag = template.triggerHashtag {
-                // Only prepend if the trigger isn't already present
-                if !processedText.lowercased().contains(triggerHashtag.lowercased()) {
-                    processedText = triggerHashtag + "\n" + processedText
-                    print("📋 Prepended template hashtag: \(triggerHashtag)")
-                }
-            }
-
             print("🔍 Raw OCR result: \(ocrResult.fullText)")
             print("🔍 Average confidence: \(Int(ocrResult.averageConfidence * 100))%")
 
             // Step 3: Classify note type (before spell correction to catch trigger)
-            let noteType = textClassifier.classifyNote(content: processedText)
+            let noteType = textClassifier.classifyNote(content: ocrResult.fullText)
             print("📋 Classified as: \(noteType.displayName)")
 
             // Step 4: Apply on-device spell correction (including learned corrections)
@@ -109,7 +99,7 @@ final class CameraViewModel {
             if noteType == .email {
                 // Use email-specific correction for email notes
                 // Note: correctEmailContent calls correctSpelling internally, so we pass learned corrections there
-                let correction = spellCorrector.correctEmailContent(processedText, learnedCorrections: learnedCorrections)
+                let correction = spellCorrector.correctEmailContent(ocrResult.fullText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections (email mode):")
@@ -121,7 +111,7 @@ final class CameraViewModel {
                 }
             } else {
                 // Use general spell correction
-                let correction = spellCorrector.correctSpelling(processedText, learnedCorrections: learnedCorrections)
+                let correction = spellCorrector.correctSpelling(ocrResult.fullText, learnedCorrections: learnedCorrections)
                 correctedText = correction.correctedText
                 if correction.hasCorrections {
                     print("📝 Applied \(correction.correctionCount) spell corrections:")
