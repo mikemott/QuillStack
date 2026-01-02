@@ -247,7 +247,7 @@
 		I00200000000002D /* ImageRetentionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRetentionService.swift; sourceTree = "<group>"; };
 		I00200000000002E /* ContentSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSanitizer.swift; sourceTree = "<group>"; };
 		I00200000000002F /* DetailHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailHeader.swift; sourceTree = "<group>"; };
-		I002000000000030 /* PageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageHeader.swift; sourceTree = "<group>"; };
+		I002000000000030 /* PageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageHeader.swift; sourceTree = SOURCE_ROOT; };
 		J002000000000030 /* BusinessCardDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardDetector.swift; sourceTree = "<group>"; };
 		J002000000000031 /* ContactParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactParser.swift; sourceTree = "<group>"; };
 		J002000000000032 /* ReminderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDetailView.swift; sourceTree = "<group>"; };
@@ -764,22 +764,8 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
 /* Begin PBXShellScriptBuildPhase section */
-		S002000000000001 /* Extract dSYMs from Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Extract dSYMs from Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Extract dSYMs from frameworks that have embedded debug info\nif [ \"\$CONFIGURATION\" = \"Release\" ]; then\n  FRAMEWORKS_DIR=\"\$TARGET_BUILD_DIR/\$FRAMEWORKS_FOLDER_PATH\"\n  if [ -d \"\$FRAMEWORKS_DIR\" ]; then\n    for FRAMEWORK in \"\$FRAMEWORKS_DIR\"/*.framework; do\n      if [ -d \"\$FRAMEWORK\" ]; then\n        FRAMEWORK_NAME=\$(basename \"\$FRAMEWORK\" .framework)\n        FRAMEWORK_BINARY=\"\$FRAMEWORK/\$FRAMEWORK_NAME\"\n        if [ -f \"\$FRAMEWORK_BINARY\" ]; then\n          if dsymutil --help >/dev/null 2>&1; then\n            echo \"Extracting dSYM for \$FRAMEWORK_NAME\"\n            dsymutil \"\$FRAMEWORK_BINARY\" -o \"\$DWARF_DSYM_FOLDER_PATH/\$FRAMEWORK_NAME.framework.dSYM\" 2>&1 || true\n          fi\n        fi\n      fi\n    done\n  fi\nfi\n";
-		};
 		S001000000000001 /* Upload dSYMs to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -793,10 +779,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which sentry-cli >/dev/null; then\n  export SENTRY_ORG=quillstack-7z\n  export SENTRY_PROJECT=qs-ios\n  export SENTRY_AUTH_TOKEN=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\n  \n  # Only run for Release builds\n  if [ \"\$CONFIGURATION\" = \"Release\" ]; then\n    VERSION=\"\$MARKETING_VERSION\"\n    BUILD=\"\$CURRENT_PROJECT_VERSION\"\n    RELEASE=\"\$VERSION-\$BUILD\"\n    \n    echo \"Creating Sentry release \$RELEASE\"\n    \n    # Create release\n    sentry-cli releases new \"\$RELEASE\" || echo \"warning: failed to create release\"\n    \n    # Associate commits (if in git repo)\n    sentry-cli releases set-commits \"\$RELEASE\" --auto || echo \"warning: failed to set commits\"\n    \n    # Upload dSYMs\n    ERROR=\$(sentry-cli upload-dif \"\$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n    if [ \! \$? -eq 0 ]; then\n      echo \"warning: sentry-cli upload-dif - \$ERROR\"\n    fi\n    \n    # Finalize release\n    sentry-cli releases finalize \"\$RELEASE\" || echo \"warning: failed to finalize release\"\n    \n    echo \"Sentry release \$RELEASE created and uploaded\"\n  fi\nelse\n  echo \"warning: sentry-cli not installed\"\nfi\n";
+			shellScript = "if which sentry-cli >/dev/null; then\n  export SENTRY_ORG=quillstack-7z\n  export SENTRY_PROJECT=qs-ios\n  export SENTRY_AUTH_TOKEN=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\n  \n  # Only run for Release builds\n  if [ \"$CONFIGURATION\" = \"Release\" ]; then\n    VERSION=\"$MARKETING_VERSION\"\n    BUILD=\"$CURRENT_PROJECT_VERSION\"\n    RELEASE=\"$VERSION-$BUILD\"\n    \n    echo \"Creating Sentry release $RELEASE\"\n    \n    # Create release\n    sentry-cli releases new \"$RELEASE\" || echo \"warning: failed to create release\"\n    \n    # Associate commits (if in git repo)\n    sentry-cli releases set-commits \"$RELEASE\" --auto || echo \"warning: failed to set commits\"\n    \n    # Upload dSYMs\n    ERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n    if [ ! $? -eq 0 ]; then\n      echo \"warning: sentry-cli upload-dif - $ERROR\"\n    fi\n    \n    # Finalize release\n    sentry-cli releases finalize \"$RELEASE\" || echo \"warning: failed to finalize release\"\n    \n    echo \"Sentry release $RELEASE created and uploaded\"\n  fi\nelse\n  echo \"warning: sentry-cli not installed\"\nfi\n";
+		};
+		S002000000000001 /* Extract dSYMs from Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Extract dSYMs from Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Extract dSYMs from frameworks that have embedded debug info\nif [ \"$CONFIGURATION\" = \"Release\" ]; then\n  FRAMEWORKS_DIR=\"$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\"\n  if [ -d \"$FRAMEWORKS_DIR\" ]; then\n    for FRAMEWORK in \"$FRAMEWORKS_DIR\"/*.framework; do\n      if [ -d \"$FRAMEWORK\" ]; then\n        FRAMEWORK_NAME=$(basename \"$FRAMEWORK\" .framework)\n        FRAMEWORK_BINARY=\"$FRAMEWORK/$FRAMEWORK_NAME\"\n        if [ -f \"$FRAMEWORK_BINARY\" ]; then\n          if dsymutil --help >/dev/null 2>&1; then\n            echo \"Extracting dSYM for $FRAMEWORK_NAME\"\n            dsymutil \"$FRAMEWORK_BINARY\" -o \"$DWARF_DSYM_FOLDER_PATH/$FRAMEWORK_NAME.framework.dSYM\" 2>&1 || true\n          fi\n        fi\n      fi\n    done\n  fi\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
-
 
 /* Begin PBXSourcesBuildPhase section */
 		2796C1532EEB51D800E05291 /* Sources */ = {
