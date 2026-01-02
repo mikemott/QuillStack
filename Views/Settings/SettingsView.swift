@@ -45,9 +45,6 @@ struct SettingsView: View {
                             aiDisclosureSection
                         }
 
-                        // OCR Settings Section
-                        ocrSettingsSection
-
                         // Storage & Privacy Section
                         storagePrivacySection
 
@@ -250,56 +247,6 @@ struct SettingsView: View {
                 .padding(16)
                 .opacity(settings.hasAPIKey ? 1 : 0.5)
                 .disabled(!settings.hasAPIKey)
-            }
-            .background(Color.white)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-        }
-    }
-
-    // MARK: - OCR Settings Section
-
-    private var ocrSettingsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeader(title: "Text Recognition", icon: "text.viewfinder")
-
-            VStack(spacing: 0) {
-                // Show highlights toggle
-                Toggle(isOn: $settings.showLowConfidenceHighlights) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Highlight uncertain words")
-                            .font(.serifBody(15, weight: .medium))
-                            .foregroundColor(.textDark)
-                        Text("Underline words the OCR is unsure about")
-                            .font(.serifCaption(12, weight: .regular))
-                            .foregroundColor(.textMedium)
-                    }
-                }
-                .tint(.forestDark)
-                .padding(16)
-
-                Divider()
-
-                // Confidence threshold slider
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Confidence threshold")
-                            .font(.serifBody(15, weight: .medium))
-                            .foregroundColor(.textDark)
-                        Spacer()
-                        Text("\(Int(settings.lowConfidenceThreshold * 100))%")
-                            .font(.serifBody(14, weight: .medium))
-                            .foregroundColor(.forestDark)
-                    }
-
-                    Slider(value: $settings.lowConfidenceThreshold, in: 0.5...0.95, step: 0.05)
-                        .tint(.forestDark)
-
-                    Text("Words below this confidence will be highlighted")
-                        .font(.serifCaption(12, weight: .regular))
-                        .foregroundColor(.textMedium)
-                }
-                .padding(16)
             }
             .background(Color.white)
             .cornerRadius(12)
@@ -1025,84 +972,6 @@ struct AIDisclosureSheet: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-    }
-}
-
-// MARK: - Learned Corrections View
-
-struct LearnedCorrectionsView: View {
-    @State private var corrections: [(original: String, corrected: String, frequency: Int)] = []
-
-    var body: some View {
-        ZStack {
-            Color.creamLight.ignoresSafeArea()
-
-            if corrections.isEmpty {
-                VStack(spacing: 16) {
-                    Image(systemName: "brain")
-                        .font(.system(size: 48))
-                        .foregroundColor(.textLight)
-                    Text("No corrections learned yet")
-                        .font(.serifBody(16, weight: .medium))
-                        .foregroundColor(.textMedium)
-                    Text("Edit notes to teach the app your handwriting patterns")
-                        .font(.serifCaption(13, weight: .regular))
-                        .foregroundColor(.textLight)
-                        .multilineTextAlignment(.center)
-                }
-                .padding(40)
-            } else {
-                List {
-                    ForEach(corrections, id: \.original) { correction in
-                        HStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack(spacing: 8) {
-                                    Text(correction.original)
-                                        .font(.system(size: 15, weight: .medium, design: .monospaced))
-                                        .foregroundColor(.red.opacity(0.8))
-                                        .strikethrough()
-
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(.textLight)
-
-                                    Text(correction.corrected)
-                                        .font(.system(size: 15, weight: .medium, design: .monospaced))
-                                        .foregroundColor(.green.opacity(0.9))
-                                }
-
-                                Text("Used \(correction.frequency) time\(correction.frequency == 1 ? "" : "s")")
-                                    .font(.serifCaption(11, weight: .regular))
-                                    .foregroundColor(.textLight)
-                            }
-
-                            Spacer()
-                        }
-                        .listRowBackground(Color.white)
-                    }
-                    .onDelete(perform: deleteCorrections)
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-        }
-        .navigationTitle("Learned Corrections")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            loadCorrections()
-        }
-    }
-
-    private func loadCorrections() {
-        corrections = HandwritingLearningService.shared.recentCorrections(limit: 100)
-    }
-
-    private func deleteCorrections(at offsets: IndexSet) {
-        for index in offsets {
-            let correction = corrections[index]
-            HandwritingLearningService.shared.removeCorrection(originalWord: correction.original)
-        }
-        corrections.remove(atOffsets: offsets)
     }
 }
 

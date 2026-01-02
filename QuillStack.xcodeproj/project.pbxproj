@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		T001000000000001 /* TextClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000001 /* TextClassifierTests.swift */; };
-		T001000000000002 /* DetailBottomBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000002 /* DetailBottomBarTests.swift */; };
-		T001000000000003 /* NoteDetailViewProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000003 /* NoteDetailViewProtocolTests.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
 		125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */; };
@@ -44,7 +41,6 @@
 		2796C1E12EEB700000E05291 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1DF2EEB700000E05291 /* EmailDetailView.swift */; };
 		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
-		2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */; };
 		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
 		30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */; };
 		3E065E96161C05869F566CC7 /* LLMServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */; };
@@ -52,12 +48,11 @@
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
 		9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60271B88FC8F3E46581FB9B5 /* NoteType.swift */; };
-		M0010000000001AA /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AA /* ActionType.swift */; };
-		M0010000000001AB /* NoteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AB /* NoteAction.swift */; };
-		N0010000000001AC /* ActionTriggerParserProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AC /* ActionTriggerParserProtocol.swift */; };
-		N0010000000001AD /* ActionTriggerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AD /* ActionTriggerParser.swift */; };
 		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
+		A4F800ABD629E75C845D571E /* LearnedCorrectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */; };
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
+		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
+		FL0000000000000002 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FL0000000000000001 /* FlowLayout.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -134,13 +129,27 @@
 		L00100000000004A /* RecipeNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004A /* RecipeNoteTypePlugin.swift */; };
 		L00100000000004B /* IdeaNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004B /* IdeaNoteTypePlugin.swift */; };
 		L00100000000004C /* ClaudePromptNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004C /* ClaudePromptNoteTypePlugin.swift */; };
+		M0010000000001AA /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AA /* ActionType.swift */; };
+		M0010000000001AB /* NoteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AB /* NoteAction.swift */; };
+		N0010000000001AC /* ActionTriggerParserProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AC /* ActionTriggerParserProtocol.swift */; };
+		N0010000000001AD /* ActionTriggerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AD /* ActionTriggerParser.swift */; };
+		T001000000000001 /* TextClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000001 /* TextClassifierTests.swift */; };
+		T001000000000002 /* DetailBottomBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000002 /* DetailBottomBarTests.swift */; };
+		T001000000000003 /* NoteDetailViewProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002000000000003 /* NoteDetailViewProtocolTests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		T004000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2796C14F2EEB51D800E05291 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2796C1562EEB51D800E05291;
+			remoteInfo = QuillStack;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		T002000000000001 /* TextClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifierTests.swift; sourceTree = "<group>"; };
-		T002000000000002 /* DetailBottomBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBottomBarTests.swift; sourceTree = "<group>"; };
-		T002000000000003 /* NoteDetailViewProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocolTests.swift; sourceTree = "<group>"; };
-		T002000000000004 /* QuillStackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
 		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2796C1852EEB552B00E05291 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -174,17 +183,14 @@
 		2796C1DF2EEB700000E05291 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailDetailView.swift; sourceTree = "<group>"; };
 		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidenceTextView.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
-		M0020000000001AA /* ActionType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionType.swift; path = Models/ActionType.swift; sourceTree = SOURCE_ROOT; };
-		M0020000000001AB /* NoteAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteAction.swift; path = Models/NoteAction.swift; sourceTree = SOURCE_ROOT; };
-		N0020000000001AC /* ActionTriggerParserProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionTriggerParserProtocol.swift; path = Services/Protocols/ActionTriggerParserProtocol.swift; sourceTree = SOURCE_ROOT; };
-		N0020000000001AD /* ActionTriggerParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionTriggerParser.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
 		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
+		A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionToast.swift; sourceTree = "<group>"; };
+		FL0000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		A7C04153EA7033D6D21E3919 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
 		B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		B70B286A2AC36CA436C77ACE /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
@@ -267,6 +273,14 @@
 		L00200000000004A /* RecipeNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeNoteTypePlugin.swift; sourceTree = "<group>"; };
 		L00200000000004B /* IdeaNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaNoteTypePlugin.swift; sourceTree = "<group>"; };
 		L00200000000004C /* ClaudePromptNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudePromptNoteTypePlugin.swift; sourceTree = "<group>"; };
+		M0020000000001AA /* ActionType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionType.swift; path = Models/ActionType.swift; sourceTree = SOURCE_ROOT; };
+		M0020000000001AB /* NoteAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteAction.swift; path = Models/NoteAction.swift; sourceTree = SOURCE_ROOT; };
+		N0020000000001AC /* ActionTriggerParserProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionTriggerParserProtocol.swift; path = Services/Protocols/ActionTriggerParserProtocol.swift; sourceTree = SOURCE_ROOT; };
+		N0020000000001AD /* ActionTriggerParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionTriggerParser.swift; sourceTree = "<group>"; };
+		T002000000000001 /* TextClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifierTests.swift; sourceTree = "<group>"; };
+		T002000000000002 /* DetailBottomBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBottomBarTests.swift; sourceTree = "<group>"; };
+		T002000000000003 /* NoteDetailViewProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocolTests.swift; sourceTree = "<group>"; };
+		T002000000000004 /* QuillStackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -309,16 +323,6 @@
 				T002000000000004 /* QuillStackTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		T003000000000001 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				T002000000000001 /* TextClassifierTests.swift */,
-				T002000000000002 /* DetailBottomBarTests.swift */,
-				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
-			);
-			path = Tests;
 			sourceTree = "<group>";
 		};
 		2796C17B2EEB542300E05291 /* App */ = {
@@ -416,35 +420,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		L00300000000003F /* Plugins */ = {
-			isa = PBXGroup;
-			children = (
-				L003000000000040 /* BuiltIn */,
-				L00200000000003F /* NoteTypePlugin.swift */,
-				L002000000000040 /* NoteTypeRegistry.swift */,
-			);
-			path = Plugins;
-			sourceTree = "<group>";
-		};
-		L003000000000040 /* BuiltIn */ = {
-			isa = PBXGroup;
-			children = (
-				L002000000000041 /* GeneralNoteTypePlugin.swift */,
-				L002000000000042 /* TodoNoteTypePlugin.swift */,
-				L002000000000043 /* EmailNoteTypePlugin.swift */,
-				L002000000000044 /* MeetingNoteTypePlugin.swift */,
-				L002000000000045 /* ReminderNoteTypePlugin.swift */,
-				L002000000000046 /* ContactNoteTypePlugin.swift */,
-				L002000000000047 /* EventNoteTypePlugin.swift */,
-				L002000000000048 /* ExpenseNoteTypePlugin.swift */,
-				L002000000000049 /* ShoppingNoteTypePlugin.swift */,
-				L00200000000004A /* RecipeNoteTypePlugin.swift */,
-				L00200000000004B /* IdeaNoteTypePlugin.swift */,
-				L00200000000004C /* ClaudePromptNoteTypePlugin.swift */,
-			);
-			path = BuiltIn;
-			sourceTree = "<group>";
-		};
 		2796C1812EEB546300E05291 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -510,6 +485,7 @@
 			isa = PBXGroup;
 			children = (
 				2796C1EF2EEB800000E05291 /* SettingsView.swift */,
+				10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -517,10 +493,11 @@
 		2796C1F52EEB800000E05291 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */,
 				I00200000000002F /* DetailHeader.swift */,
 				G002000000000022 /* LabelChip.swift */,
 				87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */,
+				A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */,
+				FL0000000000000001 /* FlowLayout.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -536,14 +513,6 @@
 				N0020000000001AC /* ActionTriggerParserProtocol.swift */,
 			);
 			name = Protocols;
-			sourceTree = "<group>";
-		};
-		N0030000000001AE /* Actions */ = {
-			isa = PBXGroup;
-			children = (
-				N0020000000001AD /* ActionTriggerParser.swift */,
-			);
-			path = Actions;
 			sourceTree = "<group>";
 		};
 		E003000000000001 /* Export */ = {
@@ -605,14 +574,6 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		S003000000000001 /* Statistics */ = {
-			isa = PBXGroup;
-			children = (
-				B70B286A2AC36CA436C77ACE /* StatisticsView.swift */,
-			);
-			path = Statistics;
-			sourceTree = "<group>";
-		};
 		K003000000000039 /* Integration */ = {
 			isa = PBXGroup;
 			children = (
@@ -631,25 +592,62 @@
 			path = Events;
 			sourceTree = "<group>";
 		};
+		L00300000000003F /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				L003000000000040 /* BuiltIn */,
+				L00200000000003F /* NoteTypePlugin.swift */,
+				L002000000000040 /* NoteTypeRegistry.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		L003000000000040 /* BuiltIn */ = {
+			isa = PBXGroup;
+			children = (
+				L002000000000041 /* GeneralNoteTypePlugin.swift */,
+				L002000000000042 /* TodoNoteTypePlugin.swift */,
+				L002000000000043 /* EmailNoteTypePlugin.swift */,
+				L002000000000044 /* MeetingNoteTypePlugin.swift */,
+				L002000000000045 /* ReminderNoteTypePlugin.swift */,
+				L002000000000046 /* ContactNoteTypePlugin.swift */,
+				L002000000000047 /* EventNoteTypePlugin.swift */,
+				L002000000000048 /* ExpenseNoteTypePlugin.swift */,
+				L002000000000049 /* ShoppingNoteTypePlugin.swift */,
+				L00200000000004A /* RecipeNoteTypePlugin.swift */,
+				L00200000000004B /* IdeaNoteTypePlugin.swift */,
+				L00200000000004C /* ClaudePromptNoteTypePlugin.swift */,
+			);
+			path = BuiltIn;
+			sourceTree = "<group>";
+		};
+		N0030000000001AE /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				N0020000000001AD /* ActionTriggerParser.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
+		S003000000000001 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				B70B286A2AC36CA436C77ACE /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		T003000000000001 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				T002000000000001 /* TextClassifierTests.swift */,
+				T002000000000002 /* DetailBottomBarTests.swift */,
+				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
-
-/* Begin PBXContainerItemProxy section */
-		T004000000000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2796C14F2EEB51D800E05291 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2796C1562EEB51D800E05291;
-			remoteInfo = QuillStack;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXTargetDependency section */
-		T005000000000001 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2796C1562EEB51D800E05291 /* QuillStack */;
-			targetProxy = T004000000000001 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXNativeTarget section */
 		2796C1562EEB51D800E05291 /* QuillStack */ = {
@@ -775,7 +773,6 @@
 				2796C1F02EEB800000E05291 /* LLMService.swift in Sources */,
 				2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */,
 				2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */,
-				2796C1F22EEB800000E05291 /* ConfidenceTextView.swift in Sources */,
 				E001000000000001 /* ExportService.swift in Sources */,
 				E001000000000002 /* ExportDestination.swift in Sources */,
 				E001000000000003 /* TagRouter.swift in Sources */,
@@ -865,6 +862,9 @@
 				L00100000000004A /* RecipeNoteTypePlugin.swift in Sources */,
 				L00100000000004B /* IdeaNoteTypePlugin.swift in Sources */,
 				L00100000000004C /* ClaudePromptNoteTypePlugin.swift in Sources */,
+				C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */,
+				FL0000000000000002 /* FlowLayout.swift in Sources */,
+				A4F800ABD629E75C845D571E /* LearnedCorrectionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -879,6 +879,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		T005000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2796C1562EEB51D800E05291 /* QuillStack */;
+			targetProxy = T004000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2796C1652EEB51D900E05291 /* Debug */ = {
@@ -1007,8 +1015,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1048,8 +1056,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
