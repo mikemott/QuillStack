@@ -285,4 +285,105 @@ final class TextClassifierTests: XCTestCase {
             )
         }
     }
+
+    // MARK: - Multi-Tag Splitting Tests
+
+    func testSplitIntoSections_SingleTag() {
+        let content = "#todo# Buy milk"
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 1)
+        XCTAssertEqual(sections[0].noteType, .todo)
+        XCTAssertEqual(sections[0].content, "Buy milk")
+    }
+
+    func testSplitIntoSections_MultipleTags() {
+        let content = """
+        #todo# Buy groceries
+        Get milk and bread
+
+        #email# Draft response to client
+        Dear Jane, Thank you for your inquiry.
+        """
+
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 2)
+
+        XCTAssertEqual(sections[0].noteType, .todo)
+        XCTAssertTrue(sections[0].content.contains("Buy groceries"))
+        XCTAssertTrue(sections[0].content.contains("Get milk and bread"))
+
+        XCTAssertEqual(sections[1].noteType, .email)
+        XCTAssertTrue(sections[1].content.contains("Draft response"))
+        XCTAssertTrue(sections[1].content.contains("Dear Jane"))
+    }
+
+    func testSplitIntoSections_ThreeTags() {
+        let content = """
+        #todo# Call dentist
+
+        #shopping# Milk, eggs, butter
+
+        #reminder# Pick up package at 3pm
+        """
+
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 3)
+        XCTAssertEqual(sections[0].noteType, .todo)
+        XCTAssertEqual(sections[1].noteType, .shopping)
+        XCTAssertEqual(sections[2].noteType, .reminder)
+    }
+
+    func testSplitIntoSections_ContentBeforeFirstTag() {
+        let content = """
+        Some notes before the tag
+
+        #todo# Buy milk
+        """
+
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 2)
+        XCTAssertEqual(sections[0].noteType, .general)
+        XCTAssertTrue(sections[0].content.contains("Some notes before"))
+
+        XCTAssertEqual(sections[1].noteType, .todo)
+        XCTAssertTrue(sections[1].content.contains("Buy milk"))
+    }
+
+    func testSplitIntoSections_NoTags() {
+        let content = "Just some general content without tags"
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 1)
+        XCTAssertEqual(sections[0].noteType, .general)
+        XCTAssertEqual(sections[0].content, content)
+    }
+
+    func testSplitIntoSections_EmptyContentBetweenTags() {
+        let content = "#todo##email# Draft"
+
+        let sections = classifier.splitIntoSections(content: content)
+
+        // Should only create one section for #email# since #todo# has no content
+        XCTAssertEqual(sections.count, 1)
+        XCTAssertEqual(sections[0].noteType, .email)
+    }
+
+    func testSplitIntoSections_MixedCaseAndWhitespace() {
+        let content = """
+        #TODO#    Buy groceries
+
+
+        #Email#   Dear John
+        """
+
+        let sections = classifier.splitIntoSections(content: content)
+
+        XCTAssertEqual(sections.count, 2)
+        XCTAssertEqual(sections[0].noteType, .todo)
+        XCTAssertEqual(sections[1].noteType, .email)
+    }
 }

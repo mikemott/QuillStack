@@ -84,95 +84,85 @@ final class CameraViewModel {
             print("🔍 Raw OCR result: \(ocrResult.fullText)")
             print("🔍 Average confidence: \(Int(ocrResult.averageConfidence * 100))%")
 
-            // Step 3: Classify note type (before spell correction to catch trigger)
-            let noteType = textClassifier.classifyNote(content: ocrResult.fullText)
-            print("📋 Classified as: \(noteType.displayName)")
+            // Step 3: Split into sections based on detected tags
+            let sections = textClassifier.splitIntoSections(content: ocrResult.fullText)
+            print("📋 Detected \(sections.count) section(s)")
 
-            // Step 4: Apply on-device spell correction (including learned corrections)
+            // Step 4: Process each section separately
             let learnedCorrections = HandwritingLearningService.shared.getLearnedCorrections()
             let learnedCount = learnedCorrections.count
             if learnedCount > 0 {
                 print("📚 Using \(learnedCount) learned corrections")
             }
 
-            let correctedText: String
-            if noteType == .email {
-                // Use email-specific correction for email notes
-                // Note: correctEmailContent calls correctSpelling internally, so we pass learned corrections there
-                let correction = spellCorrector.correctEmailContent(ocrResult.fullText, learnedCorrections: learnedCorrections)
-                correctedText = correction.correctedText
-                if correction.hasCorrections {
-                    print("📝 Applied \(correction.correctionCount) spell corrections (email mode):")
-                    for c in correction.corrections {
-                        print("   '\(c.original)' → '\(c.corrected)' [\(c.source)]")
-                    }
-                } else {
-                    print("📝 No spell corrections needed")
-                }
-            } else {
-                // Use general spell correction
-                let correction = spellCorrector.correctSpelling(ocrResult.fullText, learnedCorrections: learnedCorrections)
-                correctedText = correction.correctedText
-                if correction.hasCorrections {
-                    print("📝 Applied \(correction.correctionCount) spell corrections:")
-                    for c in correction.corrections {
-                        print("   '\(c.original)' → '\(c.corrected)' [\(c.source)]")
-                    }
-                } else {
-                    print("📝 No spell corrections needed")
-                }
-            }
-
-            // Step 5: Apply LLM enhancement if enabled (with offline support)
-            var finalText = correctedText
-            var shouldQueueEnhancement = false
             let offlineQueue = OfflineQueueService.shared
+            let thumbnail = imageProcessor.generateThumbnail(from: image)
 
-            print("🔧 LLM Check - autoEnhanceOCR: \(settings.autoEnhanceOCR), hasAPIKey: \(settings.hasAPIKey), isOnline: \(offlineQueue.isOnline)")
+            for (index, section) in sections.enumerated() {
+                print("\n--- Section \(index + 1)/\(sections.count): \(section.noteType.displayName) ---")
 
-            if settings.autoEnhanceOCR && settings.hasAPIKey {
-                if offlineQueue.isOnline {
-                    // Online - try enhancement now
-                    print("🤖 Auto-enhance enabled, calling LLM for \(noteType.rawValue) note...")
-                    do {
-                        let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: noteType.rawValue)
-                        finalText = result.enhancedText
-                        print("✨ LLM enhanced text: \(result.enhancedText)")
-                    } catch {
-                        print("⚠️ LLM enhancement failed, using spell-corrected text: \(error.localizedDescription)")
-                        // Queue for retry if it was a network error
+                // Apply spell correction for this section
+                let correctedText: String
+                if section.noteType == .email {
+                    let correction = spellCorrector.correctEmailContent(section.content, learnedCorrections: learnedCorrections)
+                    correctedText = correction.correctedText
+                    if correction.hasCorrections {
+                        print("📝 Applied \(correction.correctionCount) spell corrections (email mode)")
+                    }
+                } else {
+                    let correction = spellCorrector.correctSpelling(section.content, learnedCorrections: learnedCorrections)
+                    correctedText = correction.correctedText
+                    if correction.hasCorrections {
+                        print("📝 Applied \(correction.correctionCount) spell corrections")
+                    }
+                }
+
+                // Apply LLM enhancement if enabled
+                var finalText = correctedText
+                var shouldQueueEnhancement = false
+
+                if settings.autoEnhanceOCR && settings.hasAPIKey {
+                    if offlineQueue.isOnline {
+                        print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
+                        do {
+                            let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
+                            finalText = result.enhancedText
+                            print("✨ LLM enhanced text")
+                        } catch {
+                            print("⚠️ LLM enhancement failed: \(error.localizedDescription)")
+                            shouldQueueEnhancement = true
+                        }
+                    } else {
+                        print("📴 Offline - queueing enhancement for later")
                         shouldQueueEnhancement = true
                     }
-                } else {
-                    // Offline - queue for later
-                    print("📴 Offline - queueing enhancement for later")
-                    shouldQueueEnhancement = true
                 }
-            }
 
-            print("✏️ Final text: \(finalText)")
+                print("✏️ Final text: \(finalText)")
 
-            // Step 6: Save to Core Data with OCR result
-            let noteId = await saveNote(
-                text: finalText,
-                noteType: noteType,
-                ocrResult: ocrResult,
-                originalImage: image,
-                thumbnail: imageProcessor.generateThumbnail(from: image)
-            )
-
-            // Step 7: Queue enhancement if needed (offline or failed)
-            if shouldQueueEnhancement, let noteId = noteId {
-                await offlineQueue.enqueue(
-                    noteId: noteId,
-                    text: correctedText,
-                    noteType: noteType.rawValue
+                // Save this section as a separate note
+                // Only attach image to first section to avoid duplication
+                let noteId = await saveNote(
+                    text: finalText,
+                    noteType: section.noteType,
+                    ocrResult: ocrResult,
+                    originalImage: index == 0 ? image : nil,
+                    thumbnail: index == 0 ? thumbnail : nil
                 )
-            }
 
-            // Step 8: Apply image retention policy
-            if let noteId = noteId {
-                await applyImageRetentionPolicy(noteId: noteId)
+                // Queue enhancement if needed
+                if shouldQueueEnhancement, let noteId = noteId {
+                    await offlineQueue.enqueue(
+                        noteId: noteId,
+                        text: correctedText,
+                        noteType: section.noteType.rawValue
+                    )
+                }
+
+                // Apply image retention policy
+                if let noteId = noteId {
+                    await applyImageRetentionPolicy(noteId: noteId)
+                }
             }
 
             isProcessing = false

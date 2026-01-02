@@ -386,6 +386,103 @@ final class TextClassifier: TextClassifierProtocol {
 
         return cleaned
     }
+
+    /// Represents a section of content with a specific note type
+    struct NoteSection {
+        let noteType: NoteType
+        let content: String
+        let tagRange: Range<String.Index>
+    }
+
+    /// Detects all tags in content and splits into multiple sections
+    /// Returns array of (noteType, content) for each detected section
+    /// If no tags found, returns single section with classified type
+    func splitIntoSections(content: String) -> [NoteSection] {
+        let lowercased = content.lowercased()
+        var sections: [NoteSection] = []
+
+        // Find all tag positions
+        var tagPositions: [(range: Range<String.Index>, type: NoteType)] = []
+
+        // Get all triggers from registry and check for each
+        let allTypes: [NoteType] = [.todo, .email, .meeting, .contact, .reminder,
+                                     .expense, .shopping, .recipe, .event, .idea, .claudePrompt]
+
+        for noteType in allTypes {
+            let triggers = NoteTypeRegistry.shared.triggers(for: noteType)
+
+            for trigger in triggers {
+                var searchStart = lowercased.startIndex
+
+                while searchStart < lowercased.endIndex,
+                      let range = lowercased.range(of: trigger, range: searchStart..<lowercased.endIndex) {
+                    tagPositions.append((range, noteType))
+                    searchStart = range.upperBound
+                }
+            }
+        }
+
+        // Sort by position
+        tagPositions.sort { content.distance(from: content.startIndex, to: $0.range.lowerBound) < content.distance(from: content.startIndex, to: $1.range.lowerBound) }
+
+        // If no tags found, classify entire content
+        if tagPositions.isEmpty {
+            let noteType = classifyNote(content: content)
+            return [NoteSection(noteType: noteType, content: content, tagRange: content.startIndex..<content.startIndex)]
+        }
+
+        // Handle content before first tag (if any)
+        if !tagPositions.isEmpty {
+            let firstTagIndex = tagPositions[0].range.lowerBound
+            let contentBeforeFirstTag = String(content[content.startIndex..<firstTagIndex])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if !contentBeforeFirstTag.isEmpty {
+                // Classify content before first tag
+                let preTagType = classifyNote(content: contentBeforeFirstTag)
+                sections.append(NoteSection(
+                    noteType: preTagType,
+                    content: contentBeforeFirstTag,
+                    tagRange: content.startIndex..<content.startIndex
+                ))
+            }
+        }
+
+        // Split content based on tag positions
+        for (index, tagPosition) in tagPositions.enumerated() {
+            let endIndex: String.Index
+
+            if index < tagPositions.count - 1 {
+                // Not the last section: end at next tag
+                endIndex = tagPositions[index + 1].range.lowerBound
+            } else {
+                // Last section: include all remaining content
+                endIndex = content.endIndex
+            }
+
+            // Extract section content (excluding the tag itself)
+            let sectionContent = String(content[tagPosition.range.upperBound..<endIndex])
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            // Only create section if there's content after the tag
+            if !sectionContent.isEmpty {
+                sections.append(NoteSection(
+                    noteType: tagPosition.type,
+                    content: sectionContent,
+                    tagRange: tagPosition.range
+                ))
+            }
+        }
+
+        // If we found tags but no valid sections (e.g., all tags at end with no content),
+        // treat as single note
+        if sections.isEmpty {
+            let noteType = classifyNote(content: content)
+            return [NoteSection(noteType: noteType, content: content, tagRange: content.startIndex..<content.startIndex)]
+        }
+
+        return sections
+    }
 }
 
 // NoteType enum is now defined in Models/NoteType.swift
