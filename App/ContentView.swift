@@ -20,9 +20,9 @@ struct ContentView: View {
                 }
                 .tag(0)
 
-            MeetingListView()
+            TypeGuideView()
                 .tabItem {
-                    Label("Meetings", systemImage: "calendar")
+                    Label("Type Guide", systemImage: "book.closed")
                 }
                 .tag(1)
 
