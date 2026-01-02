@@ -182,14 +182,14 @@ final class CameraViewModel {
         text: String,
         noteType: NoteType,
         ocrResult: OCRResult,
-        originalImage: UIImage,
+        originalImage: UIImage?,
         thumbnail: UIImage?
     ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
         // Encode OCR result on main actor before entering background context
         let ocrResultData = try? JSONEncoder().encode(ocrResult)
-        let imageData = originalImage.jpegData(compressionQuality: 0.8)
+        let imageData = originalImage?.jpegData(compressionQuality: 0.8)
         let thumbnailData = thumbnail?.jpegData(compressionQuality: 0.6)
         let avgConfidence = ocrResult.averageConfidence
         let lowConfidenceCount = ocrResult.lowConfidenceWords.count

@@ -387,13 +387,6 @@ final class TextClassifier: TextClassifierProtocol {
         return cleaned
     }
 
-    /// Represents a section of content with a specific note type
-    struct NoteSection {
-        let noteType: NoteType
-        let content: String
-        let tagRange: Range<String.Index>
-    }
-
     /// Detects all tags in content and splits into multiple sections
     /// Returns array of (noteType, content) for each detected section
     /// If no tags found, returns single section with classified type
