@@ -101,6 +101,7 @@
 		I00100000000002D /* ImageRetentionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002D /* ImageRetentionService.swift */; };
 		I00100000000002E /* ContentSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002E /* ContentSanitizer.swift */; };
 		I00100000000002F /* DetailHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = I00200000000002F /* DetailHeader.swift */; };
+		I001000000000030 /* PageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = I002000000000030 /* PageHeader.swift */; };
 		J001000000000030 /* BusinessCardDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000030 /* BusinessCardDetector.swift */; };
 		J001000000000031 /* ContactParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000031 /* ContactParser.swift */; };
 		J001000000000032 /* ReminderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J002000000000032 /* ReminderDetailView.swift */; };
@@ -246,6 +247,7 @@
 		I00200000000002D /* ImageRetentionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRetentionService.swift; sourceTree = "<group>"; };
 		I00200000000002E /* ContentSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSanitizer.swift; sourceTree = "<group>"; };
 		I00200000000002F /* DetailHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailHeader.swift; sourceTree = "<group>"; };
+		I002000000000030 /* PageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageHeader.swift; sourceTree = "<group>"; };
 		J002000000000030 /* BusinessCardDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardDetector.swift; sourceTree = "<group>"; };
 		J002000000000031 /* ContactParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactParser.swift; sourceTree = "<group>"; };
 		J002000000000032 /* ReminderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDetailView.swift; sourceTree = "<group>"; };
@@ -303,6 +305,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		270730BA2F08062E00EAF60D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		2796C14E2EEB51D800E05291 = {
 			isa = PBXGroup;
 			children = (
@@ -314,6 +323,7 @@
 				2796C17B2EEB542300E05291 /* App */,
 				T003000000000001 /* Tests */,
 				2796C1C12EEB580000E05291 /* Assets.xcassets */,
+				270730BA2F08062E00EAF60D /* Frameworks */,
 				2796C1582EEB51D800E05291 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -497,6 +507,7 @@
 			isa = PBXGroup;
 			children = (
 				I00200000000002F /* DetailHeader.swift */,
+				I002000000000030 /* PageHeader.swift */,
 				G002000000000022 /* LabelChip.swift */,
 				87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */,
 				A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */,
@@ -523,8 +534,7 @@
 			children = (
 				E6CBC205145101FF179EBE6E /* TypeGuideView.swift */,
 			);
-			name = TypeGuide;
-		path = TypeGuide;
+			path = TypeGuide;
 			sourceTree = "<group>";
 		};
 		E003000000000001 /* Export */ = {
@@ -669,12 +679,17 @@
 				2796C1532EEB51D800E05291 /* Sources */,
 				2796C1542EEB51D800E05291 /* Frameworks */,
 				2796C1552EEB51D800E05291 /* Resources */,
+				S002000000000001 /* Extract dSYMs from Frameworks */,
+				S001000000000001 /* Upload dSYMs to Sentry */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = QuillStack;
+			packageProductDependencies = (
+				270730BA2F08037200EAF60D /* Sentry */,
+			);
 			productName = QuillStack;
 			productReference = 2796C1572EEB51D800E05291 /* QuillStack.app */;
 			productType = "com.apple.product-type.application";
@@ -725,6 +740,9 @@
 			);
 			mainGroup = 2796C14E2EEB51D800E05291;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				270730B92F08037100EAF60D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2796C1582EEB51D800E05291 /* Products */;
 			projectDirPath = "";
@@ -746,6 +764,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+/* Begin PBXShellScriptBuildPhase section */
+		S002000000000001 /* Extract dSYMs from Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Extract dSYMs from Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Extract dSYMs from frameworks that have embedded debug info\nif [ \"\$CONFIGURATION\" = \"Release\" ]; then\n  FRAMEWORKS_DIR=\"\$TARGET_BUILD_DIR/\$FRAMEWORKS_FOLDER_PATH\"\n  if [ -d \"\$FRAMEWORKS_DIR\" ]; then\n    for FRAMEWORK in \"\$FRAMEWORKS_DIR\"/*.framework; do\n      if [ -d \"\$FRAMEWORK\" ]; then\n        FRAMEWORK_NAME=\$(basename \"\$FRAMEWORK\" .framework)\n        FRAMEWORK_BINARY=\"\$FRAMEWORK/\$FRAMEWORK_NAME\"\n        if [ -f \"\$FRAMEWORK_BINARY\" ]; then\n          if dsymutil --help >/dev/null 2>&1; then\n            echo \"Extracting dSYM for \$FRAMEWORK_NAME\"\n            dsymutil \"\$FRAMEWORK_BINARY\" -o \"\$DWARF_DSYM_FOLDER_PATH/\$FRAMEWORK_NAME.framework.dSYM\" 2>&1 || true\n          fi\n        fi\n      fi\n    done\n  fi\nfi\n";
+		};
+		S001000000000001 /* Upload dSYMs to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload dSYMs to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which sentry-cli >/dev/null; then\n  export SENTRY_ORG=quillstack-7z\n  export SENTRY_PROJECT=qs-ios\n  export SENTRY_AUTH_TOKEN=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\n  \n  # Only run for Release builds\n  if [ \"\$CONFIGURATION\" = \"Release\" ]; then\n    VERSION=\"\$MARKETING_VERSION\"\n    BUILD=\"\$CURRENT_PROJECT_VERSION\"\n    RELEASE=\"\$VERSION-\$BUILD\"\n    \n    echo \"Creating Sentry release \$RELEASE\"\n    \n    # Create release\n    sentry-cli releases new \"\$RELEASE\" || echo \"warning: failed to create release\"\n    \n    # Associate commits (if in git repo)\n    sentry-cli releases set-commits \"\$RELEASE\" --auto || echo \"warning: failed to set commits\"\n    \n    # Upload dSYMs\n    ERROR=\$(sentry-cli upload-dif \"\$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n    if [ \! \$? -eq 0 ]; then\n      echo \"warning: sentry-cli upload-dif - \$ERROR\"\n    fi\n    \n    # Finalize release\n    sentry-cli releases finalize \"\$RELEASE\" || echo \"warning: failed to finalize release\"\n    \n    echo \"Sentry release \$RELEASE created and uploaded\"\n  fi\nelse\n  echo \"warning: sentry-cli not installed\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 
 /* Begin PBXSourcesBuildPhase section */
 		2796C1532EEB51D800E05291 /* Sources */ = {
@@ -831,6 +882,7 @@
 				I00100000000002D /* ImageRetentionService.swift in Sources */,
 				I00100000000002E /* ContentSanitizer.swift in Sources */,
 				I00100000000002F /* DetailHeader.swift in Sources */,
+				I001000000000030 /* PageHeader.swift in Sources */,
 				J001000000000030 /* BusinessCardDetector.swift in Sources */,
 				J001000000000031 /* ContactParser.swift in Sources */,
 				J001000000000032 /* ReminderDetailView.swift in Sources */,
@@ -939,7 +991,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1002,7 +1054,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1175,6 +1227,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		270730B92F08037100EAF60D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		270730BA2F08037200EAF60D /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 270730B92F08037100EAF60D /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		2796C1CE2EEB600000E05291 /* QuillStack.xcdatamodeld */ = {
