@@ -55,6 +55,10 @@
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
 		9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60271B88FC8F3E46581FB9B5 /* NoteType.swift */; };
+		M0010000000001AA /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AA /* ActionType.swift */; };
+		M0010000000001AB /* NoteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0020000000001AB /* NoteAction.swift */; };
+		N0010000000001AC /* ActionTriggerParserProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AC /* ActionTriggerParserProtocol.swift */; };
+		N0010000000001AD /* ActionTriggerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = N0020000000001AD /* ActionTriggerParser.swift */; };
 		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
@@ -176,6 +180,10 @@
 		2796C1F32EEB800000E05291 /* ConfidenceTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfidenceTextView.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
+		M0020000000001AA /* ActionType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionType.swift; path = Models/ActionType.swift; sourceTree = SOURCE_ROOT; };
+		M0020000000001AB /* NoteAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteAction.swift; path = Models/NoteAction.swift; sourceTree = SOURCE_ROOT; };
+		N0020000000001AC /* ActionTriggerParserProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionTriggerParserProtocol.swift; path = Services/Protocols/ActionTriggerParserProtocol.swift; sourceTree = SOURCE_ROOT; };
+		N0020000000001AD /* ActionTriggerParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionTriggerParser.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
@@ -343,6 +351,8 @@
 				K00200000000003D /* Tag.swift */,
 				2796C18F2EEB558200E05291 /* TodoItem.swift */,
 				60271B88FC8F3E46581FB9B5 /* NoteType.swift */,
+				M0020000000001AA /* ActionType.swift */,
+				M0020000000001AB /* NoteAction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -379,6 +389,7 @@
 		2796C1802EEB545C00E05291 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				N0030000000001AE /* Actions */,
 				E003000000000001 /* Export */,
 				K003000000000039 /* Integration */,
 				K00300000000003B /* Events */,
@@ -531,8 +542,17 @@
 				73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */,
 				F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */,
 				E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */,
+				N0020000000001AC /* ActionTriggerParserProtocol.swift */,
 			);
 			name = Protocols;
+			sourceTree = "<group>";
+		};
+		N0030000000001AE /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				N0020000000001AD /* ActionTriggerParser.swift */,
+			);
+			path = Actions;
 			sourceTree = "<group>";
 		};
 		E003000000000001 /* Export */ = {
@@ -824,6 +844,10 @@
 				J001000000000037 /* EventDetailView.swift in Sources */,
 				J001000000000038 /* IdeaDetailView.swift in Sources */,
 				9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */,
+				M0010000000001AA /* ActionType.swift in Sources */,
+				M0010000000001AB /* NoteAction.swift in Sources */,
+				N0010000000001AC /* ActionTriggerParserProtocol.swift in Sources */,
+				N0010000000001AD /* ActionTriggerParser.swift in Sources */,
 				7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */,
 				171D8FDF19DEB33AE9E56252 /* OCRServiceProtocol.swift in Sources */,
 				0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */,

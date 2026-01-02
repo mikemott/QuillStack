@@ -52,6 +52,9 @@ final class DependencyContainer: Sendable {
     /// Integration registry for managing integration providers
     let integrationRegistry: IntegrationRegistry
 
+    /// Action trigger parser for extracting inline action triggers
+    let actionTriggerParser: ActionTriggerParserProtocol
+
     // MARK: - Initialization
 
     /// Initialize with default production services.
@@ -62,6 +65,7 @@ final class DependencyContainer: Sendable {
         self.calendarService = CalendarService.shared
         self.remindersService = RemindersService.shared
         self.integrationRegistry = IntegrationRegistry.shared
+        self.actionTriggerParser = ActionTriggerParser()
     }
 
     /// Initialize with custom services (for testing).
@@ -72,13 +76,15 @@ final class DependencyContainer: Sendable {
     ///   - calendarService: Custom calendar service implementation
     ///   - remindersService: Custom reminders service implementation
     ///   - integrationRegistry: Custom integration registry
+    ///   - actionTriggerParser: Custom action trigger parser implementation
     init(
         ocrService: OCRServiceProtocol? = nil,
         textClassifier: TextClassifierProtocol? = nil,
         llmService: LLMServiceProtocol? = nil,
         calendarService: CalendarServiceProtocol? = nil,
         remindersService: RemindersServiceProtocol? = nil,
-        integrationRegistry: IntegrationRegistry? = nil
+        integrationRegistry: IntegrationRegistry? = nil,
+        actionTriggerParser: ActionTriggerParserProtocol? = nil
     ) {
         self.ocrService = ocrService ?? OCRService.shared
         self.textClassifier = textClassifier ?? TextClassifier()
@@ -86,6 +92,7 @@ final class DependencyContainer: Sendable {
         self.calendarService = calendarService ?? CalendarService.shared
         self.remindersService = remindersService ?? RemindersService.shared
         self.integrationRegistry = integrationRegistry ?? IntegrationRegistry.shared
+        self.actionTriggerParser = actionTriggerParser ?? ActionTriggerParser()
     }
 }
 
