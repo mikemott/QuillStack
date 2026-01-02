@@ -1,0 +1,23 @@
+{
+  "name": "testflight-welcome-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker to send welcome emails to new TestFlight beta testers",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "kv:create": "wrangler kv:namespace create SENT_EMAILS"
+  },
+  "keywords": ["cloudflare-workers", "testflight", "email", "resend"],
+  "author": "QuillStack",
+  "license": "MIT",
+  "dependencies": {
+    "jose": "^5.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.0"
+  }
+}
