@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TypeGuideView: View {
-    @State private var selectedType: NoteTypePlugin?
+    @State private var selectedType: (any NoteTypePlugin)?
     @State private var showingExample = false
 
     private let columns = [
@@ -20,7 +20,7 @@ struct TypeGuideView: View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(PluginRegistry.shared.allPlugins, id: \.id) { plugin in
+                    ForEach(NoteTypeRegistry.shared.allPlugins(), id: \.id) { plugin in
                         TypeCard(plugin: plugin)
                             .onTapGesture {
                                 selectedType = plugin
@@ -42,7 +42,7 @@ struct TypeGuideView: View {
 }
 
 struct TypeCard: View {
-    let plugin: NoteTypePlugin
+    let plugin: any NoteTypePlugin
 
     var body: some View {
         VStack(spacing: 12) {
@@ -117,7 +117,7 @@ struct TypeCard: View {
 }
 
 struct TypeExampleSheet: View {
-    let plugin: NoteTypePlugin
+    let plugin: any NoteTypePlugin
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

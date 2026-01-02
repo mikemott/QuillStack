@@ -524,6 +524,7 @@
 				E6CBC205145101FF179EBE6E /* TypeGuideView.swift */,
 			);
 			name = TypeGuide;
+		path = TypeGuide;
 			sourceTree = "<group>";
 		};
 		E003000000000001 /* Export */ = {
