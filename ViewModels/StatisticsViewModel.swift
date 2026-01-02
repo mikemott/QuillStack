@@ -160,29 +160,21 @@ class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchLearningStats() -> LearningStats {
-        let request = NSFetchRequest<NSManagedObject>(entityName: "OCRCorrection")
+        let request = NSFetchRequest<OCRCorrection>(entityName: "OCRCorrection")
 
         do {
             let corrections = try context.fetch(request)
-            let totalCorrections = corrections.count
-
-            // Find most frequent correction
-            var mostFrequent: (original: String, corrected: String, count: Int)?
-            for correction in corrections {
-                if let original = correction.value(forKey: "originalText") as? String,
-                   let corrected = correction.value(forKey: "correctedText") as? String,
-                   let frequency = correction.value(forKey: "frequency") as? Int {
-                    if mostFrequent == nil || frequency > mostFrequent!.count {
-                        mostFrequent = (original, corrected, frequency)
-                    }
-                }
+            guard !corrections.isEmpty else {
+                return LearningStats()
             }
 
+            let mostFrequent = corrections.max(by: { $0.frequency < $1.frequency })
+
             return LearningStats(
-                totalCorrections: totalCorrections,
-                mostFrequentOriginal: mostFrequent?.original,
-                mostFrequentCorrected: mostFrequent?.corrected,
-                mostFrequentCount: mostFrequent?.count ?? 0
+                totalCorrections: corrections.count,
+                mostFrequentOriginal: mostFrequent?.originalWord,
+                mostFrequentCorrected: mostFrequent?.correctedWord,
+                mostFrequentCount: mostFrequent.map { Int($0.frequency) } ?? 0
             )
         } catch {
             print("Failed to fetch learning stats: \(error)")
