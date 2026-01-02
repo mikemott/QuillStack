@@ -16,13 +16,15 @@ xcuserdata/
 *.xcscmblueprint
 *.xcworkspace
 !default.xcworkspace
+!*.xcodeproj/project.xcworkspace/xcshareddata/
 
 # Swift Package Manager
 .build/
 Packages/
 Package.pins
-Package.resolved
-*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+# Package.resolved should be committed for iOS apps (required for Xcode Cloud)
+# Only ignore the Packages directory inside swiftpm
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Packages/
 
 # CocoaPods
 Pods/
