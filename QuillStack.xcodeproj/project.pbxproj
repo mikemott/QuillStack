@@ -119,6 +119,20 @@
 		K00100000000003C /* NoteEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003C /* NoteEventBus.swift */; };
 		K00100000000003D /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003D /* Tag.swift */; };
 		K00100000000003E /* TagMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = K00200000000003E /* TagMigrationService.swift */; };
+		L00100000000003F /* NoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000003F /* NoteTypePlugin.swift */; };
+		L001000000000040 /* NoteTypeRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000040 /* NoteTypeRegistry.swift */; };
+		L001000000000041 /* GeneralNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000041 /* GeneralNoteTypePlugin.swift */; };
+		L001000000000042 /* TodoNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000042 /* TodoNoteTypePlugin.swift */; };
+		L001000000000043 /* EmailNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000043 /* EmailNoteTypePlugin.swift */; };
+		L001000000000044 /* MeetingNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000044 /* MeetingNoteTypePlugin.swift */; };
+		L001000000000045 /* ReminderNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000045 /* ReminderNoteTypePlugin.swift */; };
+		L001000000000046 /* ContactNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000046 /* ContactNoteTypePlugin.swift */; };
+		L001000000000047 /* EventNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000047 /* EventNoteTypePlugin.swift */; };
+		L001000000000048 /* ExpenseNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000048 /* ExpenseNoteTypePlugin.swift */; };
+		L001000000000049 /* ShoppingNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L002000000000049 /* ShoppingNoteTypePlugin.swift */; };
+		L00100000000004A /* RecipeNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004A /* RecipeNoteTypePlugin.swift */; };
+		L00100000000004B /* IdeaNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004B /* IdeaNoteTypePlugin.swift */; };
+		L00100000000004C /* ClaudePromptNoteTypePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00200000000004C /* ClaudePromptNoteTypePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -237,6 +251,20 @@
 		K00200000000003C /* NoteEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEventBus.swift; sourceTree = "<group>"; };
 		K00200000000003D /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		K00200000000003E /* TagMigrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagMigrationService.swift; sourceTree = "<group>"; };
+		L00200000000003F /* NoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000040 /* NoteTypeRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypeRegistry.swift; sourceTree = "<group>"; };
+		L002000000000041 /* GeneralNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000042 /* TodoNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000043 /* EmailNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000044 /* MeetingNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000045 /* ReminderNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000046 /* ContactNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000047 /* EventNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000048 /* ExpenseNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L002000000000049 /* ShoppingNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L00200000000004A /* RecipeNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L00200000000004B /* IdeaNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaNoteTypePlugin.swift; sourceTree = "<group>"; };
+		L00200000000004C /* ClaudePromptNoteTypePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudePromptNoteTypePlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -354,6 +382,7 @@
 				E003000000000001 /* Export */,
 				K003000000000039 /* Integration */,
 				K00300000000003B /* Events */,
+				L00300000000003F /* Plugins */,
 				J002000000000030 /* BusinessCardDetector.swift */,
 				F00200000000000D /* CalendarService.swift */,
 				2796C1902EEB55A300E05291 /* CameraManager.swift */,
@@ -381,6 +410,35 @@
 				135689AE59463E16DB510DA6 /* DetailViewFactory.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		L00300000000003F /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				L003000000000040 /* BuiltIn */,
+				L00200000000003F /* NoteTypePlugin.swift */,
+				L002000000000040 /* NoteTypeRegistry.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		L003000000000040 /* BuiltIn */ = {
+			isa = PBXGroup;
+			children = (
+				L002000000000041 /* GeneralNoteTypePlugin.swift */,
+				L002000000000042 /* TodoNoteTypePlugin.swift */,
+				L002000000000043 /* EmailNoteTypePlugin.swift */,
+				L002000000000044 /* MeetingNoteTypePlugin.swift */,
+				L002000000000045 /* ReminderNoteTypePlugin.swift */,
+				L002000000000046 /* ContactNoteTypePlugin.swift */,
+				L002000000000047 /* EventNoteTypePlugin.swift */,
+				L002000000000048 /* ExpenseNoteTypePlugin.swift */,
+				L002000000000049 /* ShoppingNoteTypePlugin.swift */,
+				L00200000000004A /* RecipeNoteTypePlugin.swift */,
+				L00200000000004B /* IdeaNoteTypePlugin.swift */,
+				L00200000000004C /* ClaudePromptNoteTypePlugin.swift */,
+			);
+			path = BuiltIn;
 			sourceTree = "<group>";
 		};
 		2796C1812EEB546300E05291 /* Utilities */ = {
@@ -781,6 +839,20 @@
 				K00100000000003C /* NoteEventBus.swift in Sources */,
 				K00100000000003D /* Tag.swift in Sources */,
 				K00100000000003E /* TagMigrationService.swift in Sources */,
+				L00100000000003F /* NoteTypePlugin.swift in Sources */,
+				L001000000000040 /* NoteTypeRegistry.swift in Sources */,
+				L001000000000041 /* GeneralNoteTypePlugin.swift in Sources */,
+				L001000000000042 /* TodoNoteTypePlugin.swift in Sources */,
+				L001000000000043 /* EmailNoteTypePlugin.swift in Sources */,
+				L001000000000044 /* MeetingNoteTypePlugin.swift in Sources */,
+				L001000000000045 /* ReminderNoteTypePlugin.swift in Sources */,
+				L001000000000046 /* ContactNoteTypePlugin.swift in Sources */,
+				L001000000000047 /* EventNoteTypePlugin.swift in Sources */,
+				L001000000000048 /* ExpenseNoteTypePlugin.swift in Sources */,
+				L001000000000049 /* ShoppingNoteTypePlugin.swift in Sources */,
+				L00100000000004A /* RecipeNoteTypePlugin.swift in Sources */,
+				L00100000000004B /* IdeaNoteTypePlugin.swift in Sources */,
+				L00100000000004C /* ClaudePromptNoteTypePlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
