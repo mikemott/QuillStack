@@ -1,0 +1,25 @@
+{
+  "name": "quillstack-api-proxy",
+  "version": "1.0.0",
+  "description": "CloudFlare Worker proxy for QuillStack beta API access with credits tracking",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "kv:create": "wrangler kv:namespace create CREDITS_KV",
+    "kv:list": "wrangler kv:key list --namespace-id YOUR_KV_NAMESPACE_ID"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "anthropic",
+    "api-proxy"
+  ],
+  "author": "QuillStack",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^3.94.0"
+  }
+}

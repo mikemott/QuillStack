@@ -7,7 +7,8 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail",
-    "kv:create": "wrangler kv:namespace create SENT_EMAILS"
+    "kv:create": "wrangler kv:namespace create SENT_EMAILS",
+    "test-email": "tsx send-test-email.ts"
   },
   "keywords": ["cloudflare-workers", "testflight", "email", "resend"],
   "author": "QuillStack",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240117.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "wrangler": "^3.22.0"
   }

@@ -5,7 +5,7 @@
 /**
  * Generate HTML version of welcome email
  */
-export function getWelcomeEmailHTML(firstName: string): string {
+export function getWelcomeEmailHTML(firstName: string, betaCode: string): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -198,6 +198,41 @@ export function getWelcomeEmailHTML(firstName: string): string {
     .footer a:hover {
       text-decoration: underline;
     }
+    .beta-code-section {
+      background: linear-gradient(135deg, #1e4d2f 0%, #143d23 100%);
+      padding: 30px;
+      border-radius: 12px;
+      margin: 30px 0;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(30, 77, 47, 0.25);
+    }
+    .beta-code-label {
+      color: #d4e0d4;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .beta-code {
+      background: white;
+      color: #1e4d2f;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 28px;
+      font-weight: 700;
+      padding: 16px 24px;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 2px;
+      margin: 8px 0;
+      border: 3px solid #e8f0e8;
+    }
+    .beta-code-instructions {
+      color: #e8f0e8;
+      font-size: 14px;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -216,6 +251,15 @@ export function getWelcomeEmailHTML(firstName: string): string {
       <p>Most OCR apps just convert text. QuillStack goes further—it reads your handwritten notes, recognizes what type of note it is, and routes it to the right place with purpose-built features.</p>
 
       <a href="https://quillstack.io" class="intro-link">Visit quillstack.io to learn more →</a>
+    </div>
+
+    <div class="beta-code-section">
+      <div class="beta-code-label">Your Beta Access Code</div>
+      <div class="beta-code">${betaCode}</div>
+      <div class="beta-code-instructions">
+        Enter this code in Settings → AI Enhancement to unlock 500 free credits for AI-powered text enhancement.
+        <br><strong>No credit card required.</strong>
+      </div>
     </div>
 
     <h2>What Makes QuillStack Different</h2>
@@ -316,6 +360,7 @@ export function getWelcomeEmailHTML(firstName: string): string {
     <h2>Get Started</h2>
     <ol class="steps">
       <li>Open QuillStack from TestFlight</li>
+      <li>Go to Settings → AI Enhancement and enter your beta code: <code>${betaCode}</code></li>
       <li>Point your camera at any handwritten note</li>
       <li>Add hashtag triggers to unlock smart features</li>
       <li>Export or sync to your favorite tools</li>
@@ -348,7 +393,7 @@ export function getWelcomeEmailHTML(firstName: string): string {
 /**
  * Generate plain text version of welcome email
  */
-export function getWelcomeEmailText(firstName: string): string {
+export function getWelcomeEmailText(firstName: string, betaCode: string): string {
   return `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   WELCOME TO QUILLSTACK BETA
@@ -363,6 +408,14 @@ Most OCR apps just convert text. QuillStack goes further—it reads your handwri
 
 Visit quillstack.io to learn more →
 https://quillstack.io
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 YOUR BETA ACCESS CODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${betaCode}
+
+Enter this code in Settings → AI Enhancement to unlock 500 free credits for AI-powered text enhancement. No credit card required.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WHAT MAKES QUILLSTACK DIFFERENT
@@ -396,9 +449,10 @@ GET STARTED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. Open QuillStack from TestFlight
-2. Point your camera at any handwritten note
-3. Add hashtag triggers to unlock smart features
-4. Export or sync to your favorite tools
+2. Go to Settings → AI Enhancement and enter your beta code: ${betaCode}
+3. Point your camera at any handwritten note
+4. Add hashtag triggers to unlock smart features
+5. Export or sync to your favorite tools
 
 Visit quillstack.io
 https://quillstack.io

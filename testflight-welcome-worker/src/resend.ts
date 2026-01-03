@@ -27,6 +27,7 @@ interface ResendEmailResponse {
  * Send a welcome email to a beta tester via Resend
  *
  * @param tester - Beta tester information
+ * @param betaCode - Unique beta access code for this tester
  * @param resendApiKey - Resend API key
  * @param fromEmail - Sender email address
  * @param fromName - Sender name
@@ -34,6 +35,7 @@ interface ResendEmailResponse {
  */
 export async function sendWelcomeEmail(
   tester: BetaTester,
+  betaCode: string,
   resendApiKey: string,
   fromEmail: string,
   fromName: string
@@ -45,8 +47,8 @@ export async function sendWelcomeEmail(
     from: `${fromName} <${fromEmail}>`,
     to: tester.email,
     subject: 'Welcome to QuillStack Beta!',
-    html: getWelcomeEmailHTML(firstName),
-    text: getWelcomeEmailText(firstName),
+    html: getWelcomeEmailHTML(firstName, betaCode),
+    text: getWelcomeEmailText(firstName, betaCode),
     tags: [
       { name: 'type', value: 'testflight-welcome' },
       { name: 'automation', value: 'cloudflare-worker' }

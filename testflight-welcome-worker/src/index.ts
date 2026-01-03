@@ -16,8 +16,9 @@ import { sendWelcomeEmail } from './resend';
  * Environment bindings and secrets
  */
 export interface Env {
-  // KV namespace binding
+  // KV namespace bindings
   SENT_EMAILS: KVNamespace;
+  CREDITS_KV: KVNamespace; // Shared with API proxy for beta codes
 
   // App Store Connect credentials (secrets)
   APP_STORE_ISSUER_ID: string;
@@ -51,6 +52,39 @@ interface WorkerResult {
   testersChecked: number;
   emailsSent: number;
   errors: string[];
+}
+
+/**
+ * Beta user record stored in shared CREDITS_KV namespace
+ */
+interface BetaUser {
+  betaCode: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  creditsRemaining: number;
+  creditsTotal: number;
+  createdAt: string;
+  lastUsedAt: string;
+  requestCount: number;
+  source: 'testflight' | 'registration';
+}
+
+/**
+ * Generate a unique beta code from tester ID
+ * Format: BETA-XXXX where XXXX is a deterministic hash
+ */
+function generateBetaCode(testerId: string): string {
+  // Create a simple hash from the tester ID
+  let hash = 0;
+  for (let i = 0; i < testerId.length; i++) {
+    hash = ((hash << 5) - hash) + testerId.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+
+  // Convert to positive number and format as 4-digit code
+  const code = Math.abs(hash).toString().padStart(4, '0').slice(0, 4);
+  return `BETA-${code}`;
 }
 
 export default {
@@ -105,8 +139,34 @@ export default {
           try {
             console.log(`📤 Sending welcome email to ${tester.email}...`);
 
+            // Generate unique beta code
+            const betaCode = generateBetaCode(tester.id);
+            console.log(`🔑 Generated beta code: ${betaCode}`);
+
+            // Create beta user record in shared KV
+            const betaUser: BetaUser = {
+              betaCode,
+              email: tester.email,
+              firstName: tester.firstName || '',
+              lastName: tester.lastName || '',
+              creditsRemaining: 500, // Default credits
+              creditsTotal: 500,
+              createdAt: new Date().toISOString(),
+              lastUsedAt: new Date().toISOString(),
+              requestCount: 0,
+              source: 'testflight'
+            };
+
+            // Store in CREDITS_KV (shared with API proxy)
+            await env.CREDITS_KV.put(
+              `user:${betaCode}`,
+              JSON.stringify(betaUser)
+            );
+
+            // Send email with beta code
             await sendWelcomeEmail(
               tester,
+              betaCode,
               env.RESEND_API_KEY,
               env.FROM_EMAIL,
               env.FROM_NAME
@@ -128,7 +188,7 @@ export default {
             );
 
             result.emailsSent++;
-            console.log(`✅ Welcome email sent to ${tester.email}`);
+            console.log(`✅ Welcome email sent to ${tester.email} with code ${betaCode}`);
           } catch (error) {
             const errorMessage = error instanceof Error
               ? error.message

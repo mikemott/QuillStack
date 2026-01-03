@@ -1,0 +1,25 @@
+name = "quillstack-api-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+# KV namespace for credits tracking
+[[kv_namespaces]]
+binding = "CREDITS_KV"
+id = "4a21172990624efebb1b2d92af7a0194"
+
+# Environment variables (secrets set via wrangler secret put)
+[vars]
+# ANTHROPIC_API_KEY is set as a secret, not here
+
+# Development settings
+[env.development]
+[[env.development.kv_namespaces]]
+binding = "CREDITS_KV"
+id = "YOUR_DEV_KV_NAMESPACE_ID"  # For local testing
+
+# Production settings
+[env.production]
+[[env.production.kv_namespaces]]
+binding = "CREDITS_KV"
+id = "YOUR_PROD_KV_NAMESPACE_ID"

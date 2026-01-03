@@ -1,0 +1,19 @@
+{
+  "name": "quillstack-beta-registration",
+  "version": "1.0.0",
+  "description": "Beta registration page for QuillStack",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "keywords": [
+    "cloudflare-pages",
+    "beta-registration"
+  ],
+  "author": "QuillStack",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^3.94.0"
+  }
+}
