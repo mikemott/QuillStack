@@ -9,6 +9,7 @@ import Foundation
 import AVFoundation
 import Speech
 import CoreData
+import Combine
 
 @MainActor
 final class VoiceMemoViewModel: ObservableObject {
@@ -48,10 +49,10 @@ final class VoiceMemoViewModel: ObservableObject {
 
     init(
         locale: Locale = Locale.autoupdatingCurrent,
-        textClassifier: TextClassifierProtocol = TextClassifier()
+        textClassifier: TextClassifierProtocol? = nil
     ) {
         self.speechRecognizer = SFSpeechRecognizer(locale: locale)
-        self.textClassifier = textClassifier
+        self.textClassifier = textClassifier ?? TextClassifier()
         self.microphoneGranted = AVAudioSession.sharedInstance().recordPermission == .granted
 
         let currentSpeechStatus = SFSpeechRecognizer.authorizationStatus()
@@ -59,7 +60,16 @@ final class VoiceMemoViewModel: ObservableObject {
     }
 
     deinit {
-        finishRecordingSession(cancelTask: true)
+        // Cleanup audio resources on deallocation
+        if audioEngine.isRunning {
+            audioEngine.stop()
+        }
+        if audioTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+        }
+        recognitionRequest?.endAudio()
+        recognitionTask?.cancel()
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
     // MARK: - Permissions
@@ -138,7 +148,10 @@ final class VoiceMemoViewModel: ObservableObject {
                 audioTapInstalled = false
             }
             let recordingFormat = inputNode.outputFormat(forBus: 0)
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+
+            // Install audio tap with larger buffer for better speech capture
+            // Using 4096 samples for more reliable streaming
+            inputNode.installTap(onBus: 0, bufferSize: 4096, format: recordingFormat) { [weak self] buffer, _ in
                 self?.recognitionRequest?.append(buffer)
             }
             audioTapInstalled = true
@@ -191,7 +204,7 @@ final class VoiceMemoViewModel: ObservableObject {
 
     private func configureAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .allowBluetooth])
+        try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.duckOthers, .allowBluetooth])
         try session.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
