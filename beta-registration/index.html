@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuillStack Beta Access | Get Your Code</title>
+  <meta name="description" content="Join the QuillStack beta and get instant access to AI-powered handwriting capture with 500 free credits.">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #FAF7F2;
+      color: #2D3A2E;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #143d23 0%, #1e4d2f 100%);
+      padding: 60px 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(20, 61, 35, 0.15);
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 24px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #e8f0e8;
+      font-size: 42px;
+      font-weight: 700;
+      font-family: Georgia, 'Times New Roman', serif;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      color: #d4e0d4;
+      font-size: 18px;
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: -40px auto 60px;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #1e4d2f 0%, #2a6d42 100%);
+      border-radius: 16px 16px 0 0;
+    }
+
+    h2 {
+      color: #1e4d2f;
+      font-size: 28px;
+      font-weight: 700;
+      font-family: Georgia, 'Times New Roman', serif;
+      margin-bottom: 12px;
+    }
+
+    .description {
+      color: #4a6b4f;
+      font-size: 16px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .benefits {
+      background: #f5f2ed;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .benefit {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .benefit:last-child {
+      margin-bottom: 0;
+    }
+
+    .benefit-icon {
+      color: #1e4d2f;
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .benefit-text {
+      color: #2D3A2E;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .benefit-text strong {
+      color: #1e4d2f;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      color: #1e4d2f;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="email"],
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #E8E4DC;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    input[type="email"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #1e4d2f;
+      box-shadow: 0 0 0 3px rgba(30, 77, 47, 0.1);
+    }
+
+    .input-hint {
+      font-size: 13px;
+      color: #7A8A7C;
+      margin-top: 6px;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #1e4d2f 0%, #143d23 100%);
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(30, 77, 47, 0.25);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(30, 77, 47, 0.35);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success {
+      background: linear-gradient(135deg, #1e4d2f 0%, #2a6d42 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      display: none;
+    }
+
+    .success.show {
+      display: block;
+    }
+
+    .success h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    .beta-code-display {
+      background: white;
+      color: #1e4d2f;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 36px;
+      font-weight: 700;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 24px 0;
+      letter-spacing: 3px;
+      border: 4px solid #e8f0e8;
+      word-break: break-all;
+    }
+
+    .success-instructions {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #e8f0e8;
+    }
+
+    .success-instructions strong {
+      color: white;
+    }
+
+    .copy-button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin-top: 20px;
+      font-size: 15px;
+      padding: 12px 24px;
+    }
+
+    .copy-button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .error {
+      background: #fff4f4;
+      border: 2px solid #ff6b6b;
+      color: #c92a2a;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7A8A7C;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #1e4d2f;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .header {
+        padding: 40px 20px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      .card {
+        padding: 32px 24px;
+      }
+
+      .beta-code-display {
+        font-size: 28px;
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">✍️</div>
+    <h1>Get Beta Access</h1>
+    <p class="subtitle">Join QuillStack Beta — AI-Powered Handwriting Capture</p>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div id="form-container">
+        <h2>Request Your Beta Code</h2>
+        <p class="description">
+          Get instant access to QuillStack with 500 free AI credits. No credit card required.
+        </p>
+
+        <div class="benefits">
+          <div class="benefit">
+            <span class="benefit-icon">✨</span>
+            <div class="benefit-text">
+              <strong>500 Free Credits</strong> — Worth $5 of AI-powered text enhancement
+            </div>
+          </div>
+          <div class="benefit">
+            <span class="benefit-icon">🚀</span>
+            <div class="benefit-text">
+              <strong>Instant Access</strong> — Get your beta code immediately
+            </div>
+          </div>
+          <div class="benefit">
+            <span class="benefit-icon">🔒</span>
+            <div class="benefit-text">
+              <strong>Privacy First</strong> — Your data stays on-device with optional iCloud sync
+            </div>
+          </div>
+        </div>
+
+        <div class="error" id="error-message"></div>
+
+        <form id="beta-form">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+            >
+            <p class="input-hint">We'll send your beta code and updates here</p>
+          </div>
+
+          <div class="form-group">
+            <label for="firstName">First Name (Optional)</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="John"
+              autocomplete="given-name"
+            >
+          </div>
+
+          <button type="submit" id="submit-btn">
+            Get My Beta Code →
+          </button>
+        </form>
+      </div>
+
+      <div class="success" id="success-message">
+        <h3>🎉 Welcome to QuillStack Beta!</h3>
+        <p class="success-instructions">Here's your beta access code:</p>
+        <div class="beta-code-display" id="beta-code-value"></div>
+        <p class="success-instructions">
+          <strong>Next Steps:</strong><br>
+          1. Download QuillStack from TestFlight<br>
+          2. Go to Settings → AI Enhancement<br>
+          3. Enter your beta code above<br>
+          4. Start capturing handwritten notes!
+        </p>
+        <button class="copy-button" id="copy-btn" onclick="copyCode()">
+          Copy Code to Clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>
+      <a href="https://quillstack.io">quillstack.io</a> •
+      <a href="mailto:support@quillstack.io">support@quillstack.io</a>
+    </p>
+  </div>
+
+  <script>
+    const form = document.getElementById('beta-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const formContainer = document.getElementById('form-container');
+    const successMessage = document.getElementById('success-message');
+    const errorMessage = document.getElementById('error-message');
+    const betaCodeValue = document.getElementById('beta-code-value');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Hide previous errors
+      errorMessage.classList.remove('show');
+
+      // Get form data
+      const email = document.getElementById('email').value;
+      const firstName = document.getElementById('firstName').value;
+
+      // Disable submit button and show loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loading"></span> Generating your code...';
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, firstName })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to register');
+        }
+
+        // Show success message
+        betaCodeValue.textContent = data.betaCode;
+        formContainer.style.display = 'none';
+        successMessage.classList.add('show');
+
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Get My Beta Code →';
+      }
+    });
+
+    function copyCode() {
+      const code = betaCodeValue.textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const copyBtn = document.getElementById('copy-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
