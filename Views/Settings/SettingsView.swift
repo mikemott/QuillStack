@@ -255,7 +255,9 @@ struct SettingsView: View {
                         .padding(.top, 4)
 
                         // Low credits warning
-                        if let usage = settings.creditUsagePercentage(), usage > 0.8 {
+                        if settings.betaCreditsTotal > 0,
+                           let usage = settings.creditUsagePercentage(),
+                           usage > 0.8 {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.system(size: 12))
@@ -1078,6 +1080,10 @@ struct SettingsView: View {
     private func saveBetaCode() {
         settings.betaCode = betaCodeInput
         settings.useBetaAPIProxy = true
+
+        // Reset credits when changing beta codes to prevent stale display
+        settings.betaCreditsRemaining = 0
+        settings.betaCreditsTotal = 0
 
         // Set default proxy URL if not already set
         if settings.betaAPIProxyURL == nil {
