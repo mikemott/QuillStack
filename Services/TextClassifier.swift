@@ -12,13 +12,18 @@ import Foundation
 @MainActor
 final class TextClassifier: TextClassifierProtocol {
     /// Classifies the type of note based on content
-    /// Priority: explicit hashtag triggers > business card detection > content analysis
+    /// Priority: explicit hashtag triggers > spoken command triggers > business card detection > content analysis
     func classifyNote(content: String) -> NoteType {
         let lowercased = content.lowercased()
 
         // First check for explicit hashtag triggers (highest priority)
         if let explicitType = detectExplicitTrigger(lowercased) {
             return explicitType
+        }
+
+        // Next check for natural-language voice/command triggers
+        if let commandType = detectCommandTrigger(lowercased) {
+            return commandType
         }
 
         // Check for business card (auto-detect contact without hashtag)
@@ -248,6 +253,119 @@ final class TextClassifier: TextClassifierProtocol {
         }
         if matchesLoosePattern(normalized, keywords: ["meeting", "notes", "minutes"]) {
             return .meeting
+        }
+
+        return nil
+    }
+
+    /// Detects spoken/voice-friendly phrases like "create a reminder" to infer note type without hashtags.
+    private func detectCommandTrigger(_ text: String) -> NoteType? {
+        let sanitized = text
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+
+        let phraseChecks: [(NoteType, [String])] = [
+            (.reminder, [
+                "create a reminder",
+                "set a reminder",
+                "reminder for",
+                "reminder to",
+                "remind me to",
+                "remind me about",
+                "remind us to"
+            ]),
+            (.todo, [
+                "create a todo",
+                "create a to-do",
+                "make a to-do",
+                "todo list",
+                "to-do list",
+                "task list",
+                "add this task",
+                "add to my list",
+                "create a checklist",
+                "checklist for"
+            ]),
+            (.meeting, [
+                "schedule a meeting",
+                "schedule meeting",
+                "meeting with",
+                "meeting at",
+                "set up a meeting",
+                "plan a meeting",
+                "agenda for"
+            ]),
+            (.event, [
+                "schedule an event",
+                "plan an event",
+                "schedule the event",
+                "appointment at",
+                "book an appointment",
+                "set an appointment"
+            ]),
+            (.shopping, [
+                "add to my shopping list",
+                "add this to groceries",
+                "shopping run",
+                "restock list"
+            ]),
+            (.recipe, [
+                "recipe for",
+                "ingredients for",
+                "how to cook",
+                "how do i cook"
+            ]),
+            (.idea, [
+                "idea for",
+                "brainstorm",
+                "what if we",
+                "concept for",
+                "thinking about"
+            ]),
+            (.expense, [
+                "log an expense",
+                "add an expense",
+                "expense report",
+                "track this expense",
+                "paid for",
+                "i spent"
+            ]),
+            (.email, [
+                "draft an email",
+                "write an email",
+                "compose an email",
+                "email draft",
+                "send an email to"
+            ]),
+            (.contact, [
+                "save this contact",
+                "contact info",
+                "phone number is",
+                "email address is",
+                "add them to contacts"
+            ])
+        ]
+
+        for (noteType, phrases) in phraseChecks {
+            if phrases.contains(where: { sanitized.contains($0) }) {
+                return noteType
+            }
+        }
+
+        if sanitized.contains("shopping list") || sanitized.contains("grocery list") {
+            return .shopping
+        }
+
+        if sanitized.contains("receipt for") || sanitized.contains("i paid") {
+            return .expense
+        }
+
+        if sanitized.contains("schedule a call") || sanitized.contains("plan a call") {
+            return .meeting
+        }
+
+        if sanitized.contains("reminder") && sanitized.contains("tomorrow") {
+            return .reminder
         }
 
         return nil

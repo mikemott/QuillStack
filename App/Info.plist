@@ -6,6 +6,12 @@
 	<key>NSCameraUsageDescription</key>
 	<string>QuillStack uses your camera to capture photos of handwritten notes for text recognition.</string>
 
+	<!-- Microphone + Speech Recognition for voice memos -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>QuillStack records your voice memos so we can convert them into notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>QuillStack transcribes recorded voice memos into searchable notes on your device.</string>
+
 	<!-- Photo Library (for future import feature) -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>QuillStack can import photos of handwritten notes from your library for text recognition.</string>
