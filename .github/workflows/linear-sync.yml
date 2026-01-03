@@ -1,0 +1,78 @@
+name: Linear PR Sync
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+jobs:
+  sync-linear:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract Linear issue identifier from PR
+        id: extract_issue
+        run: |
+          # Extract issue identifier from branch name (e.g., qui-67-test-feature -> QUI-67)
+          BRANCH="${{ github.head_ref }}"
+          if [[ $BRANCH =~ ^qui-([0-9]+) ]]; then
+            ISSUE_IDENTIFIER="QUI-${BASH_REMATCH[1]}"
+            echo "issue_identifier=$ISSUE_IDENTIFIER" >> $GITHUB_OUTPUT
+            echo "Found Linear issue: $ISSUE_IDENTIFIER"
+          else
+            echo "No Linear issue found in branch name"
+            echo "issue_identifier=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get Linear issue UUID and update to In Review
+        if: |
+          steps.extract_issue.outputs.issue_identifier != '' &&
+          (github.event.action == 'opened' ||
+           github.event.action == 'reopened' ||
+           github.event.action == 'ready_for_review')
+        run: |
+          # Query Linear to get issue UUID from identifier
+          RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "query { issue(id: \"${{ steps.extract_issue.outputs.issue_identifier }}\") { id team { states(filter: { name: { eq: \"In Review\" } }) { nodes { id } } } } }"
+            }')
+
+          # Extract UUID and In Review state ID
+          ISSUE_UUID=$(echo $RESPONSE | jq -r '.data.issue.id')
+          IN_REVIEW_STATE_ID=$(echo $RESPONSE | jq -r '.data.issue.team.states.nodes[0].id')
+
+          if [ "$ISSUE_UUID" != "null" ] && [ "$IN_REVIEW_STATE_ID" != "null" ]; then
+            echo "Updating issue $ISSUE_UUID to In Review state $IN_REVIEW_STATE_ID"
+            curl -X POST https://api.linear.app/graphql \
+              -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "query": "mutation { issueUpdate(id: \"'"$ISSUE_UUID"'\", input: { stateId: \"'"$IN_REVIEW_STATE_ID"'\" }) { success issue { id title state { name } } } }"
+              }'
+          else
+            echo "Could not find issue or In Review state"
+          fi
+
+      - name: Add PR link comment to Linear
+        if: |
+          steps.extract_issue.outputs.issue_identifier != '' &&
+          github.event.action == 'opened'
+        run: |
+          # Get issue UUID
+          RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "query { issue(id: \"${{ steps.extract_issue.outputs.issue_identifier }}\") { id } }"
+            }')
+
+          ISSUE_UUID=$(echo $RESPONSE | jq -r '.data.issue.id')
+
+          if [ "$ISSUE_UUID" != "null" ]; then
+            curl -X POST https://api.linear.app/graphql \
+              -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "query": "mutation { commentCreate(input: { issueId: \"'"$ISSUE_UUID"'\", body: \"PR opened: [#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})\" }) { success } }"
+              }'
+          fi
