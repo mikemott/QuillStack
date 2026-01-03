@@ -10,6 +10,33 @@ SwiftUI iOS app for handwritten note capture via camera, OCR, and type-based org
 - Start fresh conversations for unrelated tasks
 - Use `/compact` when context builds up
 
+## Development Workflow
+
+For non-trivial features and fixes, follow this workflow:
+
+1. **Plan & Create Issue**: Discuss approach, then create Linear issue with proper labels/project
+2. **Branch Naming**: Use Linear's format: `qui-XX-short-description` (lowercase, hyphens)
+3. **Implement**: Make changes, commit with clear messages
+4. **Create PR**: Use `gh pr create` with `Closes QUI-XX` in description body
+5. **Automated Reviews**: PR-Agent and Linear sync run automatically
+6. **Merge**: After addressing feedback, merge PR (Linear issue auto-closes)
+
+**When to use this workflow:**
+- New features or significant changes
+- Bug fixes requiring testing
+- Refactoring touching multiple files
+- Anything that benefits from code review
+
+**When to skip:**
+- Trivial changes (typos, minor tweaks)
+- Documentation-only updates
+- Emergency hotfixes explicitly requested
+
+**Automation in place:**
+- **PR-Agent**: AI code review with Claude Sonnet 4.5 (`.github/workflows/pr-agent.yml`)
+- **Linear Sync**: Auto-updates issue to "In Review" when PR opens (`.github/workflows/linear-sync.yml`)
+- **GitHub Webhook**: Auto-links commits and closes issues via magic words (`Fixes/Closes QUI-XX`)
+
 ## Key Concepts
 
 **Note Types:** Auto-classified via hashtag triggers (`#todo#`, `#email#`, `#meeting#`, etc.) in `TextClassifier.swift`. Each type has a dedicated detail view. 12 types total, implemented as plugins in `Services/Plugins/BuiltIn/`.
