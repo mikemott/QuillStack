@@ -7,11 +7,14 @@ compatibility_date = "2024-01-01"
 crons = ["*/15 * * * *"]
 
 # KV namespace for tracking sent emails
-# Create with: wrangler kv:namespace create SENT_EMAILS
-# Then update the id below with the output
 [[kv_namespaces]]
 binding = "SENT_EMAILS"
 id = "22aa30bbc14548bda301cdb0961a136f"
+
+# KV namespace for beta codes (shared with API proxy and registration page)
+[[kv_namespaces]]
+binding = "CREDITS_KV"
+id = "4a21172990624efebb1b2d92af7a0194"
 
 # Public environment variables
 [vars]
