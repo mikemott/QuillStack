@@ -1,0 +1,128 @@
+name: Enhance Short Linear Issues
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  enhance-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find and enhance short issues
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Fetch issues created/updated in last 3 hours with short descriptions
+          RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "query { issues(filter: { updatedAt: { gt: \"'"$(date -u -d '3 hours ago' +%Y-%m-%dT%H:%M:%SZ)"'\" } }, first: 20) { nodes { id identifier title description state { name } labels { nodes { name } } } } }"
+            }')
+
+          echo "$RESPONSE" | jq -c '.data.issues.nodes[]' | while read -r issue; do
+            ISSUE_ID=$(echo "$issue" | jq -r '.id')
+            ISSUE_IDENTIFIER=$(echo "$issue" | jq -r '.identifier')
+            TITLE=$(echo "$issue" | jq -r '.title')
+            DESCRIPTION=$(echo "$issue" | jq -r '.description // ""')
+            LABELS=$(echo "$issue" | jq -r '.labels.nodes[].name')
+
+            # Check if already enhanced (has "auto-enhanced" label)
+            if echo "$LABELS" | grep -q "auto-enhanced"; then
+              echo "Issue $ISSUE_IDENTIFIER already enhanced, skipping"
+              continue
+            fi
+
+            # Check if description is short (< 400 chars)
+            DESC_LENGTH=${#DESCRIPTION}
+            if [ $DESC_LENGTH -lt 400 ]; then
+              echo "Enhancing issue $ISSUE_IDENTIFIER: '$TITLE' (description: $DESC_LENGTH chars)"
+
+              # Prepare context about the codebase
+              CODEBASE_CONTEXT="QuillStack is an iOS SwiftUI app for handwritten note capture via camera, OCR (Apple Vision), and type-based organization using hashtag triggers. Key architecture: MVVM with service layer, Core Data persistence, NoteTypePlugin protocol for extensible note types. Main areas: OCR pipeline (OCRService.swift, LLMService.swift), classification (TextClassifier.swift), camera (CameraManager.swift), note types in Services/Plugins/."
+
+              # Call Claude API to enhance the issue
+              ENHANCED_DESC=$(curl -s -X POST https://api.anthropic.com/v1/messages \
+                -H "x-api-key: $ANTHROPIC_API_KEY" \
+                -H "anthropic-version: 2023-06-01" \
+                -H "content-type: application/json" \
+                -d '{
+                  "model": "claude-sonnet-4-20250514",
+                  "max_tokens": 1024,
+                  "messages": [{
+                    "role": "user",
+                    "content": "You are enhancing a Linear issue for QuillStack. The issue has minimal detail and needs expansion.\n\nCodebase context: '"$CODEBASE_CONTEXT"'\n\nIssue title: '"$TITLE"'\nCurrent description: '"$DESCRIPTION"'\n\nExpand this into a detailed issue description including:\n1. Clear problem statement or feature request\n2. Expected behavior or acceptance criteria\n3. Relevant technical context (which services/files might be involved)\n4. Any potential implementation considerations\n\nKeep it concise but informative. Use markdown formatting. Do not add a title/heading."
+                  }]
+                }' | jq -r '.content[0].text')
+
+              if [ -n "$ENHANCED_DESC" ] && [ "$ENHANCED_DESC" != "null" ]; then
+                echo "Generated enhanced description:"
+                echo "$ENHANCED_DESC"
+
+                # Update the issue with enhanced description
+                UPDATE_RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+                  -H "Authorization: $LINEAR_API_KEY" \
+                  -H "Content-Type: application/json" \
+                  --data-binary @- <<EOF
+{
+  "query": "mutation(\$id: String!, \$description: String!) { issueUpdate(id: \$id, input: { description: \$description }) { success issue { id identifier } } }",
+  "variables": {
+    "id": "$ISSUE_ID",
+    "description": "$ENHANCED_DESC\n\n---\n*Auto-enhanced from brief description*"
+  }
+}
+EOF
+)
+
+                SUCCESS=$(echo "$UPDATE_RESPONSE" | jq -r '.data.issueUpdate.success')
+                if [ "$SUCCESS" = "true" ]; then
+                  echo "Successfully enhanced issue $ISSUE_IDENTIFIER"
+
+                  # Add "auto-enhanced" label to prevent re-processing
+                  # First, get or create the label
+                  LABEL_RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                      "query": "query { issueLables(filter: { name: { eq: \"auto-enhanced\" } }) { nodes { id } } }"
+                    }')
+
+                  LABEL_ID=$(echo "$LABEL_RESPONSE" | jq -r '.data.issueLabels.nodes[0].id // empty')
+
+                  if [ -z "$LABEL_ID" ]; then
+                    # Create label if it doesn't exist
+                    CREATE_LABEL=$(curl -s -X POST https://api.linear.app/graphql \
+                      -H "Authorization: $LINEAR_API_KEY" \
+                      -H "Content-Type: application/json" \
+                      -d '{
+                        "query": "mutation { issueLabelCreate(input: { name: \"auto-enhanced\", color: \"#95a2b3\" }) { issueLabel { id } } }"
+                      }')
+                    LABEL_ID=$(echo "$CREATE_LABEL" | jq -r '.data.issueLabelCreate.issueLabel.id')
+                  fi
+
+                  if [ -n "$LABEL_ID" ]; then
+                    # Add label to issue
+                    curl -s -X POST https://api.linear.app/graphql \
+                      -H "Authorization: $LINEAR_API_KEY" \
+                      -H "Content-Type: application/json" \
+                      -d '{
+                        "query": "mutation { issueAddLabel(id: \"'"$ISSUE_ID"'\", labelId: \"'"$LABEL_ID"'\") { success } }"
+                      }'
+                  fi
+                else
+                  echo "Failed to update issue $ISSUE_IDENTIFIER"
+                fi
+              else
+                echo "Failed to generate enhanced description"
+              fi
+            else
+              echo "Issue $ISSUE_IDENTIFIER has sufficient detail ($DESC_LENGTH chars), skipping"
+            fi
+          done
