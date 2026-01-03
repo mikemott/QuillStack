@@ -16,35 +16,40 @@ struct StatisticsView: View {
             ZStack {
                 Color.creamLight.ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Time range picker
-                        timeRangePicker
+                VStack(spacing: 0) {
+                    // Custom header
+                    PageHeader(title: "Statistics")
 
-                        // Summary cards
-                        summarySection
+                    // Content
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            // Time range picker
+                            timeRangePicker
 
-                        // Capture activity chart
-                        captureActivitySection
+                            // Summary cards
+                            summarySection
 
-                        // Type distribution
-                        typeDistributionSection
+                            // Capture activity chart
+                            captureActivitySection
 
-                        // OCR accuracy trend
-                        accuracyTrendSection
+                            // Type distribution
+                            typeDistributionSection
 
-                        // Learning progress
-                        learningProgressSection
+                            // OCR accuracy trend
+                            accuracyTrendSection
 
-                        // Insights
-                        insightsSection
+                            // Learning progress
+                            learningProgressSection
+
+                            // Insights
+                            insightsSection
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
                 }
             }
-            .navigationTitle("Statistics")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
             .refreshable {
                 viewModel.loadStatistics()
             }
@@ -66,11 +71,17 @@ struct StatisticsView: View {
                         .foregroundColor(viewModel.selectedTimeRange == range ? .white : .textDark)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(
-                            viewModel.selectedTimeRange == range
-                                ? Color.forestDark
-                                : Color.white
-                        )
+                        .background {
+                            if viewModel.selectedTimeRange == range {
+                                Color.forestDark
+                            } else {
+                                LinearGradient(
+                                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            }
+                        }
                         .cornerRadius(8)
                 }
             }
@@ -430,9 +441,15 @@ struct SummaryCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(
+            LinearGradient(
+                colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 }
 
@@ -470,9 +487,15 @@ struct InsightCard: View {
             Spacer()
         }
         .padding(12)
-        .background(Color.white)
+        .background(
+            LinearGradient(
+                colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 }
 

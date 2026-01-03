@@ -18,20 +18,29 @@ struct TypeGuideView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(NoteTypeRegistry.shared.allPlugins(), id: \.id) { plugin in
-                        TypeCard(plugin: plugin)
-                            .onTapGesture {
-                                selectedType = plugin
-                                showingExample = true
+            ZStack {
+                Color.creamLight.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    // Custom header
+                    PageHeader(title: "Note Types")
+
+                    // Content
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(NoteTypeRegistry.shared.allPlugins(), id: \.id) { plugin in
+                                TypeCard(plugin: plugin)
+                                    .onTapGesture {
+                                        selectedType = plugin
+                                        showingExample = true
+                                    }
                             }
+                        }
+                        .padding()
                     }
                 }
-                .padding()
             }
-            .navigationTitle("Note Types")
-            .background(Color.creamLight)
+            .navigationBarHidden(true)
             .sheet(isPresented: $showingExample) {
                 if let plugin = selectedType {
                     TypeExampleSheet(plugin: plugin)
@@ -79,11 +88,17 @@ struct TypeCard: View {
                 .lineLimit(2)
                 .padding(.horizontal, 4)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 180)
         .padding()
-        .background(Color.white)
+        .background(
+            LinearGradient(
+                colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 
     private func descriptionFor(_ type: NoteType) -> String {

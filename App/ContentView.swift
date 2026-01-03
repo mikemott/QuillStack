@@ -12,9 +12,19 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var showingOnboarding = false
 
+    // Deep link handling
+    @Environment(DeepLinkManager.self) private var deepLinkManager
+    @State private var showingCameraFromDeepLink = false
+    @State private var showingVoiceFromDeepLink = false
+    @State private var deepLinkNoteId: UUID?
+
     var body: some View {
         TabView(selection: $selectedTab) {
-            NoteListView()
+            NoteListView(
+                showingCameraFromDeepLink: $showingCameraFromDeepLink,
+                showingVoiceFromDeepLink: $showingVoiceFromDeepLink,
+                deepLinkNoteId: $deepLinkNoteId
+            )
                 .tabItem {
                     Label("Notes", systemImage: "doc.text")
                 }
@@ -68,6 +78,37 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $showingOnboarding) {
             OnboardingView()
+        }
+        .onChange(of: deepLinkManager.activeDeepLink) { oldValue, newValue in
+            handleDeepLink(newValue)
+        }
+    }
+
+    private func handleDeepLink(_ deepLink: DeepLink?) {
+        guard let deepLink else { return }
+
+        switch deepLink {
+        case .captureCamera:
+            selectedTab = 0 // Switch to Notes tab
+            showingCameraFromDeepLink = true
+
+        case .captureVoice:
+            selectedTab = 0 // Switch to Notes tab
+            showingVoiceFromDeepLink = true
+
+        case .note(let uuid):
+            selectedTab = 0 // Switch to Notes tab
+            deepLinkNoteId = uuid
+
+        case .tab(let index):
+            if index >= 0 && index < 4 {
+                selectedTab = index
+            }
+        }
+
+        // Reset deep link after handling
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            deepLinkManager.reset()
         }
     }
 }

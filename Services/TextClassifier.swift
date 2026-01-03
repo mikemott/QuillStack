@@ -505,14 +505,104 @@ final class TextClassifier: TextClassifierProtocol {
         return cleaned
     }
 
+    /// Returns all trigger patterns for a note type (hardcoded for reliability)
+    private func getAllTriggerPatterns(for noteType: NoteType) -> [String] {
+        switch noteType {
+        case .claudePrompt:
+            return ["#claude#", "#c1aude#", "#ciaude#", "#claudee#", "#claube#",
+                    "#feature#", "#featur#", "#featuer#", "#featuree#", "#f3ature#",
+                    "#prompt#", "#prompl#", "#prornpt#", "#promptt#",
+                    "#request#", "#requesl#", "#requesi#", "#requestt#",
+                    "#issue#", "#issu3#", "#issuse#", "#issuee#"]
+        case .reminder:
+            return ["#reminder#", "#reminde#", "#rerinder#", "#rerninder#",
+                    "#remind#", "#rernind#", "#rernlnd#", "#remindme#"]
+        case .contact:
+            return ["#contact#", "#contacl#", "#contaci#", "#coniact#",
+                    "#person#", "#pers0n#", "#persun#", "#phone#", "#phon3#", "#fone#"]
+        case .expense:
+            return ["#expense#", "#expens3#", "#expanse#", "#expensee#",
+                    "#receipt#", "#recipt#", "#reciept#", "#recelpt#",
+                    "#spent#", "#spentt#", "#sp3nt#", "#paid#", "#pald#", "#pa1d#"]
+        case .shopping:
+            return ["#shopping#", "#shoppinq#", "#shopplng#", "#shoppingg#",
+                    "#shop#", "#shopp#", "#grocery#", "#groceries#", "#grocer1es#",
+                    "#qrocery#", "#list#", "#listt#"]
+        case .recipe:
+            return ["#recipe#", "#recipee#", "#recip3#", "#reclpe#",
+                    "#cook#", "#cookk#", "#c00k#", "#bake#", "#bakee#", "#bak3#"]
+        case .event:
+            return ["#event#", "#eventt#", "#evnt#", "#3vent#",
+                    "#appointment#", "#appointrnent#", "#apointment#", "#appointmentt#",
+                    "#schedule#", "#schedu1e#", "#schedulle#", "#appt#", "#apptt#"]
+        case .idea:
+            return ["#idea#", "#ideaa#", "#1dea#", "#ldea#",
+                    "#thought#", "#thoughtt#", "#thouqht#", "#thoughl#",
+                    "#note-to-self#", "#notetoself#", "#note2self#"]
+        case .todo:
+            return ["#todo#", "#tod0#", "#todoo#", "#toDo#",
+                    "#task#", "#tasks#", "#taskk#", "#tash#", "#tashs#",
+                    "#to-do#", "#todolt", "#todott"]
+        case .email:
+            return ["#email#", "#emaill#", "#emailtt", "#ernail#", "#emai1#",
+                    "#mail#", "#maill#", "#mai1#"]
+        case .meeting:
+            return ["#meeting#", "#meetinq#", "#meetimg#", "#rneetinq#",
+                    "#notes#", "#notess#", "#note5#",
+                    "#minutes#", "#rninutes#", "#minutess#"]
+        case .general:
+            return []
+        }
+    }
+
+    /// Maps a position in normalized text back to the original text
+    /// Searches for # character near the approximate offset
+    private func findTagInOriginal(
+        lowercased: String,
+        approximateOffset: Int,
+        trigger: String
+    ) -> Range<String.Index>? {
+        // Search window around the approximate position
+        let windowSize = 15
+        let searchStart = max(0, approximateOffset - windowSize)
+        let searchEnd = min(lowercased.count, approximateOffset + trigger.count + windowSize)
+
+        guard searchStart < lowercased.count else { return nil }
+
+        let startIndex = lowercased.index(lowercased.startIndex, offsetBy: searchStart)
+        let endIndex = lowercased.index(lowercased.startIndex, offsetBy: searchEnd)
+
+        let searchWindow = String(lowercased[startIndex..<endIndex])
+
+        // Look for # character (tags always start with #)
+        guard let hashIndex = searchWindow.firstIndex(of: "#") else { return nil }
+
+        // Estimate tag length (tags are typically 5-15 chars like #todo# or #reminder#)
+        let estimatedLength = min(trigger.count + 10, searchWindow.count - searchWindow.distance(from: searchWindow.startIndex, to: hashIndex))
+        let tagEndIndex = searchWindow.index(hashIndex, offsetBy: estimatedLength, limitedBy: searchWindow.endIndex) ?? searchWindow.endIndex
+
+        // Map back to original indices
+        let originalStart = lowercased.index(startIndex, offsetBy: searchWindow.distance(from: searchWindow.startIndex, to: hashIndex))
+        let originalEnd = lowercased.index(startIndex, offsetBy: searchWindow.distance(from: searchWindow.startIndex, to: tagEndIndex))
+
+        return originalStart..<originalEnd
+    }
+
     /// Detects all tags in content and splits into multiple sections
     /// Returns array of (noteType, content) for each detected section
     /// If no tags found, returns single section with classified type
     func splitIntoSections(content: String) -> [NoteSection] {
         let lowercased = content.lowercased()
+
+        // Normalize for fuzzy matching (remove spaces, dots, commas like detectFuzzyTrigger does)
+        let normalized = lowercased
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: ".", with: "#")
+            .replacingOccurrences(of: ",", with: "")
+
         var sections: [NoteSection] = []
 
-        // Find all tag positions
+        // Find all tag positions using normalized text
         var tagPositions: [(range: Range<String.Index>, type: NoteType)] = []
 
         // Get all triggers from registry and check for each
@@ -520,15 +610,37 @@ final class TextClassifier: TextClassifierProtocol {
                                      .expense, .shopping, .recipe, .event, .idea, .claudePrompt]
 
         for noteType in allTypes {
-            let triggers = NoteTypeRegistry.shared.triggers(for: noteType)
+            // Try registry first, fall back to hardcoded patterns
+            var triggers = NoteTypeRegistry.shared.triggers(for: noteType)
+            if triggers.isEmpty {
+                triggers = getAllTriggerPatterns(for: noteType)
+            }
 
+            // Search in NORMALIZED text but track positions in ORIGINAL text
             for trigger in triggers {
-                var searchStart = lowercased.startIndex
+                let normalizedTrigger = trigger
+                    .replacingOccurrences(of: " ", with: "")
+                    .replacingOccurrences(of: ".", with: "#")
+                    .replacingOccurrences(of: ",", with: "")
 
-                while searchStart < lowercased.endIndex,
-                      let range = lowercased.range(of: trigger, range: searchStart..<lowercased.endIndex) {
-                    tagPositions.append((range, noteType))
-                    searchStart = range.upperBound
+                var searchStart = normalized.startIndex
+
+                while searchStart < normalized.endIndex,
+                      let normalizedRange = normalized.range(of: normalizedTrigger, range: searchStart..<normalized.endIndex) {
+
+                    // Map normalized position back to original content position
+                    let approximateOffset = normalized.distance(from: normalized.startIndex, to: normalizedRange.lowerBound)
+
+                    // Find the actual tag position in original lowercased text (within a small window)
+                    if let originalRange = findTagInOriginal(
+                        lowercased: lowercased,
+                        approximateOffset: approximateOffset,
+                        trigger: trigger
+                    ) {
+                        tagPositions.append((originalRange, noteType))
+                    }
+
+                    searchStart = normalizedRange.upperBound
                 }
             }
         }

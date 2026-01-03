@@ -14,6 +14,9 @@ struct QuillStackApp: App {
     // Core Data stack initialization
     let coreDataStack = CoreDataStack.shared
 
+    // Deep link manager
+    @State private var deepLinkManager = DeepLinkManager()
+
     init() {
         // Initialize Sentry for crash reporting
         SentrySDK.start { options in
@@ -60,6 +63,10 @@ struct QuillStackApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, coreDataStack.persistentContainer.viewContext)
+                .environment(deepLinkManager)
+                .onOpenURL { url in
+                    deepLinkManager.handle(url: url)
+                }
         }
     }
 }

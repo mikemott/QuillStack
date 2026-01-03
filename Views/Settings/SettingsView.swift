@@ -256,8 +256,8 @@ struct SettingsView: View {
 
                         // Low credits warning
                         if settings.betaCreditsTotal > 0,
-                           let usage = settings.creditUsagePercentage(),
-                           usage > 0.8 {
+                           Double(settings.betaCreditsRemaining) / Double(settings.betaCreditsTotal) < 0.2 {
+                            let usagePercentage = Int((1.0 - Double(settings.betaCreditsRemaining) / Double(settings.betaCreditsTotal)) * 100)
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.system(size: 12))
@@ -267,7 +267,7 @@ struct SettingsView: View {
                                     Text("Credits Running Low")
                                         .font(.serifCaption(12, weight: .semibold))
                                         .foregroundColor(.orange)
-                                    Text("\(Int(usage * 100))% used - Consider getting more beta credits")
+                                    Text("\(usagePercentage)% used - Consider getting more beta credits")
                                         .font(.serifCaption(11, weight: .regular))
                                         .foregroundColor(.orange.opacity(0.8))
                                 }

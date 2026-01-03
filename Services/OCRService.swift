@@ -7,6 +7,7 @@
 
 import UIKit
 @preconcurrency import Vision
+import Sentry
 
 // MARK: - OCR Result Models
 
@@ -106,17 +107,52 @@ final class OCRService: OCRServiceProtocol, @unchecked Sendable {
 
     /// Recognizes text from an image with detailed word-level confidence
     func recognizeTextWithConfidence(from image: UIImage) async throws -> OCRResult {
+        // Sentry: Start performance transaction for OCR
+        let transaction = SentrySDK.startTransaction(
+            name: "OCRService.recognizeTextWithConfidence",
+            operation: "ocr.recognize"
+        )
+        transaction.setData(value: [
+            "image_size": "\(Int(image.size.width))x\(Int(image.size.height))"
+        ], key: "image_info")
+        
         // Apply preprocessing pipeline for better OCR
+        let preprocessSpan = transaction.startChild(
+            operation: "image.preprocess",
+            description: "Preprocess image for OCR"
+        )
         let processedImage = imageProcessor.preprocessForOCR(image: image) ?? image
+        preprocessSpan.finish()
 
         guard let cgImage = processedImage.cgImage else {
+            transaction.finish(status: .invalidArgument)
             throw OCRError.invalidImage
         }
 
         // Perform OCR on background thread
-        return try await Task.detached(priority: .userInitiated) {
+        let ocrSpan = transaction.startChild(
+            operation: "ocr.vision",
+            description: "Vision framework OCR"
+        )
+        let result = try await Task.detached(priority: .userInitiated) {
             try self.performOCRSync(cgImage: cgImage)
         }.value
+        
+        ocrSpan.setData(value: [
+            "text_length": result.fullText.count,
+            "confidence": Int(result.averageConfidence * 100),
+            "lines_count": result.lines.count,
+            "low_confidence_words": result.lowConfidenceWords.count
+        ], key: "ocr_result")
+        ocrSpan.finish()
+
+        transaction.setData(value: [
+            "text_length": result.fullText.count,
+            "confidence": Int(result.averageConfidence * 100)
+        ], key: "result")
+        transaction.finish(status: .ok)
+
+        return result
     }
 
     /// Synchronous OCR helper - runs on background thread

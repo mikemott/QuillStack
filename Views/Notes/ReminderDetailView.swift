@@ -43,6 +43,7 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
                             TextEditor(text: $reminderText)
                                 .font(.serifBody(16, weight: .regular))
                                 .foregroundColor(.textDark)
+                                .scrollContentBackground(.hidden)
                                 .frame(minHeight: 100)
                                 .padding(12)
                                 .background(Color.white.opacity(0.6))

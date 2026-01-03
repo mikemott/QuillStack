@@ -46,6 +46,7 @@ final class KeychainService {
         case claudeAPIKey = "com.quillstack.claude-api-key"
         case notionAPIKey = "com.quillstack.notion-api-key"
         case gitHubAccessToken = "com.quillstack.github-access-token"
+        case betaCode = "com.quillstack.beta-code"
 
         var service: String { "QuillStack" }
     }

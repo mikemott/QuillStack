@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		465CC9491DF94A909609A4DC /* LockScreenWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */; };
-
-		D18D738A4B734735A15F38D3 /* VoiceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11A1703495D4868A6C2D0CA /* VoiceViewModel.swift */; };
-		12A1D5F1D4CD43239C041BCF /* TranscriptionServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3663FAD03FB14C66A858C1F4 /* TranscriptionServiceProtocol.swift */; };
-		697BA58989874A01AD451A2F /* SpeechTranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD79D2003084472BC26CDB3 /* SpeechTranscriptionService.swift */; };
-		CF5714C22F7E4C438DB73C30 /* VoiceCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00998A1A93E9449387D768A6 /* VoiceCaptureView.swift */; };
-		FC020ACA9CEE43DD8509E08D /* AudioPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6CDCCB7989D4EC6B0692463 /* AudioPreviewView.swift */; };
-
 		016BD80C0268E8A6F23BD919 /* SmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7081B48CFDB4DEC19A6D7A96 /* SmallWidgetView.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
@@ -337,13 +329,7 @@
 		T002000000000002 /* DetailBottomBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBottomBarTests.swift; sourceTree = "<group>"; };
 		T002000000000003 /* NoteDetailViewProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocolTests.swift; sourceTree = "<group>"; };
 		T002000000000004 /* QuillStackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F11A1703495D4868A6C2D0CA /* VoiceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceViewModel.swift; sourceTree = "<group>"; };
-		3663FAD03FB14C66A858C1F4 /* TranscriptionServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionServiceProtocol.swift; sourceTree = "<group>"; };
-		CAD79D2003084472BC26CDB3 /* SpeechTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriptionService.swift; sourceTree = "<group>"; };
-		00998A1A93E9449387D768A6 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
-		D6CDCCB7989D4EC6B0692463 /* AudioPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPreviewView.swift; sourceTree = "<group>"; };
-				B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LockScreenWidgetViews.swift; path = QuillStackWidget/Views/LockScreenWidgetViews.swift; sourceTree = "<group>"; };
-		/* End PBXFileReference section */
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0ECA9B83E51C7DE19011858B /* Frameworks */ = {
@@ -450,7 +436,6 @@
 		2796C17E2EEB545100E05291 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				169A7421ED7C430DBE078C17 /* Voice */,
 				2796C1C52EEB590000E05291 /* Tasks */,
 				2796C1842EEB548300E05291 /* Meetings */,
 				2796C1832EEB547E00E05291 /* Notes */,
@@ -469,7 +454,6 @@
 		2796C17F2EEB545600E05291 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				F11A1703495D4868A6C2D0CA /* VoiceViewModel.swift */,
 				B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */,
 				2796C1982EEB55C700E05291 /* CameraViewModel.swift */,
 				2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */,
@@ -482,8 +466,6 @@
 		2796C1802EEB545C00E05291 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				3663FAD03FB14C66A858C1F4 /* TranscriptionServiceProtocol.swift */,
-				CAD79D2003084472BC26CDB3 /* SpeechTranscriptionService.swift */,
 				N0030000000001AE /* Actions */,
 				E003000000000001 /* Export */,
 				K003000000000039 /* Integration */,
@@ -640,7 +622,6 @@
 		A78A08638098FD3D822EA78C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */,
 				7081B48CFDB4DEC19A6D7A96 /* SmallWidgetView.swift */,
 				64D584C722D131E7A1541D0E /* MediumWidgetView.swift */,
 				C89B0310848CE29C4927637D /* LargeWidgetView.swift */,
@@ -804,16 +785,7 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		169A7421ED7C430DBE078C17 /* Voice */ = {
-			isa = PBXGroup;
-			children = (
-				00998A1A93E9449387D768A6 /* VoiceCaptureView.swift */,
-				D6CDCCB7989D4EC6B0692463 /* AudioPreviewView.swift */,
-			);
-			path = Voice;
-			sourceTree = "<group>";
-		};
-	/* End PBXGroup section */
+/* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
 		2796C1562EEB51D800E05291 /* QuillStack */ = {
@@ -974,12 +946,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D18D738A4B734735A15F38D3 /* VoiceViewModel.swift in Sources */,
-				12A1D5F1D4CD43239C041BCF /* TranscriptionServiceProtocol.swift in Sources */,
-				697BA58989874A01AD451A2F /* SpeechTranscriptionService.swift in Sources */,
-				CF5714C22F7E4C438DB73C30 /* VoiceCaptureView.swift in Sources */,
-				FC020ACA9CEE43DD8509E08D /* AudioPreviewView.swift in Sources */,
-
 				061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */,
 				29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */,
 				546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */,
@@ -1115,8 +1081,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				465CC9491DF94A909609A4DC /* LockScreenWidgetViews.swift in Sources */,
-
 				23B03747BE9AB8ED4C62082A /* QuillStackWidgetBundle.swift in Sources */,
 				B3B10053FC7F717E1C90EDF0 /* QuillStackWidget.swift in Sources */,
 				E62EE68DBFA82C4FAABAC554 /* NotesTimelineProvider.swift in Sources */,
@@ -1285,8 +1249,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
@@ -1328,8 +1291,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
@@ -1363,7 +1325,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = QuillStackWidget/QuillStackWidget.entitlements;
-				DEVELOPMENT_TEAM = HZQB6JS358;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = QuillStackWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStack.QuillStackWidget;
@@ -1380,7 +1342,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = QuillStackWidget/QuillStackWidget.entitlements;
-				DEVELOPMENT_TEAM = HZQB6JS358;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = QuillStackWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStack.QuillStackWidget;
@@ -1400,8 +1362,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;
@@ -1422,8 +1383,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;

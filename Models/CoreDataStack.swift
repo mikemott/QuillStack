@@ -18,16 +18,29 @@ class CoreDataStack {
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "QuillStack")
 
-        // Enable encryption and file protection
-        let description = container.persistentStoreDescriptions.first
-        description?.setOption(
-            FileProtectionType.complete as NSObject,
-            forKey: NSPersistentStoreFileProtectionKey
-        )
+        // Configure shared container URL for App Groups
+        if let description = container.persistentStoreDescriptions.first {
+            // Use shared App Group container for widget access
+            if let containerURL = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: "group.quillstack.app.shared"
+            ) {
+                let storeURL = containerURL.appendingPathComponent("QuillStack.sqlite")
+                description.url = storeURL
+                print("📦 Using shared container at: \(storeURL.path)")
+            } else {
+                print("⚠️ Failed to get shared container URL, using default location")
+            }
 
-        // Enable automatic lightweight migration
-        description?.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
-        description?.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+            // Enable encryption and file protection
+            description.setOption(
+                FileProtectionType.complete as NSObject,
+                forKey: NSPersistentStoreFileProtectionKey
+            )
+
+            // Enable automatic lightweight migration
+            description.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
+            description.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+        }
 
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {

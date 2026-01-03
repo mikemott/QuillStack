@@ -1,0 +1,176 @@
+# QuillStack Development Rules for Cursor
+
+## Project Overview
+SwiftUI iOS app for handwritten note capture via camera, OCR, and type-based organization.
+- **Target:** iOS 26.2+ | **Swift:** 6.0 | **Xcode:** 26.1+
+- **Architecture:** MVVM with service layer, Core Data for persistence
+
+## Code Style & Architecture
+
+### Swift Conventions
+- Use `@MainActor` for ViewModels and UI-related code
+- Use `@Observable` macro for state management (not `@Published`)
+- Follow Swift 6.0 concurrency patterns
+- Use `async/await` for asynchronous operations
+- Prefer `Task` over `DispatchQueue` for async work
+
+### Architecture Patterns
+- **MVVM:** ViewModels in `ViewModels/`, Views in `Views/`
+- **Service Layer:** Services in `Services/` directory
+- **Plugin Pattern:** Note types implemented as plugins in `Services/Plugins/BuiltIn/`
+- **Event Bus:** Use `NoteEventBus` for loose coupling between components
+
+### Note Type System
+- Note types are auto-classified via hashtag triggers in `TextClassifier.swift`
+- Each note type has a dedicated plugin in `Services/Plugins/BuiltIn/`
+- Each note type has a detail view in `Views/`
+- 12 types total: todo, email, meeting, contact, etc.
+
+### Error Handling
+- Use `SentrySDK.capture()` for error tracking
+- Add breadcrumbs before important operations
+- Include context in error captures
+- Use `LocalizedError` for user-facing errors
+
+## Workflow Conventions
+
+### Branch Naming
+- Format: `qui-XX-short-description` (lowercase, hyphens)
+- Example: `qui-67-add-invoice-type`
+- Extract Linear issue number from branch name
+
+### Commit Messages
+- Format: `QUI-XX: Brief description`
+- Include Linear issue number
+- Be descriptive but concise
+
+### Pull Requests
+- Title: `QUI-XX: Feature description`
+- Body must include: `Closes QUI-XX`
+- Reference Linear issue link
+- PR-Agent will auto-review
+- Linear sync will update issue status
+
+### When to Create PRs
+- ✅ New features or significant changes
+- ✅ Bug fixes requiring testing
+- ✅ Refactoring touching multiple files
+- ❌ Skip for: trivial changes, typos, docs-only
+
+## Key Files & Locations
+
+### Core Components
+- Entry: `App/QuillStackApp.swift`, `App/ContentView.swift`
+- OCR: `Services/OCRService.swift`, `Services/LLMService.swift`
+- Classification: `Services/TextClassifier.swift`, `Services/Plugins/`
+- Camera: `Services/CameraManager.swift`, `ViewModels/CameraViewModel.swift`
+- Data: `Models/Note.swift`, `Models/CoreDataStack.swift`
+- UI: `Views/Notes/`, `Views/Components/DetailBottomBar.swift`
+
+### Documentation
+- `CLAUDE.md` - Development workflow and conventions
+- `CURSOR.md` - Cursor integration guide
+- `FEATURE_PLAN.md` - Feature specifications
+- `DEPLOYMENT-STATUS.md` - Deployment information
+
+## Integration Points
+
+### GitHub
+- PRs auto-trigger PR-Agent review
+- PRs auto-sync with Linear issues
+- Branch names should match Linear issue format
+
+### Linear
+- Issues tracked as QUI-XX
+- PRs automatically update Linear issue status
+- Use Linear for planning, not just tracking
+
+### Sentry
+- All errors should be captured with context
+- Use breadcrumbs for debugging
+- Include relevant data in error context
+
+### Cloudflare Workers
+- `api-proxy-worker/` - API proxy for Claude
+- `testflight-welcome-worker/` - TestFlight automation
+- `beta-registration/` - Beta registration page
+- Use `wrangler` CLI for deployment
+
+## Code Quality
+
+### Testing
+- Write tests for non-trivial features
+- Test files in `Tests/` directory
+- Use dependency injection for testability
+
+### Performance
+- Use background contexts for Core Data operations
+- Optimize image processing
+- Monitor with Sentry performance tracking
+
+### Security
+- Store sensitive data in Keychain via `KeychainService`
+- Don't hardcode API keys
+- Use environment variables for secrets
+
+## Common Patterns
+
+### Adding a New Note Type
+1. Add hashtag trigger in `TextClassifier.swift`
+2. Create plugin in `Services/Plugins/BuiltIn/`
+3. Create detail view in `Views/`
+4. Update `NoteType` enum
+5. Register plugin in `NoteTypeRegistry`
+
+### Error Tracking Pattern
+```swift
+SentrySDK.capture(error: error) { scope in
+    scope.setLevel(.error)
+    scope.setContext(value: ["key": "value"], key: "context_name")
+}
+```
+
+### Background Core Data Operations
+```swift
+let context = CoreDataStack.shared.newBackgroundContext()
+context.perform {
+    // Core Data operations
+    try? context.save()
+}
+```
+
+## Custom Colors
+- `.forestDark/.forestMedium/.forestLight` (greens)
+- `.creamLight/.paperBeige/.paperTan` (backgrounds)
+- `.badgeTodo/.badgeEmail/etc` (type badges)
+- Defined in `Utilities/Extensions.swift`
+
+## Build Notes
+- Camera requires physical device for testing
+- If xcodebuild fails: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
+- Uses `@MainActor` default isolation
+
+## When Using Cursor
+
+### Always Reference
+- Relevant files: `@Services/TextClassifier.swift`
+- Documentation: `@CLAUDE.md`, `@CURSOR.md`
+- Linear issues: Mention QUI-XX in prompts
+
+### Use Composer For
+- Multi-file changes
+- Feature implementations
+- Refactoring across files
+
+### Use Chat For
+- Code understanding questions
+- Small fixes
+- Debugging help
+- Architecture questions
+
+### Maintain Workflow
+- Don't skip Linear issues
+- Don't skip PRs for non-trivial changes
+- Don't skip PR-Agent reviews
+- Test before committing
+

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Sentry
 
 // MARK: - LLM Service
 
@@ -83,8 +84,25 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             throw LLMError.consentRequired
         }
 
-        guard let apiKey = await settings.claudeAPIKey, !apiKey.isEmpty else {
-            throw LLMError.noAPIKey
+        // Check if using beta proxy or direct API
+        let useBetaProxy = await settings.useBetaAPIProxy
+        let betaCode = await settings.betaCode
+        let betaProxyURL = await settings.betaAPIProxyURL
+        let apiKey = await settings.claudeAPIKey
+
+        // Validate credentials based on mode
+        if useBetaProxy {
+            guard let code = betaCode, !code.isEmpty else {
+                throw LLMError.noAPIKey
+            }
+            guard let proxyURLString = betaProxyURL, !proxyURLString.isEmpty,
+                  let _ = URL(string: proxyURLString) else {
+                throw LLMError.networkError("Invalid beta proxy URL")
+            }
+        } else {
+            guard let key = apiKey, !key.isEmpty else {
+                throw LLMError.noAPIKey
+            }
         }
 
         // Sanitize content to remove sensitive information before sending to API
@@ -99,11 +117,27 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             ]
         ]
 
-        var request = URLRequest(url: apiURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
+        // Build request based on mode
+        let requestURL: URL
+        var request: URLRequest
+
+        if useBetaProxy, let proxyURLString = betaProxyURL, let proxyURL = URL(string: proxyURLString) {
+            // Use beta proxy
+            requestURL = proxyURL
+            request = URLRequest(url: requestURL)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(betaCode, forHTTPHeaderField: "X-Beta-Code")
+        } else {
+            // Use direct Anthropic API
+            requestURL = apiURL
+            request = URLRequest(url: requestURL)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+            request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
+        }
+
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
 
         let (data, response) = try await pinnedSession.data(for: request)
@@ -112,9 +146,33 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             throw LLMError.invalidResponse
         }
 
+        // Handle response based on status code
         switch httpResponse.statusCode {
         case 200:
-            break
+            // Update credits if using beta proxy
+            if useBetaProxy {
+                if let creditsRemaining = httpResponse.value(forHTTPHeaderField: "X-Credits-Remaining"),
+                   let remaining = Double(creditsRemaining) {
+                    await MainActor.run {
+                        Task {
+                            await settings.updateCredits(remaining: remaining)
+                        }
+                    }
+                }
+                if let creditsTotal = httpResponse.value(forHTTPHeaderField: "X-Credits-Total"),
+                   let total = Double(creditsTotal) {
+                    await MainActor.run {
+                        Task {
+                            await settings.updateCredits(total: total)
+                        }
+                    }
+                }
+            }
+        case 401:
+            throw LLMError.noAPIKey
+        case 402:
+            // Credits exhausted (beta proxy specific)
+            throw LLMError.networkError("Beta credits exhausted. The app will continue to work with basic OCR.")
         case 429:
             throw LLMError.rateLimited
         default:
@@ -178,17 +236,53 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
 
     /// Clean up OCR text using Claude API
     func enhanceOCRText(_ text: String, noteType: String = "general") async throws -> EnhancedTextResult {
+        // Sentry: Start performance transaction for LLM
+        let transaction = SentrySDK.startTransaction(
+            name: "LLMService.enhanceOCRText",
+            operation: "llm.enhance"
+        )
+        transaction.setData(value: [
+            "note_type": noteType,
+            "original_length": text.count
+        ], key: "request_context")
+        
+        let promptSpan = transaction.startChild(
+            operation: "llm.prompt",
+            description: "Build prompt"
+        )
         let prompt = buildPrompt(for: text, noteType: noteType)
+        promptSpan.setData(value: ["prompt_length": prompt.count], key: "prompt_info")
+        promptSpan.finish()
+        
+        let apiSpan = transaction.startChild(
+            operation: "llm.api",
+            description: "Claude API request"
+        )
         let enhancedText = try await performAPIRequest(prompt: prompt, maxTokens: 2048)
+        apiSpan.finish()
 
         // Calculate what changed
+        let changesSpan = transaction.startChild(
+            operation: "llm.diff",
+            description: "Calculate text changes"
+        )
         let changes = findChanges(original: text, enhanced: enhancedText)
+        changesSpan.finish()
 
-        return EnhancedTextResult(
+        let result = EnhancedTextResult(
             originalText: text,
             enhancedText: enhancedText,
             changes: changes
         )
+
+        transaction.setData(value: [
+            "enhanced_length": enhancedText.count,
+            "changes_count": changes.count,
+            "note_type": noteType
+        ], key: "result")
+        transaction.finish(status: .ok)
+
+        return result
     }
 
     /// Extract structured meeting details from text using LLM

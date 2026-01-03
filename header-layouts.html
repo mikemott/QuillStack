@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>QuillStack Header Layouts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --forest-dark: #2d5016;
+            --forest-medium: #4a7c2c;
+            --forest-light: #90b77d;
+            --cream-light: #f8f4ed;
+            --paper-beige: #f0e9d8;
+            --paper-tan: #e8dfc8;
+            --text-dark: #2a2520;
+            --text-medium: #5a544d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .layouts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .phone-frame {
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            background: var(--cream-light);
+            border-radius: 32px;
+            overflow: hidden;
+            height: 680px;
+            position: relative;
+        }
+
+        .layout-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 20;
+            letter-spacing: 0.3px;
+        }
+
+        /* Minimal Layout */
+        .minimal-header {
+            background: linear-gradient(180deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
+            padding: 48px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--forest-light) 0%, var(--forest-medium) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--forest-dark);
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--forest-light);
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .edit-btn {
+            color: var(--forest-light);
+            font-size: 16px;
+            font-weight: 600;
+            background: transparent;
+            padding: 0 4px;
+        }
+
+        /* FAB Layout */
+        .fab-header {
+            background: linear-gradient(180deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
+            padding: 48px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fab-branding {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fab-branding .logo-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--forest-light);
+            letter-spacing: -0.5px;
+        }
+
+        .fab-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .fab-button {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(45, 80, 22, 0.4);
+            z-index: 15;
+            animation: fabPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes fabPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(45, 80, 22, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 32px rgba(45, 80, 22, 0.5); }
+        }
+
+        /* Two-Row Layout */
+        .tworow-header {
+            background: linear-gradient(180deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
+            padding: 48px 20px 0;
+        }
+
+        .tworow-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+        }
+
+        .tworow-branding {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tworow-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-top: 1px solid rgba(144, 183, 125, 0.15);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .text-btn {
+            color: var(--forest-light);
+            font-size: 15px;
+            font-weight: 600;
+            background: transparent;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .text-btn:hover {
+            opacity: 1;
+        }
+
+        .primary-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Content area */
+        .content {
+            padding: 20px;
+            height: calc(100% - 110px);
+            overflow-y: auto;
+        }
+
+        .fab-layout .content {
+            padding-bottom: 100px;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--paper-beige) 0%, var(--paper-tan) 100%);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(45, 80, 22, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .note-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--forest-dark) 0%, var(--forest-medium) 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        .note-text {
+            color: var(--text-dark);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-medium);
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(45, 80, 22, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 8px;
+            max-width: 100px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--forest-dark) 0%, var(--forest-medium) 100%);
+            width: 88%;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--cream-light);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 24px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-medium);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .tab-item.active {
+            color: var(--forest-dark);
+        }
+
+        .tab-icon {
+            font-size: 20px;
+        }
+
+        /* Analysis section */
+        .analysis {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 40px;
+        }
+
+        .analysis h2 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-card h3 {
+            color: var(--forest-light);
+            font-size: 18px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .pros, .cons {
+            margin-bottom: 16px;
+        }
+
+        .pros h4, .cons h4 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .pros h4 {
+            color: #86efac;
+        }
+
+        .cons h4 {
+            color: #fca5a5;
+        }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .pros li::before {
+            content: '✓ ';
+            color: #86efac;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .cons li::before {
+            content: '× ';
+            color: #fca5a5;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .recommendation {
+            background: linear-gradient(135deg, var(--forest-dark) 0%, var(--forest-medium) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 8px;
+        }
+
+        .recommendation h4 {
+            color: var(--forest-light);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendation p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QuillStack Header Redesign</h1>
+        <p class="subtitle">Three alternative layouts to reduce crowding while maintaining functionality and iOS-native feel</p>
+
+        <div class="layouts">
+            <!-- Minimal Layout -->
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="minimal-header">
+                        <div class="logo-icon">QS</div>
+                        <div class="header-actions">
+                            <div class="edit-btn">Edit</div>
+                            <div class="icon-btn">🔍</div>
+                            <div class="icon-btn">📷</div>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">"Tell me more!" "What was that like?" "What got you into that?"...</div>
+                            <div class="note-meta">
+                                <span>📝 101 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>88%</span>
+                            </div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">Fullstack • Stack • Claude code (primary Agent)...</div>
+                            <div class="note-meta">
+                                <span>📝 36 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>83%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-bar">
+                        <div class="tab-item active">
+                            <div class="tab-icon">📄</div>
+                            <div>Notes</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📅</div>
+                            <div>Meetings</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📊</div>
+                            <div>Statistics</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">⚙️</div>
+                            <div>Settings</div>
+                        </div>
+                    </div>
+
+                    <div class="layout-label">1. Minimal</div>
+                </div>
+            </div>
+
+            <!-- FAB Layout -->
+            <div class="phone-frame">
+                <div class="phone-screen fab-layout">
+                    <div class="fab-header">
+                        <div class="fab-branding">
+                            <div class="logo-icon">QS</div>
+                            <div class="app-title">QuillStack</div>
+                        </div>
+                        <div class="fab-actions">
+                            <div class="edit-btn">Edit</div>
+                            <div class="icon-btn">🔍</div>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">"Tell me more!" "What was that like?" "What got you into that?"...</div>
+                            <div class="note-meta">
+                                <span>📝 101 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>88%</span>
+                            </div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">Fullstack • Stack • Claude code (primary Agent)...</div>
+                            <div class="note-meta">
+                                <span>📝 36 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>83%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fab-button">📷</div>
+
+                    <div class="tab-bar">
+                        <div class="tab-item active">
+                            <div class="tab-icon">📄</div>
+                            <div>Notes</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📅</div>
+                            <div>Meetings</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📊</div>
+                            <div>Statistics</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">⚙️</div>
+                            <div>Settings</div>
+                        </div>
+                    </div>
+
+                    <div class="layout-label">2. FAB Pattern</div>
+                </div>
+            </div>
+
+            <!-- Two-Row Layout -->
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="tworow-header">
+                        <div class="tworow-top">
+                            <div class="tworow-branding">
+                                <div class="logo-icon">QS</div>
+                                <div class="app-title">QuillStack</div>
+                            </div>
+                            <div class="edit-btn">Edit</div>
+                        </div>
+                        <div class="tworow-bottom">
+                            <div class="action-group">
+                                <div class="text-btn">All Notes</div>
+                            </div>
+                            <div class="primary-actions">
+                                <div class="icon-btn">🔍</div>
+                                <div class="icon-btn">📷</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">"Tell me more!" "What was that like?" "What got you into that?"...</div>
+                            <div class="note-meta">
+                                <span>📝 101 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>88%</span>
+                            </div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-badge">📋 GENERAL</div>
+                            <div class="note-text">Fullstack • Stack • Claude code (primary Agent)...</div>
+                            <div class="note-meta">
+                                <span>📝 36 words</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <span>83%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-bar">
+                        <div class="tab-item active">
+                            <div class="tab-icon">📄</div>
+                            <div>Notes</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📅</div>
+                            <div>Meetings</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📊</div>
+                            <div>Statistics</div>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-item">⚙️</div>
+                            <div>Settings</div>
+                        </div>
+                    </div>
+
+                    <div class="layout-label">3. Two-Row</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Section -->
+        <div class="analysis">
+            <h2>Layout Analysis & Recommendations</h2>
+
+            <div class="comparison-grid">
+                <!-- Minimal -->
+                <div class="comparison-card">
+                    <h3>1. Minimal</h3>
+                    <div class="pros">
+                        <h4>Pros</h4>
+                        <ul>
+                            <li>Maximum content space</li>
+                            <li>Clean, focused aesthetic</li>
+                            <li>Fast visual parsing</li>
+                            <li>Logo remains recognizable</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Cons</h4>
+                        <ul>
+                            <li>Loses app name visibility</li>
+                            <li>Still 4 elements in one row</li>
+                            <li>Edit button competes with icons</li>
+                        </ul>
+                    </div>
+                    <div class="recommendation">
+                        <h4>Best for</h4>
+                        <p>Users who open the app frequently and don't need branding reinforcement. Great for power users.</p>
+                    </div>
+                </div>
+
+                <!-- FAB -->
+                <div class="comparison-card">
+                    <h3>2. FAB Pattern</h3>
+                    <div class="pros">
+                        <h4>Pros</h4>
+                        <ul>
+                            <li>Camera always accessible</li>
+                            <li>Cleaner header (3 elements)</li>
+                            <li>Maintains brand presence</li>
+                            <li>Modern, familiar pattern</li>
+                            <li>Camera action is prominent</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Cons</h4>
+                        <ul>
+                            <li>FAB occludes content</li>
+                            <li>Less iOS-native (more Material)</li>
+                        </ul>
+                    </div>
+                    <div class="recommendation">
+                        <h4>Best for</h4>
+                        <p>Emphasizing camera capture as the primary action. Best balance of clarity and functionality.</p>
+                    </div>
+                </div>
+
+                <!-- Two-Row -->
+                <div class="comparison-card">
+                    <h3>3. Two-Row</h3>
+                    <div class="pros">
+                        <h4>Pros</h4>
+                        <ul>
+                            <li>Clear hierarchy</li>
+                            <li>Most breathing room</li>
+                            <li>Space for filters/context</li>
+                            <li>Actions clearly separated</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Cons</h4>
+                        <ul>
+                            <li>Takes most vertical space</li>
+                            <li>May feel heavy on mobile</li>
+                        </ul>
+                    </div>
+                    <div class="recommendation">
+                        <h4>Best for</h4>
+                        <p>Apps with filtering/sorting needs or when you want maximum clarity and hierarchy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

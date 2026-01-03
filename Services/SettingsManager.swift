@@ -126,6 +126,13 @@ final class SettingsManager: ObservableObject {
         static let imageRetentionPolicy = "imageRetentionPolicy"
         static let autoDeleteOriginalImages = "autoDeleteOriginalImages"
         static let imageRetentionDays = "imageRetentionDays"
+
+        // Beta Program
+        static let betaCode = "betaCode"
+        static let betaCreditsRemaining = "betaCreditsRemaining"
+        static let betaCreditsTotal = "betaCreditsTotal"
+        static let betaAPIProxyURL = "betaAPIProxyURL"
+        static let useBetaAPIProxy = "useBetaAPIProxy"
     }
 
     // MARK: - Initialization
@@ -267,6 +274,46 @@ final class SettingsManager: ObservableObject {
         }
     }
 
+    // MARK: - Beta Program Settings
+
+    @Published var betaCode: String? = nil {
+        didSet {
+            if let code = betaCode {
+                defaults.set(code, forKey: Keys.betaCode)
+            } else {
+                defaults.removeObject(forKey: Keys.betaCode)
+            }
+        }
+    }
+
+    @Published var betaCreditsRemaining: Int = 0 {
+        didSet {
+            defaults.set(betaCreditsRemaining, forKey: Keys.betaCreditsRemaining)
+        }
+    }
+
+    @Published var betaCreditsTotal: Int = 0 {
+        didSet {
+            defaults.set(betaCreditsTotal, forKey: Keys.betaCreditsTotal)
+        }
+    }
+
+    @Published var betaAPIProxyURL: String? = nil {
+        didSet {
+            if let url = betaAPIProxyURL {
+                defaults.set(url, forKey: Keys.betaAPIProxyURL)
+            } else {
+                defaults.removeObject(forKey: Keys.betaAPIProxyURL)
+            }
+        }
+    }
+
+    @Published var useBetaAPIProxy: Bool = false {
+        didSet {
+            defaults.set(useBetaAPIProxy, forKey: Keys.useBetaAPIProxy)
+        }
+    }
+
     // MARK: - Computed Properties
 
     var hasAPIKey: Bool {
@@ -289,9 +336,39 @@ final class SettingsManager: ObservableObject {
         return !id.isEmpty
     }
 
+    var hasBetaCode: Bool {
+        guard let code = betaCode else { return false }
+        return !code.isEmpty
+    }
+
+    var canUseAIFeatures: Bool {
+        hasAPIKey || (hasBetaCode && useBetaAPIProxy)
+    }
+
     /// Whether user needs to see the AI disclosure before first use
     var needsAIDisclosure: Bool {
         hasAPIKey && !hasAcceptedAIDisclosure
+    }
+
+    // MARK: - Beta Credits Management
+
+    func updateCredits(remaining: Double? = nil, total: Double? = nil) async {
+        await MainActor.run {
+            if let remaining = remaining {
+                self.betaCreditsRemaining = Int(remaining)
+            }
+            if let total = total {
+                self.betaCreditsTotal = Int(total)
+            }
+        }
+    }
+
+    func decrementCredits() async {
+        await MainActor.run {
+            if self.betaCreditsRemaining > 0 {
+                self.betaCreditsRemaining -= 1
+            }
+        }
     }
 
     // MARK: - Loading
@@ -328,6 +405,13 @@ final class SettingsManager: ObservableObject {
         }
         autoDeleteOriginalImages = defaults.bool(forKey: Keys.autoDeleteOriginalImages)
         imageRetentionDays = defaults.object(forKey: Keys.imageRetentionDays) as? Int ?? 30
+
+        // Load beta program settings
+        betaCode = defaults.string(forKey: Keys.betaCode)
+        betaCreditsRemaining = defaults.integer(forKey: Keys.betaCreditsRemaining)
+        betaCreditsTotal = defaults.integer(forKey: Keys.betaCreditsTotal)
+        betaAPIProxyURL = defaults.string(forKey: Keys.betaAPIProxyURL)
+        useBetaAPIProxy = defaults.bool(forKey: Keys.useBetaAPIProxy)
     }
 
     // MARK: - Migration

@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		465CC9491DF94A909609A4DC /* LockScreenWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */; };
-
 		D18D738A4B734735A15F38D3 /* VoiceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11A1703495D4868A6C2D0CA /* VoiceViewModel.swift */; };
 		12A1D5F1D4CD43239C041BCF /* TranscriptionServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3663FAD03FB14C66A858C1F4 /* TranscriptionServiceProtocol.swift */; };
 		697BA58989874A01AD451A2F /* SpeechTranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD79D2003084472BC26CDB3 /* SpeechTranscriptionService.swift */; };
@@ -342,7 +340,6 @@
 		CAD79D2003084472BC26CDB3 /* SpeechTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriptionService.swift; sourceTree = "<group>"; };
 		00998A1A93E9449387D768A6 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
 		D6CDCCB7989D4EC6B0692463 /* AudioPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPreviewView.swift; sourceTree = "<group>"; };
-				B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LockScreenWidgetViews.swift; path = QuillStackWidget/Views/LockScreenWidgetViews.swift; sourceTree = "<group>"; };
 		/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -640,7 +637,6 @@
 		A78A08638098FD3D822EA78C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B876AA78392D492E9FC8EAE9 /* LockScreenWidgetViews.swift */,
 				7081B48CFDB4DEC19A6D7A96 /* SmallWidgetView.swift */,
 				64D584C722D131E7A1541D0E /* MediumWidgetView.swift */,
 				C89B0310848CE29C4927637D /* LargeWidgetView.swift */,
@@ -1115,8 +1111,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				465CC9491DF94A909609A4DC /* LockScreenWidgetViews.swift in Sources */,
-
 				23B03747BE9AB8ED4C62082A /* QuillStackWidgetBundle.swift in Sources */,
 				B3B10053FC7F717E1C90EDF0 /* QuillStackWidget.swift in Sources */,
 				E62EE68DBFA82C4FAABAC554 /* NotesTimelineProvider.swift in Sources */,
@@ -1285,8 +1279,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
@@ -1328,8 +1321,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
@@ -1363,7 +1355,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = QuillStackWidget/QuillStackWidget.entitlements;
-				DEVELOPMENT_TEAM = HZQB6JS358;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = QuillStackWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStack.QuillStackWidget;
@@ -1380,7 +1372,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = QuillStackWidget/QuillStackWidget.entitlements;
-				DEVELOPMENT_TEAM = HZQB6JS358;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = QuillStackWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStack.QuillStackWidget;
@@ -1400,8 +1392,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;
@@ -1422,8 +1413,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = quillstack.app.QuillStackTests;

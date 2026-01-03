@@ -81,3 +81,5 @@ playground.xcworkspace
 
 # Instruments
 *.instrdst
+.linear-api-key
+.sentry-api-key

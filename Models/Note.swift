@@ -23,6 +23,8 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var isArchived: Bool
     @NSManaged public var summary: String? // Cached AI-generated summary
     @NSManaged public var summaryGeneratedAt: Date? // When summary was generated
+    @NSManaged public var audioData: Data? // Voice recording audio
+    @NSManaged public var captureSource: String? // "camera" or "voice"
 
     // Relationships
     @NSManaged public var todoItems: NSSet?

@@ -51,38 +51,58 @@ class NoteViewModel: ObservableObject {
 
         // Get notes to delete before modifying array
         let notesToDelete = offsets.map { notes[$0] }
+        let objectIDs = notesToDelete.map { $0.objectID }
 
         // Update local array first (optimistic update)
         notes.remove(atOffsets: offsets)
 
-        // Delete from Core Data
-        for note in notesToDelete {
-            context.delete(note)
-        }
-
-        do {
-            try CoreDataStack.shared.saveViewContext()
-        } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
-            // Restore on failure
-            fetchNotes()
+        // Delete from Core Data on background context
+        let backgroundContext = CoreDataStack.shared.newBackgroundContext()
+        backgroundContext.perform {
+            do {
+                // Fetch notes in the background context
+                for objectID in objectIDs {
+                    if let noteToDelete = try? backgroundContext.existingObject(with: objectID) as? Note {
+                        backgroundContext.delete(noteToDelete)
+                    }
+                }
+                try CoreDataStack.shared.save(context: backgroundContext)
+            } catch {
+                // If background delete fails, restore on main thread
+                Task { @MainActor in
+                    self.errorMessage = "Failed to delete note: \(error.localizedDescription)"
+                    self.fetchNotes() // Restore the notes
+                }
+            }
         }
     }
 
     func deleteNote(_ note: Note) {
         errorMessage = nil
 
-        // Update local array first
-        notes.removeAll { $0.id == note.id }
+        // Get note ID before deleting (needed for background context)
+        let noteId = note.id
 
-        // Delete from Core Data
-        context.delete(note)
+        // Update local array first (optimistic update)
+        notes.removeAll { $0.id == noteId }
 
-        do {
-            try CoreDataStack.shared.saveViewContext()
-        } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
-            fetchNotes()
+        // Delete from Core Data on background context
+        let backgroundContext = CoreDataStack.shared.newBackgroundContext()
+        backgroundContext.perform {
+            do {
+                // Fetch the note in the background context
+                let noteToDelete = try backgroundContext.existingObject(with: note.objectID) as? Note
+                if let noteToDelete = noteToDelete {
+                    backgroundContext.delete(noteToDelete)
+                    try CoreDataStack.shared.save(context: backgroundContext)
+                }
+            } catch {
+                // If background delete fails, restore on main thread
+                Task { @MainActor in
+                    self.errorMessage = "Failed to delete note: \(error.localizedDescription)"
+                    self.fetchNotes() // Restore the note
+                }
+            }
         }
     }
 
@@ -90,20 +110,29 @@ class NoteViewModel: ObservableObject {
         errorMessage = nil
 
         let idsToDelete = Set(notesToDelete.map { $0.id })
+        let objectIDs = notesToDelete.map { $0.objectID }
 
-        // Update local array first
+        // Update local array first (optimistic update)
         notes.removeAll { idsToDelete.contains($0.id) }
 
-        // Delete from Core Data
-        for note in notesToDelete {
-            context.delete(note)
-        }
-
-        do {
-            try CoreDataStack.shared.saveViewContext()
-        } catch {
-            errorMessage = "Failed to delete notes: \(error.localizedDescription)"
-            fetchNotes()
+        // Delete from Core Data on background context
+        let backgroundContext = CoreDataStack.shared.newBackgroundContext()
+        backgroundContext.perform {
+            do {
+                // Fetch notes in the background context
+                for objectID in objectIDs {
+                    if let noteToDelete = try? backgroundContext.existingObject(with: objectID) as? Note {
+                        backgroundContext.delete(noteToDelete)
+                    }
+                }
+                try CoreDataStack.shared.save(context: backgroundContext)
+            } catch {
+                // If background delete fails, restore on main thread
+                Task { @MainActor in
+                    self.errorMessage = "Failed to delete notes: \(error.localizedDescription)"
+                    self.fetchNotes() // Restore the notes
+                }
+            }
         }
     }
 
@@ -112,18 +141,28 @@ class NoteViewModel: ObservableObject {
     func archiveNote(_ note: Note) {
         errorMessage = nil
 
-        // Update local array first
-        notes.removeAll { $0.id == note.id }
+        let noteId = note.id
+        let objectID = note.objectID
 
-        // Update in Core Data
-        note.isArchived = true
-        note.updatedAt = Date()
+        // Update local array first (optimistic update)
+        notes.removeAll { $0.id == noteId }
 
-        do {
-            try CoreDataStack.shared.saveViewContext()
-        } catch {
-            errorMessage = "Failed to archive note: \(error.localizedDescription)"
-            fetchNotes()
+        // Update in Core Data on background context
+        let backgroundContext = CoreDataStack.shared.newBackgroundContext()
+        backgroundContext.perform {
+            do {
+                if let noteToArchive = try? backgroundContext.existingObject(with: objectID) as? Note {
+                    noteToArchive.isArchived = true
+                    noteToArchive.updatedAt = Date()
+                    try CoreDataStack.shared.save(context: backgroundContext)
+                }
+            } catch {
+                // If background archive fails, restore on main thread
+                Task { @MainActor in
+                    self.errorMessage = "Failed to archive note: \(error.localizedDescription)"
+                    self.fetchNotes() // Restore the note
+                }
+            }
         }
     }
 
@@ -131,21 +170,29 @@ class NoteViewModel: ObservableObject {
         errorMessage = nil
 
         let idsToArchive = Set(notesToArchive.map { $0.id })
+        let objectIDs = notesToArchive.map { $0.objectID }
 
-        // Update local array first
+        // Update local array first (optimistic update)
         notes.removeAll { idsToArchive.contains($0.id) }
 
-        // Update in Core Data
-        for note in notesToArchive {
-            note.isArchived = true
-            note.updatedAt = Date()
-        }
-
-        do {
-            try CoreDataStack.shared.saveViewContext()
-        } catch {
-            errorMessage = "Failed to archive notes: \(error.localizedDescription)"
-            fetchNotes()
+        // Update in Core Data on background context
+        let backgroundContext = CoreDataStack.shared.newBackgroundContext()
+        backgroundContext.perform {
+            do {
+                for objectID in objectIDs {
+                    if let noteToArchive = try? backgroundContext.existingObject(with: objectID) as? Note {
+                        noteToArchive.isArchived = true
+                        noteToArchive.updatedAt = Date()
+                    }
+                }
+                try CoreDataStack.shared.save(context: backgroundContext)
+            } catch {
+                // If background archive fails, restore on main thread
+                Task { @MainActor in
+                    self.errorMessage = "Failed to archive notes: \(error.localizedDescription)"
+                    self.fetchNotes() // Restore the notes
+                }
+            }
         }
     }
 
