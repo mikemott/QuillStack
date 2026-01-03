@@ -52,6 +52,8 @@
 		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
 		A4F800ABD629E75C845D571E /* LearnedCorrectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */; };
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
+		A1F6BB9C2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */; };
+		A1F6BBA32F1CFA3A00A1C9D1 /* VoiceCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
@@ -172,12 +174,14 @@
 		2796C1982EEB55C700E05291 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingViewModel.swift; sourceTree = "<group>"; };
 		2796C19B2EEB55C700E05291 /* NoteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewModel.swift; sourceTree = "<group>"; };
+		A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoViewModel.swift; sourceTree = "<group>"; };
 		2796C19C2EEB55EC00E05291 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		2796C19D2EEB55EC00E05291 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewView.swift; sourceTree = "<group>"; };
 		2796C1A02EEB55F800E05291 /* MeetingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingListView.swift; sourceTree = "<group>"; };
 		2796C1A12EEB560500E05291 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
 		2796C1A32EEB560500E05291 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
+		A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
 		2796C1A42EF0B20100E05291 /* SpellCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpellCorrector.swift; sourceTree = "<group>"; };
 		2796C1C12EEB580000E05291 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2796C1CF2EEB600000E05291 /* QuillStack.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = QuillStack.xcdatamodel; sourceTree = "<group>"; };
@@ -373,6 +377,7 @@
 				2796C1842EEB548300E05291 /* Meetings */,
 				2796C1832EEB547E00E05291 /* Notes */,
 				2796C1822EEB547500E05291 /* Capture */,
+				A1F6BBA12F1CFA3A00A1C9D1 /* Voice */,
 				2796C1F42EEB800000E05291 /* Settings */,
 				2796C1F52EEB800000E05291 /* Components */,
 				E003000000000003 /* Export */,
@@ -384,6 +389,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		A1F6BBA12F1CFA3A00A1C9D1 /* Voice */ = {
+			isa = PBXGroup;
+			children = (
+				A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */,
+			);
+			path = Voice;
+			sourceTree = "<group>";
+		};
 		2796C17F2EEB545600E05291 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -391,6 +404,7 @@
 				2796C1982EEB55C700E05291 /* CameraViewModel.swift */,
 				2796C19A2EEB55C700E05291 /* MeetingViewModel.swift */,
 				2796C19B2EEB55C700E05291 /* NoteViewModel.swift */,
+				A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */,
 				F002000000000010 /* SearchViewModel.swift */,
 			);
 			path = ViewModels;
@@ -824,12 +838,14 @@
 				2796C1B62EEB570000E05291 /* CameraViewModel.swift in Sources */,
 				2796C1B82EEB570000E05291 /* MeetingViewModel.swift in Sources */,
 				2796C1B92EEB570000E05291 /* NoteViewModel.swift in Sources */,
+				A1F6BB9C2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift in Sources */,
 				2796C1BA2EEB570000E05291 /* CameraPreviewView.swift in Sources */,
 				2796C1BB2EEB570000E05291 /* CameraView.swift in Sources */,
 				2796C1BC2EEB570000E05291 /* ImagePreviewView.swift in Sources */,
 				2796C1BD2EEB570000E05291 /* MeetingListView.swift in Sources */,
 				2796C1BE2EEB570000E05291 /* NoteDetailView.swift in Sources */,
 				2796C1C02EEB570000E05291 /* NoteListView.swift in Sources */,
+				A1F6BBA32F1CFA3A00A1C9D1 /* VoiceCaptureView.swift in Sources */,
 				2796C1D02EEB600000E05291 /* QuillStack.xcdatamodeld in Sources */,
 				2796C1E02EEB700000E05291 /* TodoDetailView.swift in Sources */,
 				2796C1E12EEB700000E05291 /* EmailDetailView.swift in Sources */,

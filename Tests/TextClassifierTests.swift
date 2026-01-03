@@ -193,6 +193,23 @@ final class TextClassifierTests: XCTestCase {
         XCTAssertEqual(classifier.classifyNote(content: "Checklist for tomorrow"), .todo)
     }
 
+    // MARK: - Voice Command Detection
+
+    func testVoiceCommandReminderDetection() {
+        let content = "I'd like to create a reminder for tomorrow at 2pm to pay bills."
+        XCTAssertEqual(classifier.classifyNote(content: content), .reminder)
+    }
+
+    func testVoiceCommandTodoDetection() {
+        let content = "Please add this to my to-do list: call the contractor about the leak."
+        XCTAssertEqual(classifier.classifyNote(content: content), .todo)
+    }
+
+    func testVoiceCommandMeetingDetection() {
+        let content = "Let's schedule a meeting with Ben on Tuesday to go over integrations."
+        XCTAssertEqual(classifier.classifyNote(content: content), .meeting)
+    }
+
     // MARK: - extractTriggerTag Tests
 
     func testExtractTriggerTagBasic() {
