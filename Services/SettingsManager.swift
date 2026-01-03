@@ -110,6 +110,12 @@ final class SettingsManager: ObservableObject {
         static let lowConfidenceThreshold = "lowConfidenceThreshold"
         static let hasAcceptedAIDisclosure = "hasAcceptedAIDisclosure"
 
+        // Beta API Proxy Settings
+        static let useBetaAPIProxy = "useBetaAPIProxy"
+        static let betaAPIProxyURL = "betaAPIProxyURL"
+        static let betaCreditsRemaining = "betaCreditsRemaining"
+        static let betaCreditsTotal = "betaCreditsTotal"
+
         // Export settings
         static let obsidianVaultPath = "obsidianVaultPath"
         static let obsidianDefaultFolder = "obsidianDefaultFolder"
@@ -156,6 +162,46 @@ final class SettingsManager: ObservableObject {
     @Published var hasAcceptedAIDisclosure: Bool = false {
         didSet {
             defaults.set(hasAcceptedAIDisclosure, forKey: Keys.hasAcceptedAIDisclosure)
+        }
+    }
+
+    // MARK: - Beta API Proxy Settings
+
+    @Published var betaCode: String? = nil {
+        didSet {
+            if let code = betaCode, !code.isEmpty {
+                try? keychain.save(code, for: .betaCode)
+            } else {
+                try? keychain.delete(for: .betaCode)
+            }
+        }
+    }
+
+    @Published var useBetaAPIProxy: Bool = false {
+        didSet {
+            defaults.set(useBetaAPIProxy, forKey: Keys.useBetaAPIProxy)
+        }
+    }
+
+    @Published var betaAPIProxyURL: String? = nil {
+        didSet {
+            if let url = betaAPIProxyURL {
+                defaults.set(url, forKey: Keys.betaAPIProxyURL)
+            } else {
+                defaults.removeObject(forKey: Keys.betaAPIProxyURL)
+            }
+        }
+    }
+
+    @Published var betaCreditsRemaining: Double = 0 {
+        didSet {
+            defaults.set(betaCreditsRemaining, forKey: Keys.betaCreditsRemaining)
+        }
+    }
+
+    @Published var betaCreditsTotal: Double = 0 {
+        didSet {
+            defaults.set(betaCreditsTotal, forKey: Keys.betaCreditsTotal)
         }
     }
 
@@ -274,6 +320,19 @@ final class SettingsManager: ObservableObject {
         return !key.isEmpty
     }
 
+    var hasBetaCode: Bool {
+        guard let code = betaCode else { return false }
+        return !code.isEmpty
+    }
+
+    /// Whether AI features are available (either via beta proxy or personal API key)
+    var canUseAIFeatures: Bool {
+        if useBetaAPIProxy && hasBetaCode && betaCreditsRemaining > 0 {
+            return true
+        }
+        return hasAPIKey
+    }
+
     var hasObsidianVault: Bool {
         guard let path = obsidianVaultPath else { return false }
         return !path.isEmpty
@@ -300,12 +359,19 @@ final class SettingsManager: ObservableObject {
         // Load from Keychain (secure)
         claudeAPIKey = keychain.retrieve(for: .claudeAPIKey)
         notionAPIKey = keychain.retrieve(for: .notionAPIKey)
+        betaCode = keychain.retrieve(for: .betaCode)
 
         // Load from UserDefaults (non-sensitive)
         autoEnhanceOCR = defaults.bool(forKey: Keys.autoEnhanceOCR)
         hasAcceptedAIDisclosure = defaults.bool(forKey: Keys.hasAcceptedAIDisclosure)
         showLowConfidenceHighlights = defaults.object(forKey: Keys.showLowConfidenceHighlights) as? Bool ?? true
         lowConfidenceThreshold = defaults.object(forKey: Keys.lowConfidenceThreshold) as? Float ?? 0.7
+
+        // Load beta proxy settings
+        useBetaAPIProxy = defaults.bool(forKey: Keys.useBetaAPIProxy)
+        betaAPIProxyURL = defaults.string(forKey: Keys.betaAPIProxyURL)
+        betaCreditsRemaining = defaults.object(forKey: Keys.betaCreditsRemaining) as? Double ?? 0
+        betaCreditsTotal = defaults.object(forKey: Keys.betaCreditsTotal) as? Double ?? 0
 
         // Load export settings
         obsidianVaultPath = defaults.string(forKey: Keys.obsidianVaultPath)
@@ -358,5 +424,26 @@ final class SettingsManager: ObservableObject {
         }
 
         return await LLMService.shared.validateAPIKey(apiKey)
+    }
+
+    // MARK: - Beta Credits Management
+
+    /// Updates beta credits from API response headers
+    @MainActor
+    func updateCredits(remaining: Double? = nil, total: Double? = nil) {
+        if let remaining = remaining {
+            betaCreditsRemaining = remaining
+        }
+        if let total = total {
+            betaCreditsTotal = total
+        }
+    }
+
+    /// Calculates the percentage of beta credits used
+    /// - Returns: Percentage of credits used (0.0 to 1.0), or nil if total credits is invalid
+    func creditUsagePercentage() -> Double? {
+        guard betaCreditsTotal > 0 else { return nil }
+        let used = betaCreditsTotal - betaCreditsRemaining
+        return used / betaCreditsTotal
     }
 }
