@@ -10,6 +10,7 @@ import SwiftUI
 struct NoteListView: View {
     @StateObject private var viewModel = NoteViewModel()
     @State private var showingCamera = false
+    @State private var showingVoice = false
     @State private var showingSearch = false
     @State private var selectedNote: Note?
 
@@ -18,6 +19,21 @@ struct NoteListView: View {
     @State private var selectedNotes: Set<Note> = []
     @State private var showingBulkExport = false
     @State private var showingDeleteConfirmation = false
+
+    // Deep link bindings (optional, for widget support)
+    @Binding var showingCameraFromDeepLink: Bool
+    @Binding var showingVoiceFromDeepLink: Bool
+    @Binding var deepLinkNoteId: UUID?
+
+    init(
+        showingCameraFromDeepLink: Binding<Bool> = .constant(false),
+        showingVoiceFromDeepLink: Binding<Bool> = .constant(false),
+        deepLinkNoteId: Binding<UUID?> = .constant(nil)
+    ) {
+        self._showingCameraFromDeepLink = showingCameraFromDeepLink
+        self._showingVoiceFromDeepLink = showingVoiceFromDeepLink
+        self._deepLinkNoteId = deepLinkNoteId
+    }
 
     var body: some View {
         NavigationStack {
@@ -41,10 +57,18 @@ struct NoteListView: View {
                         bulkActionToolbar
                     }
                 }
+
+                // Floating Action Button (FAB) for camera
+                if !isEditing {
+                    cameraFAB
+                }
             }
             .navigationBarHidden(true)
             .sheet(isPresented: $showingCamera) {
                 CameraView()
+            }
+            .sheet(isPresented: $showingVoice) {
+                VoiceCaptureView()
             }
             .fullScreenCover(isPresented: $showingSearch) {
                 NoteSearchView()
@@ -56,6 +80,25 @@ struct NoteListView: View {
             }
             .navigationDestination(item: $selectedNote) { note in
                 destinationView(for: note)
+            }
+            .onChange(of: showingCameraFromDeepLink) { _, newValue in
+                if newValue {
+                    showingCamera = true
+                    showingCameraFromDeepLink = false
+                }
+            }
+            .onChange(of: showingVoiceFromDeepLink) { _, newValue in
+                if newValue {
+                    showingVoice = true
+                    showingVoiceFromDeepLink = false
+                }
+            }
+            .onChange(of: deepLinkNoteId) { _, newValue in
+                if let noteId = newValue,
+                   let note = viewModel.notes.first(where: { $0.id == noteId }) {
+                    selectedNote = note
+                    deepLinkNoteId = nil
+                }
             }
             .confirmationDialog(
                 "Delete \(selectedNotes.count) note\(selectedNotes.count == 1 ? "" : "s")?",
@@ -174,9 +217,9 @@ struct NoteListView: View {
                         }
                         .accessibilityLabel("Search notes")
 
-                        // Camera button
-                        Button(action: { showingCamera = true }) {
-                            Image(systemName: "camera")
+                        // Voice button
+                        Button(action: { showingVoice = true }) {
+                            Image(systemName: "mic.fill")
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.forestLight)
                                 .frame(width: 44, height: 44)
@@ -190,7 +233,7 @@ struct NoteListView: View {
                                 .cornerRadius(10)
                                 .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
                         }
-                        .accessibilityLabel("Capture new note")
+                        .accessibilityLabel("Record voice note")
                     }
                 }
             }
@@ -406,6 +449,35 @@ struct NoteListView: View {
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: -2)
         )
         .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    // MARK: - Floating Action Button
+
+    private var cameraFAB: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button(action: { showingCamera = true }) {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 60, height: 60)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.forestMedium, Color.forestDark],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(Circle())
+                        .shadow(color: .forestDark.opacity(0.4), radius: 12, x: 0, y: 6)
+                }
+                .accessibilityLabel("Capture new note")
+                .padding(.trailing, 20)
+                .padding(.bottom, 20)
+            }
+        }
     }
 
     private func archiveNote(_ note: Note) {
