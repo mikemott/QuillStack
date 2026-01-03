@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Sentry
 
 struct SettingsView: View {
     @ObservedObject private var settings = SettingsManager.shared
@@ -18,6 +19,10 @@ struct SettingsView: View {
     @State private var showingClearConfirmation = false
     @State private var showingGitHubDeviceCode = false
     @State private var isPollingGitHub = false
+
+    // Beta code state
+    @State private var betaCodeInput: String = ""
+    @State private var showingBetaCode = false
 
     // Storage management state
     @State private var storageUsed: Int64 = 0
@@ -35,38 +40,49 @@ struct SettingsView: View {
             ZStack {
                 Color.creamLight.ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // AI Enhancement Section
-                        aiEnhancementSection
+                VStack(spacing: 0) {
+                    // Custom header
+                    PageHeader(title: "Settings")
 
-                        // AI Data Disclosure (only show when API key is set)
-                        if settings.hasAPIKey {
-                            aiDisclosureSection
+                    // Content
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            // AI Enhancement Section
+                            aiEnhancementSection
+
+                            // AI Data Disclosure (only show when API key is set)
+                            if settings.hasAPIKey {
+                                aiDisclosureSection
+                            }
+
+                            // Storage & Privacy Section
+                            storagePrivacySection
+
+                            // Handwriting Learning Section
+                            handwritingLearningSection
+
+                            // GitHub Integration Section
+                            gitHubIntegrationSection
+
+                            // Export Settings Section
+                            exportSettingsSection
+
+                            // About Section
+                            aboutSection
+
+                            #if DEBUG
+                            // Debug Section (only in debug builds)
+                            debugSection
+                            #endif
                         }
-
-                        // Storage & Privacy Section
-                        storagePrivacySection
-
-                        // Handwriting Learning Section
-                        handwritingLearningSection
-
-                        // GitHub Integration Section
-                        gitHubIntegrationSection
-
-                        // Export Settings Section
-                        exportSettingsSection
-
-                        // About Section
-                        aboutSection
+                        .padding(20)
                     }
-                    .padding(20)
                 }
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
             .onAppear {
                 apiKeyInput = settings.claudeAPIKey ?? ""
+                betaCodeInput = settings.betaCode ?? ""
                 learnedCorrectionCount = HandwritingLearningService.shared.correctionCount()
                 loadStorageInfo()
             }
@@ -170,6 +186,142 @@ struct SettingsView: View {
 
                 Divider()
 
+                // Beta Code Entry (Optional alternative to API key)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Beta Access Code")
+                            .font(.serifBody(14, weight: .medium))
+                            .foregroundColor(.textDark)
+
+                        Spacer()
+
+                        Text("OPTIONAL")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundColor(.textMedium)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.textMedium.opacity(0.1))
+                            .cornerRadius(4)
+                    }
+
+                    HStack(spacing: 12) {
+                        Group {
+                            if showingBetaCode {
+                                TextField("BETA-XXX-XXX", text: $betaCodeInput)
+                            } else {
+                                SecureField("BETA-XXX-XXX", text: $betaCodeInput)
+                            }
+                        }
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14, design: .monospaced))
+                        .foregroundStyle(Color.black)
+                        .tint(.black)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+
+                        Button(action: { showingBetaCode.toggle() }) {
+                            Image(systemName: showingBetaCode ? "eye.slash" : "eye")
+                                .foregroundColor(.textMedium)
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.forestDark.opacity(0.2), lineWidth: 1)
+                    )
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 11))
+                            .foregroundColor(.forestMedium)
+                        Text("Use your beta code instead of an API key")
+                            .font(.serifCaption(12, weight: .regular))
+                            .foregroundColor(.textMedium)
+                    }
+
+                    // Credits display (if using beta code)
+                    if settings.hasBetaCode {
+                        HStack {
+                            Image(systemName: "creditcard")
+                                .font(.system(size: 12))
+                                .foregroundColor(.forestDark)
+                            Text("\(Int(settings.betaCreditsRemaining)) of \(Int(settings.betaCreditsTotal)) credits remaining")
+                                .font(.serifCaption(12, weight: .medium))
+                                .foregroundColor(.forestDark)
+                            Spacer()
+                        }
+                        .padding(.top, 4)
+
+                        // Low credits warning
+                        if settings.betaCreditsTotal > 0,
+                           let usage = settings.creditUsagePercentage(),
+                           usage > 0.8 {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.orange)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Credits Running Low")
+                                        .font(.serifCaption(12, weight: .semibold))
+                                        .foregroundColor(.orange)
+                                    Text("\(Int(usage * 100))% used - Consider getting more beta credits")
+                                        .font(.serifCaption(11, weight: .regular))
+                                        .foregroundColor(.orange.opacity(0.8))
+                                }
+
+                                Spacer()
+                            }
+                            .padding(10)
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(6)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                            )
+                            .padding(.top, 8)
+                        }
+                    }
+                }
+                .padding(16)
+
+                Divider()
+
+                // Save Beta Code / Clear Button
+                if !betaCodeInput.isEmpty || settings.hasBetaCode {
+                    HStack(spacing: 12) {
+                        Button(action: saveBetaCode) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "checkmark.circle")
+                                Text("Save Beta Code")
+                                    .font(.serifBody(14, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(betaCodeInput.isEmpty ? Color.gray : Color.forestMedium)
+                            .cornerRadius(8)
+                        }
+                        .disabled(betaCodeInput.isEmpty)
+
+                        if settings.hasBetaCode {
+                            Button(action: clearBetaCode) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                    .padding(12)
+                                    .background(Color.red.opacity(0.1))
+                                    .cornerRadius(8)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+
+                    Divider()
+                }
+
                 // Save & Test Button
                 HStack(spacing: 12) {
                     Button(action: saveAndTestAPIKey) {
@@ -245,12 +397,18 @@ struct SettingsView: View {
                 }
                 .tint(.forestDark)
                 .padding(16)
-                .opacity(settings.hasAPIKey ? 1 : 0.5)
-                .disabled(!settings.hasAPIKey)
+                .opacity(settings.canUseAIFeatures ? 1 : 0.5)
+                .disabled(!settings.canUseAIFeatures)
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -352,9 +510,15 @@ struct SettingsView: View {
                     }
                 }
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
 
             // Privacy note
             Text("Thumbnails are always kept for display. Only full-resolution originals are affected.")
@@ -442,9 +606,15 @@ struct SettingsView: View {
                 }
                 .padding(16)
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -557,9 +727,15 @@ struct SettingsView: View {
                 }
                 .padding(16)
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -659,9 +835,15 @@ struct SettingsView: View {
                 .tint(.forestDark)
                 .padding(16)
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -711,9 +893,15 @@ struct SettingsView: View {
                     .padding(16)
                 }
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -749,11 +937,87 @@ struct SettingsView: View {
                     .padding(16)
                 }
             }
-            .background(Color.white)
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
+
+    // MARK: - Debug Section
+
+    #if DEBUG
+    private var debugSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader(title: "Debug Tools", icon: "ladybug")
+
+            VStack(spacing: 0) {
+                // Test crash button
+                Button(action: {
+                    // Add a breadcrumb first so we can see the flow before crash
+                    let breadcrumb = Breadcrumb(level: .info, category: "debug")
+                    breadcrumb.message = "User triggered test crash"
+                    SentrySDK.addBreadcrumb(breadcrumb)
+
+                    // Trigger crash
+                    fatalError("Test crash triggered from Settings")
+                }) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.red)
+                        Text("Trigger Test Crash")
+                            .font(.serifBody(15, weight: .medium))
+                        Spacer()
+                    }
+                    .foregroundColor(.forestDark)
+                    .padding(16)
+                }
+
+                Divider()
+
+                // Send test event
+                Button(action: {
+                    SentrySDK.capture(message: "Test event from Settings") { scope in
+                        scope.setLevel(.info)
+                        scope.setContext(value: [
+                            "source": "debug_settings",
+                            "timestamp": Date().ISO8601Format()
+                        ], key: "test_event")
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "paperplane.fill")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("Send Test Event to Sentry")
+                            .font(.serifBody(15, weight: .medium))
+                        Spacer()
+                    }
+                    .foregroundColor(.forestDark)
+                    .padding(16)
+                }
+            }
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+
+            Text("Test crash reporting and Sentry integration. Only visible in DEBUG builds.")
+                .font(.serifCaption(12))
+                .foregroundColor(.textLight)
+        }
+    }
+    #endif
 
     // MARK: - Helper Views
 
@@ -811,6 +1075,33 @@ struct SettingsView: View {
         settings.claudeAPIKey = nil
         settings.hasAcceptedAIDisclosure = false
         apiTestResult = nil
+    }
+
+    private func saveBetaCode() {
+        settings.betaCode = betaCodeInput
+        settings.useBetaAPIProxy = true
+
+        // Reset credits when changing beta codes to prevent stale display
+        settings.betaCreditsRemaining = 0
+        settings.betaCreditsTotal = 0
+
+        // Set default proxy URL if not already set
+        if settings.betaAPIProxyURL == nil {
+            settings.betaAPIProxyURL = "https://quillstack-api-proxy.mikebmott.workers.dev"
+        }
+
+        // Show disclosure sheet if not already accepted
+        if !settings.hasAcceptedAIDisclosure {
+            showingDisclosureSheet = true
+        }
+    }
+
+    private func clearBetaCode() {
+        betaCodeInput = ""
+        settings.betaCode = nil
+        settings.useBetaAPIProxy = false
+        settings.betaCreditsRemaining = 0
+        settings.betaCreditsTotal = 0
     }
 
     private func loadStorageInfo() {
