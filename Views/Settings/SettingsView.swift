@@ -1007,7 +1007,8 @@ struct SettingsView: View {
 
                 Divider()
 
-                // Classification accuracy test
+                // Classification accuracy test (DEBUG only - makes 40+ LLM API calls)
+                #if DEBUG
                 NavigationLink(destination: ClassificationTestView()) {
                     HStack {
                         Image(systemName: "chart.bar.fill")
@@ -1022,6 +1023,7 @@ struct SettingsView: View {
                     .foregroundColor(.forestDark)
                     .padding(16)
                 }
+                #endif
             }
             .background(
                 LinearGradient(

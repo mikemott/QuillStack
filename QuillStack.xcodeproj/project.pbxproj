@@ -313,6 +313,10 @@
 		T002000000000002 /* DetailBottomBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBottomBarTests.swift; sourceTree = "<group>"; };
 		T002000000000003 /* NoteDetailViewProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocolTests.swift; sourceTree = "<group>"; };
 		T002000000000004 /* QuillStackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationTestView.swift; sourceTree = "<group>"; };
+
+		C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationTestCases.swift; sourceTree = "<group>"; };
+		A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationAccuracyTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -801,6 +805,14 @@
 				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		260A9FD53AA7803074EF3E36 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

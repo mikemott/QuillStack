@@ -284,10 +284,16 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     private func parseContent() {
         // First, try to load from extractedDataJSON if available
         if let extractedJSON = note.extractedDataJSON,
-           let jsonData = extractedJSON.data(using: .utf8),
-           let extractedContact = try? JSONDecoder().decode(ParsedContact.self, from: jsonData) {
-            contact = extractedContact
-            return
+           let jsonData = extractedJSON.data(using: .utf8) {
+            do {
+                let extractedContact = try JSONDecoder().decode(ParsedContact.self, from: jsonData)
+                contact = extractedContact
+                return
+            } catch {
+                // Log JSON decoding error for debugging, but fall back gracefully
+                // Don't expose error details to user - just use fallback parsing
+                print("Failed to decode extractedDataJSON for contact: \(error.localizedDescription)")
+            }
         }
         
         // Fall back to parsing from content
@@ -331,9 +337,15 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 await MainActor.run {
                     saveSuccess = true
                 }
+            } catch let error as ContactsError {
+                await MainActor.run {
+                    // Use user-facing message (sanitized, no system details)
+                    errorMessage = error.userFacingMessage
+                }
             } catch {
                 await MainActor.run {
-                    errorMessage = error.localizedDescription
+                    // Generic fallback for unexpected errors
+                    errorMessage = "Unable to save contact. Please try again."
                 }
             }
         }

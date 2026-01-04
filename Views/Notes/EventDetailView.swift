@@ -398,26 +398,31 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     private func parseEventContent() {
         // First, try to load from extractedDataJSON if available
         if let extractedJSON = note.extractedDataJSON,
-           let jsonData = extractedJSON.data(using: .utf8),
-           let extractedEvent = try? JSONDecoder().decode(ExtractedEvent.self, from: jsonData) {
-            // Populate fields from extracted event
-            eventTitle = extractedEvent.title
-            location = extractedEvent.location ?? ""
-            eventNotes = extractedEvent.description ?? ""
-            
-            // Parse date/time
-            if let parsedDateTime = extractedEvent.parsedDateTime {
-                eventDate = parsedDateTime
-                let calendar = Calendar.current
-                let components = calendar.dateComponents([.hour, .minute], from: parsedDateTime)
-                if components.hour != nil || components.minute != nil {
-                    hasTime = true
-                    eventTime = parsedDateTime
-                } else {
-                    hasTime = false
+           let jsonData = extractedJSON.data(using: .utf8) {
+            do {
+                let extractedEvent = try JSONDecoder().decode(ExtractedEvent.self, from: jsonData)
+                // Populate fields from extracted event
+                eventTitle = extractedEvent.title
+                location = extractedEvent.location ?? ""
+                eventNotes = extractedEvent.description ?? ""
+                
+                // Parse date/time
+                if let parsedDateTime = extractedEvent.parsedDateTime {
+                    eventDate = parsedDateTime
+                    let calendar = Calendar.current
+                    let components = calendar.dateComponents([.hour, .minute], from: parsedDateTime)
+                    if components.hour != nil || components.minute != nil {
+                        hasTime = true
+                        eventTime = parsedDateTime
+                    } else {
+                        hasTime = false
+                    }
                 }
+                return
+            } catch {
+                // Log JSON decoding error for debugging, but fall back gracefully
+                print("Failed to decode extractedDataJSON for event: \(error.localizedDescription)")
             }
-            return
         }
         
         // Fall back to parsing from content

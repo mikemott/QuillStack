@@ -149,13 +149,18 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     private func parseTasks() {
         // First, try to load from extractedDataJSON if available
         if let extractedJSON = note.extractedDataJSON,
-           let jsonData = extractedJSON.data(using: .utf8),
-           let extractedTodos = try? JSONDecoder().decode([ExtractedTodo].self, from: jsonData) {
-            // Convert ExtractedTodo to ParsedTask
-            tasks = extractedTodos.map { todo in
-                ParsedTask(text: todo.text, isCompleted: todo.isCompleted)
+           let jsonData = extractedJSON.data(using: .utf8) {
+            do {
+                let extractedTodos = try JSONDecoder().decode([ExtractedTodo].self, from: jsonData)
+                // Convert ExtractedTodo to ParsedTask
+                tasks = extractedTodos.map { todo in
+                    ParsedTask(text: todo.text, isCompleted: todo.isCompleted)
+                }
+                return
+            } catch {
+                // Log JSON decoding error for debugging, but fall back gracefully
+                print("Failed to decode extractedDataJSON for todos: \(error.localizedDescription)")
             }
-            return
         }
         
         // Fall back to parsing from content

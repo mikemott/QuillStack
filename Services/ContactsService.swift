@@ -52,7 +52,9 @@ final class ContactsService: @unchecked Sendable {
         do {
             return try await contactStore.requestAccess(for: .contacts)
         } catch {
-            Self.logger.error("Contacts access request failed: \(error.localizedDescription)")
+            // Log error type without exposing system details
+            let errorType = String(describing: type(of: error))
+            Self.logger.error("Contacts access request failed: \(errorType)")
             return false
         }
     }
@@ -136,14 +138,17 @@ final class ContactsService: @unchecked Sendable {
         
         do {
             try contactStore.execute(saveRequest)
-            Self.logger.info("Successfully created contact: \(contact.displayName)")
+            // Log success without PII (only log that a contact was created, not the name)
+            Self.logger.info("Successfully created contact (hasName: \(!contact.displayName.isEmpty), hasEmail: \(!contact.email.isEmpty), hasPhone: \(!contact.phone.isEmpty))")
             
-            // Return a stable identifier (CNContact doesn't provide one until saved)
-            // We'll use the display name as a reference
             return cnContact.identifier
         } catch {
-            Self.logger.error("Failed to save contact: \(error.localizedDescription)")
-            throw ContactsError.createFailed(error.localizedDescription)
+            // Log error without exposing PII or system details
+            let errorType = String(describing: type(of: error))
+            Self.logger.error("Failed to save contact: \(errorType) (code: \((error as NSError).code))")
+            // Sanitize error message for user-facing error
+            let sanitizedMessage = sanitizeErrorMessage(error)
+            throw ContactsError.createFailed(sanitizedMessage)
         }
     }
     
@@ -187,9 +192,35 @@ final class ContactsService: @unchecked Sendable {
             }
             return found
         } catch {
-            Self.logger.error("Failed to check contact existence: \(error.localizedDescription)")
+            // Log error type without exposing system details
+            let errorType = String(describing: type(of: error))
+            Self.logger.error("Failed to check contact existence: \(errorType)")
             return false
         }
+    }
+    
+    // MARK: - Error Sanitization
+    
+    /// Sanitize error messages to remove PII and system details
+    private func sanitizeErrorMessage(_ error: Error) -> String {
+        // Remove common system error prefixes and PII patterns
+        var message = error.localizedDescription
+        
+        // Remove file paths
+        message = message.replacingOccurrences(of: #"/[^\s]+"#, with: "[path]", options: .regularExpression)
+        
+        // Remove email addresses
+        message = message.replacingOccurrences(of: #"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"#, with: "[email]", options: .regularExpression)
+        
+        // Remove phone numbers
+        message = message.replacingOccurrences(of: #"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}"#, with: "[phone]", options: .regularExpression)
+        
+        // Genericize common error messages
+        if message.lowercased().contains("domain") && message.lowercased().contains("code") {
+            return "A system error occurred while saving the contact."
+        }
+        
+        return message.isEmpty ? "An unknown error occurred." : message
     }
 }
 
@@ -205,9 +236,22 @@ enum ContactsError: LocalizedError {
         case .accessDenied:
             return "Access to Contacts was denied. Please enable access in Settings."
         case .createFailed(let message):
-            return "Failed to create contact: \(message)"
+            // Return user-friendly message (already sanitized)
+            return "Failed to create contact. \(message)"
         case .invalidData:
             return "Invalid contact data provided."
+        }
+    }
+    
+    /// User-facing error message (sanitized, no system details)
+    var userFacingMessage: String {
+        switch self {
+        case .accessDenied:
+            return "Contacts access is required. Please enable it in Settings."
+        case .createFailed:
+            return "Unable to save contact. Please try again."
+        case .invalidData:
+            return "The contact information is incomplete or invalid."
         }
     }
 }

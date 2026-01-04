@@ -3,10 +3,12 @@
 //  QuillStack
 //
 //  Debug view for running classification accuracy tests
+//  WARNING: This view makes 40+ LLM API calls. Only available in DEBUG builds.
 //
 
 import SwiftUI
 
+#if DEBUG
 @MainActor
 struct ClassificationTestView: View {
     @State private var isRunning = false
@@ -325,8 +327,10 @@ struct RecommendationRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     NavigationStack {
         ClassificationTestView()
     }
 }
+#endif
