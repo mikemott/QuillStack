@@ -12,27 +12,52 @@ SwiftUI iOS app for handwritten note capture via camera, OCR, and type-based org
 
 ## Development Workflow
 
-For non-trivial features and fixes, follow this workflow:
+**⚠️ CRITICAL: NEVER commit directly to `main` branch!**
 
-1. **Plan & Create Issue**: Discuss approach, then create Linear issue with proper labels/project
-2. **Branch Naming**: Use Linear's format: `qui-XX-short-description` (lowercase, hyphens)
-3. **Implement**: Make changes, commit with clear messages
-4. **Create PR**: Use `gh pr create` with `Closes QUI-XX` in description body
-5. **Automated Reviews**: PR-Agent and Linear sync run automatically
-6. **Merge**: After addressing feedback, merge PR (Linear issue auto-closes)
+A git pre-commit hook is installed to prevent this. Follow this workflow:
 
-**When to use this workflow:**
+### Required Steps for All Non-Trivial Work
+
+1. **Create Feature Branch FIRST**
+   ```bash
+   git checkout -b qui-XXX-short-description
+   ```
+   Branch naming: Linear's format (`qui-XX-short-description`, lowercase, hyphens)
+
+2. **Implement & Commit**
+   - Make changes on feature branch
+   - Commit with clear messages
+   - Multiple commits are fine
+
+3. **Push & Create PR**
+   ```bash
+   git push -u origin qui-XXX-short-description
+   gh pr create --title "..." --body "Closes QUI-XXX\n\n[description]"
+   ```
+   - Include `Closes QUI-XXX` in PR body
+   - PR-Agent will auto-review
+   - Linear issue auto-updates to "In Review"
+
+4. **Merge After Review**
+   - Address any PR-Agent feedback
+   - Merge when ready (Linear issue auto-closes)
+
+### When to Use This Workflow
+
+**ALWAYS use for:**
 - New features or significant changes
 - Bug fixes requiring testing
 - Refactoring touching multiple files
 - Anything that benefits from code review
+- **Any work on Linear issues**
 
-**When to skip:**
-- Trivial changes (typos, minor tweaks)
-- Documentation-only updates
-- Emergency hotfixes explicitly requested
+**Can skip ONLY for:**
+- Trivial typo fixes in documentation
+- Emergency hotfixes explicitly requested by user
 
-**Automation in place:**
+### Automation in Place
+
+- **Git Hook**: Blocks commits to `main` (`.git/hooks/pre-commit`)
 - **PR-Agent**: AI code review with Claude Sonnet 4.5 (`.github/workflows/pr-agent.yml`)
 - **Linear Sync**: Auto-updates issue to "In Review" when PR opens (`.github/workflows/linear-sync.yml`)
 - **GitHub Webhook**: Auto-links commits and closes issues via magic words (`Fixes/Closes QUI-XX`)
