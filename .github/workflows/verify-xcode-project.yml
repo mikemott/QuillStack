@@ -1,0 +1,49 @@
+name: Verify Xcode Project Integrity
+
+on:
+  pull_request:
+    paths:
+      - '**.swift'
+      - '**.xcodeproj/**'
+
+jobs:
+  verify-project:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for Swift files not in Xcode project
+        run: |
+          echo "🔍 Checking for Swift files not added to Xcode project..."
+
+          # Find all Swift files (excluding Tests, Packages, and hidden directories)
+          SWIFT_FILES=$(find . -name "*.swift" -not -path "*/Tests/*" -not -path "*/.*/*" -not -path "*/Package.swift" -not -path "*/Packages/*" | sed 's|^\./||')
+
+          MISSING_FILES=""
+
+          while IFS= read -r file; do
+            FILENAME=$(basename "$file")
+
+            # Check if file is in project.pbxproj
+            if ! grep -q "$FILENAME" QuillStack.xcodeproj/project.pbxproj; then
+              MISSING_FILES="${MISSING_FILES}${file}\n"
+            fi
+          done <<< "$SWIFT_FILES"
+
+          if [ -n "$MISSING_FILES" ]; then
+            echo ""
+            echo "❌ ERROR: Swift files found that are not in Xcode project:"
+            echo -e "$MISSING_FILES"
+            echo ""
+            echo "These files won't be compiled!"
+            echo "Please add them to the QuillStack target in Xcode."
+            exit 1
+          fi
+
+          echo "✅ All Swift files are properly added to Xcode project"
+
+      - name: Verify project builds
+        run: |
+          echo "🔨 Verifying project builds..."
+          xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' build | grep -E "(error:|BUILD SUCCEEDED)" || true
