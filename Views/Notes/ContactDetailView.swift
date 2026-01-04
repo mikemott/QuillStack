@@ -15,6 +15,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveSheet = false
     @State private var saveSuccess = false
     @State private var errorMessage: String?
+    @State private var showingTypePicker = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -26,7 +27,8 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                     title: contact.displayName.isEmpty ? "Contact" : contact.displayName,
                     date: note.createdAt,
                     noteType: "contact",
-                    onBack: { dismiss() }
+                    onBack: { dismiss() },
+                    classification: note.classification
                 )
 
                 ScrollView {
@@ -64,6 +66,9 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
             Button("OK") { }
         } message: {
             Text(errorMessage ?? "")
+        }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
         }
     }
 
@@ -205,6 +210,14 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
 
     private var bottomBar: some View {
         HStack(spacing: 16) {
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
+
             Button(action: shareContact) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))

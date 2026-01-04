@@ -55,9 +55,77 @@ struct ParsedContact: Codable, Sendable {
 /// Service for parsing contact information from text content
 struct ContactParser {
 
+    // MARK: - LLM-Powered Extraction
+
+    /// Parse contact information using LLM (Phase 2.1)
+    /// - Parameter content: The text content to parse (e.g., business card OCR text)
+    /// - Returns: ExtractedContact with structured data, or nil if extraction fails
+    static func parseWithLLM(_ content: String) async throws -> ExtractedContact? {
+        let prompt = """
+        Extract contact information from this business card text.
+        Return ONLY valid JSON with this exact structure:
+        {
+            "name": "Full Name" or null,
+            "firstName": "First Name" or null,
+            "lastName": "Last Name" or null,
+            "phone": "Phone number" or null,
+            "email": "Email address" or null,
+            "company": "Company name" or null,
+            "title": "Job title" or null,
+            "address": "Full address" or null,
+            "website": "Website URL" or null,
+            "notes": "Any additional notes" or null
+        }
+
+        Rules:
+        - Extract what you can confidently identify
+        - Use null for missing fields
+        - Preserve formatting for phone/address
+        - If unsure, use null rather than guessing
+
+        Text:
+        \(content)
+        """
+
+        // Use LLMService to perform the extraction
+        guard let response = try? await LLMService.shared.performAPIRequest(
+            prompt: prompt,
+            maxTokens: 300
+        ) else {
+            return nil
+        }
+
+        // Try to parse JSON response
+        let jsonData = Data(response.utf8)
+
+        // Decode the ExtractedContact
+        let decoder = JSONDecoder()
+        do {
+            let contact = try decoder.decode(ExtractedContact.self, from: jsonData)
+            return contact
+        } catch {
+            // If JSON parsing fails, return nil and fall back to heuristic parsing
+            print("Failed to decode LLM contact extraction: \(error)")
+            return nil
+        }
+    }
+
+    /// Parse contact with LLM first, fallback to heuristics
+    /// - Parameter content: The text content to parse
+    /// - Returns: ParsedContact with best available extraction
+    static func parseWithFallback(_ content: String) async -> ParsedContact {
+        // Try LLM extraction first
+        if let extracted = try? await parseWithLLM(content) {
+            return extracted.toParsedContact()
+        }
+
+        // Fallback to heuristic parsing
+        return parse(content)
+    }
+
     // MARK: - Main Parsing
 
-    /// Parse text content into a structured contact
+    /// Parse text content into a structured contact (heuristic-based)
     static func parse(_ content: String) -> ParsedContact {
         var contact = ParsedContact()
         let lines = content

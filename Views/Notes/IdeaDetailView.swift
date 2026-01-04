@@ -16,6 +16,7 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
     @State private var expandError: String?
     @State private var showingExpandSheet: Bool = false
     @State private var showingExportSheet: Bool = false
+    @State private var showingTypePicker = false
     @State private var tags: [String] = []
     @State private var newTag: String = ""
     @ObservedObject private var settings = SettingsManager.shared
@@ -65,6 +66,9 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
         .sheet(isPresented: $showingExportSheet) {
             ExportSheet(note: note)
                 .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
         }
     }
 
@@ -229,6 +233,11 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
 
                 Spacer()
 
+                // Classification badge (only for automatic classifications)
+                if note.classification.method.isAutomatic {
+                    ClassificationBadge(classification: note.classification)
+                }
+
                 noteTypeBadge
             }
             .padding(.horizontal, 16)
@@ -271,6 +280,14 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
 
     private var bottomBar: some View {
         HStack(spacing: 20) {
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
+
             // Expand with AI (main action)
             if settings.hasAPIKey {
                 Button(action: { showingExpandSheet = true }) {
