@@ -14,6 +14,15 @@ struct EventExtractor {
     // MARK: - LLM-Powered Extraction
     
     /// Extract event information from text using LLM
+    /// 
+    /// **Security:**
+    /// Content is automatically sanitized by LLMService.performAPIRequest() to redact
+    /// sensitive patterns (credit cards, SSNs, API keys, passwords) before sending to external API.
+    /// 
+    /// **Input Validation:**
+    /// Content is sent as-is to LLM. For size limits and prompt injection mitigation,
+    /// see LLMService and ContentSanitizer implementations.
+    /// 
     /// - Parameter content: The text content to extract from
     /// - Returns: Extracted event data
     /// - Throws: EventExtractionError if extraction fails
@@ -80,17 +89,34 @@ struct EventExtractor {
         )
     }
     
-    /// Hybrid approach: Try LLM first, fall back to MeetingParser heuristics
-    static func extractHybrid(_ content: String) async -> ExtractedEvent? {
+    /// Hybrid approach: Try LLM first, fall back to heuristics
+    /// 
+    /// **Error Handling:**
+    /// - Recoverable errors (invalidResponse, parsingFailed): Falls back to heuristics
+    /// - Critical errors (noAPIKey, network issues): Re-thrown to notify caller
+    /// 
+    /// **Security Note:**
+    /// Content is sanitized by LLMService.performAPIRequest() before sending to external API.
+    /// See ContentSanitizer for details on sensitive data redaction.
+    static func extractHybrid(_ content: String) async throws -> ExtractedEvent? {
         // Try LLM first
-        if let llmEvent = try? await extract(content),
-           llmEvent.hasMinimumData {
-            return llmEvent
+        do {
+            let llmEvent = try await extract(content)
+            if llmEvent.hasMinimumData {
+                return llmEvent
+            }
+            // LLM succeeded but didn't extract minimum data, fall through to heuristics
+        } catch let error as EventExtractionError 
+            where error == .invalidResponse || error == .parsingFailed {
+            // Recoverable errors: fall back to heuristic parser
+            // Log for debugging but don't surface to user
+            print("LLM extraction failed, falling back to heuristic parser. Error: \(error.localizedDescription ?? "Unknown")")
+        } catch {
+            // Critical errors (noAPIKey, network issues): re-throw to notify caller
+            throw error
         }
         
-        // Fall back to MeetingParser for basic extraction
-        // Note: MeetingParser is for meetings, but can extract basic event info
-        // This is a simple fallback - could be enhanced
+        // Fall back to heuristic extraction
         return extractFromHeuristics(content)
     }
     
