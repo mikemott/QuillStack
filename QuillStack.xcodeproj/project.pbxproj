@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9EA67A6CF5A565BEFAF80853 /* ClassificationTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */; };
+		62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */; };
+		01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
 		0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C42B046C56E7232F89EB98 /* DateParsingService.swift */; };
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
@@ -340,7 +343,6 @@
 		1648B2EAC34857DA5373F705 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				260A9FD53AA7803074EF3E36 /* Debug */,
 				9B1018A4B00B3AD22B9A2F4D /* Components */,
 			);
 			name = Views;
@@ -425,6 +427,7 @@
 		2796C17E2EEB545100E05291 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				260A9FD53AA7803074EF3E36 /* Debug */,
 				2796C1C52EEB590000E05291 /* Tasks */,
 				2796C1842EEB548300E05291 /* Meetings */,
 				2796C1832EEB547E00E05291 /* Notes */,
