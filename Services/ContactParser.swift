@@ -58,9 +58,23 @@ struct ContactParser {
     // MARK: - LLM-Powered Extraction
 
     /// Parse contact information using LLM (Phase 2.1)
+    ///
+    /// **Privacy & Consent:**
+    /// - Content is sent to Claude API for extraction (LLMService handles this)
+    /// - LLMService checks user consent via `hasAcceptedAIDisclosure` setting
+    /// - Content is sanitized by ContentSanitizer before API transmission
+    /// - User must explicitly opt-in to AI features in Settings
+    ///
     /// - Parameter content: The text content to parse (e.g., business card OCR text)
     /// - Returns: ExtractedContact with structured data, or nil if extraction fails
     static func parseWithLLM(_ content: String) async throws -> ExtractedContact? {
+        // Prevent excessive API costs from unusually large content
+        // Business cards should be <1000 chars; limit at 5000 (~1250 tokens)
+        guard content.count < 5000 else {
+            print("Content too large for LLM extraction (\(content.count) chars), falling back to heuristics")
+            return nil
+        }
+
         let prompt = """
         Extract contact information from this business card text.
         Return ONLY valid JSON with this exact structure:
@@ -88,10 +102,16 @@ struct ContactParser {
         """
 
         // Use LLMService to perform the extraction
-        guard let response = try? await LLMService.shared.performAPIRequest(
-            prompt: prompt,
-            maxTokens: 300
-        ) else {
+        // LLMService handles: API key validation, consent checks, content sanitization
+        let response: String
+        do {
+            response = try await LLMService.shared.performAPIRequest(
+                prompt: prompt,
+                maxTokens: 300
+            )
+        } catch {
+            // Log specific error for debugging (common: no API key, offline, rate limit)
+            print("LLM contact extraction failed: \(error.localizedDescription)")
             return nil
         }
 

@@ -39,7 +39,8 @@ class ClassificationAnalytics {
             Classification correction:
             - Original: \(originalType.rawValue) (\(originalMethod.rawValue), \(Int(originalConfidence * 100))%)
             - Corrected: \(correctedType.rawValue)
-            - Content preview: \(note.content.prefix(50))
+            - Content length: \(note.content.count) chars
+            - Content hash: \(note.content.hashValue)
             """)
 
         // In a production app, you might send this to analytics:
@@ -54,14 +55,18 @@ class ClassificationAnalytics {
     /// - Parameter context: Core Data context
     /// - Returns: Percentage of notes that were manually corrected (0.0-1.0)
     func getCorrectionRate(in context: NSManagedObjectContext) async -> Double {
-        let fetchRequest = Note.fetchRequest() as! NSFetchRequest<Note>
+        let fetchRequest = Note.fetchRequest()
 
         do {
-            let allNotes = try context.fetch(fetchRequest)
-            guard !allNotes.isEmpty else { return 0.0 }
+            // Get total count without fetching all objects (more efficient)
+            let totalCount = try context.count(for: fetchRequest)
+            guard totalCount > 0 else { return 0.0 }
 
-            let correctedNotes = allNotes.filter { $0.classificationMethod == "manual" }
-            return Double(correctedNotes.count) / Double(allNotes.count)
+            // Get count of manually corrected notes
+            fetchRequest.predicate = NSPredicate(format: "classificationMethod == %@", "manual")
+            let correctedCount = try context.count(for: fetchRequest)
+
+            return Double(correctedCount) / Double(totalCount)
         } catch {
             logger.error("Failed to fetch notes for correction rate: \(error.localizedDescription)")
             return 0.0
