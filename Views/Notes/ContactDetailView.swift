@@ -16,7 +16,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     @State private var saveSuccess = false
     @State private var errorMessage: String?
     @State private var showingTypePicker = false
-    @State private var contactsAccessDenied = false
+    @State private var isContactsAccessDenied = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -67,10 +67,15 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
         )) {
-            if contactsAccessDenied {
+            if isContactsAccessDenied {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
+                        UIApplication.shared.open(url, options: [:]) { success in
+                            if !success {
+                                // Settings app failed to open - this is rare but handle gracefully
+                                // User can manually navigate to Settings if needed
+                            }
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -273,7 +278,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 )
                 .cornerRadius(10)
             }
-            .disabled(contact.displayName.isEmpty || contactsAccessDenied)
+            .disabled(contact.displayName.isEmpty || isContactsAccessDenied)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -326,7 +331,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     private func checkContactsAccess() {
         let contactsService = ContactsService.shared
         let status = contactsService.authorizationStatus
-        contactsAccessDenied = (status == .denied || status == .restricted)
+        isContactsAccessDenied = (status == .denied || status == .restricted)
     }
 
     private func saveToContacts() {
@@ -339,14 +344,14 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 let granted = await contactsService.requestAccess()
                 if !granted {
                     await MainActor.run {
-                        contactsAccessDenied = true
+                        isContactsAccessDenied = true
                         errorMessage = "Please enable Contacts access in Settings."
                     }
                     return
                 }
             } else if status == .denied || status == .restricted {
                 await MainActor.run {
-                    contactsAccessDenied = true
+                    isContactsAccessDenied = true
                     errorMessage = "Contacts access is required. Please enable it in Settings."
                 }
                 return
@@ -354,7 +359,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
             
             // Update access denied state if we got here (access granted)
             await MainActor.run {
-                contactsAccessDenied = false
+                isContactsAccessDenied = false
             }
             
             // Create and save contact
