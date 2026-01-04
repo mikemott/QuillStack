@@ -15,6 +15,7 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     @State private var showingExportSheet: Bool = false
     @State private var showingSummarySheet: Bool = false
     @State private var showingRemindersSheet: Bool = false
+    @State private var showingTypePicker: Bool = false
     @FocusState private var isAddingTask: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -36,7 +37,8 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
                     noteType: "todo",
                     onBack: { dismiss() },
                     completedCount: completedCount,
-                    totalCount: tasks.count
+                    totalCount: tasks.count,
+                    classification: note.classification
                 )
 
                 // Task list
@@ -79,6 +81,9 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
             ExportToRemindersSheet(tasks: tasks)
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
+        }
     }
 
     // MARK: - Add Task Row
@@ -112,6 +117,11 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
             aiActions: DetailBottomBar.summarizeOnlyAIActions(
                 onSummarize: { showingSummarySheet = true }
             ),
+            customActions: [
+                DetailAction(icon: "arrow.left.arrow.right.circle") {
+                    showingTypePicker = true
+                }
+            ],
             primaryAction: DetailAction(
                 icon: "checklist",
                 color: .badgeTodo

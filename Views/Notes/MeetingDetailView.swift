@@ -137,6 +137,7 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
     @State private var showingCreateEventSheet = false
     @State private var showingEventPicker = false
     @State private var showingSummarySheet = false
+    @State private var showingTypePicker = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -150,7 +151,8 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
                     title: "Meeting",
                     date: note.createdAt,
                     noteType: "meeting",
-                    onBack: { dismiss() }
+                    onBack: { dismiss() },
+                    classification: note.classification
                 )
 
                 // Content
@@ -220,6 +222,9 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
         .sheet(isPresented: $showingSummarySheet) {
             SummarySheet(note: note)
                 .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
         }
     }
 
@@ -414,6 +419,14 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
                         .foregroundColor(.forestDark)
                 }
             }
+
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
 
             // Export
             Button(action: { showingExportSheet = true }) {

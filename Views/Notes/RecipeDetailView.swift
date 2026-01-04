@@ -15,6 +15,7 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
     @State private var servingsMultiplier: Double = 1.0
     @State private var showingExportSheet: Bool = false
     @State private var showingShareSheet: Bool = false
+    @State private var showingTypePicker = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -53,6 +54,9 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
             ExportIngredientsSheet(ingredients: scaledIngredients, recipeTitle: recipe.title)
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
+        }
     }
 
     // MARK: - Header
@@ -72,6 +76,11 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
                     .lineLimit(1)
 
                 Spacer()
+
+                // Classification badge (only for automatic classifications)
+                if note.classification.method.isAutomatic {
+                    ClassificationBadge(classification: note.classification)
+                }
 
                 HStack(spacing: 4) {
                     Image(systemName: "fork.knife")
@@ -328,6 +337,14 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
 
     private var bottomBar: some View {
         HStack(spacing: 20) {
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
+
             Button(action: shareRecipe) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))

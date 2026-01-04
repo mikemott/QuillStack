@@ -18,6 +18,7 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
     @State private var showingDatePicker: Bool = false
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
+    @State private var showingTypePicker = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -29,7 +30,8 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
                     title: "Reminder",
                     date: note.createdAt,
                     noteType: "reminder",
-                    onBack: { dismiss() }
+                    onBack: { dismiss() },
+                    classification: note.classification
                 )
 
                 ScrollView {
@@ -120,12 +122,23 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
         } message: {
             Text(saveErrorMessage)
         }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
+        }
     }
 
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
         HStack(spacing: 20) {
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
+
             Button(action: shareNote) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))

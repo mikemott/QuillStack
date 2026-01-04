@@ -289,7 +289,7 @@ final class CameraViewModel {
 
             note.ocrConfidence = avgConfidence
             note.ocrResultData = ocrResultData
-            note.captureSource = "camera"
+            // note.captureSource = "camera" // TODO: Add this field to Note model
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData
