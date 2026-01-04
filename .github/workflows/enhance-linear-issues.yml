@@ -7,6 +7,10 @@ on:
   workflow_dispatch:
     # Allow manual trigger
 
+concurrency:
+  group: 'enhance-short-linear-issues'
+  cancel-in-progress: true
+
 jobs:
   enhance-issues:
     runs-on: ubuntu-latest
