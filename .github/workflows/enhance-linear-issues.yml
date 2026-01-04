@@ -1,9 +1,12 @@
 name: Enhance Short Linear Issues
 
 on:
+  repository_dispatch:
+    # Triggered by Linear webhooks when issues are created/updated
+    types: [linear-issue-created, linear-issue-updated]
   schedule:
-    # Run every 2 hours
-    - cron: '0 */2 * * *'
+    # Daily backup check at 8am UTC to catch any missed issues
+    - cron: '0 8 * * *'
   workflow_dispatch:
     # Allow manual trigger
 
