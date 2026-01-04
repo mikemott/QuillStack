@@ -46,4 +46,15 @@ jobs:
       - name: Verify project builds
         run: |
           echo "🔨 Verifying project builds..."
-          xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' build | grep -E "(error:|BUILD SUCCEEDED)" || true
+          set -o pipefail
+
+          # Run build and capture output
+          if xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' build 2>&1 | tee build.log; then
+            echo "✅ Build succeeded"
+          else
+            echo "❌ Build failed"
+            echo ""
+            echo "Errors:"
+            grep -E "error:" build.log || echo "No specific errors found in log"
+            exit 1
+          fi
