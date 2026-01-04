@@ -197,8 +197,12 @@ struct ClassificationTestResults {
 class ClassificationAccuracyTester {
     private let classifier: TextClassifierProtocol
 
-    init(classifier: TextClassifierProtocol = TextClassifier()) {
+    init(classifier: TextClassifierProtocol) {
         self.classifier = classifier
+    }
+
+    convenience init() {
+        self.init(classifier: TextClassifier())
     }
 
     /// Run all tests and return results
