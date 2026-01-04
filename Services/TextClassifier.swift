@@ -14,11 +14,13 @@ import UIKit
 final class TextClassifier: TextClassifierProtocol {
     
     // MARK: - LLM Classification Cache
-    
-    /// Cache for LLM classification results to avoid redundant API calls
+
+    /// In-memory cache for LLM classification results to avoid redundant API calls
+    /// Note: This is a session cache. For persistent caching, use Note.llmClassificationCache field.
+    /// The Core Data field is used when saving notes, while this in-memory cache is for the current session.
     private var classificationCache: [String: NoteClassification] = [:]
     private let cacheMaxSize = 100
-    
+
     /// Clear old cache entries when limit reached
     private func maintainCache() {
         if classificationCache.count > cacheMaxSize {
@@ -133,49 +135,69 @@ final class TextClassifier: TextClassifierProtocol {
     }
     
     // MARK: - LLM Classification
-    
+
     /// Classifies note content using LLM
-    /// Returns nil if LLM classification fails (network error, invalid response, etc.)
+    /// Returns nil if LLM classification fails (network error, invalid response, rate limited, etc.)
     private func classifyWithLLM(_ text: String) async -> NoteClassification? {
-        // Check if LLM service is available (has API key)
+        // 1. Check network availability first (offline fallback)
+        guard NetworkAvailability.shared.isNetworkAvailable else {
+            return nil // Fall back to heuristics when offline
+        }
+
+        // 2. Check rate limits to prevent excessive API costs
+        guard LLMRateLimiter.shared.canMakeCall() else {
+            return nil // Fall back to heuristics when rate limited
+        }
+
+        // 3. Check if LLM service is available (has API key)
         let settings = await SettingsManager.shared
         guard let apiKey = await settings.claudeAPIKey, !apiKey.isEmpty else {
             return nil // Fall back to heuristics
         }
-        
-        // Skip LLM for very short text (likely noise)
+
+        // 4. Skip LLM for very short text (likely noise)
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.count < 10 {
             return nil
         }
-        
-        // Build classification prompt
+
+        // 5. Build classification prompt
         let prompt = buildClassificationPrompt(text: trimmed)
-        
+
         do {
             // Call LLM with short response (just type name)
             let response = try await LLMService.shared.performAPIRequest(
                 prompt: prompt,
                 maxTokens: 20
             )
-            
+
+            // Record successful call for rate limiting
+            LLMRateLimiter.shared.recordCall()
+
             // Parse response - should be just a type name
             let typeName = response
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .lowercased()
                 .replacingOccurrences(of: ".", with: "") // Remove trailing periods
-            
+                .replacingOccurrences(of: "\"", with: "") // Remove quotes
+                .replacingOccurrences(of: "'", with: "") // Remove single quotes
+
             // Map to NoteType
             guard let noteType = NoteType(rawValue: typeName) else {
                 // Invalid response - try to extract type from response
-                return extractTypeFromLLMResponse(response)
+                if let extracted = extractTypeFromLLMResponse(response) {
+                    return extracted
+                }
+                // If extraction fails, return nil to fall back to heuristics
+                return nil
             }
-            
+
             // Return LLM classification with high confidence
             return .llm(noteType, confidence: 0.85, reasoning: "LLM classification")
-            
+
         } catch {
             // LLM call failed - fall back to heuristics
+            // Don't record call since it failed
             return nil
         }
     }

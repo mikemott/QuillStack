@@ -26,6 +26,8 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var classificationConfidence: Double // 0.0 to 1.0
     @NSManaged public var classificationMethod: String? // "explicit", "llm", "heuristic", etc.
     @NSManaged public var extractedDataJSON: String? // JSON-encoded extracted data (Contact, Event, Todo)
+    @NSManaged public var llmClassificationCache: String? // Cached LLM classification result
+    @NSManaged public var originalClassificationType: String? // Original type before manual correction
 
     // Relationships
     @NSManaged public var todoItems: NSSet?
@@ -55,6 +57,8 @@ public class Note: NSManagedObject, Identifiable {
         classificationConfidence = 0.0
         classificationMethod = nil
         extractedDataJSON = nil
+        llmClassificationCache = nil
+        originalClassificationType = nil
     }
 }
 
