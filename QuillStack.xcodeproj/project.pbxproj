@@ -336,6 +336,7 @@
 		1648B2EAC34857DA5373F705 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				260A9FD53AA7803074EF3E36 /* Debug */,
 				9B1018A4B00B3AD22B9A2F4D /* Components */,
 			);
 			name = Views;
@@ -793,6 +794,8 @@
 		T003000000000001 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */,
+				C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */,
 				T002000000000001 /* TextClassifierTests.swift */,
 				T002000000000002 /* DetailBottomBarTests.swift */,
 				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
@@ -934,6 +937,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EA67A6CF5A565BEFAF80853 /* ClassificationTestCases.swift in Sources */,
+				62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */,
+				01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */,
 				061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */,
 				29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */,
 				546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */,

@@ -396,6 +396,31 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     }
 
     private func parseEventContent() {
+        // First, try to load from extractedDataJSON if available
+        if let extractedJSON = note.extractedDataJSON,
+           let jsonData = extractedJSON.data(using: .utf8),
+           let extractedEvent = try? JSONDecoder().decode(ExtractedEvent.self, from: jsonData) {
+            // Populate fields from extracted event
+            eventTitle = extractedEvent.title
+            location = extractedEvent.location ?? ""
+            eventNotes = extractedEvent.description ?? ""
+            
+            // Parse date/time
+            if let parsedDateTime = extractedEvent.parsedDateTime {
+                eventDate = parsedDateTime
+                let calendar = Calendar.current
+                let components = calendar.dateComponents([.hour, .minute], from: parsedDateTime)
+                if components.hour != nil || components.minute != nil {
+                    hasTime = true
+                    eventTime = parsedDateTime
+                } else {
+                    hasTime = false
+                }
+            }
+            return
+        }
+        
+        // Fall back to parsing from content
         let classifier = TextClassifier()
         let content: String
         if let extracted = classifier.extractTriggerTag(from: note.content) {

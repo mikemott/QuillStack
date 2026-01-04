@@ -147,6 +147,18 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     }
 
     private func parseTasks() {
+        // First, try to load from extractedDataJSON if available
+        if let extractedJSON = note.extractedDataJSON,
+           let jsonData = extractedJSON.data(using: .utf8),
+           let extractedTodos = try? JSONDecoder().decode([ExtractedTodo].self, from: jsonData) {
+            // Convert ExtractedTodo to ParsedTask
+            tasks = extractedTodos.map { todo in
+                ParsedTask(text: todo.text, isCompleted: todo.isCompleted)
+            }
+            return
+        }
+        
+        // Fall back to parsing from content
         let classifier = TextClassifier()
         let content: String
         if let extracted = classifier.extractTriggerTag(from: note.content) {
