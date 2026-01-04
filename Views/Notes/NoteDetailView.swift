@@ -21,7 +21,6 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
     @State private var enhanceError: String?
     @State private var hasPendingEnhancement: Bool = false
     @State private var saveTask: Task<Void, Never>?
-    @State private var showingTypePicker = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -42,8 +41,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     onBack: { dismiss() },
                     wordCount: wordCount,
                     ocrConfidence: note.ocrConfidence,
-                    hasPendingEnhancement: hasPendingEnhancement,
-                    classification: note.classification
+                    hasPendingEnhancement: hasPendingEnhancement
                 )
 
                 // Content area - always editable
@@ -104,9 +102,6 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
         }
         .fullScreenCover(isPresented: $showingPageNavigator) {
             PageNavigatorView(note: note)
-        }
-        .sheet(isPresented: $showingTypePicker) {
-            NoteTypePickerSheet(note: note)
         }
     }
 
@@ -179,14 +174,6 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                         .foregroundColor(.forestDark)
                 }
             }
-
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
 
             // Multi-page menu
             Menu {

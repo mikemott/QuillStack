@@ -27,9 +27,6 @@ struct DetailHeader: View {
     var hasPendingEnhancement: Bool = false
     var customLabel: String? = nil
 
-    // Optional classification info
-    var classification: NoteClassification? = nil
-
     var body: some View {
         VStack(spacing: 0) {
             // Top row: back, title, badge
@@ -51,12 +48,6 @@ struct DetailHeader: View {
                 // Pending enhancement indicator
                 if hasPendingEnhancement {
                     PendingEnhancementBadge()
-                }
-
-                // Classification confidence badge (if available and automatic)
-                if let classification = classification,
-                   classification.method.isAutomatic {
-                    ClassificationBadge(classification: classification)
                 }
 
                 noteTypeBadge

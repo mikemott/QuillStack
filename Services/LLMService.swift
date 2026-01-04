@@ -67,11 +67,10 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
         }
     }
 
-    // MARK: - Internal API Helper
+    // MARK: - Private API Helper
 
     /// Unified API request handler - eliminates code duplication
-    /// Internal visibility allows TextClassifier to use this for LLM classification
-    func performAPIRequest(prompt: String, maxTokens: Int) async throws -> String {
+    private func performAPIRequest(prompt: String, maxTokens: Int) async throws -> String {
         // Check network connectivity first
         let offlineQueue = await OfflineQueueService.shared
         guard await offlineQueue.isOnline else {
