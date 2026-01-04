@@ -327,7 +327,6 @@ struct RecommendationRow: View {
     }
 }
 
-#if DEBUG
 #Preview {
     NavigationStack {
         ClassificationTestView()
