@@ -254,34 +254,32 @@ struct ClassificationTestView: View {
         logText = "Starting tests...\n"
         results = nil
 
-        Task {
+        Task { @MainActor in
             let tester = ClassificationAccuracyTester()
             let testResults = await tester.runAllTests()
 
-            await MainActor.run {
-                results = testResults
-                isRunning = false
+            results = testResults
+            isRunning = false
 
-                // Generate log output
-                var log = ""
-                log += "Completed \(testResults.totalTests) tests\n"
-                log += "Accuracy: \(String(format: "%.1f%%", testResults.accuracy * 100))\n\n"
+            // Generate log output
+            var log = ""
+            log += "Completed \(testResults.totalTests) tests\n"
+            log += "Accuracy: \(String(format: "%.1f%%", testResults.accuracy * 100))\n\n"
 
-                if !testResults.failures.isEmpty {
-                    log += "Failures:\n"
-                    for failure in testResults.failures.prefix(5) {
-                        log += "  - \(failure.testCase.id): expected \(failure.testCase.expectedType.rawValue), got \(failure.actualType.rawValue)\n"
-                    }
-                    if testResults.failures.count > 5 {
-                        log += "  ... and \(testResults.failures.count - 5) more\n"
-                    }
+            if !testResults.failures.isEmpty {
+                log += "Failures:\n"
+                for failure in testResults.failures.prefix(5) {
+                    log += "  - \(failure.testCase.id): expected \(failure.testCase.expectedType.rawValue), got \(failure.actualType.rawValue)\n"
                 }
-
-                logText = log
-
-                // Also print to console for debugging
-                testResults.printReport()
+                if testResults.failures.count > 5 {
+                    log += "  ... and \(testResults.failures.count - 5) more\n"
+                }
             }
+
+            logText = log
+
+            // Also print to console for debugging
+            testResults.printReport()
         }
     }
 
