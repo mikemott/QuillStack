@@ -1258,6 +1258,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1299,6 +1301,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
