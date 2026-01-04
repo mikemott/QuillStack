@@ -282,6 +282,21 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     // MARK: - Parsing
 
     private func parseContent() {
+        // First, try to load from extractedDataJSON if available
+        if let extractedJSON = note.extractedDataJSON,
+           let jsonData = extractedJSON.data(using: .utf8) {
+            do {
+                let extractedContact = try JSONDecoder().decode(ParsedContact.self, from: jsonData)
+                contact = extractedContact
+                return
+            } catch {
+                // Log JSON decoding error for debugging, but fall back gracefully
+                // Don't expose error details to user - just use fallback parsing
+                print("Failed to decode extractedDataJSON for contact: \(error.localizedDescription)")
+            }
+        }
+        
+        // Fall back to parsing from content
         let classifier = TextClassifier()
         let content: String
         if let extracted = classifier.extractTriggerTag(from: note.content) {
@@ -296,79 +311,43 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     // MARK: - Actions
 
     private func saveToContacts() {
-        let store = CNContactStore()
-
-        store.requestAccess(for: .contacts) { granted, error in
-            DispatchQueue.main.async {
-                if granted {
-                    self.createContact(store: store)
-                } else {
-                    self.errorMessage = "Please enable Contacts access in Settings."
+        Task {
+            let contactsService = ContactsService.shared
+            
+            // Check authorization
+            let status = contactsService.authorizationStatus
+            if status == .notDetermined {
+                let granted = await contactsService.requestAccess()
+                if !granted {
+                    await MainActor.run {
+                        errorMessage = "Please enable Contacts access in Settings."
+                    }
+                    return
+                }
+            } else if status == .denied || status == .restricted {
+                await MainActor.run {
+                    errorMessage = "Contacts access is required. Please enable it in Settings."
+                }
+                return
+            }
+            
+            // Create and save contact
+            do {
+                _ = try contactsService.createContact(from: contact)
+                await MainActor.run {
+                    saveSuccess = true
+                }
+            } catch let error as ContactsError {
+                await MainActor.run {
+                    // Use user-facing message (sanitized, no system details)
+                    errorMessage = error.userFacingMessage
+                }
+            } catch {
+                await MainActor.run {
+                    // Generic fallback for unexpected errors
+                    errorMessage = "Unable to save contact. Please try again."
                 }
             }
-        }
-    }
-
-    private func createContact(store: CNContactStore) {
-        let cnContact = CNMutableContact()
-
-        cnContact.givenName = contact.firstName
-        cnContact.familyName = contact.lastName
-        cnContact.organizationName = contact.company
-        cnContact.jobTitle = contact.jobTitle
-
-        if !contact.phone.isEmpty {
-            cnContact.phoneNumbers = [CNLabeledValue(
-                label: CNLabelPhoneNumberMain,
-                value: CNPhoneNumber(stringValue: contact.phone)
-            )]
-        }
-
-        if !contact.email.isEmpty {
-            cnContact.emailAddresses = [CNLabeledValue(
-                label: CNLabelWork,
-                value: contact.email as NSString
-            )]
-        }
-
-        if !contact.website.isEmpty {
-            var urlString = contact.website
-            if !urlString.hasPrefix("http://") && !urlString.hasPrefix("https://") {
-                urlString = "https://" + urlString
-            }
-            cnContact.urlAddresses = [CNLabeledValue(
-                label: CNLabelWork,
-                value: urlString as NSString
-            )]
-        }
-
-        // Add postal address if any address fields are filled
-        if contact.hasAddress {
-            let address = CNMutablePostalAddress()
-            address.street = contact.streetAddress
-            address.city = contact.city
-            address.state = contact.state
-            address.postalCode = contact.zipCode
-            address.country = "USA"
-
-            cnContact.postalAddresses = [CNLabeledValue(
-                label: CNLabelWork,
-                value: address
-            )]
-        }
-
-        if !contact.notes.isEmpty {
-            cnContact.note = contact.notes
-        }
-
-        let saveRequest = CNSaveRequest()
-        saveRequest.add(cnContact, toContainerWithIdentifier: nil)
-
-        do {
-            try store.execute(saveRequest)
-            saveSuccess = true
-        } catch {
-            errorMessage = error.localizedDescription
         }
     }
 

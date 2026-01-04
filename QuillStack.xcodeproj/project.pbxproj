@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
 		0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C42B046C56E7232F89EB98 /* DateParsingService.swift */; };
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
@@ -50,6 +51,8 @@
 		546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */; };
 		546F2F8E7516FB2AB0B1A1EF /* NoteClassification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07232297C49D5ED086A1E66A /* NoteClassification.swift */; };
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
+		62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */; };
+		7323932D06013BF9820E3792 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF65609DDFA199412CB81D3 /* ContactsService.swift */; };
 		76196027B23F99473691C734 /* LLMCostTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */; };
 		7BBA236D7D0C755FFF969A3A /* NoteTypePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */; };
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
@@ -57,6 +60,7 @@
 		913ADB2ED128AEA3957A143B /* ClassificationAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */; };
 		9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60271B88FC8F3E46581FB9B5 /* NoteType.swift */; };
 		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
+		9EA67A6CF5A565BEFAF80853 /* ClassificationTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */; };
 		A00952A62E5A5F4244EC6F42 /* ExtractedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28251EDDBAFBF35904F5BA9 /* ExtractedEvent.swift */; };
 		A1F6BB9C2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */; };
 		A1F6BBA32F1CFA3A00A1C9D1 /* VoiceCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */; };
@@ -204,12 +208,14 @@
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
+		6FF65609DDFA199412CB81D3 /* ContactsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactsService.swift; path = Services/ContactsService.swift; sourceTree = "<group>"; };
 		7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMCostTracker.swift; path = Services/LLMCostTracker.swift; sourceTree = "<group>"; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
 		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
+		A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationAccuracyTest.swift; sourceTree = "<group>"; };
 		A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoViewModel.swift; sourceTree = "<group>"; };
 		A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
 		A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionToast.swift; sourceTree = "<group>"; };
@@ -219,6 +225,7 @@
 		B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
 		BF6C22302ED7A73DFD1CA59A /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
 		C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocol.swift; sourceTree = "<group>"; };
+		C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationTestCases.swift; sourceTree = "<group>"; };
 		C7BD5FC36F48E960345EA0E8 /* LLMRateLimiter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMRateLimiter.swift; path = Services/LLMRateLimiter.swift; sourceTree = "<group>"; };
 		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
 		E002000000000001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
@@ -231,6 +238,7 @@
 		E002000000000008 /* ObsidianSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianSetupView.swift; sourceTree = "<group>"; };
 		E002000000000009 /* NotionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionSetupView.swift; sourceTree = "<group>"; };
 		E00200000000000A /* MeetingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDetailView.swift; sourceTree = "<group>"; };
+		E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationTestView.swift; sourceTree = "<group>"; };
 		E6CBC205145101FF179EBE6E /* TypeGuideView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeGuideView.swift; sourceTree = "<group>"; };
 		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedTodo.swift; path = ExtractedTodo.swift; sourceTree = "<group>"; };
@@ -350,6 +358,14 @@
 			name = Components;
 			sourceTree = "<group>";
 		};
+		260A9FD53AA7803074EF3E36 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		270730BA2F08062E00EAF60D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,6 +436,7 @@
 		2796C17E2EEB545100E05291 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				260A9FD53AA7803074EF3E36 /* Debug */,
 				2796C1C52EEB590000E05291 /* Tasks */,
 				2796C1842EEB548300E05291 /* Meetings */,
 				2796C1832EEB547E00E05291 /* Notes */,
@@ -631,6 +648,7 @@
 			isa = PBXGroup;
 			children = (
 				FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */,
+				6FF65609DDFA199412CB81D3 /* ContactsService.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -793,6 +811,8 @@
 		T003000000000001 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */,
+				C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */,
 				T002000000000001 /* TextClassifierTests.swift */,
 				T002000000000002 /* DetailBottomBarTests.swift */,
 				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
@@ -934,6 +954,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EA67A6CF5A565BEFAF80853 /* ClassificationTestCases.swift in Sources */,
+				62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */,
+				01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */,
 				061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */,
 				29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */,
 				546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */,
@@ -1074,6 +1097,7 @@
 				A00952A62E5A5F4244EC6F42 /* ExtractedEvent.swift in Sources */,
 				0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */,
 				3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */,
+				7323932D06013BF9820E3792 /* ContactsService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1234,6 +1258,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1275,6 +1301,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

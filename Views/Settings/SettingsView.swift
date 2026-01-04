@@ -1004,6 +1004,26 @@ struct SettingsView: View {
                     .foregroundColor(.forestDark)
                     .padding(16)
                 }
+
+                Divider()
+
+                // Classification accuracy test (DEBUG only - makes 40+ LLM API calls)
+                #if DEBUG
+                NavigationLink(destination: ClassificationTestView()) {
+                    HStack {
+                        Image(systemName: "chart.bar.fill")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("Classification Accuracy Test")
+                            .font(.serifBody(15, weight: .medium))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.secondary)
+                    }
+                    .foregroundColor(.forestDark)
+                    .padding(16)
+                }
+                #endif
             }
             .background(
                 LinearGradient(
