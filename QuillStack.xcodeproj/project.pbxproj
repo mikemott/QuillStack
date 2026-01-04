@@ -11,7 +11,6 @@
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
 		125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */; };
 		171D8FDF19DEB33AE9E56252 /* OCRServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */; };
-		2258C20A8E8E7123794D368F /* ExtractedContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6EFFEDA2BB62F2342A471C /* ExtractedContact.swift */; };
 		2796C1862EEB552B00E05291 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1852EEB552B00E05291 /* ContentView.swift */; };
 		2796C1892EEB554000E05291 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1882EEB554000E05291 /* QuillStackApp.swift */; };
 		2796C1A52EF0B20100E05291 /* SpellCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1A42EF0B20100E05291 /* SpellCorrector.swift */; };
@@ -217,7 +216,6 @@
 		BF6C22302ED7A73DFD1CA59A /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
 		C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocol.swift; sourceTree = "<group>"; };
 		C7BD5FC36F48E960345EA0E8 /* LLMRateLimiter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMRateLimiter.swift; path = Services/LLMRateLimiter.swift; sourceTree = "<group>"; };
-		CF6EFFEDA2BB62F2342A471C /* ExtractedContact.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedContact.swift; path = Models/ExtractedContact.swift; sourceTree = "<group>"; };
 		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
 		E002000000000001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
 		E002000000000002 /* ExportDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDestination.swift; sourceTree = "<group>"; };
@@ -607,7 +605,6 @@
 		84EA092AFF214C48F674EE9F /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				CF6EFFEDA2BB62F2342A471C /* ExtractedContact.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1056,7 +1053,6 @@
 				546F2F8E7516FB2AB0B1A1EF /* NoteClassification.swift in Sources */,
 				3BE2C1EC12DEBD683AF11821 /* ClassificationBadge.swift in Sources */,
 				3EDE6B3B9044C334344F6EF6 /* NoteTypePickerSheet.swift in Sources */,
-				2258C20A8E8E7123794D368F /* ExtractedContact.swift in Sources */,
 				913ADB2ED128AEA3957A143B /* ClassificationAnalytics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
