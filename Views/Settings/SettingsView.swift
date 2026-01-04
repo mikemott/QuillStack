@@ -82,7 +82,7 @@ struct SettingsView: View {
             .navigationBarHidden(true)
             .onAppear {
                 apiKeyInput = settings.claudeAPIKey ?? ""
-                betaCodeInput = settings.betaCode ?? ""
+                // betaCodeInput = settings.betaCode ?? "" // TODO: Beta code feature not implemented yet
                 learnedCorrectionCount = HandwritingLearningService.shared.correctionCount()
                 loadStorageInfo()
             }
@@ -187,6 +187,8 @@ struct SettingsView: View {
                 Divider()
 
                 // Beta Code Entry (Optional alternative to API key)
+                // TODO: Beta code feature not implemented yet - commenting out for now
+                /*
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Beta Access Code")
@@ -321,6 +323,7 @@ struct SettingsView: View {
 
                     Divider()
                 }
+                */
 
                 // Save & Test Button
                 HStack(spacing: 12) {
@@ -397,8 +400,8 @@ struct SettingsView: View {
                 }
                 .tint(.forestDark)
                 .padding(16)
-                .opacity(settings.canUseAIFeatures ? 1 : 0.5)
-                .disabled(!settings.canUseAIFeatures)
+                .opacity(settings.hasAPIKey ? 1 : 0.5)
+                .disabled(!settings.hasAPIKey)
             }
             .background(
                 LinearGradient(
@@ -1077,6 +1080,8 @@ struct SettingsView: View {
         apiTestResult = nil
     }
 
+    // TODO: Beta code feature not implemented yet
+    /*
     private func saveBetaCode() {
         settings.betaCode = betaCodeInput
         settings.useBetaAPIProxy = true
@@ -1103,6 +1108,7 @@ struct SettingsView: View {
         settings.betaCreditsRemaining = 0
         settings.betaCreditsTotal = 0
     }
+    */
 
     private func loadStorageInfo() {
         isCalculatingStorage = true

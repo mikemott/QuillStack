@@ -21,6 +21,7 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
     @State private var showingMailError = false
     @State private var showingExportSheet = false
     @State private var showingSummarySheet = false
+    @State private var showingTypePicker = false
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - NoteDetailViewProtocol
@@ -46,7 +47,8 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
                     date: note.createdAt,
                     noteType: "email",
                     onBack: { dismiss() },
-                    customLabel: "Draft"
+                    customLabel: "Draft",
+                    classification: note.classification
                 )
 
                 // Email fields
@@ -143,6 +145,9 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
             SummarySheet(note: note)
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
+        }
     }
 
     // MARK: - Email Field
@@ -200,6 +205,11 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
             aiActions: DetailBottomBar.summarizeOnlyAIActions(
                 onSummarize: { showingSummarySheet = true }
             ),
+            customActions: [
+                DetailAction(icon: "arrow.left.arrow.right.circle") {
+                    showingTypePicker = true
+                }
+            ],
             primaryAction: DetailAction(
                 icon: "paperplane.fill",
                 color: .badgeEmail

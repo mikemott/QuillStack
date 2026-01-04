@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Represents a section of content with a specific note type
 struct NoteSection {

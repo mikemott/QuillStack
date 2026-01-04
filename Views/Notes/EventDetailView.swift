@@ -28,6 +28,7 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     @State private var calendarAccessDenied: Bool = false
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
+    @State private var showingTypePicker = false
     @ObservedObject private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -164,6 +165,9 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         } message: {
             Text(saveErrorMessage)
         }
+        .sheet(isPresented: $showingTypePicker) {
+            NoteTypePickerSheet(note: note)
+        }
     }
 
     // MARK: - Header
@@ -183,6 +187,11 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                     .lineLimit(1)
 
                 Spacer()
+
+                // Classification badge (only for automatic classifications)
+                if note.classification.method.isAutomatic {
+                    ClassificationBadge(classification: note.classification)
+                }
 
                 // Badge
                 HStack(spacing: 4) {
@@ -255,6 +264,14 @@ struct EventDetailView: View, NoteDetailViewProtocol {
 
     private var bottomBar: some View {
         HStack(spacing: 20) {
+            // Change Type button
+            Button(action: { showingTypePicker = true }) {
+                Image(systemName: "arrow.left.arrow.right.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.textDark)
+            }
+            .accessibilityLabel("Change note type")
+
             Spacer()
 
             // Add to Calendar button
