@@ -34,58 +34,10 @@ struct ExtractedTodo: Codable, Identifiable, Sendable, Equatable {
     }
     
     /// Parse dueDate string into a Date object
-    /// Handles ISO 8601, natural language ("tomorrow", "next week"), and common formats
+    /// Uses DateParsingService for robust date extraction via NSDataDetector
     var parsedDueDate: Date? {
         guard let dueDate = dueDate else { return nil }
-        
-        // Try ISO 8601 first
-        let isoFormatter = ISO8601DateFormatter()
-        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = isoFormatter.date(from: dueDate) {
-            return date
-        }
-        
-        // Try without fractional seconds
-        isoFormatter.formatOptions = [.withInternetDateTime]
-        if let date = isoFormatter.date(from: dueDate) {
-            return date
-        }
-        
-        // Try common date formats
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        
-        let formats = [
-            "yyyy-MM-dd",
-            "MM/dd/yyyy",
-            "MM/dd/yy",
-            "MMMM dd, yyyy",
-            "MMM dd, yyyy"
-        ]
-        
-        for format in formats {
-            formatter.dateFormat = format
-            if let date = formatter.date(from: dueDate) {
-                return date
-            }
-        }
-        
-        // Try natural language parsing (basic)
-        let lowercased = dueDate.lowercased()
-        let calendar = Calendar.current
-        let now = Date()
-        
-        if lowercased.contains("tomorrow") {
-            return calendar.date(byAdding: .day, value: 1, to: now)
-        } else if lowercased.contains("next week") {
-            return calendar.date(byAdding: .weekOfYear, value: 1, to: now)
-        } else if lowercased.contains("next month") {
-            return calendar.date(byAdding: .month, value: 1, to: now)
-        } else if lowercased.contains("today") {
-            return now
-        }
-        
-        return nil
+        return DateParsingService.parse(dateString: dueDate)
     }
     
     /// Convert to TodoItem priority enum
