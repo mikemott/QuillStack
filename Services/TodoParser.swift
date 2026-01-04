@@ -14,6 +14,141 @@ class TodoParser {
     init(context: NSManagedObjectContext) {
         self.context = context
     }
+    
+    // MARK: - LLM-Powered Extraction
+    
+    /// Extract todos from text using LLM for better accuracy
+    /// Falls back to heuristic parsing if LLM fails
+    func extractWithLLM(_ content: String) async throws -> [ExtractedTodo] {
+        let prompt = """
+        Extract all todo items from this text. Return valid JSON only, no other text.
+        
+        Format:
+        {
+            "todos": [
+                {
+                    "text": "Task description",
+                    "completed": false,
+                    "priority": "normal",
+                    "dueDate": "2024-12-25" or "tomorrow" or null,
+                    "notes": "Additional context if any"
+                }
+            ]
+        }
+        
+        Rules:
+        - Extract ALL tasks, even if not explicitly marked
+        - Set completed=true if task has checkmark [x] or is marked done
+        - Priority: "high" (urgent/critical), "medium" (important), "normal" (default)
+        - Extract dates in natural language ("tomorrow", "next week") or ISO format
+        - If no todos found, return empty array
+        
+        Text:
+        \(content)
+        """
+        
+        let settings = await SettingsManager.shared
+        guard let apiKey = await settings.claudeAPIKey, !apiKey.isEmpty else {
+            throw TodoExtractionError.noAPIKey
+        }
+        
+        let response = try await LLMService.shared.performAPIRequest(
+            prompt: prompt,
+            maxTokens: 500
+        )
+        
+        // Parse JSON response
+        guard let jsonData = response.data(using: .utf8) else {
+            throw TodoExtractionError.invalidResponse
+        }
+        
+        // Try to extract JSON from markdown code blocks if present
+        let cleanedResponse = cleanJSONResponse(response)
+        guard let cleanedData = cleanedResponse.data(using: .utf8) else {
+            throw TodoExtractionError.invalidResponse
+        }
+        
+        let decoder = JSONDecoder()
+        let extractionResult = try decoder.decode(TodoExtractionJSON.self, from: cleanedData)
+        
+        // Convert to ExtractedTodo
+        return extractionResult.todos.map { jsonTodo in
+            ExtractedTodo(
+                text: jsonTodo.text,
+                isCompleted: jsonTodo.completed ?? false,
+                priority: jsonTodo.priority ?? "normal",
+                dueDate: jsonTodo.dueDate,
+                notes: jsonTodo.notes
+            )
+        }
+    }
+    
+    /// Hybrid approach: Try LLM first, fall back to heuristics
+    func extractHybrid(_ content: String) async -> [ExtractedTodo] {
+        // Try LLM first
+        if let llmTodos = try? await extractWithLLM(content),
+           !llmTodos.isEmpty {
+            return llmTodos
+        }
+        
+        // Fall back to existing heuristic parser
+        let todoItems = parseTodos(from: content)
+        return todoItems.map { item in
+            let dateString: String?
+            if let dueDate = item.dueDate {
+                let formatter = ISO8601DateFormatter()
+                formatter.formatOptions = [.withInternetDateTime]
+                dateString = formatter.string(from: dueDate)
+            } else {
+                dateString = nil
+            }
+            
+            return ExtractedTodo(
+                text: item.text,
+                isCompleted: item.isCompleted,
+                priority: item.priority,
+                dueDate: dateString,
+                notes: nil
+            )
+        }
+    }
+    
+    /// Clean JSON response by removing markdown code blocks
+    private func cleanJSONResponse(_ response: String) -> String {
+        var cleaned = response.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Remove markdown code blocks
+        if cleaned.hasPrefix("```json") {
+            cleaned = String(cleaned.dropFirst(7))
+        } else if cleaned.hasPrefix("```") {
+            cleaned = String(cleaned.dropFirst(3))
+        }
+        
+        if cleaned.hasSuffix("```") {
+            cleaned = String(cleaned.dropLast(3))
+        }
+        
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    // MARK: - Errors
+    
+    enum TodoExtractionError: LocalizedError {
+        case noAPIKey
+        case invalidResponse
+        case parsingFailed
+        
+        var errorDescription: String? {
+            switch self {
+            case .noAPIKey:
+                return "No API key configured for LLM extraction"
+            case .invalidResponse:
+                return "Invalid response from LLM"
+            case .parsingFailed:
+                return "Failed to parse todo extraction result"
+            }
+        }
+    }
 
     /// Parses todo items from text content
     func parseTodos(from text: String, note: Note? = nil) -> [TodoItem] {
