@@ -17,10 +17,16 @@ final class LLMRateLimiter {
     private let maxCallsPerHour = 100
     private let maxCallsPerDay = 500
 
-    // Tracking
+    // Tracking (persisted to UserDefaults)
     private var callTimestamps: [Date] = []
+    private let userDefaultsKey = "llm_call_timestamps"
 
-    private init() {}
+    private init() {
+        // Load timestamps from UserDefaults
+        if let savedTimestamps = UserDefaults.standard.object(forKey: userDefaultsKey) as? [Date] {
+            callTimestamps = savedTimestamps
+        }
+    }
 
     /// Check if a new LLM call is allowed under rate limits
     func canMakeCall() -> Bool {
@@ -56,6 +62,8 @@ final class LLMRateLimiter {
     /// Record that a call was made
     func recordCall() {
         callTimestamps.append(Date())
+        // Persist to UserDefaults
+        UserDefaults.standard.set(callTimestamps, forKey: userDefaultsKey)
     }
 
     /// Clean up timestamps older than 24 hours
@@ -83,5 +91,6 @@ final class LLMRateLimiter {
     /// Reset all rate limits (for testing)
     func reset() {
         callTimestamps.removeAll()
+        UserDefaults.standard.removeObject(forKey: userDefaultsKey)
     }
 }

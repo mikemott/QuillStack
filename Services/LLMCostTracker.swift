@@ -4,6 +4,10 @@
 //
 //  Basic cost tracking for LLM API usage
 //
+//  NOTE: recordUsage() is currently not integrated because LLMService.performAPIRequest()
+//  does not return token counts. This will be integrated when the API response structure
+//  is updated to include usage metadata. For now, this provides the infrastructure.
+//
 
 import Foundation
 

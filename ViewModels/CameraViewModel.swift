@@ -150,7 +150,8 @@ final class CameraViewModel {
                 var shouldQueueEnhancement = false
 
                 if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
-                    if offlineQueue.isOnline {
+                    // Check both online status AND rate limits
+                    if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
                         print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
 
                         // Sentry: Track LLM call
@@ -163,6 +164,9 @@ final class CameraViewModel {
                             let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
                             finalText = result.enhancedText
                             print("✨ LLM enhanced text")
+
+                            // Record call for rate limiting
+                            LLMRateLimiter.shared.recordCall()
 
                             // Sentry: Track LLM success
                             let successBreadcrumb = Breadcrumb(level: .info, category: "llm")
@@ -180,7 +184,11 @@ final class CameraViewModel {
                             shouldQueueEnhancement = true
                         }
                     } else {
-                        print("📴 Offline - queueing enhancement for later")
+                        if !offlineQueue.isOnline {
+                            print("📴 Offline - queueing enhancement for later")
+                        } else {
+                            print("🚫 Rate limited - queueing enhancement for later")
+                        }
                         shouldQueueEnhancement = true
                     }
                 }
