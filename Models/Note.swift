@@ -23,6 +23,9 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var isArchived: Bool
     @NSManaged public var summary: String? // Cached AI-generated summary
     @NSManaged public var summaryGeneratedAt: Date? // When summary was generated
+    @NSManaged public var classificationConfidence: Double // 0.0 to 1.0
+    @NSManaged public var classificationMethod: String? // "explicit", "llm", "heuristic", etc.
+    @NSManaged public var extractedDataJSON: String? // JSON-encoded extracted data (Contact, Event, Todo)
 
     // Relationships
     @NSManaged public var todoItems: NSSet?
@@ -49,6 +52,9 @@ public class Note: NSManagedObject, Identifiable {
         noteType = "general"
         ocrConfidence = 0.0
         isArchived = false
+        classificationConfidence = 0.0
+        classificationMethod = nil
+        extractedDataJSON = nil
     }
 }
 
@@ -119,5 +125,38 @@ extension Note {
         sortedPages
             .compactMap { $0.ocrText }
             .joined(separator: "\n\n--- Page Break ---\n\n")
+    }
+}
+
+// MARK: - Classification Extensions
+
+extension Note {
+    /// Get the classification method used for this note
+    var classificationMethodEnum: ClassificationMethod? {
+        get {
+            guard let methodString = classificationMethod else { return nil }
+            return ClassificationMethod(rawValue: methodString)
+        }
+        set {
+            classificationMethod = newValue?.rawValue
+        }
+    }
+    
+    /// Get the classification result for this note
+    var classification: NoteClassification {
+        NoteClassification(
+            type: type,
+            confidence: classificationConfidence,
+            method: classificationMethodEnum ?? .default,
+            reasoning: nil
+        )
+    }
+    
+    /// Set the classification result for this note
+    func setClassification(_ classification: NoteClassification) {
+        type = classification.type
+        classificationConfidence = classification.confidence
+        classificationMethodEnum = classification.method
+        updatedAt = Date()
     }
 }

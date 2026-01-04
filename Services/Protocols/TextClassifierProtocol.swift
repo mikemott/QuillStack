@@ -23,7 +23,17 @@ protocol TextClassifierProtocol {
     /// Priority: explicit hashtag triggers > business card detection > content analysis
     /// - Parameter content: The text content to classify
     /// - Returns: The detected NoteType
+    /// - Note: This is the synchronous version for backwards compatibility
     func classifyNote(content: String) -> NoteType
+    
+    /// Classifies the type of note with full classification details including confidence and method.
+    /// Priority: explicit hashtag triggers > LLM classification > heuristic detection > content analysis
+    /// - Parameters:
+    ///   - content: The text content to classify
+    ///   - image: Optional image context for visual classification (future enhancement)
+    /// - Returns: Full classification result with confidence and method
+    /// - Note: This is the async version that supports LLM classification
+    func classifyNoteAsync(content: String, image: UIImage?) async -> NoteClassification
 
     /// Extracts the first trigger tag from content.
     /// - Parameter content: The text content to search
