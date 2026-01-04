@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 import Combine
 import CoreData
+import Sentry
 
 @MainActor
 @Observable
@@ -73,6 +74,14 @@ final class CameraViewModel {
         isProcessing = true
         error = nil
 
+        // Sentry: Track capture start
+        let breadcrumb = Breadcrumb(level: .info, category: "capture")
+        breadcrumb.message = "Started processing captured image"
+        breadcrumb.data = [
+            "image_size": "\(Int(image.size.width))x\(Int(image.size.height))"
+        ]
+        SentrySDK.addBreadcrumb(breadcrumb)
+
         do {
             // Step 1: Just correct orientation - OCRService handles full preprocessing
             let correctedImage = imageProcessor.correctOrientation(image: image)
@@ -84,9 +93,28 @@ final class CameraViewModel {
             print("🔍 Raw OCR result: \(ocrResult.fullText)")
             print("🔍 Average confidence: \(Int(ocrResult.averageConfidence * 100))%")
 
+            // Sentry: Track OCR completion
+            let ocrBreadcrumb = Breadcrumb(level: .info, category: "ocr")
+            ocrBreadcrumb.message = "OCR completed"
+            ocrBreadcrumb.data = [
+                "text_length": ocrResult.fullText.count,
+                "confidence": Int(ocrResult.averageConfidence * 100),
+                "low_confidence_words": ocrResult.lowConfidenceWords.count
+            ]
+            SentrySDK.addBreadcrumb(ocrBreadcrumb)
+
             // Step 3: Split into sections based on detected tags
             let sections = textClassifier.splitIntoSections(content: ocrResult.fullText)
             print("📋 Detected \(sections.count) section(s)")
+
+            // Sentry: Track section splitting
+            let sectionBreadcrumb = Breadcrumb(level: .info, category: "classification")
+            sectionBreadcrumb.message = "Split into \(sections.count) section(s)"
+            sectionBreadcrumb.data = [
+                "section_count": sections.count,
+                "types": sections.map { $0.noteType.rawValue }.joined(separator: ", ")
+            ]
+            SentrySDK.addBreadcrumb(sectionBreadcrumb)
 
             // Step 4: Process each section separately
             let learnedCorrections = HandwritingLearningService.shared.getLearnedCorrections()
@@ -121,19 +149,46 @@ final class CameraViewModel {
                 var finalText = correctedText
                 var shouldQueueEnhancement = false
 
-                if settings.autoEnhanceOCR && settings.hasAPIKey {
-                    if offlineQueue.isOnline {
+                if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+                    // Check both online status AND rate limits
+                    if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
                         print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
+
+                        // Sentry: Track LLM call
+                        let llmBreadcrumb = Breadcrumb(level: .info, category: "llm")
+                        llmBreadcrumb.message = "Starting LLM enhancement"
+                        llmBreadcrumb.data = ["note_type": section.noteType.rawValue]
+                        SentrySDK.addBreadcrumb(llmBreadcrumb)
+
                         do {
                             let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
                             finalText = result.enhancedText
                             print("✨ LLM enhanced text")
+
+                            // Record call for rate limiting
+                            LLMRateLimiter.shared.recordCall()
+
+                            // Sentry: Track LLM success
+                            let successBreadcrumb = Breadcrumb(level: .info, category: "llm")
+                            successBreadcrumb.message = "LLM enhancement completed"
+                            SentrySDK.addBreadcrumb(successBreadcrumb)
                         } catch {
                             print("⚠️ LLM enhancement failed: \(error.localizedDescription)")
+
+                            // Sentry: Track LLM failure (not as error, just breadcrumb)
+                            let failBreadcrumb = Breadcrumb(level: .warning, category: "llm")
+                            failBreadcrumb.message = "LLM enhancement failed, queuing for later"
+                            failBreadcrumb.data = ["error": error.localizedDescription]
+                            SentrySDK.addBreadcrumb(failBreadcrumb)
+
                             shouldQueueEnhancement = true
                         }
                     } else {
-                        print("📴 Offline - queueing enhancement for later")
+                        if !offlineQueue.isOnline {
+                            print("📴 Offline - queueing enhancement for later")
+                        } else {
+                            print("🚫 Rate limited - queueing enhancement for later")
+                        }
                         shouldQueueEnhancement = true
                     }
                 }
@@ -165,16 +220,43 @@ final class CameraViewModel {
                 }
             }
 
+            // Sentry: Track successful completion
+            let completeBreadcrumb = Breadcrumb(level: .info, category: "capture")
+            completeBreadcrumb.message = "Image processing completed successfully"
+            completeBreadcrumb.data = ["sections_saved": sections.count]
+            SentrySDK.addBreadcrumb(completeBreadcrumb)
+
             isProcessing = false
         } catch OCRService.OCRError.noTextDetected {
             isProcessing = false
             error = .ocrFailed("No text detected in image. Try capturing again with better lighting.")
+
+            // Sentry: Track OCR error
+            SentrySDK.capture(error: OCRService.OCRError.noTextDetected) { scope in
+                scope.setLevel(.warning)
+                scope.setContext(value: ["error_type": "no_text_detected"], key: "ocr_error")
+            }
         } catch OCRService.OCRError.lowConfidence {
             isProcessing = false
             error = .ocrFailed("Text quality is too low. Try capturing with better lighting or focus.")
+
+            // Sentry: Track low confidence error
+            SentrySDK.capture(error: OCRService.OCRError.lowConfidence) { scope in
+                scope.setLevel(.warning)
+                scope.setContext(value: ["error_type": "low_confidence"], key: "ocr_error")
+            }
         } catch let caughtError {
             isProcessing = false
             self.error = .ocrFailed(caughtError.localizedDescription)
+
+            // Sentry: Capture unexpected error
+            SentrySDK.capture(error: caughtError) { scope in
+                scope.setLevel(.error)
+                scope.setContext(value: [
+                    "error_description": caughtError.localizedDescription,
+                    "flow": "image_processing"
+                ], key: "capture_error")
+            }
         }
     }
 
@@ -207,6 +289,7 @@ final class CameraViewModel {
 
             note.ocrConfidence = avgConfidence
             note.ocrResultData = ocrResultData
+            note.captureSource = "camera"
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData

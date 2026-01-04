@@ -27,6 +27,11 @@
         <attribute name="summary" optional="YES" attributeType="String"/>
         <attribute name="summaryGeneratedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="tags" optional="YES" attributeType="String"/>
+        <attribute name="classificationConfidence" optional="NO" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="classificationMethod" optional="YES" attributeType="String"/>
+        <attribute name="extractedDataJSON" optional="YES" attributeType="String"/>
+        <attribute name="llmClassificationCache" optional="YES" attributeType="String"/>
+        <attribute name="originalClassificationType" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>

@@ -6,11 +6,31 @@
 //
 
 import Foundation
+import UIKit
 
 /// Default implementation of text classification for note type detection.
 /// Uses hashtag triggers, business card detection, and content analysis.
 @MainActor
 final class TextClassifier: TextClassifierProtocol {
+    
+    // MARK: - LLM Classification Cache
+
+    /// In-memory cache for LLM classification results to avoid redundant API calls
+    /// Note: This is a session cache. For persistent caching, use Note.llmClassificationCache field.
+    /// The Core Data field is used when saving notes, while this in-memory cache is for the current session.
+    private var classificationCache: [String: NoteClassification] = [:]
+    private let cacheMaxSize = 100
+
+    /// Clear old cache entries when limit reached
+    private func maintainCache() {
+        if classificationCache.count > cacheMaxSize {
+            // Remove oldest entries (simple FIFO)
+            let keysToRemove = Array(classificationCache.keys.prefix(classificationCache.count - cacheMaxSize))
+            for key in keysToRemove {
+                classificationCache.removeValue(forKey: key)
+            }
+        }
+    }
     /// Classifies the type of note based on content
     /// Priority: explicit hashtag triggers > spoken command triggers > business card detection > content analysis
     func classifyNote(content: String) -> NoteType {
@@ -41,6 +61,178 @@ final class TextClassifier: TextClassifierProtocol {
         }
 
         return .general
+    }
+    
+    // MARK: - Async Classification with Full Details
+    
+    /// Classifies the type of note with full classification details including confidence and method.
+    /// Priority: explicit hashtag triggers > LLM classification > heuristic detection > content analysis
+    func classifyNoteAsync(content: String, image: UIImage?) async -> NoteClassification {
+        let lowercased = content.lowercased()
+        
+        // 1. Hashtag triggers (explicit - highest priority, 100% confidence)
+        if let explicitType = detectExplicitTrigger(lowercased) {
+            return .explicit(explicitType)
+        }
+        
+        // 2. LLM classification (NEW - intelligent detection)
+        // Check cache first
+        let cacheKey = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let cached = classificationCache[cacheKey] {
+            return cached
+        }
+        
+        // Try LLM classification (with error handling and fallback)
+        if let llmClassification = await classifyWithLLM(content) {
+            // Cache the result
+            maintainCache()
+            classificationCache[cacheKey] = llmClassification
+            return llmClassification
+        }
+        
+        // 3. Voice command triggers (existing)
+        if let commandType = detectCommandTrigger(lowercased) {
+            return NoteClassification(
+                type: commandType,
+                confidence: 0.80,
+                method: .voiceCommand,
+                reasoning: "Voice command pattern detected"
+            )
+        }
+        
+        // 4. Business card detection (heuristic - existing)
+        if BusinessCardDetector.isBusinessCard(content) {
+            let score = BusinessCardDetector.confidenceScore(content)
+            let confidence = min(Double(score) / 100.0, 0.95) // Normalize to 0-0.95
+            return .heuristic(
+                .contact,
+                confidence: max(confidence, 0.70),
+                reasoning: "Business card pattern detected (phone + email)"
+            )
+        }
+        
+        // 5. Content analysis (existing heuristics)
+        if isMeetingNote(lowercased) {
+            return NoteClassification(
+                type: .meeting,
+                confidence: 0.65,
+                method: .contentAnalysis,
+                reasoning: "Meeting keywords detected"
+            )
+        }
+        
+        if isTodoNote(lowercased) {
+            return NoteClassification(
+                type: .todo,
+                confidence: 0.65,
+                method: .contentAnalysis,
+                reasoning: "Todo keywords detected"
+            )
+        }
+        
+        // 6. Default fallback
+        return .default(.general)
+    }
+    
+    // MARK: - LLM Classification
+
+    /// Classifies note content using LLM
+    /// Returns nil if LLM classification fails (network error, invalid response, rate limited, etc.)
+    private func classifyWithLLM(_ text: String) async -> NoteClassification? {
+        // 1. Check network availability first (offline fallback)
+        guard NetworkAvailability.shared.isNetworkAvailable else {
+            return nil // Fall back to heuristics when offline
+        }
+
+        // 2. Check rate limits to prevent excessive API costs
+        guard LLMRateLimiter.shared.canMakeCall() else {
+            return nil // Fall back to heuristics when rate limited
+        }
+
+        // 3. Check if LLM service is available (has API key)
+        let settings = await SettingsManager.shared
+        guard let apiKey = await settings.claudeAPIKey, !apiKey.isEmpty else {
+            return nil // Fall back to heuristics
+        }
+
+        // 4. Skip LLM for very short text (likely noise)
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.count < 10 {
+            return nil
+        }
+
+        // 5. Build classification prompt
+        let prompt = buildClassificationPrompt(text: trimmed)
+
+        do {
+            // Call LLM with short response (just type name)
+            let response = try await LLMService.shared.performAPIRequest(
+                prompt: prompt,
+                maxTokens: 20
+            )
+
+            // Record successful call for rate limiting
+            LLMRateLimiter.shared.recordCall()
+
+            // Parse response - should be just a type name
+            let typeName = response
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+                .replacingOccurrences(of: ".", with: "") // Remove trailing periods
+                .replacingOccurrences(of: "\"", with: "") // Remove quotes
+                .replacingOccurrences(of: "'", with: "") // Remove single quotes
+
+            // Map to NoteType
+            guard let noteType = NoteType(rawValue: typeName) else {
+                // Invalid response - try to extract type from response
+                if let extracted = extractTypeFromLLMResponse(response) {
+                    return extracted
+                }
+                // If extraction fails, return nil to fall back to heuristics
+                return nil
+            }
+
+            // Return LLM classification with high confidence
+            return .llm(noteType, confidence: 0.85, reasoning: "LLM classification")
+
+        } catch {
+            // LLM call failed - fall back to heuristics
+            // Don't record call since it failed
+            return nil
+        }
+    }
+    
+    /// Builds the classification prompt for LLM
+    private func buildClassificationPrompt(text: String) -> String {
+        let availableTypes = NoteType.allCases.map { $0.rawValue }.joined(separator: ", ")
+        
+        return """
+        Classify this handwritten note into one of these types: \(availableTypes)
+        
+        Rules:
+        - Return ONLY the type name, nothing else
+        - Choose the most specific type that matches
+        - If unsure, return "general"
+        
+        Text to classify:
+        \(text)
+        
+        Type:
+        """
+    }
+    
+    /// Attempts to extract note type from LLM response that may contain extra text
+    private func extractTypeFromLLMResponse(_ response: String) -> NoteClassification? {
+        let lowercased = response.lowercased()
+        
+        // Try to find a type name in the response
+        for noteType in NoteType.allCases {
+            if lowercased.contains(noteType.rawValue) {
+                return .llm(noteType, confidence: 0.80, reasoning: "Extracted from LLM response")
+            }
+        }
+        
+        return nil
     }
 
     /// Detects explicit #type# triggers at the start of content
