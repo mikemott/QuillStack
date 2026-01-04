@@ -197,7 +197,7 @@ struct ClassificationTestResults {
 class ClassificationAccuracyTester {
     private let classifier: TextClassifierProtocol
 
-    init(classifier: TextClassifierProtocol) {
+    nonisolated init(classifier: TextClassifierProtocol) {
         self.classifier = classifier
     }
 
