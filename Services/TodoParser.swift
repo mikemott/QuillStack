@@ -84,13 +84,28 @@ class TodoParser {
     }
     
     /// Hybrid approach: Try LLM first, fall back to heuristics
-    func extractHybrid(_ content: String) async -> [ExtractedTodo] {
+    ///
+    /// **Error Handling:**
+    /// - Recoverable errors (invalidResponse, parsingFailed): Falls back to heuristics
+    /// - Critical errors (noAPIKey, network issues): Re-thrown to notify caller
+    func extractHybrid(_ content: String) async throws -> [ExtractedTodo] {
         // Try LLM first
-        if let llmTodos = try? await extractWithLLM(content),
-           !llmTodos.isEmpty {
-            return llmTodos
+        do {
+            let llmTodos = try await extractWithLLM(content)
+            if !llmTodos.isEmpty {
+                return llmTodos
+            }
+            // LLM succeeded but didn't extract any todos, fall through to heuristics
+        } catch let error as TodoExtractionError
+            where error == .invalidResponse || error == .parsingFailed {
+            // Recoverable errors: fall back to heuristic parser
+            // Log for debugging but don't surface to user
+            print("LLM extraction failed, falling back to heuristic parser. Error: \(error.localizedDescription ?? "Unknown")")
+        } catch {
+            // Critical errors (noAPIKey, network issues): re-throw to notify caller
+            throw error
         }
-        
+
         // Fall back to existing heuristic parser
         let todoItems = parseTodos(from: content)
         return todoItems.map { item in
@@ -102,7 +117,7 @@ class TodoParser {
             } else {
                 dateString = nil
             }
-            
+
             return ExtractedTodo(
                 text: item.text,
                 isCompleted: item.isCompleted,
@@ -132,12 +147,12 @@ class TodoParser {
     }
     
     // MARK: - Errors
-    
-    enum TodoExtractionError: LocalizedError {
+
+    enum TodoExtractionError: LocalizedError, Equatable {
         case noAPIKey
         case invalidResponse
         case parsingFailed
-        
+
         var errorDescription: String? {
             switch self {
             case .noAPIKey:
