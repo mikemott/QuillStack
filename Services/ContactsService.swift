@@ -164,33 +164,28 @@ final class ContactsService: @unchecked Sendable {
         guard authorizationStatus == .authorized else {
             return false
         }
-        
+
         let keys: [CNKeyDescriptor] = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactEmailAddressesKey] as [CNKeyDescriptor]
-        let request = CNContactFetchRequest(keysToFetch: keys)
-        
-        // Search by name
-        request.predicate = CNContact.predicateForContacts(matchingName: name)
-        
+        let predicate = CNContact.predicateForContacts(matchingName: name)
+
         do {
-            var found = false
-            try contactStore.enumerateContacts(with: request) { contact, _ in
+            let contacts = try contactStore.unifiedContacts(matching: predicate, keysToFetch: keys)
+
+            for contact in contacts {
                 let fullName = "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespaces)
                 if fullName.lowercased() == name.lowercased() {
                     // If email provided, check for match
                     if let email = email, !email.isEmpty {
                         let contactEmails = contact.emailAddresses.map { $0.value as String }
                         if contactEmails.contains(where: { $0.lowercased() == email.lowercased() }) {
-                            found = true
-                            return false // Stop enumeration
+                            return true
                         }
                     } else {
-                        found = true
-                        return false // Stop enumeration
+                        return true
                     }
                 }
-                return true // Continue enumeration
             }
-            return found
+            return false
         } catch {
             // Log error type without exposing system details
             let errorType = String(describing: type(of: error))
