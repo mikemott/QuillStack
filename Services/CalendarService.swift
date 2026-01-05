@@ -138,6 +138,53 @@ final class CalendarService: CalendarServiceProtocol, @unchecked Sendable {
         )
     }
 
+    /// Create event from ExtractedEvent
+    /// - Parameters:
+    ///   - extractedEvent: The extracted event data
+    ///   - calendar: Target calendar to create event in
+    /// - Returns: The created event's identifier
+    /// - Throws: CalendarError on failure
+    func createEvent(from extractedEvent: ExtractedEvent, calendar: EKCalendar) throws -> String {
+        // Validate minimum required data
+        guard extractedEvent.hasMinimumData else {
+            throw CalendarError.createFailed("Event missing required data (title and date/time)")
+        }
+
+        guard let startDate = extractedEvent.parsedDateTime else {
+            throw CalendarError.createFailed("Could not parse event date and time")
+        }
+
+        // Default duration to 1 hour if not specified
+        let duration = 60
+
+        // Build notes from extracted data
+        var notesParts: [String] = []
+        if let description = extractedEvent.description, !description.isEmpty {
+            notesParts.append(description)
+        }
+        if let organizer = extractedEvent.organizer, !organizer.isEmpty {
+            notesParts.append("Organizer: \(organizer)")
+        }
+        if let contactInfo = extractedEvent.contactInfo, !contactInfo.isEmpty {
+            notesParts.append("Contact: \(contactInfo)")
+        }
+        if extractedEvent.isRecurring, let pattern = extractedEvent.recurrencePattern {
+            notesParts.append("Recurring: \(pattern)")
+        }
+
+        let notes = notesParts.isEmpty ? nil : notesParts.joined(separator: "\n\n")
+
+        return try createEvent(
+            title: extractedEvent.title,
+            startDate: startDate,
+            duration: duration,
+            notes: notes,
+            attendees: nil,
+            location: extractedEvent.location,
+            calendar: calendar
+        )
+    }
+
     // MARK: - Fetch Events
 
     /// Fetch events for a date range

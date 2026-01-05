@@ -56,6 +56,14 @@ protocol CalendarServiceProtocol: AnyObject, Sendable {
     /// - Throws: CalendarError on failure
     func createEvent(from meeting: Meeting, calendar: EKCalendar) throws -> String
 
+    /// Create event from ExtractedEvent
+    /// - Parameters:
+    ///   - extractedEvent: The extracted event data
+    ///   - calendar: Target calendar to create event in
+    /// - Returns: The created event's identifier
+    /// - Throws: CalendarError on failure
+    func createEvent(from extractedEvent: ExtractedEvent, calendar: EKCalendar) throws -> String
+
     /// Fetch events within a date range
     /// - Parameters:
     ///   - startDate: Range start
