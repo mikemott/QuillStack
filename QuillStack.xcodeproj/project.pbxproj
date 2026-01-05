@@ -22,6 +22,7 @@
 		2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18F2EEB558200E05291 /* TodoItem.swift */; };
 		2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1902EEB55A300E05291 /* CameraManager.swift */; };
 		2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1912EEB55A300E05291 /* ImageProcessor.swift */; };
+		2796C1FF2EEB810000E05291 /* ServicePrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */; };
 		2796C1B02EEB570000E05291 /* MeetingParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1922EEB55A300E05291 /* MeetingParser.swift */; };
 		2796C1B12EEB570000E05291 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1932EEB55A300E05291 /* OCRService.swift */; };
 		2796C1B22EEB570000E05291 /* TextClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1942EEB55A300E05291 /* TextClassifier.swift */; };
@@ -184,6 +185,7 @@
 		2796C18F2EEB558200E05291 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		2796C1902EEB55A300E05291 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		2796C1912EEB55A300E05291 /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicePrewarmer.swift; sourceTree = "<group>"; };
 		2796C1922EEB55A300E05291 /* MeetingParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingParser.swift; sourceTree = "<group>"; };
 		2796C1932EEB55A300E05291 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		2796C1942EEB55A300E05291 /* TextClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifier.swift; sourceTree = "<group>"; };
@@ -483,6 +485,7 @@
 				F00200000000001D /* HandwritingLearningService.swift */,
 				I00200000000002D /* ImageRetentionService.swift */,
 				2796C1912EEB55A300E05291 /* ImageProcessor.swift */,
+				2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */,
 				F00200000000001A /* KeychainService.swift */,
 				2796C1EE2EEB800000E05291 /* LLMService.swift */,
 				2796C1922EEB55A300E05291 /* MeetingParser.swift */,
@@ -969,6 +972,7 @@
 				2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */,
 				2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */,
 				2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */,
+				2796C1FF2EEB810000E05291 /* ServicePrewarmer.swift in Sources */,
 				2796C1B02EEB570000E05291 /* MeetingParser.swift in Sources */,
 				2796C1B12EEB570000E05291 /* OCRService.swift in Sources */,
 				2796C1B22EEB570000E05291 /* TextClassifier.swift in Sources */,

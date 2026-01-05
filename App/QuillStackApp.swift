@@ -54,6 +54,9 @@ struct QuillStackApp: App {
 
         // Register all built-in note type plugins
         NoteTypeRegistry.shared.registerBuiltInPlugins()
+
+        // Warm up expensive OCR dependencies off the main thread to avoid launch stalls
+        ServicePrewarmer.warmHeavyServices()
     }
 
     var body: some Scene {
