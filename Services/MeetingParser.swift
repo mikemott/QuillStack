@@ -221,26 +221,7 @@ class MeetingParser {
     }
 
     private func parseDateString(_ string: String) -> Date? {
-        let formatter = DateFormatter()
-
-        // Try MM/dd/yyyy format
-        formatter.dateFormat = "MM/dd/yyyy"
-        if let date = formatter.date(from: string) {
-            return date
-        }
-
-        // Try MM/dd/yy format
-        formatter.dateFormat = "MM/dd/yy"
-        if let date = formatter.date(from: string) {
-            return date
-        }
-
-        // Try full text format
-        formatter.dateFormat = "MMMM dd, yyyy"
-        if let date = formatter.date(from: string) {
-            return date
-        }
-
-        return nil
+        // Use shared DateParsingService for robust date parsing
+        return DateParsingService.parse(dateString: string)
     }
 }
