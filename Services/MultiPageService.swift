@@ -179,11 +179,12 @@ class MultiPageService {
 
 // MARK: - Batch Capture State
 
-class BatchCaptureState: ObservableObject {
-    @Published var capturedImages: [UIImage] = []
-    @Published var isProcessing = false
-    @Published var processingProgress: Float = 0
-    @Published var error: String?
+@Observable
+final class BatchCaptureState {
+    var capturedImages: [UIImage] = []
+    var isProcessing = false
+    var processingProgress: Float = 0
+    var error: String?
 
     var imageCount: Int { capturedImages.count }
 

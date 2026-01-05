@@ -16,14 +16,15 @@ import os.log
 /// Manages offline queuing of LLM enhancement requests
 /// When offline, requests are stored in Core Data and processed when connectivity returns
 @MainActor
-final class OfflineQueueService: ObservableObject {
+@Observable
+final class OfflineQueueService {
     static let shared = OfflineQueueService()
 
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "OfflineQueue")
 
-    @Published private(set) var pendingCount: Int = 0
-    @Published private(set) var isOnline: Bool = true
-    @Published private(set) var isProcessing: Bool = false
+    private(set) var pendingCount: Int = 0
+    private(set) var isOnline: Bool = true
+    private(set) var isProcessing: Bool = false
 
     private let monitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "network.monitor.queue")

@@ -12,7 +12,7 @@ struct OnboardingCompletePage: View {
     let selectedFeatures: Set<OnboardingFeature>
     var onFinish: () -> Void
 
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @State private var showCheckmark = false
 
     var body: some View {

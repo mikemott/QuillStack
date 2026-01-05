@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NoteListView: View {
-    @StateObject private var viewModel = NoteViewModel()
+    @State private var viewModel = NoteViewModel()
     @State private var showingCamera = false
     @State private var showingVoice = false
     @State private var showingSearch = false

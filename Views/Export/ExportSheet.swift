@@ -14,7 +14,7 @@ import CoreData
 struct ExportSheet: View {
     let note: Note
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
 
     @State private var isExporting = false
     @State private var exportResult: ExportResult?

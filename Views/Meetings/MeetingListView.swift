@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MeetingListView: View {
-    @StateObject private var viewModel = MeetingViewModel()
+    @State private var viewModel = MeetingViewModel()
 
     var body: some View {
         NavigationStack {

@@ -10,10 +10,11 @@ import CoreData
 import Combine
 
 @MainActor
-class NoteViewModel: ObservableObject {
-    @Published private(set) var notes: [Note] = []
-    @Published private(set) var isLoading = false
-    @Published var errorMessage: String?
+@Observable
+final class NoteViewModel {
+    private(set) var notes: [Note] = []
+    private(set) var isLoading = false
+    var errorMessage: String?
 
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     private var cancellables = Set<AnyCancellable>()

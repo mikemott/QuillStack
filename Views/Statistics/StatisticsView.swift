@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatisticsView: View {
-    @StateObject private var viewModel = StatisticsViewModel()
+    @State private var viewModel = StatisticsViewModel()
 
     var body: some View {
         NavigationStack {

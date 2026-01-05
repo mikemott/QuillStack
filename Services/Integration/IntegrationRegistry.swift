@@ -12,7 +12,8 @@ import Combine
 /// Central registry for managing integration providers.
 /// Use this class to register providers and query available integrations for note types.
 @MainActor
-final class IntegrationRegistry: ObservableObject {
+@Observable
+final class IntegrationRegistry {
 
     // MARK: - Singleton
 
@@ -21,10 +22,10 @@ final class IntegrationRegistry: ObservableObject {
     // MARK: - Published State
 
     /// All registered providers (for UI binding)
-    @Published private(set) var allProviders: [any IntegrationProvider] = []
+    private(set) var allProviders: [any IntegrationProvider] = []
 
     /// Last registration change timestamp (for cache invalidation)
-    @Published private(set) var lastUpdated: Date = Date()
+    private(set) var lastUpdated: Date = Date()
 
     // MARK: - Private Storage
 

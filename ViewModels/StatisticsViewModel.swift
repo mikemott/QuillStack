@@ -11,35 +11,33 @@ import Combine
 
 /// View model for capture statistics dashboard
 @MainActor
-class StatisticsViewModel: ObservableObject {
+@Observable
+final class StatisticsViewModel {
     // MARK: - Published Properties
 
-    @Published private(set) var capturesByDay: [CaptureDay] = []
-    @Published private(set) var typeDistribution: [TypeCount] = []
-    @Published private(set) var accuracyTrend: [AccuracyPoint] = []
-    @Published private(set) var learningStats: LearningStats = LearningStats()
-    @Published private(set) var summaryStats: SummaryStats = SummaryStats()
-    @Published private(set) var isLoading = false
+    private(set) var capturesByDay: [CaptureDay] = []
+    private(set) var typeDistribution: [TypeCount] = []
+    private(set) var accuracyTrend: [AccuracyPoint] = []
+    private(set) var learningStats: LearningStats = LearningStats()
+    private(set) var summaryStats: SummaryStats = SummaryStats()
+    private(set) var isLoading = false
 
-    @Published var selectedTimeRange: TimeRange = .twoWeeks
+    var selectedTimeRange: TimeRange = .twoWeeks {
+        didSet {
+            if oldValue != selectedTimeRange {
+                loadStatistics()
+            }
+        }
+    }
 
     // MARK: - Private Properties
 
     private let context = CoreDataStack.shared.persistentContainer.viewContext
-    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
     init() {
         loadStatistics()
-
-        // Reload when time range changes
-        $selectedTimeRange
-            .dropFirst()
-            .sink { [weak self] _ in
-                self?.loadStatistics()
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods

@@ -76,7 +76,7 @@ struct DetailBottomBar: View {
     var primaryAction: DetailAction?
 
     /// Access to settings for API key check
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
 
     // MARK: - Initialization
 

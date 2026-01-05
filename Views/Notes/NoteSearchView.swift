@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - Note Search View
 
 struct NoteSearchView: View {
-    @StateObject private var viewModel = SearchViewModel()
+    @State private var viewModel = SearchViewModel()
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingFilters = false

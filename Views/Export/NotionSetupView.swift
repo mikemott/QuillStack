@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NotionSetupView: View {
-    @StateObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @State private var apiKeyInput: String = ""
     @State private var showingAPIKey = false
     @State private var testingConnection = false

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ObsidianSetupView: View {
-    @StateObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @State private var vaultPathInput: String = ""
     @State private var defaultFolderInput: String = ""
     @State private var isValidPath = false

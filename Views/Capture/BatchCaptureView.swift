@@ -13,7 +13,7 @@ import CoreData
 
 struct BatchCaptureView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var batchState = BatchCaptureState()
+    @State private var batchState = BatchCaptureState()
     @State private var cameraManager = CameraManager()
 
     @State private var showingPreview = false
@@ -291,7 +291,7 @@ struct BatchCaptureView: View {
 // MARK: - Batch Preview Sheet
 
 struct BatchPreviewSheet: View {
-    @ObservedObject var batchState: BatchCaptureState
+    @Bindable var batchState: BatchCaptureState
     @Environment(\.dismiss) private var dismiss
     @State private var currentPage = 0
 
