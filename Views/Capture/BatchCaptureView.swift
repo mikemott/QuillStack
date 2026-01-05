@@ -185,7 +185,8 @@ struct BatchCaptureView: View {
     private var thumbnailStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(Array(batchState.capturedImages.enumerated()), id: \.offset) { index, image in
+                ForEach(batchState.capturedImages.indices, id: \.self) { index in
+                    let image = batchState.capturedImages[index]
                     ZStack(alignment: .topTrailing) {
                         Image(uiImage: image)
                             .resizable()

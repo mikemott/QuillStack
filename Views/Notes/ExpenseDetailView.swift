@@ -641,7 +641,8 @@ struct ReceiptImageViewer: View {
                     }
                 } else {
                     TabView(selection: $currentPage) {
-                        ForEach(Array(note.sortedPages.enumerated()), id: \.offset) { index, page in
+                        ForEach(note.sortedPages.indices, id: \.self) { index in
+                            let page = note.sortedPages[index]
                             if let image = page.image {
                                 Image(uiImage: image)
                                     .resizable()
