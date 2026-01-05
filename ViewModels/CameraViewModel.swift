@@ -22,7 +22,7 @@ final class CameraViewModel {
     // Dependencies (protocol-based for testability)
     private let ocrService: OCRServiceProtocol
     private let textClassifier: TextClassifierProtocol
-    private let imageProcessor = ImageProcessor()
+    private let imageProcessor = ImageProcessor.shared
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
 

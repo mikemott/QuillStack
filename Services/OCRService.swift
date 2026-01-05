@@ -85,7 +85,7 @@ final class OCRService: OCRServiceProtocol, @unchecked Sendable {
         case invalidImage
     }
 
-    private let imageProcessor = ImageProcessor()
+    private let imageProcessor = ImageProcessor.shared
 
     // Common words in emails and handwritten notes to improve recognition
     private nonisolated let customVocabulary = [

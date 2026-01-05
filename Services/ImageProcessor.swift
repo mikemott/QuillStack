@@ -9,8 +9,19 @@ import UIKit
 import CoreImage
 import Vision
 
-class ImageProcessor {
-    private let context = CIContext(options: [.useSoftwareRenderer: false])
+final class ImageProcessor {
+    static let shared = ImageProcessor()
+
+    private lazy var context: CIContext = {
+        CIContext(options: [.useSoftwareRenderer: false])
+    }()
+
+    private init() {}
+
+    /// Preloads expensive GPU resources on a background queue
+    func warmUp() {
+        _ = context
+    }
 
     /// Preprocesses image for better OCR accuracy
     func preprocess(image: UIImage) -> UIImage? {
