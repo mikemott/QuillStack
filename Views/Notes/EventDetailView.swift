@@ -29,7 +29,7 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     private let calendarService = CalendarService.shared

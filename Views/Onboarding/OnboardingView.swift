@@ -24,7 +24,7 @@ enum OnboardingPageType: Equatable {
 
 struct OnboardingView: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
 
     @State private var currentPageIndex: Int = 0
     @State private var selectedFeatures: Set<OnboardingFeature> = []

@@ -138,7 +138,7 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
     @State private var showingEventPicker = false
     @State private var showingSummarySheet = false
     @State private var showingTypePicker = false
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

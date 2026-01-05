@@ -19,7 +19,7 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
     @State private var showingTypePicker = false
     @State private var tags: [String] = []
     @State private var newTag: String = ""
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

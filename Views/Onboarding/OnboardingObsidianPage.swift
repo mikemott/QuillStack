@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OnboardingObsidianPage: View {
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
 
     var onContinue: () -> Void
     var onSkip: () -> Void

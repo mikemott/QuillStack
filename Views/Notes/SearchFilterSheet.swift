@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - Search Filter Sheet
 
 struct SearchFilterSheet: View {
-    @ObservedObject var viewModel: SearchViewModel
+    @Bindable var viewModel: SearchViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var startDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()

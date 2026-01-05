@@ -28,7 +28,8 @@ import os.log
 /// // Later: NoteEventBus.shared.unsubscribe(subscriptionId)
 /// ```
 @MainActor
-final class NoteEventBus: ObservableObject {
+@Observable
+final class NoteEventBus {
 
     // MARK: - Singleton
 
@@ -41,10 +42,10 @@ final class NoteEventBus: ObservableObject {
     // MARK: - Published State
 
     /// The most recent event (for SwiftUI binding)
-    @Published private(set) var lastEvent: WrappedNoteEvent?
+    private(set) var lastEvent: WrappedNoteEvent?
 
     /// Count of events published in this session
-    @Published private(set) var eventCount: Int = 0
+    private(set) var eventCount: Int = 0
 
     // MARK: - Subscribers
 
@@ -226,11 +227,11 @@ final class NoteEventBus: ObservableObject {
     // MARK: - Combine Publisher
 
     /// Publisher for SwiftUI/Combine integration.
-    var eventPublisher: AnyPublisher<WrappedNoteEvent, Never> {
-        $lastEvent
-            .compactMap { $0 }
-            .eraseToAnyPublisher()
-    }
+    /// Note: With @Observable, use the subscription API instead of this publisher
+    /// TODO: If needed, implement using withObservationTracking or PassthroughSubject
+    // var eventPublisher: AnyPublisher<WrappedNoteEvent, Never> {
+    //     // Not available with @Observable - use subscribe() instead
+    // }
 
     // MARK: - Private Helpers
 

@@ -91,7 +91,8 @@ enum OnboardingFeature: String, CaseIterable, Codable {
 /// Central app settings management with secure credential storage
 /// API keys are stored in Keychain; other settings use UserDefaults
 @MainActor
-final class SettingsManager: ObservableObject {
+@Observable
+final class SettingsManager {
     static let shared = SettingsManager()
 
     private let defaults = UserDefaults.standard
@@ -137,7 +138,7 @@ final class SettingsManager: ObservableObject {
 
     // MARK: - AI/Claude Settings (Keychain-backed)
 
-    @Published var claudeAPIKey: String? = nil {
+    var claudeAPIKey: String? = nil {
         didSet {
             if let key = claudeAPIKey, !key.isEmpty {
                 try? keychain.save(key, for: .claudeAPIKey)
@@ -147,13 +148,13 @@ final class SettingsManager: ObservableObject {
         }
     }
 
-    @Published var autoEnhanceOCR: Bool = false {
+    var autoEnhanceOCR: Bool = false {
         didSet {
             defaults.set(autoEnhanceOCR, forKey: Keys.autoEnhanceOCR)
         }
     }
 
-    @Published var hasAcceptedAIDisclosure: Bool = false {
+    var hasAcceptedAIDisclosure: Bool = false {
         didSet {
             defaults.set(hasAcceptedAIDisclosure, forKey: Keys.hasAcceptedAIDisclosure)
         }
@@ -161,13 +162,13 @@ final class SettingsManager: ObservableObject {
 
     // MARK: - OCR Settings
 
-    @Published var showLowConfidenceHighlights: Bool = true {
+    var showLowConfidenceHighlights: Bool = true {
         didSet {
             defaults.set(showLowConfidenceHighlights, forKey: Keys.showLowConfidenceHighlights)
         }
     }
 
-    @Published var lowConfidenceThreshold: Float = 0.7 {
+    var lowConfidenceThreshold: Float = 0.7 {
         didSet {
             defaults.set(lowConfidenceThreshold, forKey: Keys.lowConfidenceThreshold)
         }
@@ -175,7 +176,7 @@ final class SettingsManager: ObservableObject {
 
     // MARK: - Export Settings
 
-    @Published var obsidianVaultPath: String? = nil {
+    var obsidianVaultPath: String? = nil {
         didSet {
             if let path = obsidianVaultPath {
                 defaults.set(path, forKey: Keys.obsidianVaultPath)
@@ -185,13 +186,13 @@ final class SettingsManager: ObservableObject {
         }
     }
 
-    @Published var obsidianDefaultFolder: String = "QuillStack" {
+    var obsidianDefaultFolder: String = "QuillStack" {
         didSet {
             defaults.set(obsidianDefaultFolder, forKey: Keys.obsidianDefaultFolder)
         }
     }
 
-    @Published var notionAPIKey: String? = nil {
+    var notionAPIKey: String? = nil {
         didSet {
             if let key = notionAPIKey, !key.isEmpty {
                 try? keychain.save(key, for: .notionAPIKey)
@@ -201,7 +202,7 @@ final class SettingsManager: ObservableObject {
         }
     }
 
-    @Published var notionDefaultDatabaseId: String? = nil {
+    var notionDefaultDatabaseId: String? = nil {
         didSet {
             if let id = notionDefaultDatabaseId {
                 defaults.set(id, forKey: Keys.notionDefaultDatabaseId)
@@ -211,19 +212,19 @@ final class SettingsManager: ObservableObject {
         }
     }
 
-    @Published var includeOriginalImageDefault: Bool = false {
+    var includeOriginalImageDefault: Bool = false {
         didSet {
             defaults.set(includeOriginalImageDefault, forKey: Keys.includeOriginalImageDefault)
         }
     }
 
-    @Published var exportTagMappings: [String: String] = [:] {
+    var exportTagMappings: [String: String] = [:] {
         didSet {
             defaults.set(exportTagMappings, forKey: Keys.exportTagMappings)
         }
     }
 
-    @Published var defaultExportDestination: String = "apple_notes" {
+    var defaultExportDestination: String = "apple_notes" {
         didSet {
             defaults.set(defaultExportDestination, forKey: Keys.defaultExportDestination)
         }
@@ -231,13 +232,13 @@ final class SettingsManager: ObservableObject {
 
     // MARK: - Onboarding Settings
 
-    @Published var hasCompletedOnboarding: Bool = false {
+    var hasCompletedOnboarding: Bool = false {
         didSet {
             defaults.set(hasCompletedOnboarding, forKey: Keys.hasCompletedOnboarding)
         }
     }
 
-    @Published var selectedOnboardingFeatures: Set<OnboardingFeature> = [] {
+    var selectedOnboardingFeatures: Set<OnboardingFeature> = [] {
         didSet {
             let rawValues = selectedOnboardingFeatures.map { $0.rawValue }
             defaults.set(rawValues, forKey: Keys.selectedOnboardingFeatures)
@@ -247,21 +248,21 @@ final class SettingsManager: ObservableObject {
     // MARK: - Image Retention Settings
 
     /// Policy for retaining original images after OCR
-    @Published var imageRetentionPolicy: ImageRetentionPolicy = .keepForever {
+    var imageRetentionPolicy: ImageRetentionPolicy = .keepForever {
         didSet {
             defaults.set(imageRetentionPolicy.rawValue, forKey: Keys.imageRetentionPolicy)
         }
     }
 
     /// Whether to automatically delete original images after OCR completes
-    @Published var autoDeleteOriginalImages: Bool = false {
+    var autoDeleteOriginalImages: Bool = false {
         didSet {
             defaults.set(autoDeleteOriginalImages, forKey: Keys.autoDeleteOriginalImages)
         }
     }
 
     /// Number of days to retain original images (used with .deleteAfterDays policy)
-    @Published var imageRetentionDays: Int = 30 {
+    var imageRetentionDays: Int = 30 {
         didSet {
             defaults.set(imageRetentionDays, forKey: Keys.imageRetentionDays)
         }

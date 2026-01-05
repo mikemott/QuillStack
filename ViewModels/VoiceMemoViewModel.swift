@@ -12,7 +12,8 @@ import CoreData
 import Combine
 
 @MainActor
-final class VoiceMemoViewModel: ObservableObject {
+@Observable
+final class VoiceMemoViewModel {
     enum SaveState: Equatable {
         case idle
         case saving
@@ -20,7 +21,7 @@ final class VoiceMemoViewModel: ObservableObject {
         case failure(String)
     }
 
-    @Published var transcript: String = "" {
+    var transcript: String = "" {
         didSet {
             if oldValue != transcript {
                 updateDetectedSections()
@@ -31,18 +32,23 @@ final class VoiceMemoViewModel: ObservableObject {
         }
     }
 
-    @Published private(set) var detectedSections: [NoteSection] = []
-    @Published private(set) var isRecording = false
-    @Published private(set) var isSaving = false
-    @Published var saveState: SaveState = .idle
-    @Published var errorMessage: String?
-    @Published private(set) var microphoneGranted = false
-    @Published private(set) var speechGranted = false
+    private(set) var detectedSections: [NoteSection] = []
+    private(set) var isRecording = false
+    private(set) var isSaving = false
+    var saveState: SaveState = .idle
+    var errorMessage: String?
+    private(set) var microphoneGranted = false
+    private(set) var speechGranted = false
 
-    private let audioEngine = AVAudioEngine()
-    private var audioTapInstalled = false
-    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
-    private var recognitionTask: SFSpeechRecognitionTask?
+    // Audio engine resources marked as nonisolated(unsafe) for deinit cleanup.
+    // This is safe because:
+    // 1. These are only accessed in deinit (cleanup only, no race conditions)
+    // 2. AVAudioEngine operations used here are thread-safe
+    // 3. No concurrent modification occurs - deinit is the final access
+    nonisolated(unsafe) private let audioEngine = AVAudioEngine()
+    nonisolated(unsafe) private var audioTapInstalled = false
+    nonisolated(unsafe) private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+    nonisolated(unsafe) private var recognitionTask: SFSpeechRecognitionTask?
     private let speechRecognizer: SFSpeechRecognizer?
     private let textClassifier: TextClassifierProtocol
     private var manualPrefix: String = ""

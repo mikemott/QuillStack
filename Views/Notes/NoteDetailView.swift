@@ -22,7 +22,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
     @State private var hasPendingEnhancement: Bool = false
     @State private var saveTask: Task<Void, Never>?
     @State private var showingTypePicker = false
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     /// Debounce delay for auto-save (in nanoseconds)

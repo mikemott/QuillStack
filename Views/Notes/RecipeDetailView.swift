@@ -16,7 +16,7 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
     @State private var showingExportSheet: Bool = false
     @State private var showingShareSheet: Bool = false
     @State private var showingTypePicker = false
-    @ObservedObject private var settings = SettingsManager.shared
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

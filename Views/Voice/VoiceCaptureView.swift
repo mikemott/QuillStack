@@ -9,7 +9,7 @@ import SwiftUI
 
 struct VoiceCaptureView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = VoiceMemoViewModel()
+    @State private var viewModel = VoiceMemoViewModel()
     @FocusState private var isEditorFocused: Bool
 
     var body: some View {

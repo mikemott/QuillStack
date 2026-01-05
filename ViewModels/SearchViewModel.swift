@@ -12,14 +12,15 @@ import Combine
 // MARK: - Search View Model
 
 @MainActor
-class SearchViewModel: ObservableObject {
+@Observable
+final class SearchViewModel {
     // MARK: - Published Properties
 
-    @Published var searchText: String = ""
-    @Published var filters = SearchFilters()
-    @Published var results: [Note] = []
-    @Published var isSearching = false
-    @Published var hasSearched = false
+    var searchText: String = ""
+    var filters = SearchFilters()
+    var results: [Note] = []
+    var isSearching = false
+    var hasSearched = false
 
     // MARK: - Private Properties
 

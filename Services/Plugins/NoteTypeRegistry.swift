@@ -29,7 +29,8 @@ import os.log
 /// }
 /// ```
 @MainActor
-final class NoteTypeRegistry: ObservableObject {
+@Observable
+final class NoteTypeRegistry {
 
     // MARK: - Singleton
 
@@ -42,10 +43,10 @@ final class NoteTypeRegistry: ObservableObject {
     // MARK: - Published State
 
     /// Number of registered plugins
-    @Published private(set) var pluginCount: Int = 0
+    private(set) var pluginCount: Int = 0
 
     /// Available note types (from registered plugins)
-    @Published private(set) var availableTypes: [NoteType] = []
+    private(set) var availableTypes: [NoteType] = []
 
     // MARK: - Storage
 
