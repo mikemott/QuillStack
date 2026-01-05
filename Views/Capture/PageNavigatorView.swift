@@ -70,7 +70,8 @@ struct PageNavigatorView: View {
 
     private var pageContent: some View {
         TabView(selection: $currentPage) {
-            ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
+            ForEach(pages.indices, id: \.self) { index in
+                let page = pages[index]
                 PageView(page: page)
                     .tag(index)
             }
@@ -84,7 +85,8 @@ struct PageNavigatorView: View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
+                    ForEach(pages.indices, id: \.self) { index in
+                        let page = pages[index]
                         Button(action: {
                             withAnimation {
                                 currentPage = index

@@ -301,7 +301,8 @@ struct BatchPreviewSheet: View {
                 Color.black.ignoresSafeArea()
 
                 TabView(selection: $currentPage) {
-                    ForEach(Array(batchState.capturedImages.enumerated()), id: \.offset) { index, image in
+                    ForEach(batchState.capturedImages.indices, id: \.self) { index in
+                        let image = batchState.capturedImages[index]
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
