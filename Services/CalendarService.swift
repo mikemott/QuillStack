@@ -154,8 +154,17 @@ final class CalendarService: CalendarServiceProtocol, @unchecked Sendable {
             throw CalendarError.createFailed("Could not parse event date and time")
         }
 
+        // Create event directly to support recurrence rules
+        let event = EKEvent(eventStore: eventStore)
+        event.calendar = calendar
+        event.title = extractedEvent.title
+        event.startDate = startDate
+
         // Default duration to 1 hour if not specified
-        let duration = 60
+        let endDate = Calendar.current.date(byAdding: .minute, value: 60, to: startDate) ?? startDate
+        event.endDate = endDate
+
+        event.location = extractedEvent.location
 
         // Build notes from extracted data
         var notesParts: [String] = []
@@ -168,20 +177,49 @@ final class CalendarService: CalendarServiceProtocol, @unchecked Sendable {
         if let contactInfo = extractedEvent.contactInfo, !contactInfo.isEmpty {
             notesParts.append("Contact: \(contactInfo)")
         }
+
+        // Add recurrence rule if event is recurring
         if extractedEvent.isRecurring, let pattern = extractedEvent.recurrencePattern {
-            notesParts.append("Recurring: \(pattern)")
+            if let recurrenceRule = parseRecurrencePattern(pattern) {
+                event.addRecurrenceRule(recurrenceRule)
+            } else {
+                // If we can't parse the pattern, add it to notes as fallback
+                notesParts.append("Recurring: \(pattern)")
+            }
         }
 
-        let notes = notesParts.isEmpty ? nil : notesParts.joined(separator: "\n\n")
+        event.notes = notesParts.isEmpty ? nil : notesParts.joined(separator: "\n\n")
 
-        return try createEvent(
-            title: extractedEvent.title,
-            startDate: startDate,
-            duration: duration,
-            notes: notes,
-            attendees: nil,
-            location: extractedEvent.location,
-            calendar: calendar
+        try eventStore.save(event, span: .thisEvent)
+        return event.eventIdentifier
+    }
+
+    /// Parse recurrence pattern string into EKRecurrenceRule
+    /// - Parameter pattern: Recurrence pattern ("daily", "weekly", "monthly", etc.)
+    /// - Returns: EKRecurrenceRule if pattern is recognized, nil otherwise
+    private func parseRecurrencePattern(_ pattern: String) -> EKRecurrenceRule? {
+        let lowercased = pattern.lowercased().trimmingCharacters(in: .whitespaces)
+
+        let frequency: EKRecurrenceFrequency
+        switch lowercased {
+        case "daily", "every day":
+            frequency = .daily
+        case "weekly", "every week":
+            frequency = .weekly
+        case "monthly", "every month":
+            frequency = .monthly
+        case "yearly", "annually", "every year":
+            frequency = .yearly
+        default:
+            // Unrecognized pattern
+            return nil
+        }
+
+        // Create recurrence rule with no end date
+        return EKRecurrenceRule(
+            recurrenceWith: frequency,
+            interval: 1,
+            end: nil
         )
     }
 
