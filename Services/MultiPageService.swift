@@ -25,10 +25,8 @@ class MultiPageService {
         for note: Note,
         context: NSManagedObjectContext
     ) async throws -> [NotePage] {
-        var pages: [NotePage] = []
-
         // Process all images in parallel using task group
-        try await withThrowingTaskGroup(of: (Int, OCRResult, Data?, Data?).self) { group in
+        let results = try await withThrowingTaskGroup(of: (Int, OCRResult, Data?, Data?).self) { group in
             for (index, image) in images.enumerated() {
                 group.addTask {
                     // Perform OCR
@@ -45,42 +43,45 @@ class MultiPageService {
             }
 
             // Collect results in order
-            var results: [(Int, OCRResult, Data?, Data?)] = []
+            var collectedResults: [(Int, OCRResult, Data?, Data?)] = []
             for try await result in group {
-                results.append(result)
+                collectedResults.append(result)
             }
 
             // Sort by original index
-            results.sort { $0.0 < $1.0 }
-
-            // Create NotePage objects on main context
-            await MainActor.run {
-                for (index, ocrResult, imageData, thumbnailData) in results {
-                    let page = NotePage(context: context)
-                    page.pageNumber = Int16(index)
-                    page.imageData = imageData
-                    page.thumbnailData = thumbnailData
-                    page.ocrText = ocrResult.fullText
-                    page.ocrConfidence = Float(ocrResult.averageConfidence)
-                    page.ocrResultData = try? JSONEncoder().encode(ocrResult)
-                    page.note = note
-
-                    note.addToPages(page)
-                    pages.append(page)
-                }
-
-                // Update note content with combined text
-                note.content = results
-                    .map { $0.1.fullText }
-                    .joined(separator: "\n\n--- Page Break ---\n\n")
-
-                // Calculate average confidence
-                let totalConfidence = results.reduce(Float(0)) { $0 + $1.1.averageConfidence }
-                note.ocrConfidence = totalConfidence / Float(results.count)
-            }
+            collectedResults.sort { $0.0 < $1.0 }
+            return collectedResults
         }
 
-        return pages
+        // Create NotePage objects on main actor (Core Data requires main context)
+        return await MainActor.run {
+            var pages: [NotePage] = []
+
+            for (index, ocrResult, imageData, thumbnailData) in results {
+                let page = NotePage(context: context)
+                page.pageNumber = Int16(index)
+                page.imageData = imageData
+                page.thumbnailData = thumbnailData
+                page.ocrText = ocrResult.fullText
+                page.ocrConfidence = Float(ocrResult.averageConfidence)
+                page.ocrResultData = try? JSONEncoder().encode(ocrResult)
+                page.note = note
+
+                note.addToPages(page)
+                pages.append(page)
+            }
+
+            // Update note content with combined text
+            note.content = results
+                .map { $0.1.fullText }
+                .joined(separator: "\n\n--- Page Break ---\n\n")
+
+            // Calculate average confidence
+            let totalConfidence = results.reduce(Float(0)) { $0 + $1.1.averageConfidence }
+            note.ocrConfidence = totalConfidence / Float(results.count)
+
+            return pages
+        }
     }
 
     /// Add a single page to an existing note

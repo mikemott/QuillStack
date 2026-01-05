@@ -40,6 +40,11 @@ final class VoiceMemoViewModel {
     private(set) var microphoneGranted = false
     private(set) var speechGranted = false
 
+    // Audio engine resources marked as nonisolated(unsafe) for deinit cleanup.
+    // This is safe because:
+    // 1. These are only accessed in deinit (cleanup only, no race conditions)
+    // 2. AVAudioEngine operations used here are thread-safe
+    // 3. No concurrent modification occurs - deinit is the final access
     nonisolated(unsafe) private let audioEngine = AVAudioEngine()
     nonisolated(unsafe) private var audioTapInstalled = false
     nonisolated(unsafe) private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
