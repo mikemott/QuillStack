@@ -68,6 +68,7 @@
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
 		AA8C277426330FD77BF879DC /* ExtractedTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
+		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -171,6 +172,7 @@
 		00954D76EE6F75C735DC5D32 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
 		05C42B046C56E7232F89EB98 /* DateParsingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DateParsingService.swift; path = DateParsingService.swift; sourceTree = "<group>"; };
 		07232297C49D5ED086A1E66A /* NoteClassification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteClassification.swift; path = Models/NoteClassification.swift; sourceTree = "<group>"; };
+		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = Views/Actions/ContactReviewSheet.swift; sourceTree = "<group>"; };
 		0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventExtractor.swift; path = Extraction/EventExtractor.swift; sourceTree = "<group>"; };
 		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
 		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
@@ -449,6 +451,7 @@
 				H003000000000024 /* Onboarding */,
 				S003000000000001 /* Statistics */,
 				D782065126BF7E0CA2F2CD90 /* TypeGuide */,
+				7E8CF69459374883FBD30733 /* Actions */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -635,6 +638,14 @@
 				N0020000000001AC /* ActionTriggerParserProtocol.swift */,
 			);
 			name = Protocols;
+			sourceTree = "<group>";
+		};
+		7E8CF69459374883FBD30733 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */,
+			);
+			name = Actions;
 			sourceTree = "<group>";
 		};
 		84EA092AFF214C48F674EE9F /* Models */ = {
@@ -1098,6 +1109,7 @@
 				0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */,
 				3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */,
 				7323932D06013BF9820E3792 /* ContactsService.swift in Sources */,
+				D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1256,9 +1268,9 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1299,9 +1311,9 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "QuillStack needs calendar access to create events from your meeting notes.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "QuillStack needs access to your camera to capture handwritten notes and documents.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "QuillStack can save contacts from scanned business cards to your Contacts app.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "QuillStack needs permission to save captured notes to your photo library.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "QuillStack needs Reminders access to export your todo items.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "QuillStack records your voice memos so we can convert them into notes.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "QuillStack transcribes recorded voice memos into searchable notes on your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

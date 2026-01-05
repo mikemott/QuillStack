@@ -12,7 +12,7 @@ import CoreData
 struct ContactDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var contact: ParsedContact = ParsedContact()
-    @State private var showingSaveSheet = false
+    @State private var showingReviewSheet = false
     @State private var saveSuccess = false
     @State private var errorMessage: String?
     @State private var showingTypePicker = false
@@ -87,6 +87,18 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingReviewSheet) {
+            ContactReviewSheet(
+                contact: contact,
+                onSave: { reviewedContact in
+                    contact = reviewedContact
+                    saveToContacts()
+                },
+                onCancel: {
+                    // Sheet dismissed
+                }
+            )
         }
     }
 
@@ -258,12 +270,12 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
 
             Spacer()
 
-            // Save to Contacts
-            Button(action: saveToContacts) {
+            // Create Contact button
+            Button(action: { showingReviewSheet = true }) {
                 HStack(spacing: 6) {
                     Image(systemName: "person.badge.plus")
                         .font(.system(size: 16, weight: .semibold))
-                    Text("Add to Contacts")
+                    Text("Create Contact")
                         .font(.serifBody(14, weight: .semibold))
                 }
                 .foregroundColor(.white)
@@ -278,7 +290,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 )
                 .cornerRadius(10)
             }
-            .disabled(contact.displayName.isEmpty || isContactsAccessDenied)
+            .disabled(contact.displayName.isEmpty)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
