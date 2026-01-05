@@ -38,7 +38,8 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 // Page content
                 TabView(selection: $currentPageIndex) {
-                    ForEach(Array(pages.enumerated()), id: \.offset) { index, pageType in
+                    ForEach(pages.indices, id: \.self) { index in
+                        let pageType = pages[index]
                         pageView(for: pageType)
                             .tag(index)
                     }
