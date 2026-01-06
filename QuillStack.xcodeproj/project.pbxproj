@@ -45,6 +45,7 @@
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
 		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
 		30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */; };
+		3B53511AF10AB949BF035314 /* EventReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E52DE837FCA19E05D95A15C /* EventReviewSheet.swift */; };
 		3E065E96161C05869F566CC7 /* LLMServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */; };
 		3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */; };
 		483CB6E94C62664F03E95662 /* NetworkAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF994FFEA388D998DB681214 /* NetworkAvailability.swift */; };
@@ -172,8 +173,9 @@
 		00954D76EE6F75C735DC5D32 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
 		05C42B046C56E7232F89EB98 /* DateParsingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DateParsingService.swift; path = DateParsingService.swift; sourceTree = "<group>"; };
 		07232297C49D5ED086A1E66A /* NoteClassification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteClassification.swift; path = Models/NoteClassification.swift; sourceTree = "<group>"; };
-		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = Views/Actions/ContactReviewSheet.swift; sourceTree = "<group>"; };
+		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = ContactReviewSheet.swift; sourceTree = "<group>"; };
 		0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventExtractor.swift; path = Extraction/EventExtractor.swift; sourceTree = "<group>"; };
+		0E52DE837FCA19E05D95A15C /* EventReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventReviewSheet.swift; path = EventReviewSheet.swift; sourceTree = "<group>"; };
 		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
 		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -644,6 +646,7 @@
 			isa = PBXGroup;
 			children = (
 				0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */,
+				0E52DE837FCA19E05D95A15C /* EventReviewSheet.swift */,
 			);
 			name = Actions;
 			path = Actions;
@@ -1111,6 +1114,7 @@
 				3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */,
 				7323932D06013BF9820E3792 /* ContactsService.swift in Sources */,
 				D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */,
+				3B53511AF10AB949BF035314 /* EventReviewSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
