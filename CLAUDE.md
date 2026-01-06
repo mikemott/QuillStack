@@ -73,7 +73,7 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
 
 ## Key Concepts
 
-**Note Types:** Auto-classified via hashtag triggers (`#todo#`, `#email#`, `#meeting#`, etc.) in `TextClassifier.swift`. Each type has a dedicated detail view. 12 types total, implemented as plugins in `Services/Plugins/BuiltIn/`.
+**Note Types:** Automatically detected using AI-powered classification in `TextClassifier.swift`. The system intelligently recognizes todo lists, meeting notes, emails, and more from natural handwriting. 12 types total, implemented as plugins in `Services/Plugins/BuiltIn/`. Hashtag triggers (e.g., `#todo#`, `#email#`) remain supported for backward compatibility.
 
 **OCR Pipeline:** Apple Vision (VNRecognizeTextRequestRevision3) → optional LLM enhancement (Claude API) → user correction for low-confidence words.
 

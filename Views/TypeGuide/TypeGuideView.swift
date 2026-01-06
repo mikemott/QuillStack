@@ -205,27 +205,27 @@ struct TypeExampleSheet: View {
         case .general:
             return "Just some quick thoughts I wanted to capture. No specific structure needed, just freeform notes."
         case .todo:
-            return "#todo#\n\n☐ Buy groceries\n☐ Call dentist\n☐ Finish project report\n☐ Exercise for 30 min"
+            return "☐ Buy groceries\n☐ Call dentist\n☐ Finish project report\n☐ Exercise for 30 min"
         case .meeting:
-            return "#meeting#\n\nQ1 Planning\nJan 15, 2026 at 2:00 PM\nWith: Sarah, Mike, Alex\n\n- Discussed new feature roadmap\n- Reviewed budget\n- Action: Sarah to draft timeline"
+            return "Q1 Planning Meeting\nJan 15, 2026 at 2:00 PM\nWith: Sarah, Mike, Alex\n\n- Discussed new feature roadmap\n- Reviewed budget\n- Action: Sarah to draft timeline"
         case .email:
-            return "#email#\n\nTo: team@company.com\nRe: Project Update\n\nHi team, wanted to share a quick update on the launch timeline..."
+            return "To: team@company.com\nRe: Project Update\n\nHi team, wanted to share a quick update on the launch timeline..."
         case .reminder:
-            return "#reminder#\n\nPick up dry cleaning\nToday at 5:00 PM"
+            return "Reminder: Pick up dry cleaning\nToday at 5:00 PM"
         case .contact:
-            return "#contact#\n\nJohn Smith\nPhone: (555) 123-4567\nEmail: john@example.com\nCompany: Acme Corp"
+            return "John Smith\nPhone: (555) 123-4567\nEmail: john@example.com\nCompany: Acme Corp"
         case .expense:
-            return "#expense#\n\nLunch meeting\n$45.00\nJan 12, 2026\nCategory: Meals"
+            return "Lunch meeting\n$45.00\nJan 12, 2026\nCategory: Meals"
         case .shopping:
-            return "#shopping#\n\n- Milk\n- Eggs\n- Bread\n- Chicken\n- Apples"
+            return "Shopping List:\n- Milk\n- Eggs\n- Bread\n- Chicken\n- Apples"
         case .recipe:
-            return "#recipe#\n\nChocolate Chip Cookies\n\nIngredients:\n- 2 cups flour\n- 1 cup butter\n- 1 cup chocolate chips\n\nBake at 350°F for 12 min"
+            return "Chocolate Chip Cookies\n\nIngredients:\n- 2 cups flour\n- 1 cup butter\n- 1 cup chocolate chips\n\nBake at 350°F for 12 min"
         case .event:
-            return "#event#\n\nDinner with friends\nSaturday, Jan 18 at 7:00 PM\nLocation: The Garden Bistro"
+            return "Dinner with friends\nSaturday, Jan 18 at 7:00 PM\nLocation: The Garden Bistro"
         case .idea:
-            return "#idea#\n\nWhat if we added a dark mode toggle? Could help with battery life and eye strain at night."
+            return "What if we added a dark mode toggle? Could help with battery life and eye strain at night."
         case .claudePrompt:
-            return "#feature#\n\nAdd ability to search notes by date range. Would be super helpful for finding old meeting notes."
+            return "Feature Request: Add ability to search notes by date range. Would be super helpful for finding old meeting notes."
         }
     }
 

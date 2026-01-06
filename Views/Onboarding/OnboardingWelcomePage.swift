@@ -53,7 +53,7 @@ struct OnboardingWelcomePage: View {
             VStack(alignment: .leading, spacing: 16) {
                 featureRow(icon: "camera.fill", text: "Capture notes with your camera")
                 featureRow(icon: "text.viewfinder", text: "Instant OCR text recognition")
-                featureRow(icon: "folder.fill", text: "Auto-organize by type")
+                featureRow(icon: "sparkles", text: "Automatically detects what you capture")
             }
             .padding(.horizontal, 40)
 
