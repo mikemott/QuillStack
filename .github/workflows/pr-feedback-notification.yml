@@ -1,0 +1,92 @@
+name: PR Feedback Notification
+
+on:
+  workflow_run:
+    workflows: ["Run PR Agent"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Get PR number
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pulls = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`
+            });
+
+            if (pulls.data.length > 0) {
+              return pulls.data[0].number;
+            }
+            return null;
+          result-encoding: string
+
+      - name: Check for compliance issues
+        if: steps.pr.outputs.result != 'null'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr.outputs.result }};
+
+            // Get PR-Agent comments
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+
+            // Look for PR-Agent compliance feedback
+            const prAgentComment = comments.data.find(c =>
+              c.user.login === 'qodo-code-review' &&
+              c.body.includes('PR Compliance Guide')
+            );
+
+            if (!prAgentComment) {
+              console.log('No PR-Agent compliance comment found');
+              return;
+            }
+
+            // Check for compliance issues (🔴 or ⚪ indicators)
+            const hasIssues = prAgentComment.body.includes('🔴') ||
+                             prAgentComment.body.includes('⚪');
+
+            if (hasIssues) {
+              // Post a notification comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## 🤖 PR-Agent Feedback Available
+
+PR-Agent has identified some items that may need attention.
+
+**Next Steps:**
+1. Review the compliance feedback above
+2. For automatic fixes, ask Claude Code: \`Can you take a look at the PR Agent's feedback and see if any changes need to be made?\`
+3. Or manually address the feedback
+
+**Quick Fix:**
+\`\`\`bash
+# In your terminal with Claude Code active:
+claude chat "Can you take a look at the PR Agent's feedback and see if any changes need to be made?"
+\`\`\`
+`
+              });
+
+              console.log('Posted notification comment');
+            } else {
+              console.log('No compliance issues found');
+            }
