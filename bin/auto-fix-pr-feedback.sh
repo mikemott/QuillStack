@@ -10,6 +10,13 @@ if [ -z "$PR_NUMBER" ]; then
     exit 1
 fi
 
+# Validate PR_NUMBER is numeric to prevent injection attacks
+if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "❌ Invalid PR number: $PR_NUMBER"
+    echo "PR number must be a positive integer"
+    exit 1
+fi
+
 echo "⏳ Waiting for PR-Agent to complete review of PR #$PR_NUMBER..."
 
 # Wait for PR-Agent to finish (max 5 minutes)
