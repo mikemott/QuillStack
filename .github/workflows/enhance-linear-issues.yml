@@ -24,6 +24,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           # Fetch issues created/updated in last 3 hours with short descriptions
+          # Only fetch issues in "Todo" or "Backlog" states to avoid enhancing issues already in development or PRs
           # Calculate timestamp 3 hours ago (portable: tries GNU date first, then BSD date)
           THREE_HOURS_AGO=$(date -u -d '3 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-3H +%Y-%m-%dT%H:%M:%SZ)
           
@@ -31,7 +32,7 @@ jobs:
             -H "Authorization: $LINEAR_API_KEY" \
             -H "Content-Type: application/json" \
             -d '{
-              "query": "query { issues(filter: { updatedAt: { gt: \"'"$THREE_HOURS_AGO"'\" } }, first: 20) { nodes { id identifier title description state { name } labels { nodes { name } } } } }"
+              "query": "query { issues(filter: { updatedAt: { gt: \"'"$THREE_HOURS_AGO"'\" }, state: { type: { in: [\"backlog\", \"unstarted\"] } } }, first: 20) { nodes { id identifier title description state { name } labels { nodes { name } } } } }"
             }')
 
           echo "$RESPONSE" | jq -c '.data.issues.nodes[]' | while read -r issue; do
