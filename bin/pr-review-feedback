@@ -6,6 +6,12 @@
 
 set -e
 
+# Ensure GitHub CLI is available
+if ! command -v gh >/dev/null 2>&1; then
+  echo "❌ Error: GitHub CLI (gh) is required but not installed." >&2
+  exit 1
+fi
+
 # Get PR number from argument or current branch
 PR_NUMBER=$1
 if [ -z "$PR_NUMBER" ]; then
@@ -34,21 +40,25 @@ ELAPSED=0
 INTERVAL=10
 
 while [ $ELAPSED -lt $MAX_WAIT ]; do
-    # Force fresh data by not relying on gh cache
-    STATUS=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | .status' 2>/dev/null || echo "")
-    CONCLUSION=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | .conclusion' 2>/dev/null || echo "")
+    # Get both status and conclusion in a single API call for efficiency
+    CHECK_DATA=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | {status, conclusion}' 2>/dev/null || echo "")
 
-    if [ "$STATUS" = "COMPLETED" ] || [ -n "$CONCLUSION" ]; then
-        echo "✅ PR-Agent review complete (conclusion: ${CONCLUSION:-success})"
-        break
-    elif [ -z "$STATUS" ]; then
-        echo "⚠️  PR-Agent check not found (may not have started yet) - waiting... ($ELAPSED/${MAX_WAIT}s)"
-        sleep $INTERVAL
+    if [ -n "$CHECK_DATA" ]; then
+        STATUS=$(echo "$CHECK_DATA" | jq -r '.status // ""')
+        CONCLUSION=$(echo "$CHECK_DATA" | jq -r '.conclusion // ""')
+
+        # Check for any terminal state (completed with any conclusion, or failed/skipped)
+        if [ "$STATUS" = "COMPLETED" ] || [ -n "$CONCLUSION" ]; then
+            echo "✅ PR-Agent review complete (conclusion: ${CONCLUSION:-unknown})"
+            break
+        else
+            echo "   Status: $STATUS - waiting... ($ELAPSED/${MAX_WAIT}s)"
+        fi
     else
-        echo "   Status: $STATUS - waiting... ($ELAPSED/${MAX_WAIT}s)"
-        sleep $INTERVAL
+        echo "⚠️  PR-Agent check not found (may not have started yet) - waiting... ($ELAPSED/${MAX_WAIT}s)"
     fi
 
+    sleep $INTERVAL
     ELAPSED=$((ELAPSED + INTERVAL))
 done
 

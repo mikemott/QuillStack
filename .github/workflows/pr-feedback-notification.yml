@@ -41,15 +41,15 @@ jobs:
           script: |
             const prNumber = ${{ steps.pr.outputs.result }};
 
-            // Get PR-Agent comments
-            const comments = await github.rest.issues.listComments({
+            // Get PR-Agent comments with pagination (handles PRs with >30 comments)
+            const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber
             });
 
             // Look for PR-Agent compliance feedback
-            const prAgentComment = comments.data.find(c =>
+            const prAgentComment = comments.find(c =>
               c.user.login === 'qodo-code-review' &&
               c.body.includes('PR Compliance Guide')
             );
