@@ -130,6 +130,13 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             throw LLMError.invalidResponse
         }
 
+        // Track token usage for cost monitoring
+        if let usage = json["usage"] as? [String: Any],
+           let inputTokens = usage["input_tokens"] as? Int,
+           let outputTokens = usage["output_tokens"] as? Int {
+            await LLMCostTracker.shared.recordUsage(inputTokens: inputTokens, outputTokens: outputTokens)
+        }
+
         return text
     }
 

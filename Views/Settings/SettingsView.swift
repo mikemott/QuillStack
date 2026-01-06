@@ -55,6 +55,11 @@ struct SettingsView: View {
                                 aiDisclosureSection
                             }
 
+                            // LLM Cost & Rate Limits (only show when API key is set)
+                            if settings.hasAPIKey {
+                                costAndRateLimitsSection
+                            }
+
                             // Storage & Privacy Section
                             storagePrivacySection
 
@@ -482,6 +487,153 @@ struct SettingsView: View {
             )
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+        }
+    }
+
+    // MARK: - Cost & Rate Limits Section
+
+    private var costAndRateLimitsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader(title: "API Usage & Costs", icon: "chart.bar.fill")
+
+            VStack(spacing: 0) {
+                // Usage Statistics
+                let usage = LLMCostTracker.shared.getCurrentUsage()
+                let rateLimits = LLMRateLimiter.shared.getCurrentUsage()
+
+                VStack(alignment: .leading, spacing: 16) {
+                    // Cost Summary
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Current Usage")
+                            .font(.serifBody(15, weight: .semibold))
+                            .foregroundColor(.textDark)
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Today")
+                                    .font(.serifCaption(11, weight: .medium))
+                                    .foregroundColor(.textMedium)
+                                Text("$\(String(format: "%.2f", usage.dailyCost))")
+                                    .font(.serifBody(16, weight: .bold))
+                                    .foregroundColor(usage.dailyCost >= usage.dailyBudget ? .red : .forestDark)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Divider()
+                                .frame(height: 40)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("This Month")
+                                    .font(.serifCaption(11, weight: .medium))
+                                    .foregroundColor(.textMedium)
+                                Text("$\(String(format: "%.2f", usage.monthlyCost))")
+                                    .font(.serifBody(16, weight: .bold))
+                                    .foregroundColor(usage.monthlyCost >= usage.monthlyBudget ? .red : .forestDark)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Divider()
+                                .frame(height: 40)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("All Time")
+                                    .font(.serifCaption(11, weight: .medium))
+                                    .foregroundColor(.textMedium)
+                                Text("$\(String(format: "%.2f", usage.lifetimeCost))")
+                                    .font(.serifBody(16, weight: .bold))
+                                    .foregroundColor(.forestDark)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+
+                    Divider()
+
+                    // Rate Limit Status
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Rate Limits")
+                            .font(.serifBody(15, weight: .semibold))
+                            .foregroundColor(.textDark)
+
+                        VStack(spacing: 8) {
+                            rateLimitRow(
+                                label: "Per Minute",
+                                current: rateLimits.callsThisMinute,
+                                max: rateLimits.maxPerMinute
+                            )
+
+                            rateLimitRow(
+                                label: "Per Hour",
+                                current: rateLimits.callsThisHour,
+                                max: rateLimits.maxPerHour
+                            )
+
+                            rateLimitRow(
+                                label: "Per Day",
+                                current: rateLimits.callsThisDay,
+                                max: rateLimits.maxPerDay
+                            )
+                        }
+                    }
+
+                    Divider()
+
+                    // Budget Warnings
+                    let budgetStatus = LLMCostTracker.shared.checkBudgetStatus()
+                    if budgetStatus.shouldAlert, let message = budgetStatus.alertMessage {
+                        HStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                            Text(message)
+                                .font(.serifCaption(12, weight: .medium))
+                                .foregroundColor(.textDark)
+                        }
+                        .padding(12)
+                        .background(Color.orange.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+
+                    // Reset button
+                    Button(action: {
+                        LLMRateLimiter.shared.resetAllLimits()
+                        LLMCostTracker.shared.resetAllUsage()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.clockwise")
+                            Text("Reset All Statistics")
+                        }
+                        .font(.serifBody(14, weight: .medium))
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity)
+                        .padding(12)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
+                .padding(16)
+            }
+            .background(
+                LinearGradient(
+                    colors: [Color.paperBeige.opacity(0.95), Color.paperTan.opacity(0.98)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+        }
+    }
+
+    // Helper view for rate limit rows
+    private func rateLimitRow(label: String, current: Int, max: Int) -> some View {
+        HStack {
+            Text(label)
+                .font(.serifCaption(12, weight: .regular))
+                .foregroundColor(.textMedium)
+            Spacer()
+            Text("\(current) / \(max)")
+                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .foregroundColor(current >= max ? .red : (Double(current) / Double(max) > 0.8 ? .orange : .forestDark))
         }
     }
 

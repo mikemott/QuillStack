@@ -7,90 +7,227 @@
 
 import Foundation
 
-/// Rate limiter for LLM API calls
+/// Rate limiter for LLM API calls to prevent excessive costs
+/// Tracks calls per minute, hour, and day with user-configurable limits
+/// Falls back to heuristic classification when limits are exceeded
 @MainActor
 final class LLMRateLimiter {
     static let shared = LLMRateLimiter()
 
-    // Rate limits (configurable)
-    private let maxCallsPerMinute = 10
-    private let maxCallsPerHour = 100
-    private let maxCallsPerDay = 500
+    private let defaults = UserDefaults.standard
 
-    // Tracking (persisted to UserDefaults)
-    private var callTimestamps: [Date] = []
-    private let userDefaultsKey = "llm_call_timestamps"
+    // MARK: - UserDefaults Keys
 
-    private init() {
-        // Load timestamps from UserDefaults
-        if let savedTimestamps = UserDefaults.standard.object(forKey: userDefaultsKey) as? [Date] {
-            callTimestamps = savedTimestamps
+    private enum Keys {
+        static let callsThisMinute = "llm_calls_this_minute"
+        static let callsThisHour = "llm_calls_this_hour"
+        static let callsThisDay = "llm_calls_this_day"
+        static let lastCallTimestamp = "llm_last_call_timestamp"
+        static let lastMinuteReset = "llm_last_minute_reset"
+        static let lastHourReset = "llm_last_hour_reset"
+        static let lastDayReset = "llm_last_day_reset"
+
+        // User-configurable limits
+        static let maxCallsPerMinute = "llm_max_calls_per_minute"
+        static let maxCallsPerHour = "llm_max_calls_per_hour"
+        static let maxCallsPerDay = "llm_max_calls_per_day"
+    }
+
+    // MARK: - Default Limits
+
+    /// Default rate limits designed to prevent excessive costs while allowing normal usage
+    /// These are conservative limits - 5 calls/minute prevents rapid-fire requests
+    /// Estimated cost at default limits: ~$2-4 per day maximum
+    private struct DefaultLimits {
+        static let perMinute = 5      // Max 5 calls per minute
+        static let perHour = 50       // Max 50 calls per hour (~$0.50-1.00 depending on usage)
+        static let perDay = 200       // Max 200 calls per day (~$2-4 per day max)
+    }
+
+    // MARK: - Configuration
+
+    var maxCallsPerMinute: Int {
+        get {
+            let value = defaults.integer(forKey: Keys.maxCallsPerMinute)
+            return value > 0 ? value : DefaultLimits.perMinute
+        }
+        set {
+            defaults.set(newValue, forKey: Keys.maxCallsPerMinute)
         }
     }
 
-    /// Check if a new LLM call is allowed under rate limits
+    var maxCallsPerHour: Int {
+        get {
+            let value = defaults.integer(forKey: Keys.maxCallsPerHour)
+            return value > 0 ? value : DefaultLimits.perHour
+        }
+        set {
+            defaults.set(newValue, forKey: Keys.maxCallsPerHour)
+        }
+    }
+
+    var maxCallsPerDay: Int {
+        get {
+            let value = defaults.integer(forKey: Keys.maxCallsPerDay)
+            return value > 0 ? value : DefaultLimits.perDay
+        }
+        set {
+            defaults.set(newValue, forKey: Keys.maxCallsPerDay)
+        }
+    }
+
+    // MARK: - Call Tracking
+
+    /// Check if a new LLM call can be made within rate limits
+    /// Returns false if any time window limit is exceeded
     func canMakeCall() -> Bool {
         let now = Date()
 
-        // Clean up old timestamps
-        cleanupOldTimestamps(before: now)
+        // Reset counters if time windows have passed
+        resetExpiredWindows(currentTime: now)
 
-        // Check minute limit
-        let minuteAgo = now.addingTimeInterval(-60)
-        let callsInLastMinute = callTimestamps.filter { $0 > minuteAgo }.count
-        if callsInLastMinute >= maxCallsPerMinute {
-            return false
-        }
+        // Check all time windows
+        let callsThisMinute = defaults.integer(forKey: Keys.callsThisMinute)
+        let callsThisHour = defaults.integer(forKey: Keys.callsThisHour)
+        let callsThisDay = defaults.integer(forKey: Keys.callsThisDay)
 
-        // Check hour limit
-        let hourAgo = now.addingTimeInterval(-3600)
-        let callsInLastHour = callTimestamps.filter { $0 > hourAgo }.count
-        if callsInLastHour >= maxCallsPerHour {
-            return false
-        }
-
-        // Check day limit
-        let dayAgo = now.addingTimeInterval(-86400)
-        let callsInLastDay = callTimestamps.filter { $0 > dayAgo }.count
-        if callsInLastDay >= maxCallsPerDay {
-            return false
-        }
-
-        return true
+        // Allow call only if all limits are satisfied
+        return callsThisMinute < maxCallsPerMinute &&
+               callsThisHour < maxCallsPerHour &&
+               callsThisDay < maxCallsPerDay
     }
 
-    /// Record that a call was made
+    /// Record a successful LLM API call
+    /// Updates all time window counters
     func recordCall() {
-        callTimestamps.append(Date())
-        // Persist to UserDefaults
-        UserDefaults.standard.set(callTimestamps, forKey: userDefaultsKey)
-    }
-
-    /// Clean up timestamps older than 24 hours
-    private func cleanupOldTimestamps(before: Date) {
-        let dayAgo = before.addingTimeInterval(-86400)
-        callTimestamps.removeAll { $0 < dayAgo }
-    }
-
-    /// Get current usage stats (for debugging/display)
-    func getUsageStats() -> (minute: Int, hour: Int, day: Int) {
         let now = Date()
-        cleanupOldTimestamps(before: now)
 
-        let minuteAgo = now.addingTimeInterval(-60)
-        let hourAgo = now.addingTimeInterval(-3600)
-        let dayAgo = now.addingTimeInterval(-86400)
+        // Reset expired windows before recording
+        resetExpiredWindows(currentTime: now)
 
-        let minute = callTimestamps.filter { $0 > minuteAgo }.count
-        let hour = callTimestamps.filter { $0 > hourAgo }.count
-        let day = callTimestamps.filter { $0 > dayAgo }.count
+        // Increment counters for all time windows
+        let callsThisMinute = defaults.integer(forKey: Keys.callsThisMinute)
+        let callsThisHour = defaults.integer(forKey: Keys.callsThisHour)
+        let callsThisDay = defaults.integer(forKey: Keys.callsThisDay)
 
-        return (minute, hour, day)
+        defaults.set(callsThisMinute + 1, forKey: Keys.callsThisMinute)
+        defaults.set(callsThisHour + 1, forKey: Keys.callsThisHour)
+        defaults.set(callsThisDay + 1, forKey: Keys.callsThisDay)
+        defaults.set(now.timeIntervalSince1970, forKey: Keys.lastCallTimestamp)
     }
 
-    /// Reset all rate limits (for testing)
-    func reset() {
-        callTimestamps.removeAll()
-        UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+    /// Reset counters for expired time windows
+    private func resetExpiredWindows(currentTime: Date) {
+        let currentTimestamp = currentTime.timeIntervalSince1970
+
+        // Minute window
+        let lastMinuteReset = defaults.double(forKey: Keys.lastMinuteReset)
+        if currentTimestamp - lastMinuteReset >= 60 {
+            defaults.set(0, forKey: Keys.callsThisMinute)
+            defaults.set(currentTimestamp, forKey: Keys.lastMinuteReset)
+        }
+
+        // Hour window
+        let lastHourReset = defaults.double(forKey: Keys.lastHourReset)
+        if currentTimestamp - lastHourReset >= 3600 {
+            defaults.set(0, forKey: Keys.callsThisHour)
+            defaults.set(currentTimestamp, forKey: Keys.lastHourReset)
+        }
+
+        // Day window
+        let lastDayReset = defaults.double(forKey: Keys.lastDayReset)
+        if currentTimestamp - lastDayReset >= 86400 {
+            defaults.set(0, forKey: Keys.callsThisDay)
+            defaults.set(currentTimestamp, forKey: Keys.lastDayReset)
+        }
+    }
+
+    // MARK: - Status Information
+
+    /// Get current usage statistics for display in Settings
+    func getCurrentUsage() -> RateLimitUsage {
+        let now = Date()
+        resetExpiredWindows(currentTime: now)
+
+        let callsThisMinute = defaults.integer(forKey: Keys.callsThisMinute)
+        let callsThisHour = defaults.integer(forKey: Keys.callsThisHour)
+        let callsThisDay = defaults.integer(forKey: Keys.callsThisDay)
+
+        return RateLimitUsage(
+            callsThisMinute: callsThisMinute,
+            callsThisHour: callsThisHour,
+            callsThisDay: callsThisDay,
+            maxPerMinute: maxCallsPerMinute,
+            maxPerHour: maxCallsPerHour,
+            maxPerDay: maxCallsPerDay
+        )
+    }
+
+    /// Reset all rate limit counters (for testing or user-requested reset)
+    func resetAllLimits() {
+        defaults.set(0, forKey: Keys.callsThisMinute)
+        defaults.set(0, forKey: Keys.callsThisHour)
+        defaults.set(0, forKey: Keys.callsThisDay)
+
+        let now = Date().timeIntervalSince1970
+        defaults.set(now, forKey: Keys.lastMinuteReset)
+        defaults.set(now, forKey: Keys.lastHourReset)
+        defaults.set(now, forKey: Keys.lastDayReset)
+    }
+
+    private init() {
+        // Initialize reset timestamps if not set
+        let now = Date().timeIntervalSince1970
+        if defaults.double(forKey: Keys.lastMinuteReset) == 0 {
+            defaults.set(now, forKey: Keys.lastMinuteReset)
+        }
+        if defaults.double(forKey: Keys.lastHourReset) == 0 {
+            defaults.set(now, forKey: Keys.lastHourReset)
+        }
+        if defaults.double(forKey: Keys.lastDayReset) == 0 {
+            defaults.set(now, forKey: Keys.lastDayReset)
+        }
+    }
+}
+
+// MARK: - Usage Statistics
+
+/// Current rate limit usage across all time windows
+struct RateLimitUsage {
+    let callsThisMinute: Int
+    let callsThisHour: Int
+    let callsThisDay: Int
+    let maxPerMinute: Int
+    let maxPerHour: Int
+    let maxPerDay: Int
+
+    /// Percentage of daily limit used (0.0 - 1.0)
+    var dailyUsagePercentage: Double {
+        guard maxPerDay > 0 else { return 0.0 }
+        return Double(callsThisDay) / Double(maxPerDay)
+    }
+
+    /// Whether any limit is close to being exceeded (>80%)
+    var isApproachingLimit: Bool {
+        let minuteUsage = Double(callsThisMinute) / Double(maxPerMinute)
+        let hourUsage = Double(callsThisHour) / Double(maxPerHour)
+        let dayUsage = Double(callsThisDay) / Double(maxPerDay)
+
+        return minuteUsage > 0.8 || hourUsage > 0.8 || dayUsage > 0.8
+    }
+
+    /// User-friendly status description
+    var statusDescription: String {
+        if callsThisDay >= maxPerDay {
+            return "Daily limit reached"
+        } else if callsThisHour >= maxPerHour {
+            return "Hourly limit reached"
+        } else if callsThisMinute >= maxPerMinute {
+            return "Rate limited (too many requests)"
+        } else if isApproachingLimit {
+            return "Approaching limit"
+        } else {
+            return "Within limits"
+        }
     }
 }
