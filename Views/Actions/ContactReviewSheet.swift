@@ -14,11 +14,12 @@ struct ContactReviewSheet: View {
     @State private var contact: ParsedContact
     @State private var isSaving = false
     @State private var saveError: String?
+    @State private var saveSuccess = false
 
-    let onSave: (ParsedContact) -> Void
+    let onSave: (ParsedContact) async throws -> Void
     let onCancel: () -> Void
 
-    init(contact: ParsedContact, onSave: @escaping (ParsedContact) -> Void, onCancel: @escaping () -> Void) {
+    init(contact: ParsedContact, onSave: @escaping (ParsedContact) async throws -> Void, onCancel: @escaping () -> Void) {
         self._contact = State(initialValue: contact)
         self.onSave = onSave
         self.onCancel = onCancel
@@ -197,8 +198,26 @@ struct ContactReviewSheet: View {
             return
         }
 
-        onSave(contact)
-        dismiss()
+        Task {
+            isSaving = true
+            saveError = nil
+
+            do {
+                try await onSave(contact)
+                // Only dismiss on success
+                await MainActor.run {
+                    isSaving = false
+                    saveSuccess = true
+                    dismiss()
+                }
+            } catch {
+                // Show error and keep sheet open for user to retry or cancel
+                await MainActor.run {
+                    isSaving = false
+                    saveError = error.localizedDescription
+                }
+            }
+        }
     }
 }
 
@@ -212,7 +231,10 @@ struct ContactReviewSheet: View {
             phone: "(555) 123-4567",
             email: "john@example.com"
         ),
-        onSave: { _ in },
+        onSave: { _ in
+            // Simulate async save
+            try await Task.sleep(nanoseconds: 500_000_000)
+        },
         onCancel: { }
     )
 }

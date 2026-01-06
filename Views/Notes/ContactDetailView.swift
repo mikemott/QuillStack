@@ -93,7 +93,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 contact: contact,
                 onSave: { reviewedContact in
                     contact = reviewedContact
-                    saveToContacts()
+                    try await saveToContactsAsync()
                 },
                 onCancel: {
                     // Sheet dismissed
@@ -346,51 +346,37 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
         isContactsAccessDenied = (status == .denied || status == .restricted)
     }
 
-    private func saveToContacts() {
-        Task {
-            let contactsService = ContactsService.shared
-            
-            // Check authorization
-            let status = contactsService.authorizationStatus
-            if status == .notDetermined {
-                let granted = await contactsService.requestAccess()
-                if !granted {
-                    await MainActor.run {
-                        isContactsAccessDenied = true
-                        errorMessage = "Please enable Contacts access in Settings."
-                    }
-                    return
-                }
-            } else if status == .denied || status == .restricted {
+    private func saveToContactsAsync() async throws {
+        let contactsService = ContactsService.shared
+
+        // Check authorization
+        let status = contactsService.authorizationStatus
+        if status == .notDetermined {
+            let granted = await contactsService.requestAccess()
+            if !granted {
                 await MainActor.run {
                     isContactsAccessDenied = true
-                    errorMessage = "Contacts access is required. Please enable it in Settings."
                 }
-                return
+                throw ContactsError.accessDenied
             }
-            
-            // Update access denied state if we got here (access granted)
+        } else if status == .denied || status == .restricted {
             await MainActor.run {
-                isContactsAccessDenied = false
+                isContactsAccessDenied = true
             }
-            
-            // Create and save contact
-            do {
-                _ = try contactsService.createContact(from: contact)
-                await MainActor.run {
-                    saveSuccess = true
-                }
-            } catch let error as ContactsError {
-                await MainActor.run {
-                    // Use user-facing message (sanitized, no system details)
-                    errorMessage = error.userFacingMessage
-                }
-            } catch {
-                await MainActor.run {
-                    // Generic fallback for unexpected errors
-                    errorMessage = "Unable to save contact. Please try again."
-                }
-            }
+            throw ContactsError.accessDenied
+        }
+
+        // Update access denied state if we got here (access granted)
+        await MainActor.run {
+            isContactsAccessDenied = false
+        }
+
+        // Create and save contact
+        _ = try contactsService.createContact(from: contact)
+
+        // Show success alert
+        await MainActor.run {
+            saveSuccess = true
         }
     }
 
