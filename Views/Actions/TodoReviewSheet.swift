@@ -305,41 +305,8 @@ struct TodoReviewSheet: View {
             saveError = nil
 
             do {
-                // Save each task to Reminders
-                for task in editableTasks {
-                    let reminder = EKReminder(eventStore: remindersService.eventStore)
-                    reminder.calendar = list
-                    reminder.title = task.text
-                    reminder.isCompleted = task.isCompleted
-
-                    // Set due date if available
-                    if let dueDate = task.dueDate {
-                        let calendar = Calendar.current
-                        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
-                        components.timeZone = TimeZone.current
-                        reminder.dueDateComponents = components
-                    }
-
-                    // Set priority
-                    switch task.priority.lowercased() {
-                    case "high", "urgent":
-                        reminder.priority = 1
-                    case "medium":
-                        reminder.priority = 5
-                    default:
-                        reminder.priority = 0
-                    }
-
-                    // Add notes if available
-                    if let notes = task.notes, !notes.isEmpty {
-                        reminder.notes = notes
-                    }
-
-                    try remindersService.eventStore.save(reminder, commit: false)
-                }
-
-                // Commit all changes at once
-                try remindersService.eventStore.commit()
+                // Use RemindersService batch creation method
+                try remindersService.createReminders(from: editableTasks, in: list)
 
                 // Call onSave with tasks
                 try await onSave(editableTasks)
@@ -351,43 +318,34 @@ struct TodoReviewSheet: View {
                     dismiss()
                 }
             } catch {
-                // Show error and keep sheet open for user to retry or cancel
+                // Show user-friendly error message instead of raw error
                 await MainActor.run {
                     isSaving = false
                     showingListPicker = false
-                    saveError = error.localizedDescription
+                    saveError = userFriendlyError(from: error)
                 }
             }
         }
     }
-}
 
-// MARK: - Editable Task Model
+    /// Convert system errors to user-friendly messages
+    private func userFriendlyError(from error: Error) -> String {
+        // Check for common error types
+        if let remindersError = error as? RemindersError {
+            return remindersError.localizedDescription
+        }
 
-struct EditableTask: Identifiable, Equatable {
-    let id: UUID
-    var text: String
-    var isCompleted: Bool
-    var priority: String
-    var dueDate: Date?
-    var notes: String?
+        // EventKit errors
+        if (error as NSError).domain == "EKErrorDomain" {
+            switch (error as NSError).code {
+            case 1: return "Reminders access was denied. Please enable it in Settings."
+            case 11: return "Unable to save to the selected list. Please try a different list."
+            default: return "Unable to save reminders. Please try again."
+            }
+        }
 
-    init(id: UUID = UUID(), text: String, isCompleted: Bool, priority: String, dueDate: Date?, notes: String?) {
-        self.id = id
-        self.text = text
-        self.isCompleted = isCompleted
-        self.priority = priority
-        self.dueDate = dueDate
-        self.notes = notes
-    }
-
-    init(from extracted: ExtractedTodo) {
-        self.id = extracted.id
-        self.text = extracted.text
-        self.isCompleted = extracted.isCompleted
-        self.priority = extracted.priority
-        self.dueDate = extracted.parsedDueDate
-        self.notes = extracted.notes
+        // Generic fallback
+        return "Unable to save reminders. Please check your permissions and try again."
     }
 }
 
@@ -541,16 +499,6 @@ struct EditableTaskRow: View {
                 .background(Color.paperBeige.opacity(0.3))
             }
         }
-    }
-}
-
-// MARK: - RemindersService Extension
-
-extension RemindersService {
-    var eventStore: EKEventStore {
-        // Access the private eventStore for TodoReviewSheet
-        // Note: This should ideally be made internal in RemindersService
-        Mirror(reflecting: self).children.first { $0.label == "eventStore" }?.value as? EKEventStore ?? EKEventStore()
     }
 }
 

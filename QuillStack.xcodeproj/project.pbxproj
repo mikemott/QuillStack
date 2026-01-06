@@ -68,6 +68,7 @@
 		A4F800ABD629E75C845D571E /* LearnedCorrectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */; };
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
 		AA8C277426330FD77BF879DC /* ExtractedTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */; };
+		BBBA718784527471B1FBBC9B /* EditableTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A16136444729219B272D1E /* EditableTask.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
 		E0BAEA1987D09846994C85C7 /* TodoReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905E2A28905852DBF55C938B /* TodoReviewSheet.swift */; };
@@ -248,6 +249,7 @@
 		E6CBC205145101FF179EBE6E /* TypeGuideView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeGuideView.swift; sourceTree = "<group>"; };
 		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedTodo.swift; path = ExtractedTodo.swift; sourceTree = "<group>"; };
+		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
 		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		F00200000000000D /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
@@ -434,6 +436,7 @@
 				M0020000000001AA /* ActionType.swift */,
 				M0020000000001AB /* NoteAction.swift */,
 				E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */,
+				49A16136444729219B272D1E /* EditableTask.swift */,
 				F28251EDDBAFBF35904F5BA9 /* ExtractedEvent.swift */,
 			);
 			path = Models;
@@ -1112,6 +1115,7 @@
 				546F2F8E7516FB2AB0B1A1EF /* NoteClassification.swift in Sources */,
 				913ADB2ED128AEA3957A143B /* ClassificationAnalytics.swift in Sources */,
 				AA8C277426330FD77BF879DC /* ExtractedTodo.swift in Sources */,
+				BBBA718784527471B1FBBC9B /* EditableTask.swift in Sources */,
 				A00952A62E5A5F4244EC6F42 /* ExtractedEvent.swift in Sources */,
 				0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */,
 				3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */,

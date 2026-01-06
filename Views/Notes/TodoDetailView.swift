@@ -157,9 +157,15 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     private var extractedTodos: [ExtractedTodo] {
         // First, try to load from extractedDataJSON if available
         if let extractedJSON = note.extractedDataJSON,
-           let jsonData = extractedJSON.data(using: .utf8),
-           let todos = try? JSONDecoder().decode([ExtractedTodo].self, from: jsonData) {
-            return todos
+           let jsonData = extractedJSON.data(using: .utf8) {
+            do {
+                let todos = try JSONDecoder().decode([ExtractedTodo].self, from: jsonData)
+                return todos
+            } catch {
+                // Log JSON decoding error for debugging
+                print("⚠️ Failed to decode extractedDataJSON for todos: \(error.localizedDescription)")
+                // Fall through to fallback below
+            }
         }
 
         // Fall back to converting from current tasks
