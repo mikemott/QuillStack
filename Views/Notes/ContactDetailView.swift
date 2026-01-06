@@ -12,7 +12,7 @@ import CoreData
 struct ContactDetailView: View, NoteDetailViewProtocol {
     @ObservedObject var note: Note
     @State private var contact: ParsedContact = ParsedContact()
-    @State private var showingSaveSheet = false
+    @State private var showingReviewSheet = false
     @State private var saveSuccess = false
     @State private var errorMessage: String?
     @State private var showingTypePicker = false
@@ -87,6 +87,18 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingReviewSheet) {
+            ContactReviewSheet(
+                contact: contact,
+                onSave: { reviewedContact in
+                    contact = reviewedContact
+                    try await saveToContactsAsync()
+                },
+                onCancel: {
+                    // Sheet dismissed
+                }
+            )
         }
     }
 
@@ -258,12 +270,12 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
 
             Spacer()
 
-            // Save to Contacts
-            Button(action: saveToContacts) {
+            // Create Contact button
+            Button(action: { showingReviewSheet = true }) {
                 HStack(spacing: 6) {
                     Image(systemName: "person.badge.plus")
                         .font(.system(size: 16, weight: .semibold))
-                    Text("Add to Contacts")
+                    Text("Create Contact")
                         .font(.serifBody(14, weight: .semibold))
                 }
                 .foregroundColor(.white)
@@ -278,7 +290,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                 )
                 .cornerRadius(10)
             }
-            .disabled(contact.displayName.isEmpty || isContactsAccessDenied)
+            .disabled(contact.displayName.isEmpty)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -334,51 +346,37 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
         isContactsAccessDenied = (status == .denied || status == .restricted)
     }
 
-    private func saveToContacts() {
-        Task {
-            let contactsService = ContactsService.shared
-            
-            // Check authorization
-            let status = contactsService.authorizationStatus
-            if status == .notDetermined {
-                let granted = await contactsService.requestAccess()
-                if !granted {
-                    await MainActor.run {
-                        isContactsAccessDenied = true
-                        errorMessage = "Please enable Contacts access in Settings."
-                    }
-                    return
-                }
-            } else if status == .denied || status == .restricted {
+    private func saveToContactsAsync() async throws {
+        let contactsService = ContactsService.shared
+
+        // Check authorization
+        let status = contactsService.authorizationStatus
+        if status == .notDetermined {
+            let granted = await contactsService.requestAccess()
+            if !granted {
                 await MainActor.run {
                     isContactsAccessDenied = true
-                    errorMessage = "Contacts access is required. Please enable it in Settings."
                 }
-                return
+                throw ContactsError.accessDenied
             }
-            
-            // Update access denied state if we got here (access granted)
+        } else if status == .denied || status == .restricted {
             await MainActor.run {
-                isContactsAccessDenied = false
+                isContactsAccessDenied = true
             }
-            
-            // Create and save contact
-            do {
-                _ = try contactsService.createContact(from: contact)
-                await MainActor.run {
-                    saveSuccess = true
-                }
-            } catch let error as ContactsError {
-                await MainActor.run {
-                    // Use user-facing message (sanitized, no system details)
-                    errorMessage = error.userFacingMessage
-                }
-            } catch {
-                await MainActor.run {
-                    // Generic fallback for unexpected errors
-                    errorMessage = "Unable to save contact. Please try again."
-                }
-            }
+            throw ContactsError.accessDenied
+        }
+
+        // Update access denied state if we got here (access granted)
+        await MainActor.run {
+            isContactsAccessDenied = false
+        }
+
+        // Create and save contact
+        _ = try contactsService.createContact(from: contact)
+
+        // Show success alert
+        await MainActor.run {
+            saveSuccess = true
         }
     }
 
