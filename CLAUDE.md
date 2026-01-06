@@ -38,8 +38,15 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
    - PR-Agent will auto-review
    - Linear issue auto-updates to "In Review"
 
-4. **Merge After Review**
-   - Address any PR-Agent feedback
+4. **Address PR-Agent Feedback** (Automated)
+   - Wait for PR-Agent review to complete (~30s)
+   - If issues found, notification comment appears
+   - Ask Claude: "Can you take a look at the PR Agent's feedback and see if any changes need to be made?"
+   - Or use: `./bin/pr-review-feedback` to check and get prompt
+   - Claude will automatically apply security/compliance fixes
+
+5. **Merge After Review**
+   - Verify all checks pass
    - Merge when ready (Linear issue auto-closes)
 
 ### When to Use This Workflow
@@ -59,8 +66,10 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
 
 - **Git Hook**: Blocks commits to `main` (`.git/hooks/pre-commit`)
 - **PR-Agent**: AI code review with Claude Sonnet 4.5 (`.github/workflows/pr-agent.yml`)
+- **PR Feedback Notification**: Auto-notifies when PR-Agent finds issues (`.github/workflows/pr-feedback-notification.yml`)
 - **Linear Sync**: Auto-updates issue to "In Review" when PR opens (`.github/workflows/linear-sync.yml`)
 - **GitHub Webhook**: Auto-links commits and closes issues via magic words (`Fixes/Closes QUI-XX`)
+- **Helper Script**: `./bin/pr-review-feedback` - Wait for PR-Agent and get Claude prompt
 
 ## Key Concepts
 
