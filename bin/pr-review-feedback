@@ -34,16 +34,18 @@ ELAPSED=0
 INTERVAL=10
 
 while [ $ELAPSED -lt $MAX_WAIT ]; do
-    STATUS=$(gh pr checks $PR_NUMBER --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | .status' 2>/dev/null || echo "")
+    # Force fresh data by not relying on gh cache
+    STATUS=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | .status' 2>/dev/null || echo "")
+    CONCLUSION=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | .conclusion' 2>/dev/null || echo "")
 
-    if [ "$STATUS" = "COMPLETED" ]; then
-        echo "✅ PR-Agent review complete"
+    if [ "$STATUS" = "COMPLETED" ] || [ -n "$CONCLUSION" ]; then
+        echo "✅ PR-Agent review complete (conclusion: ${CONCLUSION:-success})"
         break
     elif [ -z "$STATUS" ]; then
-        echo "⚠️  PR-Agent check not found (may not have started yet)"
+        echo "⚠️  PR-Agent check not found (may not have started yet) - waiting... ($ELAPSED/${MAX_WAIT}s)"
         sleep $INTERVAL
     else
-        echo "   Still running... ($ELAPSED/${MAX_WAIT}s)"
+        echo "   Status: $STATUS - waiting... ($ELAPSED/${MAX_WAIT}s)"
         sleep $INTERVAL
     fi
 

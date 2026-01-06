@@ -2,7 +2,7 @@ name: PR Feedback Notification
 
 on:
   workflow_run:
-    workflows: ["Run PR Agent"]
+    workflows: ["PR Agent"]
     types:
       - completed
 
