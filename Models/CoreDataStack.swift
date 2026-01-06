@@ -35,7 +35,9 @@ class CoreDataStack {
 
         if inMemory {
             // Use in-memory store for previews
-            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+            let inMemoryDescription = NSPersistentStoreDescription()
+            inMemoryDescription.type = NSInMemoryStoreType
+            container.persistentStoreDescriptions = [inMemoryDescription]
         } else {
             // Enable encryption and file protection
             let description = container.persistentStoreDescriptions.first
