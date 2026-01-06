@@ -426,10 +426,26 @@ struct EventReviewSheet: View {
 
                 // Add recurrence rule if recurring
                 if isRecurring, !recurrencePattern.isEmpty {
-                    if let event = calendarService.getEvent(identifier: eventId),
-                       let recurrenceRule = parseRecurrencePattern(recurrencePattern) {
-                        event.addRecurrenceRule(recurrenceRule)
-                        try calendarService.updateEvent(event)
+                    if let event = calendarService.getEvent(identifier: eventId) {
+                        if let recurrenceRule = parseRecurrencePattern(recurrencePattern) {
+                            // Successfully parsed - add native recurrence rule
+                            event.addRecurrenceRule(recurrenceRule)
+                            try calendarService.updateEvent(event)
+                        } else {
+                            // Pattern couldn't be parsed as native recurrence rule
+                            // Graceful degradation: add to notes as text instead
+                            // Note: We don't throw an error here because:
+                            // 1. Event is already created and saved
+                            // 2. User can't "retry" (would create duplicate)
+                            // 3. Pattern is preserved in notes for reference
+                            // This matches CalendarService.createEvent(from: ExtractedEvent) behavior
+                            let currentNotes = event.notes ?? ""
+                            let recurrenceNote = currentNotes.isEmpty
+                                ? "Recurring: \(recurrencePattern)"
+                                : currentNotes + "\n\nRecurring: \(recurrencePattern)"
+                            event.notes = recurrenceNote
+                            try calendarService.updateEvent(event)
+                        }
                     }
                 }
 
