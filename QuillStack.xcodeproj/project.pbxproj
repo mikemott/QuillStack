@@ -22,7 +22,6 @@
 		2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C18F2EEB558200E05291 /* TodoItem.swift */; };
 		2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1902EEB55A300E05291 /* CameraManager.swift */; };
 		2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1912EEB55A300E05291 /* ImageProcessor.swift */; };
-		2796C1FF2EEB810000E05291 /* ServicePrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */; };
 		2796C1B02EEB570000E05291 /* MeetingParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1922EEB55A300E05291 /* MeetingParser.swift */; };
 		2796C1B12EEB570000E05291 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1932EEB55A300E05291 /* OCRService.swift */; };
 		2796C1B22EEB570000E05291 /* TextClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1942EEB55A300E05291 /* TextClassifier.swift */; };
@@ -44,6 +43,7 @@
 		2796C1E12EEB700000E05291 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1DF2EEB700000E05291 /* EmailDetailView.swift */; };
 		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
+		2796C1FF2EEB810000E05291 /* ServicePrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */; };
 		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
 		30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */; };
 		3B53511AF10AB949BF035314 /* EventReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E52DE837FCA19E05D95A15C /* EventReviewSheet.swift */; };
@@ -54,6 +54,7 @@
 		546F2F8E7516FB2AB0B1A1EF /* NoteClassification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07232297C49D5ED086A1E66A /* NoteClassification.swift */; };
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
 		62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */; };
+		637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */; };
 		7323932D06013BF9820E3792 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF65609DDFA199412CB81D3 /* ContactsService.swift */; };
 		76196027B23F99473691C734 /* LLMCostTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */; };
 		7BBA236D7D0C755FFF969A3A /* NoteTypePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */; };
@@ -72,7 +73,6 @@
 		BBBA718784527471B1FBBC9B /* EditableTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A16136444729219B272D1E /* EditableTask.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
-		E0BAEA1987D09846994C85C7 /* TodoReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905E2A28905852DBF55C938B /* TodoReviewSheet.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -83,6 +83,7 @@
 		E001000000000008 /* ObsidianSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000008 /* ObsidianSetupView.swift */; };
 		E001000000000009 /* NotionSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000009 /* NotionSetupView.swift */; };
 		E00100000000000A /* MeetingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200000000000A /* MeetingDetailView.swift */; };
+		E0BAEA1987D09846994C85C7 /* TodoReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905E2A28905852DBF55C938B /* TodoReviewSheet.swift */; };
 		E0C0CCF78D0FD505795B28FC /* ClassificationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */; };
 		E539285A06F9FCBB990395A3 /* LLMRateLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BD5FC36F48E960345EA0E8 /* LLMRateLimiter.swift */; };
 		ED1206ED355AC9727BD0638C /* DetailBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */; };
@@ -177,7 +178,6 @@
 		05C42B046C56E7232F89EB98 /* DateParsingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DateParsingService.swift; path = DateParsingService.swift; sourceTree = "<group>"; };
 		07232297C49D5ED086A1E66A /* NoteClassification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteClassification.swift; path = Models/NoteClassification.swift; sourceTree = "<group>"; };
 		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = ContactReviewSheet.swift; sourceTree = "<group>"; };
-		905E2A28905852DBF55C938B /* TodoReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoReviewSheet.swift; path = TodoReviewSheet.swift; sourceTree = "<group>"; };
 		0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventExtractor.swift; path = Extraction/EventExtractor.swift; sourceTree = "<group>"; };
 		0E52DE837FCA19E05D95A15C /* EventReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventReviewSheet.swift; path = EventReviewSheet.swift; sourceTree = "<group>"; };
 		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
@@ -192,7 +192,6 @@
 		2796C18F2EEB558200E05291 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		2796C1902EEB55A300E05291 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		2796C1912EEB55A300E05291 /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
-		2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicePrewarmer.swift; sourceTree = "<group>"; };
 		2796C1922EEB55A300E05291 /* MeetingParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingParser.swift; sourceTree = "<group>"; };
 		2796C1932EEB55A300E05291 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		2796C1942EEB55A300E05291 /* TextClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextClassifier.swift; sourceTree = "<group>"; };
@@ -215,7 +214,9 @@
 		2796C1DF2EEB700000E05291 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailDetailView.swift; sourceTree = "<group>"; };
 		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicePrewarmer.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
+		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
 		6FF65609DDFA199412CB81D3 /* ContactsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactsService.swift; path = Services/ContactsService.swift; sourceTree = "<group>"; };
 		7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
@@ -224,6 +225,7 @@
 		8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMCostTracker.swift; path = Services/LLMCostTracker.swift; sourceTree = "<group>"; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
 		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
+		905E2A28905852DBF55C938B /* TodoReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoReviewSheet.swift; path = TodoReviewSheet.swift; sourceTree = "<group>"; };
 		A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationAccuracyTest.swift; sourceTree = "<group>"; };
 		A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoViewModel.swift; sourceTree = "<group>"; };
 		A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 		B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
 		BF6C22302ED7A73DFD1CA59A /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
 		C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteDetailViewProtocol.swift; sourceTree = "<group>"; };
+		C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClassificationMetrics.swift; sourceTree = "<group>"; };
 		C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationTestCases.swift; sourceTree = "<group>"; };
 		C7BD5FC36F48E960345EA0E8 /* LLMRateLimiter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMRateLimiter.swift; path = Services/LLMRateLimiter.swift; sourceTree = "<group>"; };
 		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
@@ -251,7 +254,6 @@
 		E6CBC205145101FF179EBE6E /* TypeGuideView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeGuideView.swift; sourceTree = "<group>"; };
 		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedTodo.swift; path = ExtractedTodo.swift; sourceTree = "<group>"; };
-		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
 		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		F00200000000000D /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
@@ -514,6 +516,7 @@
 				135689AE59463E16DB510DA6 /* DetailViewFactory.swift */,
 				445B55CF33378CD07282DDBC /* Extraction */,
 				05C42B046C56E7232F89EB98 /* DateParsingService.swift */,
+				C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1127,6 +1130,7 @@
 				D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */,
 				E0BAEA1987D09846994C85C7 /* TodoReviewSheet.swift in Sources */,
 				3B53511AF10AB949BF035314 /* EventReviewSheet.swift in Sources */,
+				637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
