@@ -165,6 +165,9 @@ final class LLMRateLimiter {
 
     /// Reset all rate limit counters (for testing or user-requested reset)
     func resetAllLimits() {
+        // Audit log the reset action
+        print("⏱️ LLM Rate Limiter: User reset all rate limits at \(Date())")
+
         defaults.set(0, forKey: Keys.callsThisMinute)
         defaults.set(0, forKey: Keys.callsThisHour)
         defaults.set(0, forKey: Keys.callsThisDay)
@@ -209,6 +212,8 @@ struct RateLimitUsage {
 
     /// Whether any limit is close to being exceeded (>80%)
     var isApproachingLimit: Bool {
+        guard maxPerMinute > 0, maxPerHour > 0, maxPerDay > 0 else { return false }
+
         let minuteUsage = Double(callsThisMinute) / Double(maxPerMinute)
         let hourUsage = Double(callsThisHour) / Double(maxPerHour)
         let dayUsage = Double(callsThisDay) / Double(maxPerDay)

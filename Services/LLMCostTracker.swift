@@ -211,21 +211,22 @@ final class LLMCostTracker {
     }
 
     /// Check if user is approaching or exceeding budget
+    /// Prioritizes monthly budget over daily (monthly exceeded is more critical)
     func checkBudgetStatus() -> BudgetStatus {
         let usage = getCurrentUsage()
 
-        // Check daily budget
-        if usage.dailyCost >= dailyBudgetUSD {
-            return .exceeded(.daily, usage.dailyCost, dailyBudgetUSD)
-        } else if usage.dailyCost >= dailyBudgetUSD * budgetAlertThreshold {
-            return .approaching(.daily, usage.dailyCost, dailyBudgetUSD)
-        }
-
-        // Check monthly budget
+        // Prioritize monthly budget, and exceeded status over approaching
         if usage.monthlyCost >= monthlyBudgetUSD {
             return .exceeded(.monthly, usage.monthlyCost, monthlyBudgetUSD)
-        } else if usage.monthlyCost >= monthlyBudgetUSD * budgetAlertThreshold {
+        }
+        if usage.dailyCost >= dailyBudgetUSD {
+            return .exceeded(.daily, usage.dailyCost, dailyBudgetUSD)
+        }
+        if usage.monthlyCost >= monthlyBudgetUSD * budgetAlertThreshold {
             return .approaching(.monthly, usage.monthlyCost, monthlyBudgetUSD)
+        }
+        if usage.dailyCost >= dailyBudgetUSD * budgetAlertThreshold {
+            return .approaching(.daily, usage.dailyCost, dailyBudgetUSD)
         }
 
         return .withinBudget
@@ -233,6 +234,9 @@ final class LLMCostTracker {
 
     /// Reset all usage statistics (for testing or user request)
     func resetAllUsage() {
+        // Audit log the reset action
+        print("📊 LLM Cost Tracker: User reset all usage statistics at \(Date())")
+
         // Lifetime
         defaults.removeObject(forKey: Keys.totalInputTokens)
         defaults.removeObject(forKey: Keys.totalOutputTokens)

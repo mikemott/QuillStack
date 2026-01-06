@@ -30,6 +30,9 @@ struct SettingsView: View {
     @State private var showingClearImagesConfirmation = false
     @State private var isCalculatingStorage = false
 
+    // LLM cost management state
+    @State private var showingResetStatisticsConfirmation = false
+
     enum APITestResult {
         case success
         case failure(String)
@@ -118,6 +121,19 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("This will permanently delete all original images while keeping thumbnails. This frees up storage but you won't be able to view full-resolution images. This action cannot be undone.")
+            }
+            .confirmationDialog(
+                "Reset API Statistics",
+                isPresented: $showingResetStatisticsConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Reset All Statistics", role: .destructive) {
+                    LLMRateLimiter.shared.resetAllLimits()
+                    LLMCostTracker.shared.resetAllUsage()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This will permanently delete all API usage and cost statistics. This action cannot be undone.")
             }
             .sheet(isPresented: $showingDisclosureSheet) {
                 AIDisclosureSheet(
@@ -595,8 +611,7 @@ struct SettingsView: View {
 
                     // Reset button
                     Button(action: {
-                        LLMRateLimiter.shared.resetAllLimits()
-                        LLMCostTracker.shared.resetAllUsage()
+                        showingResetStatisticsConfirmation = true
                     }) {
                         HStack {
                             Image(systemName: "arrow.clockwise")
