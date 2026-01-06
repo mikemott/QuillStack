@@ -1093,6 +1093,23 @@ struct SettingsView: View {
                     .foregroundColor(.forestDark)
                     .padding(16)
                 }
+
+                Divider()
+
+                NavigationLink(destination: UsageMetricsView()) {
+                    HStack {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("Classification Usage Metrics")
+                            .font(.serifBody(15, weight: .medium))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.secondary)
+                    }
+                    .foregroundColor(.forestDark)
+                    .padding(16)
+                }
                 #endif
             }
             .background(
