@@ -74,67 +74,140 @@ export default {
       );
     }
 
-    // Manual trigger endpoint for testing
+    // Manual trigger endpoint for testing (requires authentication)
     if (url.pathname === '/check-now' && request.method === 'POST') {
-      // Trigger a health check immediately (useful for testing)
-      const workersToMonitor: WorkerConfig[] = [
-        {
-          name: 'testflight-welcome-worker',
-          url: env.TESTFLIGHT_WORKER_URL
-        },
-        {
-          name: 'api-proxy-worker',
-          url: env.API_PROXY_WORKER_URL
-        }
-      ];
+      // Verify API key
+      const apiKeyHeader = request.headers.get('X-Manual-Trigger-Key');
+      if (!apiKeyHeader || apiKeyHeader !== env.MANUAL_TRIGGER_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
 
-      const results = await Promise.all(
-        workersToMonitor.map(async (config) => {
-          const result = await checkWorkerHealth(config);
-          await processHealthCheckResult(result, env);
-          return result;
-        })
-      );
+      try {
+        // Trigger a health check immediately (useful for testing)
+        const workersToMonitor: WorkerConfig[] = [
+          {
+            name: 'testflight-welcome-worker',
+            url: env.TESTFLIGHT_WORKER_URL
+          },
+          {
+            name: 'api-proxy-worker',
+            url: env.API_PROXY_WORKER_URL
+          }
+        ];
 
-      return new Response(
-        JSON.stringify({
-          message: 'Health check completed',
-          results,
-          timestamp: new Date().toISOString()
-        }),
-        {
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+        const results = await Promise.all(
+          workersToMonitor.map(async (config) => {
+            const result = await checkWorkerHealth(config);
+            await processHealthCheckResult(result, env);
+            // Sanitize error messages before returning
+            return {
+              workerName: result.workerName,
+              success: result.success,
+              responseTimeMs: result.responseTimeMs,
+              statusCode: result.statusCode,
+              // Don't expose detailed error messages to clients
+              hasError: !!result.error
+            };
+          })
+        );
+
+        return new Response(
+          JSON.stringify({
+            message: 'Health check completed',
+            results,
+            timestamp: new Date().toISOString()
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      } catch (error) {
+        // Don't expose internal error details
+        console.error('Error in manual health check:', error);
+        return new Response(
+          JSON.stringify({ error: 'Internal server error' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
     }
 
-    // Get metrics for a specific worker
+    // Get metrics for a specific worker (requires authentication)
     if (url.pathname.startsWith('/metrics/')) {
+      // Verify API key
+      const apiKeyHeader = request.headers.get('X-Manual-Trigger-Key');
+      if (!apiKeyHeader || apiKeyHeader !== env.MANUAL_TRIGGER_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
       const workerName = url.pathname.split('/metrics/')[1];
 
       if (!workerName) {
-        return new Response('Worker name required', { status: 400 });
+        return new Response(
+          JSON.stringify({ error: 'Worker name required' }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
       }
 
-      const stateKey = `state:${workerName}`;
-      const metricsKey = `metrics:${workerName}`;
+      // Validate worker name to prevent KV key injection
+      const validWorkerNames = ['testflight-welcome-worker', 'api-proxy-worker'];
+      if (!validWorkerNames.includes(workerName)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid worker name' }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
 
-      const [state, metrics] = await Promise.all([
-        env.HEALTH_METRICS.get(stateKey, 'json'),
-        env.HEALTH_METRICS.get(metricsKey, 'json')
-      ]);
+      try {
+        const stateKey = `state:${workerName}`;
+        const metricsKey = `metrics:${workerName}`;
 
-      return new Response(
-        JSON.stringify({
-          workerName,
-          state,
-          metrics,
-          timestamp: new Date().toISOString()
-        }),
-        {
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+        const [state, metrics] = await Promise.all([
+          env.HEALTH_METRICS.get(stateKey, 'json'),
+          env.HEALTH_METRICS.get(metricsKey, 'json')
+        ]);
+
+        return new Response(
+          JSON.stringify({
+            workerName,
+            state,
+            metrics,
+            timestamp: new Date().toISOString()
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+        return new Response(
+          JSON.stringify({ error: 'Internal server error' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
     }
 
     return new Response('Not Found', { status: 404 });

@@ -59,7 +59,7 @@ export async function createHealthAlertIssue(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': apiKey
+      'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({ query: mutation, variables })
   });

@@ -85,12 +85,24 @@ export async function updateWorkerMetrics(
 /**
  * Check if we recently created an issue for this worker (within last hour)
  * This prevents duplicate issue creation for the same ongoing problem
+ * Uses a lock to prevent race conditions from concurrent health checks
  */
 export async function hasRecentIssue(
   kv: KVNamespace,
   workerName: string,
   withinMinutes: number = 60
 ): Promise<boolean> {
+  // Check for existing lock to prevent concurrent issue creation
+  const lockKey = `lock:issue:${workerName}`;
+  const existingLock = await kv.get(lockKey);
+  if (existingLock) {
+    // Another process is already creating an issue, treat as if a recent issue exists
+    return true;
+  }
+
+  // Set a short-lived lock to prevent other processes from creating an issue
+  await kv.put(lockKey, '1', { expirationTtl: 30 }); // 30 second lock
+
   const state = await getWorkerState(kv, workerName);
 
   if (!state?.recentIssueCreatedAt) {

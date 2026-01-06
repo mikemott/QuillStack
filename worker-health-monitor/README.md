@@ -10,8 +10,10 @@ Cloudflare Worker with cron trigger that monitors the health of other Cloudflare
 - ✅ Creates Linear issues for critical problems
 - ✅ Logs metrics to Amplitude for analysis
 - ✅ Stores state in KV for persistent tracking
-- ✅ Prevents duplicate issue creation
-- ✅ Manual testing endpoint for validation
+- ✅ Prevents duplicate issue creation with KV-based locking
+- ✅ Manual testing endpoints with API key authentication
+- ✅ Timeout protection (10s) for unresponsive workers
+- ✅ Sanitized error messages in HTTP responses
 
 ## Monitored Workers
 
@@ -61,16 +63,20 @@ API_PROXY_WORKER_URL = "https://api-proxy-worker.YOUR_SUBDOMAIN.workers.dev"
 
 ### 3. Set Secrets
 
-Set the required API keys:
+Set the required API keys and authentication tokens:
 
 ```bash
-# Linear API key
+# Linear API key for creating issues
 wrangler secret put LINEAR_API_KEY
 # Paste your Linear API key when prompted
 
-# Amplitude API key
+# Amplitude API key for metrics tracking
 wrangler secret put AMPLITUDE_API_KEY
 # Paste your Amplitude API key when prompted
+
+# API key for manual trigger endpoint (generate a secure random string)
+wrangler secret put MANUAL_TRIGGER_API_KEY
+# Paste a secure random string (e.g., generated with: openssl rand -hex 32)
 ```
 
 ### 4. Deploy
@@ -83,18 +89,20 @@ npm run deploy
 
 ### Manual Health Check
 
-Trigger an immediate health check (without waiting for cron):
+Trigger an immediate health check (without waiting for cron). Requires authentication:
 
 ```bash
-curl -X POST https://worker-health-monitor.YOUR_SUBDOMAIN.workers.dev/check-now
+curl -X POST https://worker-health-monitor.YOUR_SUBDOMAIN.workers.dev/check-now \
+  -H "X-Manual-Trigger-Key: YOUR_API_KEY_HERE"
 ```
 
 ### Check Worker Status
 
-Get current metrics for a specific worker:
+Get current metrics for a specific worker. Requires authentication:
 
 ```bash
-curl https://worker-health-monitor.YOUR_SUBDOMAIN.workers.dev/metrics/testflight-welcome-worker
+curl https://worker-health-monitor.YOUR_SUBDOMAIN.workers.dev/metrics/testflight-welcome-worker \
+  -H "X-Manual-Trigger-Key: YOUR_API_KEY_HERE"
 ```
 
 ### Monitor Logs

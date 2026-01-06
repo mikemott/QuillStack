@@ -18,13 +18,20 @@ export async function checkWorkerHealth(
 
   try {
     const endpoint = config.healthEndpoint || config.url;
+
+    // Add timeout to prevent hanging on unresponsive workers
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: {
         'User-Agent': 'QuillStack-Health-Monitor/1.0'
-      }
+      },
+      signal: controller.signal
     });
 
+    clearTimeout(timeoutId);
     const responseTimeMs = Date.now() - startTime;
 
     return {
@@ -169,14 +176,10 @@ async function createConsecutiveFailureAlert(
   };
 
   try {
-    // Get team ID from Linear (you'll need to configure this)
-    // For now, using a placeholder - will need to be configured in wrangler.toml
-    const teamId = 'e2da77ea-ff59-46e5-b777-9bf4dd7c855d'; // QuillStack team ID
-
     const issue = await createHealthAlertIssue(
       alert,
       env.LINEAR_API_KEY,
-      teamId
+      env.LINEAR_TEAM_ID
     );
 
     console.log(`Created Linear issue ${issue.identifier} for consecutive failures on ${result.workerName}`);
@@ -216,12 +219,10 @@ async function createSlowResponseAlert(
   };
 
   try {
-    const teamId = 'e2da77ea-ff59-46e5-b777-9bf4dd7c855d'; // QuillStack team ID
-
     const issue = await createHealthAlertIssue(
       alert,
       env.LINEAR_API_KEY,
-      teamId
+      env.LINEAR_TEAM_ID
     );
 
     console.log(`Created Linear issue ${issue.identifier} for slow response on ${result.workerName}`);

@@ -87,6 +87,8 @@ export async function trackAlertCreated(
   });
 
   if (!response.ok) {
-    console.warn(`Failed to track alert in Amplitude: ${response.status}`);
+    // Consume response body to prevent resource leaks
+    const errorText = await response.text();
+    console.warn(`Failed to track alert in Amplitude: ${response.status} - ${errorText}`);
   }
 }

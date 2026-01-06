@@ -15,9 +15,15 @@ export interface Env {
   RESPONSE_TIME_THRESHOLD_MS: number;
   SUSTAINED_SLOW_DURATION_MIN: number;
 
-  // API Keys (secrets)
+  // Linear configuration
   LINEAR_API_KEY: string;
+  LINEAR_TEAM_ID: string;
+
+  // Amplitude API key
   AMPLITUDE_API_KEY: string;
+
+  // Security - API key for manual trigger endpoint (secret)
+  MANUAL_TRIGGER_API_KEY: string;
 }
 
 export interface WorkerConfig {
