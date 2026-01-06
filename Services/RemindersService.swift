@@ -133,6 +133,46 @@ final class RemindersService: RemindersServiceProtocol, @unchecked Sendable {
         return results
     }
 
+    /// Create multiple reminders with full task details (priority, due date, notes)
+    /// Uses batch commit for efficiency
+    func createReminders(from tasks: [EditableTask], in list: EKCalendar) throws {
+        for task in tasks {
+            let reminder = EKReminder(eventStore: eventStore)
+            reminder.calendar = list
+            reminder.title = task.text
+            reminder.isCompleted = task.isCompleted
+
+            // Set due date if available
+            if let dueDate = task.dueDate {
+                let calendar = Calendar.current
+                var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+                components.timeZone = TimeZone.current
+                reminder.dueDateComponents = components
+            }
+
+            // Set priority
+            switch task.priority.lowercased() {
+            case "high", "urgent":
+                reminder.priority = 1
+            case "medium":
+                reminder.priority = 5
+            default:
+                reminder.priority = 0
+            }
+
+            // Add notes if available
+            if let notes = task.notes, !notes.isEmpty {
+                reminder.notes = notes
+            }
+
+            // Save without committing (batch operation)
+            try eventStore.save(reminder, commit: false)
+        }
+
+        // Commit all changes at once
+        try eventStore.commit()
+    }
+
     /// Check if a reminder still exists (for synced items)
     func reminderExists(identifier: String) -> Bool {
         guard let item = eventStore.calendarItem(withIdentifier: identifier) else {
