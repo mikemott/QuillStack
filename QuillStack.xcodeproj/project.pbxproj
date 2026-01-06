@@ -58,6 +58,7 @@
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
 		62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */; };
 		637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */; };
+		665FDB539CA49B30BF4BA108 /* NoteLinkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */; };
 		7323932D06013BF9820E3792 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF65609DDFA199412CB81D3 /* ContactsService.swift */; };
 		76196027B23F99473691C734 /* LLMCostTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */; };
 		7BBA236D7D0C755FFF969A3A /* NoteTypePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */; };
@@ -79,6 +80,8 @@
 		A882257D8A42D3C5DDEC5596 /* RecipeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD359D411778CA009AA8EC0F /* RecipeFormatter.swift */; };
 		AA146931BE6C82B42EE5E40D /* NoteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB5E92C24AA2AAA9D607A7A /* NoteFormatter.swift */; };
 		AA8C277426330FD77BF879DC /* ExtractedTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */; };
+		AFF71218388D752D26CD0311 /* NoteLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD93D4AC20AA54EDCC5B2DCC /* NoteLink.swift */; };
+		B23835EC626961E08F49CF35 /* NoteLinkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C8D4343F57D596EE5AE544F /* NoteLinkService.swift */; };
 		B73A02AA3AB1C3FB4A5EFD4A /* UsageMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D42C1FE9085BA26990F8C4A /* UsageMetricsView.swift */; };
 		BBBA718784527471B1FBBC9B /* EditableTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A16136444729219B272D1E /* EditableTask.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
@@ -252,10 +255,12 @@
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		7A08139436B3B898EDDD3A0E /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoFormatter.swift; path = NoteFormatters/TodoFormatter.swift; sourceTree = "<group>"; };
+		7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLinkServiceTests.swift; path = Tests/NoteLinkServiceTests.swift; sourceTree = "<group>"; };
 		821950025E3D8375366B71B3 /* ClassificationAnalyticsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClassificationAnalyticsService.swift; sourceTree = "<group>"; };
 		8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMCostTracker.swift; path = Services/LLMCostTracker.swift; sourceTree = "<group>"; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
 		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
+		8C8D4343F57D596EE5AE544F /* NoteLinkService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLinkService.swift; path = Services/NoteLinkService.swift; sourceTree = "<group>"; };
 		8CE75909F5AF2D167701CD46 /* NoteContentProcessor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteContentProcessor.swift; path = NoteContentProcessor.swift; sourceTree = "<group>"; };
 		8F28355752CDE148EE673D0D /* NoteFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteFormatter.swift; path = NoteFormatters/NoteFormatter.swift; sourceTree = "<group>"; };
 		905E2A28905852DBF55C938B /* TodoReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoReviewSheet.swift; path = TodoReviewSheet.swift; sourceTree = "<group>"; };
@@ -317,6 +322,7 @@
 		F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarServiceProtocol.swift; path = Protocols/CalendarServiceProtocol.swift; sourceTree = "<group>"; };
 		F7D2B95E93FD91C22122AC50 /* ShoppingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ShoppingFormatter.swift; sourceTree = "<group>"; };
 		FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationAnalytics.swift; path = Services/ClassificationAnalytics.swift; sourceTree = "<group>"; };
+		FD93D4AC20AA54EDCC5B2DCC /* NoteLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLink.swift; path = Models/NoteLink.swift; sourceTree = "<group>"; };
 		FF994FFEA388D998DB681214 /* NetworkAvailability.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NetworkAvailability.swift; path = Services/NetworkAvailability.swift; sourceTree = "<group>"; };
 		FL0000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		G00200000000001F /* PromptRefinerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRefinerService.swift; sourceTree = "<group>"; };
@@ -482,6 +488,7 @@
 				E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */,
 				49A16136444729219B272D1E /* EditableTask.swift */,
 				F28251EDDBAFBF35904F5BA9 /* ExtractedEvent.swift */,
+				FD93D4AC20AA54EDCC5B2DCC /* NoteLink.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -568,6 +575,7 @@
 				97C3AF04DFECCA4BEEAAC21E /* OCRNormalizer.swift */,
 				21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */,
 				8CE75909F5AF2D167701CD46 /* NoteContentProcessor.swift */,
+				8C8D4343F57D596EE5AE544F /* NoteLinkService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -917,6 +925,7 @@
 				T002000000000001 /* TextClassifierTests.swift */,
 				T002000000000002 /* DetailBottomBarTests.swift */,
 				T002000000000003 /* NoteDetailViewProtocolTests.swift */,
+				7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1219,6 +1228,8 @@
 				E516356554D01C5B073A3991 /* ShoppingFormatter.swift in Sources */,
 				20DB3A9C0E0B03A1DB26242F /* ExpenseFormatter.swift in Sources */,
 				9D22CBA74D81B661B2A4E8A1 /* EmailFormatter.swift in Sources */,
+				AFF71218388D752D26CD0311 /* NoteLink.swift in Sources */,
+				B23835EC626961E08F49CF35 /* NoteLinkService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1229,6 +1240,7 @@
 				T001000000000001 /* TextClassifierTests.swift in Sources */,
 				T001000000000002 /* DetailBottomBarTests.swift in Sources */,
 				T001000000000003 /* NoteDetailViewProtocolTests.swift in Sources */,
+				665FDB539CA49B30BF4BA108 /* NoteLinkServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
