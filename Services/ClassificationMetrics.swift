@@ -452,6 +452,8 @@ class ClassificationMetrics {
     /// Generate data for improving LLM classification prompts
     /// - Parameter context: Core Data context
     /// - Returns: Anonymized data suitable for prompt engineering
+    /// - Warning: Content previews are aggressively anonymized but should still be treated as
+    ///   potentially sensitive. Use only with user consent for external sharing.
     func generatePromptImprovementData(in context: NSManagedObjectContext) async -> PromptImprovementData {
         let fetchRequest = Note.fetchRequest() as! NSFetchRequest<Note>
         fetchRequest.predicate = NSPredicate(format: "originalClassificationType != nil")
@@ -502,31 +504,65 @@ class ClassificationMetrics {
     }
 
     /// Anonymize content for safe export
+    /// WARNING: This is aggressive anonymization to prevent any PII leakage.
+    /// Only structural information is preserved for prompt engineering.
     private func anonymizeContent(_ content: String) -> String {
         let preview = String(content.prefix(100))
 
         // Remove emails
-        let noEmails = preview.replacingOccurrences(
+        var sanitized = preview.replacingOccurrences(
             of: #"[\w\.-]+@[\w\.-]+"#,
             with: "[EMAIL]",
             options: .regularExpression
         )
 
-        // Remove phone numbers
-        let noPhones = noEmails.replacingOccurrences(
-            of: #"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"#,
+        // Remove phone numbers (various formats)
+        sanitized = sanitized.replacingOccurrences(
+            of: #"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"#,
             with: "[PHONE]",
             options: .regularExpression
         )
 
         // Remove URLs
-        let noUrls = noPhones.replacingOccurrences(
+        sanitized = sanitized.replacingOccurrences(
             of: #"https?://[^\s]+"#,
             with: "[URL]",
             options: .regularExpression
         )
 
-        return noUrls
+        // Remove any remaining numbers (could be IDs, account numbers, SSNs, etc.)
+        sanitized = sanitized.replacingOccurrences(
+            of: #"\b\d{4,}\b"#,
+            with: "[NUMBER]",
+            options: .regularExpression
+        )
+
+        // Remove capitalized words that could be names or places
+        // Keep common words like "I", "The", "A" but remove likely proper nouns
+        sanitized = sanitized.replacingOccurrences(
+            of: #"\b[A-Z][a-z]{2,}\b"#,
+            with: "[NAME]",
+            options: .regularExpression
+        )
+
+        // Remove street addresses (number + street indicators)
+        sanitized = sanitized.replacingOccurrences(
+            of: #"\b\d+\s+(st|street|ave|avenue|rd|road|blvd|boulevard|dr|drive|ln|lane|ct|court)\b"#,
+            with: "[ADDRESS]",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        // Remove any @ symbols that might have been missed
+        sanitized = sanitized.replacingOccurrences(of: "@", with: "[AT]")
+
+        // Remove dollar amounts that could be sensitive financial info
+        sanitized = sanitized.replacingOccurrences(
+            of: #"\$\d+"#,
+            with: "[AMOUNT]",
+            options: .regularExpression
+        )
+
+        return sanitized
     }
 
     // MARK: - Export
@@ -553,6 +589,9 @@ class ClassificationMetrics {
     /// Export prompt improvement data as JSON
     /// - Parameter context: Core Data context
     /// - Returns: JSON string of anonymized examples and patterns
+    /// - Warning: This export contains anonymized note content. Even with aggressive anonymization,
+    ///   users should be informed and consent before this data is exported or shared.
+    ///   Only use for internal analysis or with explicit user permission.
     func exportPromptImprovementData(in context: NSManagedObjectContext) async -> String? {
         let data = await generatePromptImprovementData(in: context)
 
@@ -577,6 +616,7 @@ class ClassificationMetrics {
     func trackClassification(note: Note, classification: NoteClassification) {
         logger.debug("""
             Classification tracked:
+            - Note ID: \(note.id.uuidString)
             - Type: \(classification.type.rawValue)
             - Method: \(classification.method.rawValue)
             - Confidence: \(Int(classification.confidence * 100))%
@@ -599,6 +639,7 @@ class ClassificationMetrics {
     ) {
         logger.info("""
             Classification correction:
+            - Note ID: \(note.id.uuidString)
             - Original: \(originalType.rawValue) (\(originalMethod.rawValue), \(Int(originalConfidence * 100))%)
             - Corrected: \(correctedType.rawValue)
             - Content length: \(note.content.count) chars
