@@ -1,0 +1,103 @@
+#!/bin/bash
+# Review and apply PR-Agent feedback for a PR
+# Usage: ./bin/pr-review-feedback [PR_NUMBER]
+#
+# If no PR number provided, will use the current branch's PR
+
+set -e
+
+# Ensure GitHub CLI is available
+if ! command -v gh >/dev/null 2>&1; then
+  echo "❌ Error: GitHub CLI (gh) is required but not installed." >&2
+  exit 1
+fi
+
+# Get PR number from argument or current branch
+PR_NUMBER=$1
+if [ -z "$PR_NUMBER" ]; then
+    PR_NUMBER=$(gh pr view --json number -q .number 2>/dev/null || echo "")
+fi
+
+if [ -z "$PR_NUMBER" ]; then
+    echo "❌ Could not determine PR number"
+    echo "Usage: $0 [PR_NUMBER]"
+    echo "  or run from a branch with an open PR"
+    exit 1
+fi
+
+# Validate PR_NUMBER is numeric to prevent injection attacks
+if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "❌ Invalid PR number: $PR_NUMBER"
+    echo "PR number must be a positive integer"
+    exit 1
+fi
+
+echo "🔍 Checking PR #$PR_NUMBER for PR-Agent feedback..."
+
+# Wait for PR-Agent to complete (max 5 minutes)
+MAX_WAIT=300
+ELAPSED=0
+INTERVAL=10
+
+while [ $ELAPSED -lt $MAX_WAIT ]; do
+    # Get both status and conclusion in a single API call for efficiency
+    CHECK_DATA=$(gh pr checks "$PR_NUMBER" --json name,status,conclusion -q '.[] | select(.name == "Run PR Agent") | {status, conclusion}' 2>/dev/null || echo "")
+
+    if [ -n "$CHECK_DATA" ]; then
+        STATUS=$(echo "$CHECK_DATA" | jq -r '.status // ""')
+        CONCLUSION=$(echo "$CHECK_DATA" | jq -r '.conclusion // ""')
+
+        # Check for any terminal state (completed with any conclusion, or failed/skipped)
+        if [ "$STATUS" = "COMPLETED" ] || [ -n "$CONCLUSION" ]; then
+            echo "✅ PR-Agent review complete (conclusion: ${CONCLUSION:-unknown})"
+            break
+        else
+            echo "   Status: $STATUS - waiting... ($ELAPSED/${MAX_WAIT}s)"
+        fi
+    else
+        echo "⚠️  PR-Agent check not found (may not have started yet) - waiting... ($ELAPSED/${MAX_WAIT}s)"
+    fi
+
+    sleep $INTERVAL
+    ELAPSED=$((ELAPSED + INTERVAL))
+done
+
+if [ $ELAPSED -ge $MAX_WAIT ]; then
+    echo "⏱️  Timeout waiting for PR-Agent"
+    exit 1
+fi
+
+# Check for compliance issues in comments
+echo ""
+echo "📋 Checking for compliance issues..."
+
+HAS_ISSUES=$(gh pr view $PR_NUMBER --json comments --jq '
+  .comments[]
+  | select(.author.login == "qodo-code-review")
+  | select(.body | contains("PR Compliance Guide"))
+  | .body
+  | select(contains("🔴") or contains("⚪"))
+' 2>/dev/null || echo "")
+
+if [ -z "$HAS_ISSUES" ]; then
+    echo "✅ No compliance issues found!"
+    echo ""
+    echo "You can still review suggestions at:"
+    echo "  https://github.com/$(gh repo view --json nameWithOwner -q .nameWithOwner)/pull/$PR_NUMBER"
+    exit 0
+fi
+
+echo "⚠️  PR-Agent found items that need attention"
+echo ""
+echo "Opening PR in browser..."
+gh pr view $PR_NUMBER --web
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "To automatically address the feedback with Claude Code:"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "  Can you take a look at the PR Agent's feedback and"
+echo "  see if any changes need to be made?"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

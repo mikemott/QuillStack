@@ -27,17 +27,23 @@ struct NoteClassification: Equatable, Sendable {
     /// Optional reasoning for debugging/transparency
     /// e.g., "Detected phone + email pattern", "LLM identified meeting keywords"
     let reasoning: String?
-    
+
+    /// Prompt version used for LLM classification (only set when method == .llm)
+    /// Used for A/B testing and rollback capability
+    let promptVersion: String?
+
     init(
         type: NoteType,
         confidence: Double,
         method: ClassificationMethod,
-        reasoning: String? = nil
+        reasoning: String? = nil,
+        promptVersion: String? = nil
     ) {
         self.type = type
         self.confidence = confidence
         self.method = method
         self.reasoning = reasoning
+        self.promptVersion = promptVersion
     }
     
     /// Creates a classification with explicit (hashtag) method
@@ -51,12 +57,13 @@ struct NoteClassification: Equatable, Sendable {
     }
     
     /// Creates a classification with LLM method
-    static func llm(_ type: NoteType, confidence: Double = 0.85, reasoning: String? = nil) -> NoteClassification {
+    static func llm(_ type: NoteType, confidence: Double = 0.85, reasoning: String? = nil, promptVersion: String? = nil) -> NoteClassification {
         NoteClassification(
             type: type,
             confidence: confidence,
             method: .llm,
-            reasoning: reasoning
+            reasoning: reasoning,
+            promptVersion: promptVersion
         )
     }
     

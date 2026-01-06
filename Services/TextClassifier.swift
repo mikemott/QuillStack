@@ -12,7 +12,14 @@ import UIKit
 /// Uses hashtag triggers, business card detection, and content analysis.
 @MainActor
 final class TextClassifier: TextClassifierProtocol {
-    
+
+    // MARK: - Prompt Versioning
+
+    /// Current LLM prompt version for classification
+    /// Increment this when making significant prompt changes to track accuracy improvements
+    /// Format: "v{major}.{minor}" where major = breaking changes, minor = improvements
+    private static let PROMPT_VERSION = "v2.0"
+
     // MARK: - LLM Classification Cache
 
     /// In-memory cache for LLM classification results to avoid redundant API calls
@@ -192,8 +199,13 @@ final class TextClassifier: TextClassifierProtocol {
                 return nil
             }
 
-            // Return LLM classification with high confidence
-            return .llm(noteType, confidence: 0.85, reasoning: "LLM classification")
+            // Return LLM classification with high confidence and prompt version
+            return .llm(
+                noteType,
+                confidence: 0.85,
+                reasoning: "LLM classification",
+                promptVersion: Self.PROMPT_VERSION
+            )
 
         } catch {
             // LLM call failed - fall back to heuristics
@@ -202,21 +214,70 @@ final class TextClassifier: TextClassifierProtocol {
         }
     }
     
-    /// Builds the classification prompt for LLM
+    /// Builds the classification prompt for LLM with few-shot examples
     private func buildClassificationPrompt(text: String) -> String {
-        let availableTypes = NoteType.allCases.map { $0.rawValue }.joined(separator: ", ")
-        
         return """
-        Classify this handwritten note into one of these types: \(availableTypes)
-        
-        Rules:
-        - Return ONLY the type name, nothing else
-        - Choose the most specific type that matches
-        - If unsure, return "general"
-        
-        Text to classify:
+        Classify this handwritten note into one of these types:
+
+        **Note Types:**
+        - **todo**: Tasks, checklists, action items (e.g., "Buy milk", "Call dentist")
+        - **meeting**: Meeting notes, agendas, discussion summaries
+        - **email**: Draft emails, messages to send
+        - **contact**: Contact information with name and details (phone/email/address)
+        - **reminder**: Time-based reminders for future actions
+        - **expense**: Receipts, purchases, financial tracking
+        - **shopping**: Shopping lists, items to buy
+        - **recipe**: Cooking instructions, ingredient lists
+        - **event**: Calendar events, appointments, celebrations
+        - **idea**: Creative ideas, brainstorming, concepts
+        - **claudePrompt**: Requests or prompts for AI assistants like Claude
+        - **general**: General notes that don't fit other categories
+
+        **Classification Rules:**
+        1. Return ONLY the type name (lowercase), nothing else
+        2. Choose the MOST SPECIFIC type that matches
+        3. Contact requires name + contact details (phone/email/address)
+        4. Todo needs actionable tasks or checkboxes
+        5. Shopping is specifically for purchasing items
+        6. If unsure or doesn't fit a category, return "general"
+
+        **Examples:**
+
+        Example 1:
+        Text: "Call mom tomorrow at 3pm about birthday party"
+        Type: reminder
+
+        Example 2:
+        Text: "John Smith\n555-123-4567\njohn@example.com\nSales Manager at Acme Corp"
+        Type: contact
+
+        Example 3:
+        Text: "Discussed Q4 roadmap\nAction items: Update docs, schedule follow-up\nAttendees: Sarah, Mike"
+        Type: meeting
+
+        Example 4:
+        Text: "□ Buy milk\n□ Get eggs\n□ Pick up prescription"
+        Type: todo
+
+        Example 5:
+        Text: "Milk, bread, eggs, cheese, bananas"
+        Type: shopping
+
+        Example 6:
+        Text: "Spent $45.99 at Target for office supplies\nReceipt #12345"
+        Type: expense
+
+        Example 7:
+        Text: "What if we built a feature that automatically summarizes meeting notes?"
+        Type: idea
+
+        Example 8:
+        Text: "Write a poem about autumn leaves"
+        Type: claudePrompt
+
+        **Text to classify:**
         \(text)
-        
+
         Type:
         """
     }
@@ -224,14 +285,19 @@ final class TextClassifier: TextClassifierProtocol {
     /// Attempts to extract note type from LLM response that may contain extra text
     private func extractTypeFromLLMResponse(_ response: String) -> NoteClassification? {
         let lowercased = response.lowercased()
-        
+
         // Try to find a type name in the response
         for noteType in NoteType.allCases {
             if lowercased.contains(noteType.rawValue) {
-                return .llm(noteType, confidence: 0.80, reasoning: "Extracted from LLM response")
+                return .llm(
+                    noteType,
+                    confidence: 0.80,
+                    reasoning: "Extracted from LLM response",
+                    promptVersion: Self.PROMPT_VERSION
+                )
             }
         }
-        
+
         return nil
     }
 
