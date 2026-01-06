@@ -67,27 +67,34 @@ final class TextClassifier: TextClassifierProtocol {
     
     /// Classifies the type of note with full classification details including confidence and method.
     /// Priority: explicit hashtag triggers > LLM classification > heuristic detection > content analysis
+    /// Respects user classification settings (threshold, always ask, LLM enabled)
     func classifyNoteAsync(content: String, image: UIImage?) async -> NoteClassification {
         let lowercased = content.lowercased()
-        
+        let settings = await SettingsManager.shared
+
         // 1. Hashtag triggers (explicit - highest priority, 100% confidence)
         if let explicitType = detectExplicitTrigger(lowercased) {
             return .explicit(explicitType)
         }
-        
+
         // 2. LLM classification (NEW - intelligent detection)
-        // Check cache first
-        let cacheKey = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let cached = classificationCache[cacheKey] {
-            return cached
-        }
-        
-        // Try LLM classification (with error handling and fallback)
-        if let llmClassification = await classifyWithLLM(content) {
-            // Cache the result
-            maintainCache()
-            classificationCache[cacheKey] = llmClassification
-            return llmClassification
+        // Only use LLM if enabled in settings
+        let enableLLM = await settings.enableLLMClassification
+
+        if enableLLM {
+            // Check cache first
+            let cacheKey = content.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let cached = classificationCache[cacheKey] {
+                return cached
+            }
+
+            // Try LLM classification (with error handling and fallback)
+            if let llmClassification = await classifyWithLLM(content) {
+                // Cache the result
+                maintainCache()
+                classificationCache[cacheKey] = llmClassification
+                return llmClassification
+            }
         }
         
         // 3. Voice command triggers (existing)

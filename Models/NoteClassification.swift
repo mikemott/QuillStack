@@ -162,5 +162,29 @@ extension NoteClassification {
     var confidencePercentage: String {
         "\(Int(confidence * 100))%"
     }
+
+    /// Check if manual type selection should be shown based on user settings
+    /// Takes into account "always ask" mode and confidence threshold
+    /// - Parameter settings: SettingsManager instance
+    /// - Returns: True if user should be prompted to manually select type
+    func shouldShowManualTypePicker(settings: SettingsManager) -> Bool {
+        // Always show picker if user enabled "always ask" mode
+        if settings.alwaysAskForClassification {
+            return true
+        }
+
+        // For explicit hashtag classifications, never show picker (user was explicit)
+        if method == .explicit {
+            return false
+        }
+
+        // For manual classifications, never show picker (already manual)
+        if method == .manual {
+            return false
+        }
+
+        // Check if confidence is below threshold
+        return confidence < settings.classificationConfidenceThreshold
+    }
 }
 

@@ -127,6 +127,11 @@ final class SettingsManager {
         static let imageRetentionPolicy = "imageRetentionPolicy"
         static let autoDeleteOriginalImages = "autoDeleteOriginalImages"
         static let imageRetentionDays = "imageRetentionDays"
+
+        // Classification Settings
+        static let classificationConfidenceThreshold = "classificationConfidenceThreshold"
+        static let alwaysAskForClassification = "alwaysAskForClassification"
+        static let enableLLMClassification = "enableLLMClassification"
     }
 
     // MARK: - Initialization
@@ -268,6 +273,34 @@ final class SettingsManager {
         }
     }
 
+    // MARK: - Classification Settings
+
+    /// Minimum confidence threshold for automatic classification (0.0-1.0)
+    /// Notes with confidence below this threshold will show manual type picker
+    /// Default: 0.70 (70% confidence)
+    var classificationConfidenceThreshold: Double = 0.70 {
+        didSet {
+            defaults.set(classificationConfidenceThreshold, forKey: Keys.classificationConfidenceThreshold)
+        }
+    }
+
+    /// Always show type picker for manual classification (cautious mode)
+    /// When enabled, users manually select type for every note
+    var alwaysAskForClassification: Bool = false {
+        didSet {
+            defaults.set(alwaysAskForClassification, forKey: Keys.alwaysAskForClassification)
+        }
+    }
+
+    /// Enable LLM-powered classification (requires API key)
+    /// When disabled, only heuristic and pattern-based classification is used
+    /// Default: true
+    var enableLLMClassification: Bool = true {
+        didSet {
+            defaults.set(enableLLMClassification, forKey: Keys.enableLLMClassification)
+        }
+    }
+
     // MARK: - Computed Properties
 
     var hasAPIKey: Bool {
@@ -329,6 +362,11 @@ final class SettingsManager {
         }
         autoDeleteOriginalImages = defaults.bool(forKey: Keys.autoDeleteOriginalImages)
         imageRetentionDays = defaults.object(forKey: Keys.imageRetentionDays) as? Int ?? 30
+
+        // Load classification settings
+        classificationConfidenceThreshold = defaults.object(forKey: Keys.classificationConfidenceThreshold) as? Double ?? 0.70
+        alwaysAskForClassification = defaults.bool(forKey: Keys.alwaysAskForClassification)
+        enableLLMClassification = defaults.object(forKey: Keys.enableLLMClassification) as? Bool ?? true
     }
 
     // MARK: - Migration
