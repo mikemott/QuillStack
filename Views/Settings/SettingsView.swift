@@ -402,6 +402,76 @@ struct SettingsView: View {
                 .padding(16)
                 .opacity(settings.hasAPIKey ? 1 : 0.5)
                 .disabled(!settings.hasAPIKey)
+
+                Divider()
+
+                // Classification Settings Header
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Auto-Classification")
+                        .font(.serifBody(15, weight: .semibold))
+                        .foregroundColor(.textDark)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+
+                    // Enable LLM Classification Toggle
+                    Toggle(isOn: $settings.enableLLMClassification) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("AI-Powered Classification")
+                                .font(.serifBody(15, weight: .medium))
+                                .foregroundColor(.textDark)
+                            Text("Use AI to intelligently detect note types")
+                                .font(.serifCaption(12, weight: .regular))
+                                .foregroundColor(.textMedium)
+                        }
+                    }
+                    .tint(.forestDark)
+                    .padding(.horizontal, 16)
+                    .opacity(settings.hasAPIKey ? 1 : 0.5)
+                    .disabled(!settings.hasAPIKey)
+
+                    // Always Ask Toggle
+                    Toggle(isOn: $settings.alwaysAskForClassification) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Always Ask Me")
+                                .font(.serifBody(15, weight: .medium))
+                                .foregroundColor(.textDark)
+                            Text("Manually choose note type for every note")
+                                .font(.serifCaption(12, weight: .regular))
+                                .foregroundColor(.textMedium)
+                        }
+                    }
+                    .tint(.forestDark)
+                    .padding(.horizontal, 16)
+
+                    // Confidence Threshold Slider
+                    if !settings.alwaysAskForClassification {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Confidence Threshold")
+                                    .font(.serifBody(15, weight: .medium))
+                                    .foregroundColor(.textDark)
+                                Spacer()
+                                Text("\(Int(settings.classificationConfidenceThreshold * 100))%")
+                                    .font(.serifBody(15, weight: .semibold))
+                                    .foregroundColor(.forestDark)
+                            }
+
+                            Slider(
+                                value: $settings.classificationConfidenceThreshold,
+                                in: 0.5...0.95,
+                                step: 0.05
+                            )
+                            .tint(.forestDark)
+
+                            Text("Only auto-classify when confidence is above this threshold")
+                                .font(.serifCaption(12, weight: .regular))
+                                .foregroundColor(.textMedium)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(.bottom, 16)
             }
             .background(
                 LinearGradient(
