@@ -31,6 +31,32 @@ final class TextClassifier: TextClassifierProtocol {
             }
         }
     }
+
+    /// Determines if manual type selection should be shown based on classification and user settings
+    /// - Parameters:
+    ///   - classification: The classification result to evaluate
+    ///   - settings: User settings for classification behavior
+    /// - Returns: True if user should be prompted to manually select type
+    func shouldShowManualTypePicker(for classification: NoteClassification, settings: SettingsManager) -> Bool {
+        // Always show picker if user enabled "always ask" mode
+        if settings.alwaysAskForClassification {
+            return true
+        }
+
+        // For explicit hashtag classifications, never show picker (user was explicit)
+        if classification.method == .explicit {
+            return false
+        }
+
+        // For manual classifications, never show picker (already manual)
+        if classification.method == .manual {
+            return false
+        }
+
+        // Check if confidence is below threshold
+        return classification.confidence < settings.classificationConfidenceThreshold
+    }
+
     /// Classifies the type of note based on content
     /// Priority: explicit hashtag triggers > spoken command triggers > business card detection > content analysis
     func classifyNote(content: String) -> NoteType {
