@@ -74,20 +74,19 @@ jobs:
                 echo "Generated enhanced description:"
                 echo "$ENHANCED_DESC"
 
-                # Update the issue with enhanced description
-                UPDATE_RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
-                  -H "Authorization: $LINEAR_API_KEY" \
-                  -H "Content-Type: application/json" \
-                  --data-binary @- <<EOF
-{
-  "query": "mutation(\$id: String!, \$description: String!) { issueUpdate(id: \$id, input: { description: \$description }) { success issue { id identifier } } }",
-  "variables": {
-    "id": "$ISSUE_ID",
-    "description": "$ENHANCED_DESC\n\n---\n*Auto-enhanced from brief description*"
-  }
-}
-EOF
-)
+                # Update the issue with enhanced description (using jq to properly escape JSON)
+                MUTATION_QUERY='mutation($id: String!, $description: String!) { issueUpdate(id: $id, input: { description: $description }) { success issue { id identifier } } }'
+                ENHANCED_DESC_WITH_FOOTER="$ENHANCED_DESC"$'\n\n'"---"$'\n'"*Auto-enhanced from brief description*"
+
+                UPDATE_RESPONSE=$(jq -n \
+                  --arg query "$MUTATION_QUERY" \
+                  --arg id "$ISSUE_ID" \
+                  --arg desc "$ENHANCED_DESC_WITH_FOOTER" \
+                  '{query: $query, variables: {id: $id, description: $desc}}' | \
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d @-)
 
                 SUCCESS=$(echo "$UPDATE_RESPONSE" | jq -r '.data.issueUpdate.success')
                 if [ "$SUCCESS" = "true" ]; then
