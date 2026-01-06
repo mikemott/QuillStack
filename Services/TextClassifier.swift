@@ -78,10 +78,11 @@ final class TextClassifier: TextClassifierProtocol {
         }
 
         // 2. LLM classification (NEW - intelligent detection)
-        // Only use LLM if enabled in settings
+        // Only use LLM if enabled in settings and API key is configured
         let enableLLM = await settings.enableLLMClassification
+        let hasAPIKey = await settings.hasAPIKey
 
-        if enableLLM {
+        if enableLLM && hasAPIKey {
             // Check cache first
             let cacheKey = content.trimmingCharacters(in: .whitespacesAndNewlines)
             if let cached = classificationCache[cacheKey] {

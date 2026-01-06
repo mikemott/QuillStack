@@ -363,8 +363,9 @@ final class SettingsManager {
         autoDeleteOriginalImages = defaults.bool(forKey: Keys.autoDeleteOriginalImages)
         imageRetentionDays = defaults.object(forKey: Keys.imageRetentionDays) as? Int ?? 30
 
-        // Load classification settings
-        classificationConfidenceThreshold = defaults.object(forKey: Keys.classificationConfidenceThreshold) as? Double ?? 0.70
+        // Load classification settings with bounds validation
+        let loadedThreshold = defaults.object(forKey: Keys.classificationConfidenceThreshold) as? Double ?? 0.70
+        classificationConfidenceThreshold = min(max(loadedThreshold, 0.5), 0.95) // Clamp to valid range
         alwaysAskForClassification = defaults.bool(forKey: Keys.alwaysAskForClassification)
         enableLLMClassification = defaults.object(forKey: Keys.enableLLMClassification) as? Bool ?? true
     }
