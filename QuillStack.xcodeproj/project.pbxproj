@@ -61,6 +61,7 @@
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
 		8CC9CAC1B76D51B8129A8E61 /* TypeGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CBC205145101FF179EBE6E /* TypeGuideView.swift */; };
 		913ADB2ED128AEA3957A143B /* ClassificationAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */; };
+		97B501B0C5B047377359CDE5 /* ClassificationAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821950025E3D8375366B71B3 /* ClassificationAnalyticsService.swift */; };
 		9A479F4FDE276998D94EBE62 /* NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60271B88FC8F3E46581FB9B5 /* NoteType.swift */; };
 		9BF33EFBB8118A83F611C8CC /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C04153EA7033D6D21E3919 /* PDFExporter.swift */; };
 		9EA67A6CF5A565BEFAF80853 /* ClassificationTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = C636450CF565E1C99C1301E5 /* ClassificationTestCases.swift */; };
@@ -70,6 +71,7 @@
 		A4F800ABD629E75C845D571E /* LearnedCorrectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */; };
 		A5AD366FB2D0C8213C51DCF3 /* NoteDetailViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2350BDFC29B9C62B7D5FEEA /* NoteDetailViewProtocol.swift */; };
 		AA8C277426330FD77BF879DC /* ExtractedTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */; };
+		B73A02AA3AB1C3FB4A5EFD4A /* UsageMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D42C1FE9085BA26990F8C4A /* UsageMetricsView.swift */; };
 		BBBA718784527471B1FBBC9B /* EditableTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A16136444729219B272D1E /* EditableTask.swift */; };
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
@@ -216,12 +218,14 @@
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicePrewarmer.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
+		3D42C1FE9085BA26990F8C4A /* UsageMetricsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UsageMetricsView.swift; sourceTree = "<group>"; };
 		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
 		6FF65609DDFA199412CB81D3 /* ContactsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactsService.swift; path = Services/ContactsService.swift; sourceTree = "<group>"; };
 		7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
+		821950025E3D8375366B71B3 /* ClassificationAnalyticsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClassificationAnalyticsService.swift; sourceTree = "<group>"; };
 		8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMCostTracker.swift; path = Services/LLMCostTracker.swift; sourceTree = "<group>"; };
 		87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailBottomBar.swift; sourceTree = "<group>"; };
 		8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TextClassifierProtocol.swift; path = Protocols/TextClassifierProtocol.swift; sourceTree = "<group>"; };
@@ -517,6 +521,7 @@
 				445B55CF33378CD07282DDBC /* Extraction */,
 				05C42B046C56E7232F89EB98 /* DateParsingService.swift */,
 				C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */,
+				821950025E3D8375366B71B3 /* ClassificationAnalyticsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -587,6 +592,7 @@
 			children = (
 				2796C1EF2EEB800000E05291 /* SettingsView.swift */,
 				10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */,
+				3D42C1FE9085BA26990F8C4A /* UsageMetricsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1131,6 +1137,8 @@
 				E0BAEA1987D09846994C85C7 /* TodoReviewSheet.swift in Sources */,
 				3B53511AF10AB949BF035314 /* EventReviewSheet.swift in Sources */,
 				637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */,
+				B73A02AA3AB1C3FB4A5EFD4A /* UsageMetricsView.swift in Sources */,
+				97B501B0C5B047377359CDE5 /* ClassificationAnalyticsService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

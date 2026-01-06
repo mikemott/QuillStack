@@ -11,23 +11,43 @@ import CoreData
 class CoreDataStack {
     static let shared = CoreDataStack()
 
-    private init() {}
+    /// Preview instance with in-memory store for SwiftUI previews
+    static let preview: CoreDataStack = {
+        let stack = CoreDataStack(inMemory: true)
+        return stack
+    }()
+
+    private let inMemory: Bool
+
+    private init(inMemory: Bool = false) {
+        self.inMemory = inMemory
+    }
 
     // MARK: - Core Data Stack
+
+    /// Convenience accessor for the view context
+    var context: NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
 
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "QuillStack")
 
-        // Enable encryption and file protection
-        let description = container.persistentStoreDescriptions.first
-        description?.setOption(
-            FileProtectionType.complete as NSObject,
-            forKey: NSPersistentStoreFileProtectionKey
-        )
+        if inMemory {
+            // Use in-memory store for previews
+            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+        } else {
+            // Enable encryption and file protection
+            let description = container.persistentStoreDescriptions.first
+            description?.setOption(
+                FileProtectionType.complete as NSObject,
+                forKey: NSPersistentStoreFileProtectionKey
+            )
 
-        // Enable automatic lightweight migration
-        description?.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
-        description?.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+            // Enable automatic lightweight migration
+            description?.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
+            description?.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+        }
 
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
