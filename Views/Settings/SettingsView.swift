@@ -793,7 +793,7 @@ struct SettingsView: View {
                             .font(.serifCaption(12, weight: .semibold))
                             .foregroundColor(.forestDark)
                     }
-                    Text("Write #feature# or #issue# on paper, capture it with the camera, and QuillStack will transform your handwritten notes into a structured GitHub issue.")
+                    Text("Write feature requests or bug reports on paper, capture them with the camera, and QuillStack automatically detects and transforms your handwritten notes into structured GitHub issues.")
                         .font(.serifCaption(12, weight: .regular))
                         .foregroundColor(.textMedium)
                         .fixedSize(horizontal: false, vertical: true)
