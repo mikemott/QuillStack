@@ -1,0 +1,21 @@
+{
+  "name": "worker-health-monitor",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker with cron trigger to monitor health of other workers",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "kv:create": "wrangler kv:namespace create HEALTH_METRICS"
+  },
+  "keywords": ["cloudflare-workers", "health-monitoring", "cron"],
+  "author": "QuillStack",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.0"
+  }
+}
