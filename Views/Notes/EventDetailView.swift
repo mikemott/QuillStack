@@ -18,14 +18,9 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     @State private var duration: Int = 60 // minutes
     @State private var location: String = ""
     @State private var eventNotes: String = ""
-    @State private var showingCalendarPicker = false
-    @State private var showingCalendarError = false
-    @State private var calendarErrorMessage = ""
-    @State private var selectedCalendar: EKCalendar?
-    @State private var availableCalendars: [EKCalendar] = []
+    @State private var showingReviewSheet = false
     @State private var eventCreated = false
     @State private var createdEventId: String?
-    @State private var calendarAccessDenied: Bool = false
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
@@ -134,7 +129,6 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         .navigationBarHidden(true)
         .onAppear {
             parseEventContent()
-            loadCalendars()
         }
         .onChange(of: eventTitle) { _, _ in saveChanges() }
         .onChange(of: eventDate) { _, _ in saveChanges() }
@@ -143,23 +137,6 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         .onChange(of: duration) { _, _ in saveChanges() }
         .onChange(of: location) { _, _ in saveChanges() }
         .onChange(of: eventNotes) { _, _ in saveChanges() }
-        .sheet(isPresented: $showingCalendarPicker) {
-            calendarPickerSheet
-        }
-        .alert("Calendar Error", isPresented: $showingCalendarError) {
-            if calendarAccessDenied {
-                Button("Open Settings") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } else {
-                Button("OK", role: .cancel) {}
-            }
-        } message: {
-            Text(calendarErrorMessage)
-        }
         .alert("Save Failed", isPresented: $showingSaveError) {
             Button("OK") { }
         } message: {
@@ -167,6 +144,23 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingReviewSheet) {
+            EventReviewSheet(
+                title: eventTitle,
+                eventDate: eventDate,
+                eventTime: eventTime,
+                isAllDay: !hasTime,
+                duration: duration,
+                location: location,
+                notes: eventNotes,
+                onSave: { eventId in
+                    try await handleEventCreated(eventId: eventId)
+                },
+                onCancel: {
+                    // Sheet dismissed
+                }
+            )
         }
     }
 
@@ -275,7 +269,7 @@ struct EventDetailView: View, NoteDetailViewProtocol {
             Spacer()
 
             // Add to Calendar button
-            Button(action: { showingCalendarPicker = true }) {
+            Button(action: { showingReviewSheet = true }) {
                 HStack(spacing: 8) {
                     Image(systemName: eventCreated ? "checkmark.circle.fill" : "calendar.badge.plus")
                         .font(.system(size: 16, weight: .semibold))
@@ -296,8 +290,8 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                 )
                 .cornerRadius(10)
             }
-            .disabled(eventTitle.isEmpty || calendarAccessDenied)
-            .opacity(eventTitle.isEmpty || calendarAccessDenied ? 0.5 : 1)
+            .disabled(eventTitle.isEmpty)
+            .opacity(eventTitle.isEmpty ? 0.5 : 1)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -308,45 +302,6 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                 .frame(height: 1),
             alignment: .top
         )
-    }
-
-    // MARK: - Calendar Picker Sheet
-
-    private var calendarPickerSheet: some View {
-        NavigationStack {
-            List(availableCalendars, id: \.calendarIdentifier) { calendar in
-                Button(action: {
-                    selectedCalendar = calendar
-                    createCalendarEvent(in: calendar)
-                    showingCalendarPicker = false
-                }) {
-                    HStack {
-                        Circle()
-                            .fill(Color(cgColor: calendar.cgColor))
-                            .frame(width: 12, height: 12)
-                        Text(calendar.title)
-                            .font(.serifBody(16, weight: .regular))
-                            .foregroundColor(.textDark)
-                        Spacer()
-                        if calendar == calendarService.getDefaultCalendar() {
-                            Text("Default")
-                                .font(.serifCaption(12, weight: .medium))
-                                .foregroundColor(.textMedium)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Choose Calendar")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        showingCalendarPicker = false
-                    }
-                }
-            }
-        }
-        .presentationDetents([.medium])
     }
 
     // MARK: - Helpers
@@ -362,36 +317,6 @@ struct EventDetailView: View, NoteDetailViewProtocol {
             return "1 hour"
         } else {
             return "\(duration / 60) hours"
-        }
-    }
-
-    private func loadCalendars() {
-        Task {
-            let status = calendarService.authorizationStatus
-            if status == .notDetermined {
-                let granted = await calendarService.requestAccess()
-                if !granted {
-                    await MainActor.run {
-                        calendarAccessDenied = true
-                        calendarErrorMessage = "Calendar access is required to create events."
-                        showingCalendarError = true
-                    }
-                    return
-                }
-            } else if status == .denied || status == .restricted {
-                await MainActor.run {
-                    calendarAccessDenied = true
-                    calendarErrorMessage = "Calendar access is required to create events. Please enable it in Settings."
-                    showingCalendarError = true
-                }
-                return
-            }
-
-            await MainActor.run {
-                calendarAccessDenied = false
-                availableCalendars = calendarService.getCalendars().filter { $0.allowsContentModifications }
-                selectedCalendar = calendarService.getDefaultCalendar()
-            }
         }
     }
 
@@ -565,39 +490,23 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         }
     }
 
-    private func createCalendarEvent(in calendar: EKCalendar) {
-        // Combine date and time
-        let combinedDate: Date
-        if hasTime {
-            let cal = Calendar.current
-            var components = cal.dateComponents([.year, .month, .day], from: eventDate)
-            let timeComponents = cal.dateComponents([.hour, .minute], from: eventTime)
-            components.hour = timeComponents.hour
-            components.minute = timeComponents.minute
-            combinedDate = cal.date(from: components) ?? eventDate
-        } else {
-            combinedDate = eventDate
-        }
-
-        do {
-            let eventId = try calendarService.createEvent(
-                title: eventTitle,
-                startDate: combinedDate,
-                duration: hasTime ? duration : 1440, // All day = 24 hours
-                notes: eventNotes.isEmpty ? nil : eventNotes,
-                attendees: nil,
-                location: location.isEmpty ? nil : location,
-                calendar: calendar
-            )
+    private func handleEventCreated(eventId: String) async throws {
+        // Store event ID in note summary for reference
+        await MainActor.run {
             createdEventId = eventId
             eventCreated = true
-
-            // Store event ID in note summary for reference
             note.summary = eventId
+        }
+
+        // Save to Core Data
+        do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            calendarErrorMessage = error.localizedDescription
-            showingCalendarError = true
+            await MainActor.run {
+                saveErrorMessage = error.localizedDescription
+                showingSaveError = true
+            }
+            throw error
         }
     }
 }
