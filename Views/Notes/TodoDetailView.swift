@@ -139,14 +139,9 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     // MARK: - Helpers
 
     private var noteTitle: String {
-        // Remove the trigger tag from title
-        let classifier = TextClassifier()
-        if let extracted = classifier.extractTriggerTag(from: note.content) {
-            let firstLine = extracted.cleanedContent.components(separatedBy: .newlines).first ?? "To-Do List"
-            return firstLine.truncated(to: 30)
-        }
-        let firstLine = note.content.components(separatedBy: .newlines).first ?? "To-Do List"
-        return firstLine.truncated(to: 30)
+        // Use smart title extraction (QUI-146)
+        // Skips checkbox lines and finds meaningful headers
+        note.smartTitle.truncated(to: 30)
     }
 
     private var completedCount: Int {

@@ -506,8 +506,8 @@ struct NoteCardView: View {
                 dateText
             }
 
-            // Preview text
-            Text(note.content)
+            // Preview text (cleaned of OCR artifacts - QUI-146)
+            Text(note.cleanContent)
                 .font(.serifBody(15, weight: .regular))
                 .foregroundColor(.textDark)
                 .lineSpacing(6)
