@@ -53,9 +53,8 @@ enum ServicePrewarmer {
         guard let warmupImage = imageFromWarmupData(warmupData) else { return }
 
         // We discard the result – the goal is to trigger Vision/CIContext setup
-        autoreleasepool {
-            _ = try? await service.recognizeTextWithConfidence(from: warmupImage)
-        }
+        // Note: Can't use autoreleasepool with async/await - the async operation manages its own resources
+        _ = try? await service.recognizeTextWithConfidence(from: warmupImage)
     }
 
     @MainActor

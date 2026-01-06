@@ -13,7 +13,8 @@ import os.log
 @MainActor
 @Observable
 final class CameraManager: NSObject {
-    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Camera")
+    // Logger must be nonisolated to be accessible from delegate callbacks
+    nonisolated(unsafe) private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "Camera")
     // Observable state (main actor)
     var isAuthorized = false
     var isCameraUnavailable = false
