@@ -130,6 +130,20 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             throw LLMError.invalidResponse
         }
 
+        // Track token usage for cost monitoring
+        if let usage = json["usage"] as? [String: Any],
+           let inputTokens = usage["input_tokens"] as? Int,
+           let outputTokens = usage["output_tokens"] as? Int {
+            // Validate token counts are reasonable (positive and not suspiciously large)
+            guard inputTokens >= 0 && outputTokens >= 0,
+                  inputTokens < 1_000_000 && outputTokens < 1_000_000 else {
+                // Log but don't crash on invalid token counts
+                print("⚠️ Invalid token counts from API: input=\(inputTokens), output=\(outputTokens)")
+                return text
+            }
+            await LLMCostTracker.shared.recordUsage(inputTokens: inputTokens, outputTokens: outputTokens)
+        }
+
         return text
     }
 
