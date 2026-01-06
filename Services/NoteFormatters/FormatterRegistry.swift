@@ -50,24 +50,28 @@ final class FormatterRegistry {
         switch type {
         case .todo:
             formatter = TodoFormatter()
+        case .meeting:
+            formatter = MeetingFormatter()
+        case .email:
+            formatter = EmailFormatter()
+        case .recipe:
+            formatter = RecipeFormatter()
+        case .contact:
+            formatter = ContactFormatter()
+        case .shopping:
+            formatter = ShoppingFormatter()
+        case .expense:
+            formatter = ExpenseFormatter()
 
         // TODO: Implement remaining formatters as part of QUI-146
-        // case .meeting:
-        //     formatter = MeetingFormatter()
-        // case .email:
-        //     formatter = EmailFormatter()
-        // case .recipe:
-        //     formatter = RecipeFormatter()
-        // case .contact:
-        //     formatter = ContactFormatter()
         // case .event:
         //     formatter = EventFormatter()
-        // case .shopping:
-        //     formatter = ShoppingFormatter()
-        // case .expense:
-        //     formatter = ExpenseFormatter()
         // case .claudePrompt:
         //     formatter = ClaudePromptFormatter()
+        // case .journal:
+        //     formatter = JournalFormatter()
+        // case .idea:
+        //     formatter = IdeaFormatter()
 
         default:
             // Default formatter for types without specific formatting
