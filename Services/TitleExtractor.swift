@@ -74,7 +74,7 @@ final class TitleExtractor {
             extractedTitle = extractExpenseTitle(from: lines)
         case .claudePrompt:
             extractedTitle = extractClaudePromptTitle(from: lines)
-        case .general, .idea, .reminder:
+        case .general, .idea, .journal, .reminder:
             extractedTitle = extractGenericTitle(from: lines)
         }
 

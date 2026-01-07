@@ -108,6 +108,8 @@ struct TypeCard: View {
             return "Cooking instructions and ingredients"
         case .event:
             return "Events → Calendar"
+        case .journal:
+            return "Personal journal entries"
         case .idea:
             return "Capture thoughts and ideas"
         case .claudePrompt:
@@ -222,6 +224,8 @@ struct TypeExampleSheet: View {
             return "Chocolate Chip Cookies\n\nIngredients:\n- 2 cups flour\n- 1 cup butter\n- 1 cup chocolate chips\n\nBake at 350°F for 12 min"
         case .event:
             return "Dinner with friends\nSaturday, Jan 18 at 7:00 PM\nLocation: The Garden Bistro"
+        case .journal:
+            return "January 12, 2026\n\nToday was a productive day. Finally finished the project I've been working on for weeks. Feeling accomplished!"
         case .idea:
             return "What if we added a dark mode toggle? Could help with battery life and eye strain at night."
         case .claudePrompt:
@@ -251,6 +255,8 @@ struct TypeExampleSheet: View {
             return "Organizes ingredients and instructions for cooking"
         case .event:
             return "Parses event details and offers to add to your calendar"
+        case .journal:
+            return "Saves your journal entry with elegant formatting"
         case .idea:
             return "Saves your idea for future reference"
         case .claudePrompt:
