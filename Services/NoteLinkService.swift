@@ -99,7 +99,8 @@ final class NoteLinkService: @unchecked Sendable {
                 let link = try createLink(from: source, to: target, type: type, in: context)
                 createdLinks.append(link)
             } catch NoteLinkError.duplicateLink {
-                // Skip duplicates silently
+                // Skip duplicates - this is expected behavior for idempotent operations
+                Self.logger.debug("Skipped duplicate \(type.rawValue) link from note \(source.id) to \(target.id)")
                 continue
             } catch {
                 // Re-throw other errors
