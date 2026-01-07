@@ -164,13 +164,17 @@ extension Note {
     /// Get all notes that this note links to (forward links)
     var forwardLinks: [Note] {
         guard let links = outgoingLinks as? Set<NoteLink> else { return [] }
-        return links.map { $0.targetNote }
+        return links
+            .sorted { $0.createdAt < $1.createdAt }
+            .map { $0.targetNote }
     }
 
     /// Get all notes that link to this note (backlinks)
     var backlinks: [Note] {
         guard let links = incomingLinks as? Set<NoteLink> else { return [] }
-        return links.map { $0.sourceNote }
+        return links
+            .sorted { $0.createdAt < $1.createdAt }
+            .map { $0.sourceNote }
     }
 
     /// Get all linked notes (both incoming and outgoing)

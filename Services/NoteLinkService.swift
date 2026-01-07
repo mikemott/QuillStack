@@ -35,7 +35,8 @@ enum NoteLinkError: Error, LocalizedError {
 }
 
 /// Service for managing relationships between notes
-final class NoteLinkService: @unchecked Sendable {
+@MainActor
+final class NoteLinkService {
     static let shared = NoteLinkService()
 
     private static let logger = Logger(
@@ -275,32 +276,34 @@ final class NoteLinkService: @unchecked Sendable {
     /// Check if a note is an ancestor of another note
     private func isAncestor(_ potentialAncestor: Note, of note: Note, in context: NSManagedObjectContext) -> Bool {
         var visited = Set<UUID>()
-        var current = note
+        var toVisit: [Note] = [note]
 
-        while true {
+        while !toVisit.isEmpty {
+            let current = toVisit.removeFirst()
+
+            if visited.contains(current.id) {
+                continue
+            }
+
             visited.insert(current.id)
 
-            // Get parent links
+            // Get all parent links
             let parentLinks = current.typedOutgoingLinks.filter { $0.type == .parent }
 
-            guard let parentLink = parentLinks.first else {
-                // No more parents
-                return false
+            for link in parentLinks {
+                let parent = link.targetNote
+
+                if parent.id == potentialAncestor.id {
+                    return true
+                }
+
+                if !visited.contains(parent.id) {
+                    toVisit.append(parent)
+                }
             }
-
-            let parent = parentLink.targetNote
-
-            if parent.id == potentialAncestor.id {
-                return true
-            }
-
-            if visited.contains(parent.id) {
-                // Cycle detected in existing data
-                return false
-            }
-
-            current = parent
         }
+
+        return false
     }
 
     /// Check if a note is a descendant of another note

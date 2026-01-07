@@ -114,8 +114,8 @@
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="linkType" attributeType="String" defaultValueString="reference"/>
         <attribute name="label" optional="YES" attributeType="String"/>
-        <relationship name="sourceNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="outgoingLinks" inverseEntity="Note"/>
-        <relationship name="targetNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="incomingLinks" inverseEntity="Note"/>
+        <relationship name="sourceNote" maxCount="1" deletionRule="No Action" destinationEntity="Note" inverseName="outgoingLinks" inverseEntity="Note"/>
+        <relationship name="targetNote" maxCount="1" deletionRule="No Action" destinationEntity="Note" inverseName="incomingLinks" inverseEntity="Note"/>
         <fetchIndex name="bySourceNoteIndex">
             <fetchIndexElement property="sourceNote" type="Binary" order="ascending"/>
         </fetchIndex>
