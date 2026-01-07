@@ -174,39 +174,21 @@ final class IdeaFormatter: NoteFormatter {
     }
 
     private func formatTextWithTags(_ text: String) -> AttributedString {
-        var result = AttributedString()
+        var result = AttributedString(text)
+        let tagPattern = "#([\\w]+)"
 
-        // Split by # to find tags
-        let parts = text.components(separatedBy: "#")
+        guard let regex = try? NSRegularExpression(pattern: tagPattern) else {
+            return result
+        }
 
-        for (index, part) in parts.enumerated() {
-            if index == 0 {
-                // First part (before any #)
-                result.append(AttributedString(part))
-            } else {
-                // After #, extract the tag (word characters until space)
-                let tagPattern = "^([\\w]+)"
-                if let regex = try? NSRegularExpression(pattern: tagPattern),
-                   let match = regex.firstMatch(in: part, range: NSRange(part.startIndex..., in: part)) {
-                    let tagRange = Range(match.range(at: 1), in: part)
-                    if let tagRange = tagRange {
-                        let tag = String(part[tagRange])
-                        let remainder = String(part[tagRange.upperBound...])
+        let range = NSRange(text.startIndex..., in: text)
+        let matches = regex.matches(in: text, range: range)
 
-                        // Format #tag
-                        var tagAttr = AttributedString("#\(tag)")
-                        tagAttr.foregroundColor = goldColor
-                        tagAttr.font = .body.bold()
-                        result.append(tagAttr)
-
-                        // Add remainder
-                        result.append(AttributedString(remainder))
-                    } else {
-                        result.append(AttributedString("#\(part)"))
-                    }
-                } else {
-                    result.append(AttributedString("#\(part)"))
-                }
+        for match in matches {
+            if let matchRange = Range(match.range, in: text) {
+                let attributedRange = AttributedString.Index(matchRange.lowerBound, within: result)!..<AttributedString.Index(matchRange.upperBound, within: result)!
+                result[attributedRange].foregroundColor = goldColor
+                result[attributedRange].font = .body.bold()
             }
         }
 
