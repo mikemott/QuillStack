@@ -23,6 +23,7 @@ enum NoteType: String, CaseIterable, Codable, Sendable {
     case shopping = "shopping"
     case recipe = "recipe"
     case event = "event"
+    case journal = "journal"
     case idea = "idea"
 
     // MARK: - Display Properties (via Registry)

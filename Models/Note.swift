@@ -33,6 +33,8 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var todoItems: NSSet?
     @NSManaged public var meeting: Meeting?
     @NSManaged public var pages: NSSet? // Multi-page document support
+    @NSManaged public var outgoingLinks: NSSet? // Links from this note to others
+    @NSManaged public var incomingLinks: NSSet? // Links from other notes to this one
 
     /// Decoded OCR result for confidence highlighting
     /// Note: Access from main actor context for UI display
@@ -129,6 +131,81 @@ extension Note {
         sortedPages
             .compactMap { $0.ocrText }
             .joined(separator: "\n\n--- Page Break ---\n\n")
+    }
+}
+
+// MARK: - Note Links Relationship
+
+extension Note {
+    @objc(addOutgoingLinksObject:)
+    @NSManaged public func addToOutgoingLinks(_ value: NoteLink)
+
+    @objc(removeOutgoingLinksObject:)
+    @NSManaged public func removeFromOutgoingLinks(_ value: NoteLink)
+
+    @objc(addOutgoingLinks:)
+    @NSManaged public func addToOutgoingLinks(_ values: NSSet)
+
+    @objc(removeOutgoingLinks:)
+    @NSManaged public func removeFromOutgoingLinks(_ values: NSSet)
+
+    @objc(addIncomingLinksObject:)
+    @NSManaged public func addToIncomingLinks(_ value: NoteLink)
+
+    @objc(removeIncomingLinksObject:)
+    @NSManaged public func removeFromIncomingLinks(_ value: NoteLink)
+
+    @objc(addIncomingLinks:)
+    @NSManaged public func addToIncomingLinks(_ values: NSSet)
+
+    @objc(removeIncomingLinks:)
+    @NSManaged public func removeFromIncomingLinks(_ values: NSSet)
+
+    /// Get all notes that this note links to (forward links)
+    var forwardLinks: [Note] {
+        guard let links = outgoingLinks as? Set<NoteLink> else { return [] }
+        return links.map { $0.targetNote }
+    }
+
+    /// Get all notes that link to this note (backlinks)
+    var backlinks: [Note] {
+        guard let links = incomingLinks as? Set<NoteLink> else { return [] }
+        return links.map { $0.sourceNote }
+    }
+
+    /// Get all linked notes (both incoming and outgoing)
+    var allLinkedNotes: [Note] {
+        let forward = forwardLinks
+        let back = backlinks
+        // Remove duplicates and return
+        var seen = Set<UUID>()
+        var result: [Note] = []
+        for note in forward + back {
+            if !seen.contains(note.id) {
+                seen.insert(note.id)
+                result.append(note)
+            }
+        }
+        return result
+    }
+
+    /// Get count of all links (incoming + outgoing)
+    var linkCount: Int {
+        let outgoing = (outgoingLinks as? Set<NoteLink>)?.count ?? 0
+        let incoming = (incomingLinks as? Set<NoteLink>)?.count ?? 0
+        return outgoing + incoming
+    }
+
+    /// Get all outgoing links as typed array
+    var typedOutgoingLinks: [NoteLink] {
+        guard let links = outgoingLinks as? Set<NoteLink> else { return [] }
+        return Array(links).sorted { $0.createdAt > $1.createdAt }
+    }
+
+    /// Get all incoming links as typed array
+    var typedIncomingLinks: [NoteLink] {
+        guard let links = incomingLinks as? Set<NoteLink> else { return [] }
+        return Array(links).sorted { $0.createdAt > $1.createdAt }
     }
 }
 

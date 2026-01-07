@@ -35,6 +35,8 @@
         <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>
+        <relationship name="outgoingLinks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NoteLink" inverseName="sourceNote" inverseEntity="NoteLink"/>
+        <relationship name="incomingLinks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NoteLink" inverseName="targetNote" inverseEntity="NoteLink"/>
         <relationship name="pages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NotePage" inverseName="note" inverseEntity="NotePage"/>
         <relationship name="tagEntities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="notes" inverseEntity="Tag"/>
         <relationship name="todoItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TodoItem" inverseName="note" inverseEntity="TodoItem"/>
@@ -105,6 +107,20 @@
         <relationship name="notes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Note" inverseName="tagEntities" inverseEntity="Note"/>
         <fetchIndex name="byNameIndex">
             <fetchIndexElement property="name" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="NoteLink" representedClassName="NoteLink" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="linkType" attributeType="String" defaultValueString="reference"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <relationship name="sourceNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="outgoingLinks" inverseEntity="Note"/>
+        <relationship name="targetNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="incomingLinks" inverseEntity="Note"/>
+        <fetchIndex name="bySourceNoteIndex">
+            <fetchIndexElement property="sourceNote" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="byTargetNoteIndex">
+            <fetchIndexElement property="targetNote" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
 </model>

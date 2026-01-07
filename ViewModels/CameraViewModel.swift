@@ -313,7 +313,7 @@ final class CameraViewModel {
                 let parsed = ContactParser.parse(text)
                 print("👤 Detected contact: \(parsed.displayName)")
 
-            case .email, .general, .claudePrompt, .reminder, .expense, .shopping, .recipe, .event, .idea:
+            case .email, .general, .claudePrompt, .reminder, .expense, .shopping, .recipe, .event, .journal, .idea:
                 break // No special parsing needed - handled in detail views
             }
 

@@ -675,6 +675,8 @@ struct NoteCardView: View {
             return "Recipe"
         case .event:
             return "Event"
+        case .journal:
+            return "Journal"
         case .idea:
             return "Idea"
         case .general:
