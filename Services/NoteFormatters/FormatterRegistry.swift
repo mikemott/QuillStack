@@ -11,8 +11,7 @@ import Foundation
 /// Central registry for note type formatters.
 ///
 /// Provides easy access to the appropriate formatter for each note type.
-/// Currently implements TodoFormatter, with more formatters to be added
-/// as part of the QUI-146 implementation.
+/// Implements all 12 note type formatters with distinctive visual styling.
 ///
 /// **Usage:**
 /// ```swift
@@ -62,16 +61,14 @@ final class FormatterRegistry {
             formatter = ShoppingFormatter()
         case .expense:
             formatter = ExpenseFormatter()
-
-        // TODO: Implement remaining formatters as part of QUI-146
-        // case .event:
-        //     formatter = EventFormatter()
-        // case .claudePrompt:
-        //     formatter = ClaudePromptFormatter()
-        // case .journal:
-        //     formatter = JournalFormatter()
-        // case .idea:
-        //     formatter = IdeaFormatter()
+        case .event:
+            formatter = EventFormatter()
+        case .claudePrompt:
+            formatter = ClaudePromptFormatter()
+        case .journal:
+            formatter = JournalFormatter()
+        case .idea:
+            formatter = IdeaFormatter()
 
         default:
             // Default formatter for types without specific formatting
