@@ -328,7 +328,7 @@ final class VoiceMemoViewModel {
                 _ = parser.parseMeeting(from: text, note: note)
             case .contact:
                 _ = ContactParser.parse(text)
-            case .email, .general, .claudePrompt, .reminder, .expense, .shopping, .recipe, .event, .idea:
+            case .email, .general, .claudePrompt, .reminder, .expense, .shopping, .recipe, .event, .journal, .idea:
                 break
             }
 
