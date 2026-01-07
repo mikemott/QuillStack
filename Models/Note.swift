@@ -28,6 +28,8 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var extractedDataJSON: String? // JSON-encoded extracted data (Contact, Event, Todo)
     @NSManaged public var llmClassificationCache: String? // Cached LLM classification result
     @NSManaged public var originalClassificationType: String? // Original type before manual correction
+    @NSManaged public var annotationData: Data? // PKDrawing serialized data
+    @NSManaged public var hasAnnotations: Bool // Quick check if note has annotations
 
     // Relationships
     @NSManaged public var todoItems: NSSet?
@@ -61,6 +63,7 @@ public class Note: NSManagedObject, Identifiable {
         extractedDataJSON = nil
         llmClassificationCache = nil
         originalClassificationType = nil
+        hasAnnotations = false
     }
 }
 

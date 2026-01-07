@@ -499,9 +499,18 @@ struct NoteCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header: Badge + Date
+            // Header: Badge + Annotation Indicator + Date
             HStack {
                 noteTypeBadge
+
+                // Annotation indicator
+                if note.hasAnnotations {
+                    Image(systemName: "pencil.tip.crop.circle.badge.plus")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.forestDark)
+                        .accessibilityLabel("Has annotations")
+                }
+
                 Spacer()
                 dateText
             }
