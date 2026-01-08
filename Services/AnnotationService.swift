@@ -41,98 +41,90 @@ final class AnnotationService: AnnotationServiceProtocol {
 
     private let context: NSManagedObjectContext
 
-    init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
-        self.context = context
+    private init() {
+        self.context = CoreDataStack.shared.context
     }
 
     // MARK: - Save Annotation
 
-    nonisolated func saveAnnotation(for note: Note, drawing: PKDrawing) async throws {
-        try await MainActor.run {
-            do {
-                let data = drawing.dataRepresentation()
-                note.annotationData = data
-                note.hasAnnotations = !drawing.strokes.isEmpty
-                note.updatedAt = Date()
+    func saveAnnotation(for note: Note, drawing: PKDrawing) async throws {
+        do {
+            let data = drawing.dataRepresentation()
+            note.annotationData = data
+            note.hasAnnotations = !drawing.strokes.isEmpty
+            note.updatedAt = Date()
 
-                try context.save()
-                Self.logger.info("Saved annotation for note \(note.id)")
-            } catch {
-                Self.logger.error("Failed to save annotation: \(error.localizedDescription)")
-                throw AnnotationError.saveFailed(error)
-            }
+            try context.save()
+            Self.logger.info("Saved annotation for note \(note.id)")
+        } catch {
+            Self.logger.error("Failed to save annotation: \(error.localizedDescription)")
+            throw AnnotationError.saveFailed(error)
         }
     }
 
     // MARK: - Load Annotation
 
-    nonisolated func loadAnnotation(for note: Note) async throws -> PKDrawing? {
-        try await MainActor.run {
-            guard let data = note.annotationData else {
-                return nil
-            }
+    func loadAnnotation(for note: Note) async throws -> PKDrawing? {
+        guard let data = note.annotationData else {
+            return nil
+        }
 
-            do {
-                let drawing = try PKDrawing(data: data)
-                Self.logger.info("Loaded annotation for note \(note.id)")
-                return drawing
-            } catch {
-                Self.logger.error("Failed to load annotation: \(error.localizedDescription)")
-                throw AnnotationError.loadFailed(error)
-            }
+        do {
+            let drawing = try PKDrawing(data: data)
+            Self.logger.info("Loaded annotation for note \(note.id)")
+            return drawing
+        } catch {
+            Self.logger.error("Failed to load annotation: \(error.localizedDescription)")
+            throw AnnotationError.loadFailed(error)
         }
     }
 
     // MARK: - Delete Annotation
 
-    nonisolated func deleteAnnotation(for note: Note) async throws {
-        try await MainActor.run {
-            do {
-                note.annotationData = nil
-                note.hasAnnotations = false
-                note.updatedAt = Date()
+    func deleteAnnotation(for note: Note) async throws {
+        do {
+            note.annotationData = nil
+            note.hasAnnotations = false
+            note.updatedAt = Date()
 
-                try context.save()
-                Self.logger.info("Deleted annotation for note \(note.id)")
-            } catch {
-                Self.logger.error("Failed to delete annotation: \(error.localizedDescription)")
-                throw AnnotationError.deleteFailed(error)
-            }
+            try context.save()
+            Self.logger.info("Deleted annotation for note \(note.id)")
+        } catch {
+            Self.logger.error("Failed to delete annotation: \(error.localizedDescription)")
+            throw AnnotationError.deleteFailed(error)
         }
     }
 
     // MARK: - Export Annotated Image
 
-    nonisolated func exportAnnotatedImage(note: Note, drawing: PKDrawing) async throws -> UIImage {
-        try await MainActor.run {
-            // Get the original image
-            guard let imageData = note.originalImageData,
-                  let originalImage = UIImage(data: imageData) else {
-                Self.logger.error("No original image found for note \(note.id)")
-                throw AnnotationError.noOriginalImage
-            }
-
-            // Create a canvas to composite the image and drawing
-            let size = originalImage.size
-            let format = UIGraphicsImageRendererFormat()
-            format.scale = originalImage.scale
-            format.opaque = false
-
-            let renderer = UIGraphicsImageRenderer(size: size, format: format)
-
-            let compositeImage = renderer.image { context in
-                // Draw the original image
-                originalImage.draw(at: .zero)
-
-                // Draw the annotation on top
-                let cgContext = context.cgContext
-                drawing.image(from: CGRect(origin: .zero, size: size), scale: originalImage.scale)
-                    .draw(at: .zero)
-            }
-
-            Self.logger.info("Exported annotated image for note \(note.id)")
-            return compositeImage
+    func exportAnnotatedImage(note: Note, drawing: PKDrawing) async throws -> UIImage {
+        // Get the original image
+        guard let imageData = note.originalImageData,
+              let originalImage = UIImage(data: imageData) else {
+            Self.logger.error("No original image found for note \(note.id)")
+            throw AnnotationError.noOriginalImage
         }
+
+        // Create a canvas to composite the image and drawing
+        let size = originalImage.size
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = originalImage.scale
+        format.opaque = false
+
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+
+        let compositeImage = renderer.image { context in
+            // Draw the original image
+            originalImage.draw(at: .zero)
+
+            // Draw the annotation on top
+            let cgContext = context.cgContext
+            drawing.image(from: CGRect(origin: .zero, size: size), scale: originalImage.scale)
+                .draw(at: .zero)
+        }
+
+        Self.logger.info("Exported annotated image for note \(note.id)")
+        return compositeImage
     }
 }
 

@@ -493,7 +493,7 @@ struct NoteListView: View {
 // MARK: - Note Card View
 
 struct NoteCardView: View {
-    let note: Note
+    @ObservedObject var note: Note
     var isSelected: Bool = false
     @State private var isPressed = false
 
@@ -505,7 +505,7 @@ struct NoteCardView: View {
 
                 // Annotation indicator
                 if note.hasAnnotations {
-                    Image(systemName: "pencil.tip.crop.circle.badge.plus")
+                    Image(systemName: "pencil.tip.crop.circle")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.forestDark)
                         .accessibilityLabel("Has annotations")

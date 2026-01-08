@@ -44,14 +44,19 @@ struct AnnotationCanvasView: UIViewRepresentable {
         // Set delegate
         canvasView.delegate = context.coordinator
 
+        // Set up system tool picker
+        let toolPicker = PKToolPicker()
+        toolPicker.setVisible(true, forFirstResponder: canvasView)
+        toolPicker.addObserver(canvasView)
+        canvasView.becomeFirstResponder()
+        context.coordinator.toolPicker = toolPicker
+
         return canvasView
     }
 
     func updateUIView(_ canvasView: PKCanvasView, context: Context) {
-        // Update drawing if it changed externally
-        if canvasView.drawing != drawing {
-            canvasView.drawing = drawing
-        }
+        // Always update drawing (PKDrawing is not Equatable)
+        canvasView.drawing = drawing
 
         // Update tool
         canvasView.tool = tool
@@ -68,6 +73,7 @@ struct AnnotationCanvasView: UIViewRepresentable {
 
     class Coordinator: NSObject, PKCanvasViewDelegate {
         var parent: AnnotationCanvasView
+        var toolPicker: PKToolPicker?
 
         init(_ parent: AnnotationCanvasView) {
             self.parent = parent
@@ -105,14 +111,13 @@ struct AnnotationTools {
 
 // MARK: - Annotation Mode View
 
-/// Full-screen annotation mode view with tool picker and controls
+/// Full-screen annotation mode view with system tool picker
 struct AnnotationModeView: View {
     @Environment(\.dismiss) private var dismiss
 
     let note: Note
     @Binding var drawing: PKDrawing
     @State private var currentTool: PKInkingTool = AnnotationTools.default
-    @State private var showingToolPicker = true
     @State private var hasChanges = false
 
     let onSave: (PKDrawing) -> Void
@@ -129,7 +134,7 @@ struct AnnotationModeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
-            // Canvas overlay
+            // Canvas overlay (system PKToolPicker appears automatically)
             AnnotationCanvasView(
                 drawing: $drawing,
                 tool: $currentTool,
@@ -139,70 +144,6 @@ struct AnnotationModeView: View {
                 }
             )
             .ignoresSafeArea()
-
-            // Tool picker overlay
-            VStack {
-                Spacer()
-
-                HStack(spacing: 20) {
-                    // Tool buttons
-                    ToolButton(
-                        icon: "pencil",
-                        label: "Black",
-                        isSelected: currentTool == AnnotationTools.blackPen
-                    ) {
-                        currentTool = AnnotationTools.blackPen
-                    }
-
-                    ToolButton(
-                        icon: "pencil",
-                        label: "Red",
-                        isSelected: currentTool == AnnotationTools.redPen,
-                        color: .red
-                    ) {
-                        currentTool = AnnotationTools.redPen
-                    }
-
-                    ToolButton(
-                        icon: "pencil",
-                        label: "Green",
-                        isSelected: currentTool == AnnotationTools.forestPen,
-                        color: .forestDark
-                    ) {
-                        currentTool = AnnotationTools.forestPen
-                    }
-
-                    ToolButton(
-                        icon: "highlighter",
-                        label: "Highlight",
-                        isSelected: currentTool == AnnotationTools.yellowHighlighter,
-                        color: .yellow
-                    ) {
-                        currentTool = AnnotationTools.yellowHighlighter
-                    }
-
-                    Divider()
-                        .frame(height: 40)
-
-                    // Clear all button
-                    Button {
-                        drawing = PKDrawing()
-                        hasChanges = true
-                    } label: {
-                        VStack(spacing: 4) {
-                            Image(systemName: "trash")
-                                .font(.title2)
-                            Text("Clear")
-                                .font(.caption2)
-                        }
-                    }
-                    .foregroundColor(.textDark)
-                }
-                .padding()
-                .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .padding(.bottom, 20)
-            }
 
             // Top controls
             VStack {
@@ -225,6 +166,16 @@ struct AnnotationModeView: View {
 
                     Spacer()
 
+                    // Clear all button
+                    Button {
+                        drawing = PKDrawing()
+                        hasChanges = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                    .accessibilityLabel("Clear all annotations")
+
                     Button {
                         onSave(drawing)
                         dismiss()
@@ -241,34 +192,6 @@ struct AnnotationModeView: View {
             }
         }
         .navigationBarHidden(true)
-    }
-}
-
-// MARK: - Tool Button
-
-private struct ToolButton: View {
-    let icon: String
-    let label: String
-    let isSelected: Bool
-    var color: Color = .textDark
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.title2)
-                Text(label)
-                    .font(.caption2)
-            }
-            .foregroundColor(isSelected ? color : .textDark.opacity(0.6))
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(
-                isSelected ? color.opacity(0.1) : Color.clear
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
     }
 }
 

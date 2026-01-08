@@ -8,8 +8,10 @@
 import SwiftUI
 import CoreData
 import PencilKit
+import os.log
 
 struct NoteDetailView: View, NoteDetailViewProtocol {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "NoteDetail")
     @ObservedObject var note: Note
     @State private var editedContent: String = ""
     @State private var originalContent: String = "" // Track original for learning
@@ -399,7 +401,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     }
                 }
             } catch {
-                print("Failed to load annotation: \(error)")
+                Self.logger.error("Failed to load annotation for note \(self.note.id): \(error.localizedDescription)")
             }
         }
     }
@@ -412,7 +414,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     annotationDrawing = drawing
                 }
             } catch {
-                print("Failed to save annotation: \(error)")
+                Self.logger.error("Failed to save annotation for note \(self.note.id): \(error.localizedDescription)")
             }
         }
     }
