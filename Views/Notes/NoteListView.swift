@@ -493,15 +493,24 @@ struct NoteListView: View {
 // MARK: - Note Card View
 
 struct NoteCardView: View {
-    let note: Note
+    @ObservedObject var note: Note
     var isSelected: Bool = false
     @State private var isPressed = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header: Badge + Date
+            // Header: Badge + Annotation Indicator + Date
             HStack {
                 noteTypeBadge
+
+                // Annotation indicator
+                if note.hasAnnotations {
+                    Image(systemName: "pencil.tip.crop.circle")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.forestDark)
+                        .accessibilityLabel("Has annotations")
+                }
+
                 Spacer()
                 dateText
             }

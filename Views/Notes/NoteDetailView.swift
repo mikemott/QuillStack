@@ -7,8 +7,11 @@
 
 import SwiftUI
 import CoreData
+import PencilKit
+import os.log
 
 struct NoteDetailView: View, NoteDetailViewProtocol {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "QuillStack", category: "NoteDetail")
     @ObservedObject var note: Note
     @State private var editedContent: String = ""
     @State private var originalContent: String = "" // Track original for learning
@@ -22,6 +25,8 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
     @State private var hasPendingEnhancement: Bool = false
     @State private var saveTask: Task<Void, Never>?
     @State private var showingTypePicker = false
+    @State private var showingAnnotationMode = false
+    @State private var annotationDrawing = PKDrawing()
     @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -64,6 +69,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
             editedContent = note.content
             originalContent = note.content // Track for learning
             checkPendingEnhancement()
+            loadAnnotation()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NoteEnhancementCompleted"))) { notification in
             // Refresh content when enhancement completes
@@ -107,6 +113,14 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .fullScreenCover(isPresented: $showingAnnotationMode) {
+            AnnotationModeView(
+                note: note,
+                drawing: $annotationDrawing,
+                onSave: saveAnnotation,
+                onCancel: { loadAnnotation() }
+            )
         }
     }
 
@@ -178,6 +192,16 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(.forestDark)
                 }
+            }
+
+            // Annotate button (only show if note has original image)
+            if note.originalImageData != nil {
+                Button(action: { showingAnnotationMode = true }) {
+                    Image(systemName: note.hasAnnotations ? "pencil.tip.crop.circle.fill" : "pencil.tip.crop.circle")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(note.hasAnnotations ? .forestDark : .textDark)
+                }
+                .accessibilityLabel("Annotate note")
             }
 
             // Change Type button
@@ -364,6 +388,35 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
 
     private func copyContent() {
         UIPasteboard.general.string = editedContent
+    }
+
+    // MARK: - Annotation Helpers
+
+    private func loadAnnotation() {
+        Task {
+            do {
+                if let drawing = try await AnnotationService.shared.loadAnnotation(for: note) {
+                    await MainActor.run {
+                        annotationDrawing = drawing
+                    }
+                }
+            } catch {
+                Self.logger.error("Failed to load annotation for note \(self.note.id): \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func saveAnnotation(_ drawing: PKDrawing) {
+        Task {
+            do {
+                try await AnnotationService.shared.saveAnnotation(for: note, drawing: drawing)
+                await MainActor.run {
+                    annotationDrawing = drawing
+                }
+            } catch {
+                Self.logger.error("Failed to save annotation for note \(self.note.id): \(error.localizedDescription)")
+            }
+        }
     }
 }
 

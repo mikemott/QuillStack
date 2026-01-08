@@ -34,6 +34,8 @@
         <attribute name="originalClassificationType" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="annotationData" optional="YES" attributeType="Binary"/>
+        <attribute name="hasAnnotations" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="meeting" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Meeting" inverseName="note" inverseEntity="Meeting"/>
         <relationship name="outgoingLinks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NoteLink" inverseName="sourceNote" inverseEntity="NoteLink"/>
         <relationship name="incomingLinks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NoteLink" inverseName="targetNote" inverseEntity="NoteLink"/>

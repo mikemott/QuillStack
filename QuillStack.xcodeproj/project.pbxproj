@@ -90,6 +90,7 @@
 		C0F27DAF1DF2ED92FF50FD9F /* LearnedCorrectionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */; };
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
 		D5F83E0A7C5800930FC09A91 /* OCRNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C3AF04DFECCA4BEEAAC21E /* OCRNormalizer.swift */; };
+		D7C75EE030AEEF054FE2371C /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -128,6 +129,7 @@
 		F00100000000001D /* HandwritingLearningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001D /* HandwritingLearningService.swift */; };
 		F00100000000001E /* OCRCorrection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001E /* OCRCorrection.swift */; };
 		F192B8FB3CB4C8796DCD55C3 /* TitleExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */; };
+		F6244AF45A08EC483BD9CEDE /* AnnotationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58161D9CE69A9C68E3404A55 /* AnnotationService.swift */; };
 		FL0000000000000002 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FL0000000000000001 /* FlowLayout.swift */; };
 		G00100000000001F /* PromptRefinerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G00200000000001F /* PromptRefinerService.swift */; };
 		G001000000000020 /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G002000000000020 /* GitHubService.swift */; };
@@ -249,6 +251,8 @@
 		4615E33E3211A56DB3FCEBE3 /* MeetingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/MeetingFormatter.swift; sourceTree = "<group>"; };
 		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
 		4FB5E92C24AA2AAA9D607A7A /* NoteFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteFormatter.swift; path = NoteFormatters/NoteFormatter.swift; sourceTree = "<group>"; };
+		58161D9CE69A9C68E3404A55 /* AnnotationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnnotationService.swift; sourceTree = "<group>"; };
+		5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnnotationCanvasView.swift; sourceTree = "<group>"; };
 		5C49540ED6C791FA105A5167 /* NoteFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatter.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
 		616F5D2B8E441A7F0F9FDE1E /* EmailFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/EmailFormatter.swift; sourceTree = "<group>"; };
@@ -572,6 +576,7 @@
 				21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */,
 				8CE75909F5AF2D167701CD46 /* NoteContentProcessor.swift */,
 				8C8D4343F57D596EE5AE544F /* NoteLinkService.swift */,
+				58161D9CE69A9C68E3404A55 /* AnnotationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -656,6 +661,7 @@
 				87EB2C800D9D731969C965C7 /* DetailBottomBar.swift */,
 				A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */,
 				FL0000000000000001 /* FlowLayout.swift */,
+				5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1234,6 +1240,8 @@
 				91BC8575258E3BE12442921F /* JournalFormatter.swift in Sources */,
 				33C82A33FA609305832D5420 /* IdeaFormatter.swift in Sources */,
 				15B97066B6797F32A1D7952A /* ClaudePromptFormatter.swift in Sources */,
+				F6244AF45A08EC483BD9CEDE /* AnnotationService.swift in Sources */,
+				D7C75EE030AEEF054FE2371C /* AnnotationCanvasView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
