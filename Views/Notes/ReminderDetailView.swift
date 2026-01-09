@@ -94,9 +94,19 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
                         )
+
+                    // Related notes section (QUI-161)
+                    if note.linkCount > 0 {
+                        RelatedNotesSection(note: note) { selectedNote in
+                            // TODO: Navigate to selected note
+                            print("Selected related note: \(selectedNote.id)")
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                     }
-                    .padding(20)
                 }
+                .padding(20)
+            }
                 .background(
                     LinearGradient(
                         colors: [Color.paperBeige.opacity(0.98), Color.paperTan.opacity(0.98)],

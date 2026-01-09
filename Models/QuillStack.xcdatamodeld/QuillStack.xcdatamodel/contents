@@ -118,6 +118,8 @@
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="linkType" attributeType="String" defaultValueString="reference"/>
         <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="confidence" attributeType="Double" defaultValueString="1.0" usesScalarValueType="YES"/>
+        <attribute name="isAutomatic" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="sourceNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="outgoingLinks" inverseEntity="Note"/>
         <relationship name="targetNote" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="incomingLinks" inverseEntity="Note"/>
         <fetchIndex name="bySourceNoteIndex">
@@ -125,6 +127,9 @@
         </fetchIndex>
         <fetchIndex name="byTargetNoteIndex">
             <fetchIndexElement property="targetNote" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="byIsAutomaticIndex">
+            <fetchIndexElement property="isAutomatic" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
 </model>

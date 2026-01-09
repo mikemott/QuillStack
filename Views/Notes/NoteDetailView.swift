@@ -51,14 +51,31 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     classification: note.classification
                 )
 
-                // Content area - always editable
-                TextEditor(text: $editedContent)
-                    .font(.serifBody(17, weight: .regular))
-                    .foregroundColor(.textDark)
-                    .lineSpacing(8)
-                    .scrollContentBackground(.hidden)
-                    .padding(20)
-                    .background(contentBackground)
+                // Content area - scrollable with related notes
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // Editable content
+                        TextEditor(text: $editedContent)
+                            .font(.serifBody(17, weight: .regular))
+                            .foregroundColor(.textDark)
+                            .lineSpacing(8)
+                            .scrollContentBackground(.hidden)
+                            .frame(minHeight: 300)
+                            .padding(20)
+                            .background(contentBackground)
+
+                        // Related notes section (QUI-161)
+                        if note.linkCount > 0 {
+                            RelatedNotesSection(note: note) { selectedNote in
+                                // TODO: Navigate to selected note
+                                // For now, just log it
+                                print("Selected related note: \(selectedNote.id)")
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                        }
+                    }
+                }
 
                 // Bottom action bar
                 bottomBar

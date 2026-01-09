@@ -39,6 +39,15 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
 
                         // Editable fields
                         editableFields
+
+                        // Related notes section (QUI-161)
+                        if note.linkCount > 0 {
+                            RelatedNotesSection(note: note) { selectedNote in
+                                // TODO: Navigate to selected note
+                                print("Selected related note: \(selectedNote.id)")
+                            }
+                            .padding(.vertical, 12)
+                        }
                     }
                     .padding(20)
                 }
