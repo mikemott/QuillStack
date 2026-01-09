@@ -26,6 +26,9 @@ final class CameraViewModel {
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
 
+    // Cache existing tags for vocabulary consistency
+    private var existingTags: [String] = []
+
     /// Initialize with default shared services
     init() {
         self.ocrService = OCRService.shared
@@ -73,6 +76,16 @@ final class CameraViewModel {
     func processImage(_ image: UIImage) async {
         isProcessing = true
         error = nil
+
+        // Load existing tags for vocabulary consistency (if not already loaded)
+        if existingTags.isEmpty {
+            existingTags = await fetchExistingTags()
+            // Track tag vocabulary loading for debugging (no sensitive data)
+            let breadcrumb = Breadcrumb(level: .debug, category: "tag_suggestion")
+            breadcrumb.message = "Loaded existing tags for vocabulary consistency"
+            breadcrumb.data = ["tag_count": existingTags.count]
+            SentrySDK.addBreadcrumb(breadcrumb)
+        }
 
         // Sentry: Track capture start
         let breadcrumb = Breadcrumb(level: .info, category: "capture")
@@ -193,7 +206,47 @@ final class CameraViewModel {
                     }
                 }
 
-                print("✏️ Final text: \(finalText)")
+                // Track OCR completion (metadata only, no content)
+                let ocrBreadcrumb = Breadcrumb(level: .debug, category: "ocr")
+                ocrBreadcrumb.message = "OCR text extraction completed"
+                ocrBreadcrumb.data = ["text_length": finalText.count]
+                SentrySDK.addBreadcrumb(ocrBreadcrumb)
+
+                // Suggest tags if auto-enhancement is enabled and we have an API key
+                var suggestedTags: [String]? = nil
+                if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+                    if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                        do {
+                            let suggestion = try await LLMService.shared.suggestTags(
+                                for: finalText,
+                                existingTags: existingTags
+                            )
+                            suggestedTags = suggestion.allTags
+
+                            // Track success (metadata only, no tag content)
+                            let tagBreadcrumb = Breadcrumb(level: .debug, category: "tag_suggestion")
+                            tagBreadcrumb.message = "Tags suggested successfully"
+                            tagBreadcrumb.data = [
+                                "tag_count": suggestedTags!.count,
+                                "confidence": suggestion.confidence
+                            ]
+                            SentrySDK.addBreadcrumb(tagBreadcrumb)
+
+                            // Record call for rate limiting
+                            LLMRateLimiter.shared.recordCall()
+                        } catch {
+                            // Log error with context for debugging (no sensitive data)
+                            SentrySDK.capture(error: error) { scope in
+                                scope.setLevel(.warning)
+                                scope.setContext(value: [
+                                    "operation": "tag_suggestion",
+                                    "error_type": String(describing: type(of: error))
+                                ], key: "tag_suggestion_error")
+                            }
+                            // Don't block note creation if tag suggestion fails
+                        }
+                    }
+                }
 
                 // Save this section as a separate note
                 // Only attach image to first section to avoid duplication
@@ -202,7 +255,8 @@ final class CameraViewModel {
                     noteType: section.noteType,
                     ocrResult: ocrResult,
                     originalImage: index == 0 ? image : nil,
-                    thumbnail: index == 0 ? thumbnail : nil
+                    thumbnail: index == 0 ? thumbnail : nil,
+                    suggestedTags: suggestedTags
                 )
 
                 // Queue enhancement if needed
@@ -265,7 +319,8 @@ final class CameraViewModel {
         noteType: NoteType,
         ocrResult: OCRResult,
         originalImage: UIImage?,
-        thumbnail: UIImage?
+        thumbnail: UIImage?,
+        suggestedTags: [String]? = nil
     ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
@@ -293,6 +348,23 @@ final class CameraViewModel {
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData
+            }
+
+            // Apply suggested tags if available (with validation)
+            if let tags = suggestedTags {
+                let validatedTags = self.validateTags(tags)
+                for tagName in validatedTags {
+                    note.addTagEntity(named: tagName, in: context)
+                }
+
+                // Log if any tags were rejected
+                if validatedTags.count < tags.count {
+                    let rejectedCount = tags.count - validatedTags.count
+                    let breadcrumb = Breadcrumb(level: .warning, category: "tag_suggestion")
+                    breadcrumb.message = "Some LLM-suggested tags were rejected"
+                    breadcrumb.data = ["rejected_count": rejectedCount]
+                    SentrySDK.addBreadcrumb(breadcrumb)
+                }
             }
 
             // Parse based on note type
@@ -348,7 +420,63 @@ final class CameraViewModel {
                 await ImageRetentionService.shared.processAfterOCR(note: note)
             }
         } catch {
-            // Non-critical error - don't fail the capture
+            // Non-critical error - log for debugging but don't fail the capture
+            SentrySDK.capture(error: error) { scope in
+                scope.setLevel(.warning)
+                scope.setContext(value: [
+                    "operation": "image_retention_policy",
+                    "note_id": noteId.uuidString
+                ], key: "retention_error")
+            }
+        }
+    }
+
+    /// Fetch existing tags for vocabulary consistency
+    private func fetchExistingTags() async -> [String] {
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        return await context.perform {
+            let request = Tag.fetchRequest()
+            request.sortDescriptors = [NSSortDescriptor(keyPath: \Tag.createdAt, ascending: false)]
+
+            do {
+                let tags = try context.fetch(request)
+                // Sort by usage count and return top 50 tag names
+                return tags
+                    .sorted { $0.noteCount > $1.noteCount }
+                    .prefix(50)
+                    .map { $0.name }
+            } catch {
+                // Log fetch failure but return empty array (non-blocking)
+                SentrySDK.capture(error: error) { scope in
+                    scope.setLevel(.warning)
+                    scope.setContext(value: [
+                        "operation": "fetch_existing_tags"
+                    ], key: "tag_fetch_error")
+                }
+                return []
+            }
+        }
+    }
+
+    /// Validate LLM-generated tags before applying to notes
+    /// - Parameter tags: Array of tag names from LLM
+    /// - Returns: Filtered array of valid tag names
+    private func validateTags(_ tags: [String]) -> [String] {
+        let maxTags = 10
+        let maxTagLength = 50
+        let validCharacterSet = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
+
+        return tags.prefix(maxTags).compactMap { tagName in
+            let trimmed = tagName.trimmingCharacters(in: .whitespaces)
+
+            // Validate: non-empty, length limit, valid characters only
+            guard !trimmed.isEmpty,
+                  trimmed.count <= maxTagLength,
+                  trimmed.rangeOfCharacter(from: validCharacterSet.inverted) == nil else {
+                return nil
+            }
+
+            return trimmed
         }
     }
 }
