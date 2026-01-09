@@ -20,6 +20,10 @@ struct NoteListView: View {
     @State private var showingBulkExport = false
     @State private var showingDeleteConfirmation = false
 
+    // Offline mode state
+    @State private var processingQueue = ProcessingQueue.shared
+    @State private var networkMonitor = NetworkMonitor.shared
+
     // Deep link bindings (optional, for widget support)
     @Binding var showingCameraFromDeepLink: Bool
     @Binding var showingVoiceFromDeepLink: Bool
@@ -44,6 +48,11 @@ struct NoteListView: View {
                 VStack(spacing: 0) {
                     // Custom Navigation Bar
                     customNavigationBar
+
+                    // Processing queue banner
+                    if processingQueue.pendingCount > 0 {
+                        processingQueueBanner
+                    }
 
                     // Content
                     if viewModel.notes.isEmpty {
@@ -451,6 +460,50 @@ struct NoteListView: View {
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
+    // MARK: - Processing Queue Banner
+
+    private var processingQueueBanner: some View {
+        HStack(spacing: 12) {
+            // Icon
+            Image(systemName: processingQueue.isProcessing ? "arrow.triangle.2.circlepath" : "clock")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.white)
+                .symbolEffect(.pulse, isActive: processingQueue.isProcessing)
+
+            // Text
+            VStack(alignment: .leading, spacing: 2) {
+                Text(processingQueue.isProcessing ? "Processing notes..." : "\(processingQueue.pendingCount) note\(processingQueue.pendingCount == 1 ? "" : "s") queued")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+
+                if !networkMonitor.isConnected {
+                    Text("Will process when online")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(.white.opacity(0.9))
+                }
+            }
+
+            Spacer()
+
+            // Processing indicator
+            if processingQueue.isProcessing {
+                ProgressView()
+                    .tint(.white)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            LinearGradient(
+                colors: [Color.blue, Color.blue.opacity(0.85)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .animation(.easeInOut(duration: 0.3), value: processingQueue.isProcessing)
+        .animation(.easeInOut(duration: 0.3), value: processingQueue.pendingCount)
+    }
+
     // MARK: - Floating Action Button
 
     private var cameraFAB: some View {
@@ -499,9 +552,38 @@ struct NoteCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header: Badge + Annotation Indicator + Date
+            // Header: Badge + Indicators + Date
             HStack {
                 noteTypeBadge
+
+                // Processing state indicator
+                if note.processingState == .ocrOnly {
+                    HStack(spacing: 4) {
+                        Image(systemName: "wifi.slash")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("Offline")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundColor(.orange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.orange.opacity(0.15))
+                    .cornerRadius(4)
+                    .accessibilityLabel("Note captured offline")
+                } else if note.processingState == .pendingEnhancement || note.processingState == .processing {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("Queued")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.15))
+                    .cornerRadius(4)
+                    .accessibilityLabel("Note queued for enhancement")
+                }
 
                 // Annotation indicator
                 if note.hasAnnotations {

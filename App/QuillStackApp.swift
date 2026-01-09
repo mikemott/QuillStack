@@ -57,6 +57,20 @@ struct QuillStackApp: App {
 
         // Warm up expensive OCR dependencies off the main thread to avoid launch stalls
         ServicePrewarmer.warmHeavyServices()
+
+        // Initialize offline mode support
+        Task { @MainActor in
+            // Start network monitoring
+            _ = NetworkMonitor.shared
+
+            // Process any pending notes from previous sessions
+            let queue = ProcessingQueue.shared
+            await queue.updatePendingCount()
+            if queue.pendingCount > 0 {
+                print("📱 Found \(queue.pendingCount) pending notes from previous session")
+                await queue.processAllPending()
+            }
+        }
     }
 
     var body: some Scene {

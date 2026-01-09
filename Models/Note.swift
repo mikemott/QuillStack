@@ -8,6 +8,15 @@
 import Foundation
 import CoreData
 
+/// Processing state for notes captured offline
+public enum NoteProcessingState: String, CaseIterable {
+    case ocrOnly           // Captured offline, no LLM enhancement
+    case pendingEnhancement // Queued for processing
+    case processing        // Currently enhancing
+    case enhanced          // Fully processed
+    case failed            // Processing error
+}
+
 @objc(Note)
 public class Note: NSManagedObject, Identifiable {
     @NSManaged public var id: UUID
@@ -31,6 +40,7 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var annotationData: Data? // PKDrawing serialized data
     @NSManaged public var hasAnnotations: Bool // Quick check if note has annotations
     @NSManaged public var sourceNoteID: UUID? // Original note this was split from
+    @NSManaged public var processingStateRaw: String // NoteProcessingState raw value
 
     // Relationships
     @NSManaged public var todoItems: NSSet?
@@ -65,6 +75,17 @@ public class Note: NSManagedObject, Identifiable {
         llmClassificationCache = nil
         originalClassificationType = nil
         hasAnnotations = false
+        processingStateRaw = NoteProcessingState.enhanced.rawValue // Default to enhanced
+    }
+
+    /// Type-safe access to processing state
+    var processingState: NoteProcessingState {
+        get {
+            NoteProcessingState(rawValue: processingStateRaw) ?? .enhanced
+        }
+        set {
+            processingStateRaw = newValue.rawValue
+        }
     }
 }
 
