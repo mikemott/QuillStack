@@ -10,6 +10,7 @@ import AVFoundation
 import Combine
 import CoreData
 import Sentry
+import OSLog
 
 @MainActor
 @Observable
@@ -397,6 +398,33 @@ final class CameraViewModel {
                     name: AppConstants.Notifications.noteCreated,
                     object: nil
                 )
+
+                // Extract structured data asynchronously (non-blocking)
+                Task { @MainActor in
+                    // Fetch the note in the view context for extraction
+                    let viewContext = CoreDataStack.shared.persistentContainer.viewContext
+                    let request = NSFetchRequest<Note>(entityName: "Note")
+                    request.predicate = NSPredicate(format: "id == %@", noteId as CVarArg)
+                    request.fetchLimit = 1
+
+                    do {
+                        if let savedNote = try viewContext.fetch(request).first {
+                            let extractionService = DataExtractionService()
+                            await extractionService.extractData(from: savedNote)
+
+                            // Save the extracted data
+                            do {
+                                try viewContext.save()
+                            } catch {
+                                Logger(subsystem: "com.quillstack", category: "DataExtraction")
+                                    .error("Failed to save extracted data: \(error.localizedDescription, privacy: .public)")
+                            }
+                        }
+                    } catch {
+                        Logger(subsystem: "com.quillstack", category: "DataExtraction")
+                            .error("Failed to fetch note for extraction: \(error.localizedDescription, privacy: .public)")
+                    }
+                }
 
                 return noteId
             } catch {

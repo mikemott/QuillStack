@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 /// Service for extracting event information from text content
 struct EventExtractor {
@@ -106,11 +107,12 @@ struct EventExtractor {
                 return llmEvent
             }
             // LLM succeeded but didn't extract minimum data, fall through to heuristics
-        } catch let error as EventExtractionError 
+        } catch let error as EventExtractionError
             where error == .invalidResponse || error == .parsingFailed {
             // Recoverable errors: fall back to heuristic parser
             // Log for debugging but don't surface to user
-            print("LLM extraction failed, falling back to heuristic parser. Error: \(error.localizedDescription ?? "Unknown")")
+            Logger(subsystem: "com.quillstack", category: "EventExtraction")
+                .info("LLM extraction failed, falling back to heuristic parser")
         } catch {
             // Critical errors (noAPIKey, network issues): re-throw to notify caller
             throw error
