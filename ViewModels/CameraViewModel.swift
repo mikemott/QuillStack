@@ -20,9 +20,16 @@ final class CameraViewModel {
     private(set) var error: CameraError?
     private(set) var isProcessing = false
 
+    // Section detection (QUI-159)
+    private(set) var showSectionPreview = false
+    private(set) var detectedSections: [DetectedSection] = []
+    private(set) var sectionDetectionMethod: SectionDetectionResult.DetectionMethod = .none
+    private var pendingProcessData: (ocrResult: OCRResult, image: UIImage)?
+
     // Dependencies (protocol-based for testability)
     private let ocrService: OCRServiceProtocol
     private let textClassifier: TextClassifierProtocol
+    private let sectionDetector = SectionDetector.shared
     private let imageProcessor = ImageProcessor()
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
@@ -117,7 +124,22 @@ final class CameraViewModel {
             ]
             SentrySDK.addBreadcrumb(ocrBreadcrumb)
 
-            // Step 3: Split into sections based on detected tags
+            // Step 3: Check for multi-section detection (QUI-159)
+            let sectionResult = await sectionDetector.detectSections(in: ocrResult.fullText, settings: settings)
+
+            if sectionResult.shouldAutoSplit && sectionResult.sections.count >= 2 {
+                // Multiple sections detected - show preview for user decision
+                pendingProcessData = (ocrResult, correctedImage)
+                detectedSections = sectionResult.sections
+                sectionDetectionMethod = sectionResult.detectionMethod
+                showSectionPreview = true
+                isProcessing = false
+
+                print("📋 Detected \(sectionResult.sections.count) sections - showing preview")
+                return
+            }
+
+            // Step 4: Split into sections based on detected tags (existing logic)
             let sections = textClassifier.splitIntoSections(content: ocrResult.fullText)
             print("📋 Detected \(sections.count) section(s)")
 
@@ -321,7 +343,8 @@ final class CameraViewModel {
         ocrResult: OCRResult,
         originalImage: UIImage?,
         thumbnail: UIImage?,
-        suggestedTags: [String]? = nil
+        suggestedTags: [String]? = nil,
+        sourceNoteID: UUID? = nil
     ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
@@ -345,6 +368,7 @@ final class CameraViewModel {
 
             note.ocrConfidence = avgConfidence
             note.ocrResultData = ocrResultData
+            note.sourceNoteID = sourceNoteID // Link to source note if this is a split section
             // note.captureSource = "camera" // TODO: Add this field to Note model
 
             if let thumbnailData = thumbnailData {
@@ -505,6 +529,267 @@ final class CameraViewModel {
             }
 
             return trimmed
+        }
+    }
+
+    // MARK: - Section Detection (QUI-159)
+
+    /// User chose to split into multiple notes
+    func handleSplitNotes() async {
+        guard let (ocrResult, image) = pendingProcessData else { return }
+
+        showSectionPreview = false
+        isProcessing = true
+
+        // Create source note ID for linking
+        let sourceNoteID = UUID()
+
+        print("📋 Splitting into \(detectedSections.count) notes with sourceNoteID: \(sourceNoteID)")
+
+        // Process each detected section
+        for (index, section) in detectedSections.enumerated() {
+            await processSplitSection(
+                section: section,
+                index: index,
+                sourceNoteID: sourceNoteID,
+                ocrResult: ocrResult,
+                image: image
+            )
+        }
+
+        // Cleanup
+        pendingProcessData = nil
+        detectedSections = []
+        isProcessing = false
+    }
+
+    /// User chose to keep as single note
+    func handleKeepSingleNote() async {
+        guard let (ocrResult, image) = pendingProcessData else { return }
+
+        showSectionPreview = false
+        pendingProcessData = nil
+        detectedSections = []
+
+        print("📋 User chose to keep as single note - processing normally")
+
+        // Continue with existing processImage logic
+        await continueProcessing(ocrResult: ocrResult, image: image)
+    }
+
+    /// Continue processing with existing logic (extracted from processImage)
+    private func continueProcessing(ocrResult: OCRResult, image: UIImage) async {
+        isProcessing = true
+
+        // Step 3: Split into sections based on detected tags (existing logic)
+        let sections = textClassifier.splitIntoSections(content: ocrResult.fullText)
+        print("📋 Detected \(sections.count) section(s)")
+
+        // Sentry: Track section splitting
+        let sectionBreadcrumb = Breadcrumb(level: .info, category: "classification")
+        sectionBreadcrumb.message = "Split into \(sections.count) section(s)"
+        sectionBreadcrumb.data = [
+            "section_count": sections.count,
+            "types": sections.map { $0.noteType.rawValue }.joined(separator: ", ")
+        ]
+        SentrySDK.addBreadcrumb(sectionBreadcrumb)
+
+        // Step 4: Process each section separately
+        let learnedCorrections = HandwritingLearningService.shared.getLearnedCorrections()
+        let learnedCount = learnedCorrections.count
+        if learnedCount > 0 {
+            print("📚 Using \(learnedCount) learned corrections")
+        }
+
+        let offlineQueue = OfflineQueueService.shared
+        let thumbnail = imageProcessor.generateThumbnail(from: image)
+
+        for (index, section) in sections.enumerated() {
+            await processSection(
+                section: section,
+                index: index,
+                totalSections: sections.count,
+                ocrResult: ocrResult,
+                image: image,
+                thumbnail: thumbnail,
+                learnedCorrections: learnedCorrections,
+                offlineQueue: offlineQueue
+            )
+        }
+
+        // Sentry: Track successful completion
+        let completeBreadcrumb = Breadcrumb(level: .info, category: "capture")
+        completeBreadcrumb.message = "Image processing completed successfully"
+        completeBreadcrumb.data = ["sections_saved": sections.count]
+        SentrySDK.addBreadcrumb(completeBreadcrumb)
+
+        isProcessing = false
+    }
+
+    /// Process a split section (from section detection)
+    private func processSplitSection(
+        section: DetectedSection,
+        index: Int,
+        sourceNoteID: UUID,
+        ocrResult: OCRResult,
+        image: UIImage
+    ) async {
+        print("\n--- Processing section \(index + 1): \(section.suggestedType.displayName) ---")
+
+        // Apply spell correction
+        let learnedCorrections = HandwritingLearningService.shared.getLearnedCorrections()
+        let spellCorrector = SpellCorrector()
+
+        let correctedText: String
+        if section.suggestedType == .email {
+            let correction = spellCorrector.correctEmailContent(section.content, learnedCorrections: learnedCorrections)
+            correctedText = correction.correctedText
+        } else {
+            let correction = spellCorrector.correctSpelling(section.content, learnedCorrections: learnedCorrections)
+            correctedText = correction.correctedText
+        }
+
+        // Apply LLM enhancement if enabled
+        var finalText = correctedText
+        let offlineQueue = OfflineQueueService.shared
+        var shouldQueueEnhancement = false
+
+        if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                do {
+                    let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.suggestedType.rawValue)
+                    finalText = result.enhancedText
+                    LLMRateLimiter.shared.recordCall()
+                } catch {
+                    shouldQueueEnhancement = true
+                }
+            } else {
+                shouldQueueEnhancement = true
+            }
+        }
+
+        // Generate thumbnail only for first section
+        let thumbnail = index == 0 ? imageProcessor.generateThumbnail(from: image) : nil
+
+        // Use suggested tags from section detection
+        let tags = section.suggestedTags.isEmpty ? nil : section.suggestedTags
+
+        // Save note with sourceNoteID
+        let noteId = await saveNote(
+            text: finalText,
+            noteType: section.suggestedType,
+            ocrResult: ocrResult,
+            originalImage: index == 0 ? image : nil,
+            thumbnail: thumbnail,
+            suggestedTags: tags,
+            sourceNoteID: sourceNoteID // All notes in the split group share the same sourceNoteID
+        )
+
+        // Queue enhancement if needed
+        if shouldQueueEnhancement, let noteId = noteId {
+            await offlineQueue.enqueue(
+                noteId: noteId,
+                text: correctedText,
+                noteType: section.suggestedType.rawValue
+            )
+        }
+
+        // Apply image retention policy
+        if let noteId = noteId {
+            await applyImageRetentionPolicy(noteId: noteId)
+        }
+    }
+
+    /// Process a section from existing split logic (extracted for reuse)
+    private func processSection(
+        section: NoteSection,
+        index: Int,
+        totalSections: Int,
+        ocrResult: OCRResult,
+        image: UIImage,
+        thumbnail: Data?,
+        learnedCorrections: [String: String],
+        offlineQueue: OfflineQueueService
+    ) async {
+        print("\n--- Section \(index + 1)/\(totalSections): \(section.noteType.displayName) ---")
+
+        // Apply spell correction for this section
+        let correctedText: String
+        if section.noteType == .email {
+            let correction = spellCorrector.correctEmailContent(section.content, learnedCorrections: learnedCorrections)
+            correctedText = correction.correctedText
+            if correction.hasCorrections {
+                print("📝 Applied \(correction.correctionCount) spell corrections (email mode)")
+            }
+        } else {
+            let correction = spellCorrector.correctSpelling(section.content, learnedCorrections: learnedCorrections)
+            correctedText = correction.correctedText
+            if correction.hasCorrections {
+                print("📝 Applied \(correction.correctionCount) spell corrections")
+            }
+        }
+
+        // Apply LLM enhancement if enabled
+        var finalText = correctedText
+        var shouldQueueEnhancement = false
+
+        if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
+
+                do {
+                    let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
+                    finalText = result.enhancedText
+                    print("✨ LLM enhanced text")
+                    LLMRateLimiter.shared.recordCall()
+                } catch {
+                    print("⚠️ LLM enhancement failed: \(error.localizedDescription)")
+                    shouldQueueEnhancement = true
+                }
+            } else {
+                shouldQueueEnhancement = true
+            }
+        }
+
+        // Suggest tags if auto-enhancement is enabled
+        var suggestedTags: [String]? = nil
+        if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                do {
+                    let suggestion = try await LLMService.shared.suggestTags(
+                        for: finalText,
+                        existingTags: existingTags
+                    )
+                    suggestedTags = suggestion.allTags
+                    LLMRateLimiter.shared.recordCall()
+                } catch {
+                    // Don't block note creation if tag suggestion fails
+                }
+            }
+        }
+
+        // Save this section as a separate note
+        let noteId = await saveNote(
+            text: finalText,
+            noteType: section.noteType,
+            ocrResult: ocrResult,
+            originalImage: index == 0 ? image : nil,
+            thumbnail: index == 0 ? thumbnail : nil,
+            suggestedTags: suggestedTags
+        )
+
+        // Queue enhancement if needed
+        if shouldQueueEnhancement, let noteId = noteId {
+            await offlineQueue.enqueue(
+                noteId: noteId,
+                text: correctedText,
+                noteType: section.noteType.rawValue
+            )
+        }
+
+        // Apply image retention policy
+        if let noteId = noteId {
+            await applyImageRetentionPolicy(noteId: noteId)
         }
     }
 }

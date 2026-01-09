@@ -30,6 +30,7 @@ public class Note: NSManagedObject, Identifiable {
     @NSManaged public var originalClassificationType: String? // Original type before manual correction
     @NSManaged public var annotationData: Data? // PKDrawing serialized data
     @NSManaged public var hasAnnotations: Bool // Quick check if note has annotations
+    @NSManaged public var sourceNoteID: UUID? // Original note this was split from
 
     // Relationships
     @NSManaged public var todoItems: NSSet?
