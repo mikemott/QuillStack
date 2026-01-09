@@ -61,7 +61,6 @@ struct SectionPreviewSheet: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Close") {
                         dismiss()
-                        onKeepSingle()
                     }
                 }
             }

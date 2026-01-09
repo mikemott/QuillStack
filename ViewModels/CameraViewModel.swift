@@ -674,7 +674,7 @@ final class CameraViewModel {
         // Use suggested tags from section detection
         let tags = section.suggestedTags.isEmpty ? nil : section.suggestedTags
 
-        // Save note with sourceNoteID (first note gets the ID, others reference it)
+        // Save note with sourceNoteID
         let noteId = await saveNote(
             text: finalText,
             noteType: section.suggestedType,
@@ -682,7 +682,7 @@ final class CameraViewModel {
             originalImage: index == 0 ? image : nil,
             thumbnail: thumbnail,
             suggestedTags: tags,
-            sourceNoteID: index == 0 ? nil : sourceNoteID // First note doesn't reference itself
+            sourceNoteID: sourceNoteID // All notes in the split group share the same sourceNoteID
         )
 
         // Queue enhancement if needed
