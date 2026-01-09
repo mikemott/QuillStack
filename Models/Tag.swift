@@ -165,6 +165,35 @@ extension Note {
         }
         removeFromTagEntities(tag)
     }
+
+    // MARK: - Convenience Methods (QUI-153)
+
+    /// Add a tag by name (simplified - uses managedObjectContext)
+    func addTag(_ tagName: String) {
+        guard let context = managedObjectContext else { return }
+        addTagEntity(named: tagName, in: context)
+    }
+
+    /// Remove a tag by name (simplified)
+    func removeTag(_ tagName: String) {
+        removeTagEntity(named: tagName)
+    }
+
+    /// Check if note has a specific tag (simplified)
+    func hasTag(_ tagName: String) -> Bool {
+        hasTagEntity(named: tagName)
+    }
+
+    /// Primary tag (first tag alphabetically, typically the note type)
+    var primaryTag: Tag? {
+        sortedTagEntities.first
+    }
+
+    /// Secondary tags (all tags except the primary)
+    var secondaryTags: [Tag] {
+        let all = sortedTagEntities
+        return all.count > 1 ? Array(all.dropFirst()) : []
+    }
 }
 
 // MARK: - Tag Entities Relationship Accessors
