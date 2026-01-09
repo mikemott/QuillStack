@@ -111,16 +111,19 @@ final class SectionDetector {
             let markerRange = match.range
             let markerText = nsText.substring(with: match.range(at: 1))
 
-            // Get content from this marker to the next marker (or end)
-            let startIndex = text.index(text.startIndex, offsetBy: markerRange.location)
-            let endIndex: String.Index
-
+            // Get content from after this marker to the next marker (or end)
+            let contentStartOffset = markerRange.location + markerRange.length
+            let contentEndOffset: Int
             if index < matches.count - 1 {
-                let nextMarkerLocation = matches[index + 1].range.location
-                endIndex = text.index(text.startIndex, offsetBy: nextMarkerLocation)
+                contentEndOffset = matches[index + 1].range.location
             } else {
-                endIndex = text.endIndex
+                contentEndOffset = nsText.length
             }
+
+            guard contentStartOffset <= contentEndOffset else { continue }
+
+            let startIndex = text.index(text.startIndex, offsetBy: contentStartOffset)
+            let endIndex = text.index(text.startIndex, offsetBy: contentEndOffset)
 
             let sectionContent = String(text[startIndex..<endIndex]).trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -299,8 +302,8 @@ final class SectionDetector {
         var tags: [String] = []
         for match in matches {
             let tag = nsText.substring(with: match.range(at: 1))
-            // Filter out note type markers (e.g., #todo#, #meeting#)
-            if !tag.hasSuffix("#") {
+            // Filter out note type markers (e.g., #todo#, #meeting#) by checking if they are valid type identifiers
+            if NoteType.from(identifier: tag) == nil {
                 tags.append(tag.lowercased())
             }
         }
