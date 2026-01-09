@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		011A1AAA5B3926500DB1D408 /* EmailExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2290F5100AF6CF604FCBB6D4 /* EmailExtractor.swift */; };
 		01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
 		0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C42B046C56E7232F89EB98 /* DateParsingService.swift */; };
@@ -63,7 +64,9 @@
 		637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */; };
 		665FDB539CA49B30BF4BA108 /* NoteLinkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */; };
 		66ECB603D5460F059DB645A2 /* DataExtractionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337962D879C8484B0303AE51 /* DataExtractionService.swift */; };
+		6D70D5174598978D3C3B2327 /* ShoppingExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD14EA0078584235E61D8261 /* ShoppingExtractor.swift */; };
 		7323932D06013BF9820E3792 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF65609DDFA199412CB81D3 /* ContactsService.swift */; };
+		73DF07EF67D5FE3399DD7BB8 /* RecipeExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBA16FD55AADCF95C4F1AAC /* RecipeExtractor.swift */; };
 		76196027B23F99473691C734 /* LLMCostTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */; };
 		7BBA236D7D0C755FFF969A3A /* NoteTypePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */; };
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
@@ -95,6 +98,7 @@
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
 		D5F83E0A7C5800930FC09A91 /* OCRNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C3AF04DFECCA4BEEAAC21E /* OCRNormalizer.swift */; };
 		D7C75EE030AEEF054FE2371C /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */; };
+		DB2B4C67313DBAA259F754D5 /* ExpenseExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37D85BF3C15DDD62650B763 /* ExpenseExtractor.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -214,6 +218,7 @@
 		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
 		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
 		21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TitleExtractor.swift; path = TitleExtractor.swift; sourceTree = "<group>"; };
+		2290F5100AF6CF604FCBB6D4 /* EmailExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmailExtractor.swift; path = Services/Extraction/EmailExtractor.swift; sourceTree = "<group>"; };
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2796C1852EEB552B00E05291 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2796C1872EEB553000E05291 /* QuillStack-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuillStack-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -283,11 +288,14 @@
 		9752D04644F6CF1AF0865823 /* EventFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/EventFormatter.swift; sourceTree = "<group>"; };
 		97C3AF04DFECCA4BEEAAC21E /* OCRNormalizer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRNormalizer.swift; path = OCRNormalizer.swift; sourceTree = "<group>"; };
 		9A859296B5B0DA81ED7B19EC /* FormatterRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FormatterRegistry.swift; sourceTree = "<group>"; };
+		9BBA16FD55AADCF95C4F1AAC /* RecipeExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RecipeExtractor.swift; path = Services/Extraction/RecipeExtractor.swift; sourceTree = "<group>"; };
 		A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationAccuracyTest.swift; sourceTree = "<group>"; };
 		A1F6BB9B2F1CFA3A00A1C9D1 /* VoiceMemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoViewModel.swift; sourceTree = "<group>"; };
 		A1F6BBA22F1CFA3A00A1C9D1 /* VoiceCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCaptureView.swift; sourceTree = "<group>"; };
+		A37D85BF3C15DDD62650B763 /* ExpenseExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpenseExtractor.swift; path = Services/Extraction/ExpenseExtractor.swift; sourceTree = "<group>"; };
 		A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionToast.swift; sourceTree = "<group>"; };
 		A7C04153EA7033D6D21E3919 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
+		AD14EA0078584235E61D8261 /* ShoppingExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShoppingExtractor.swift; path = Services/Extraction/ShoppingExtractor.swift; sourceTree = "<group>"; };
 		B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		B70B286A2AC36CA436C77ACE /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteTypePickerSheet.swift; path = Views/Components/NoteTypePickerSheet.swift; sourceTree = "<group>"; };
@@ -778,6 +786,10 @@
 				D7510706BD2F4BCB5FBBE664 /* ExpenseExtractor.swift */,
 				4376A12EE40440CCD5D6DA3A /* ShoppingExtractor.swift */,
 				901F353D9562D7583EBC2E27 /* EmailExtractor.swift */,
+				9BBA16FD55AADCF95C4F1AAC /* RecipeExtractor.swift */,
+				A37D85BF3C15DDD62650B763 /* ExpenseExtractor.swift */,
+				AD14EA0078584235E61D8261 /* ShoppingExtractor.swift */,
+				2290F5100AF6CF604FCBB6D4 /* EmailExtractor.swift */,
 			);
 			name = Extraction;
 			path = Services/Extraction;
@@ -1271,6 +1283,10 @@
 				1B4E5A93BE0BD3E2923B1B4F /* ShoppingExtractor.swift in Sources */,
 				D02FAA4930DED90EDACD11AA /* EmailExtractor.swift in Sources */,
 				66ECB603D5460F059DB645A2 /* DataExtractionService.swift in Sources */,
+				73DF07EF67D5FE3399DD7BB8 /* RecipeExtractor.swift in Sources */,
+				DB2B4C67313DBAA259F754D5 /* ExpenseExtractor.swift in Sources */,
+				6D70D5174598978D3C3B2327 /* ShoppingExtractor.swift in Sources */,
+				011A1AAA5B3926500DB1D408 /* EmailExtractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
