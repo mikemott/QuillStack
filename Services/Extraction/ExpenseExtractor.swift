@@ -1,7 +1,10 @@
 import Foundation
+import OSLog
 
 /// Extracts structured expense data from note content using LLM with heuristic fallback.
 struct ExpenseExtractor {
+
+    private static let logger = Logger(subsystem: "com.quillstack", category: "ExpenseExtraction")
 
     /// Extracts expense data from note content
     static func extractExpense(from content: String) async throws -> ExtractedExpense {
@@ -11,7 +14,7 @@ struct ExpenseExtractor {
             do {
                 return try await extractWithLLM(from: content)
             } catch {
-                print("[ExpenseExtractor] LLM extraction failed: \(error.localizedDescription), falling back to heuristic")
+                logger.info("LLM extraction failed, falling back to heuristic")
             }
         }
 

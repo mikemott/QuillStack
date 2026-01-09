@@ -1,11 +1,14 @@
 import Foundation
 import CoreData
+import OSLog
 
 /// Service that orchestrates structured data extraction from notes.
 /// Automatically detects note type and calls the appropriate extractor,
 /// storing results in the note's extractedDataJSON field.
 @MainActor
 final class DataExtractionService {
+
+    private let logger = Logger(subsystem: "com.quillstack", category: "DataExtraction")
 
     // MARK: - Public Methods
 
@@ -15,12 +18,12 @@ final class DataExtractionService {
     @discardableResult
     func extractData(from note: Note) async -> Bool {
         guard !note.content.isEmpty else {
-            print("[DataExtractionService] Note has no content, skipping extraction")
+            logger.info("Skipping extraction: note has no content")
             return false
         }
 
         let noteType = note.noteType
-        print("[DataExtractionService] Extracting data for note type: \(noteType)")
+        logger.debug("Starting extraction for note type: \(noteType, privacy: .public)")
 
         do {
             let jsonString: String?
@@ -38,7 +41,8 @@ final class DataExtractionService {
             case "meeting":
                 // Meeting uses CoreData entity, not extractedDataJSON
                 try await extractMeeting(from: note.content, for: note)
-                jsonString = nil
+                logger.info("Created Meeting entity for note")
+                return true
 
             case "recipe":
                 jsonString = try await extractRecipe(from: note.content)
@@ -54,21 +58,22 @@ final class DataExtractionService {
 
             default:
                 // No extraction needed for general, idea, reminder, claudePrompt types
-                print("[DataExtractionService] No extraction configured for note type: \(noteType)")
+                logger.debug("No extraction configured for note type: \(noteType, privacy: .public)")
                 return false
             }
 
             // Store JSON in note
             if let jsonString = jsonString {
                 note.extractedDataJSON = jsonString
-                print("[DataExtractionService] Successfully extracted data for \(noteType) note")
+                logger.info("Successfully extracted data for \(noteType, privacy: .public) note")
                 return true
             }
 
             return false
 
         } catch {
-            print("[DataExtractionService] Extraction failed for \(noteType): \(error.localizedDescription)")
+            // Log error without exposing implementation details
+            logger.error("Extraction failed for note type \(noteType, privacy: .public)")
             return false
         }
     }
@@ -131,7 +136,6 @@ final class DataExtractionService {
         if let meeting = meetingParser.parseMeeting(from: note.content, note: note) {
             meeting.note = note
             note.meeting = meeting
-            print("[DataExtractionService] Created Meeting entity for note")
         }
     }
 

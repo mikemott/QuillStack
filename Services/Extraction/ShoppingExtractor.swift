@@ -1,7 +1,10 @@
 import Foundation
+import OSLog
 
 /// Extracts structured shopping list data from note content using LLM with heuristic fallback.
 struct ShoppingExtractor {
+
+    private static let logger = Logger(subsystem: "com.quillstack", category: "ShoppingExtraction")
 
     /// Extracts shopping list data from note content
     static func extractShoppingList(from content: String) async throws -> ExtractedShoppingList {
@@ -11,7 +14,7 @@ struct ShoppingExtractor {
             do {
                 return try await extractWithLLM(from: content)
             } catch {
-                print("[ShoppingExtractor] LLM extraction failed: \(error.localizedDescription), falling back to heuristic")
+                logger.info("LLM extraction failed, falling back to heuristic")
             }
         }
 

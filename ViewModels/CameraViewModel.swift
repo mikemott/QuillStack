@@ -10,6 +10,7 @@ import AVFoundation
 import Combine
 import CoreData
 import Sentry
+import OSLog
 
 @MainActor
 @Observable
@@ -334,12 +335,22 @@ final class CameraViewModel {
                     request.predicate = NSPredicate(format: "id == %@", noteId as CVarArg)
                     request.fetchLimit = 1
 
-                    if let savedNote = try? viewContext.fetch(request).first {
-                        let extractionService = DataExtractionService()
-                        await extractionService.extractData(from: savedNote)
+                    do {
+                        if let savedNote = try viewContext.fetch(request).first {
+                            let extractionService = DataExtractionService()
+                            await extractionService.extractData(from: savedNote)
 
-                        // Save the extracted data
-                        try? viewContext.save()
+                            // Save the extracted data
+                            do {
+                                try viewContext.save()
+                            } catch {
+                                Logger(subsystem: "com.quillstack", category: "DataExtraction")
+                                    .error("Failed to save extracted data: \(error.localizedDescription, privacy: .public)")
+                            }
+                        }
+                    } catch {
+                        Logger(subsystem: "com.quillstack", category: "DataExtraction")
+                            .error("Failed to fetch note for extraction: \(error.localizedDescription, privacy: .public)")
                     }
                 }
 

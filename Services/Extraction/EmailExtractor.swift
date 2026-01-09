@@ -1,7 +1,10 @@
 import Foundation
+import OSLog
 
 /// Extracts structured email data from note content using LLM with heuristic fallback.
 struct EmailExtractor {
+
+    private static let logger = Logger(subsystem: "com.quillstack", category: "EmailExtraction")
 
     /// Extracts email data from note content
     static func extractEmail(from content: String) async throws -> ExtractedEmail {
@@ -11,7 +14,7 @@ struct EmailExtractor {
             do {
                 return try await extractWithLLM(from: content)
             } catch {
-                print("[EmailExtractor] LLM extraction failed: \(error.localizedDescription), falling back to heuristic")
+                logger.info("LLM extraction failed, falling back to heuristic")
             }
         }
 
