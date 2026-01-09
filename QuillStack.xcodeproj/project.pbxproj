@@ -15,6 +15,7 @@
 		125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */; };
 		15B97066B6797F32A1D7952A /* ClaudePromptFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0769835F4519A4CDD53060B7 /* ClaudePromptFormatter.swift */; };
 		171D8FDF19DEB33AE9E56252 /* OCRServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */; };
+		20CC6FE64957D81FD2424740 /* RelatedNotesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637CA8617BAD387328C5B9C2 /* RelatedNotesSection.swift */; };
 		20DB3A9C0E0B03A1DB26242F /* ExpenseFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446C5DEC8A600DE409E66C99 /* ExpenseFormatter.swift */; };
 		2796C1862EEB552B00E05291 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1852EEB552B00E05291 /* ContentView.swift */; };
 		2796C1892EEB554000E05291 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1882EEB554000E05291 /* QuillStackApp.swift */; };
@@ -97,6 +98,7 @@
 		D3D1A709340C65FD071388CB /* ContactReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */; };
 		D5F83E0A7C5800930FC09A91 /* OCRNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C3AF04DFECCA4BEEAAC21E /* OCRNormalizer.swift */; };
 		D7C75EE030AEEF054FE2371C /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */; };
+		DB5CB441F351AB3B23353C84 /* CrossLinkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF96F89E9D40F8382C04CBA9 /* CrossLinkingService.swift */; };
 		E001000000000001 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000001 /* ExportService.swift */; };
 		E001000000000002 /* ExportDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000002 /* ExportDestination.swift */; };
 		E001000000000003 /* TagRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E002000000000003 /* TagRouter.swift */; };
@@ -267,6 +269,7 @@
 		5C49540ED6C791FA105A5167 /* NoteFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatter.swift; sourceTree = "<group>"; };
 		60271B88FC8F3E46581FB9B5 /* NoteType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteType.swift; path = Models/NoteType.swift; sourceTree = SOURCE_ROOT; };
 		616F5D2B8E441A7F0F9FDE1E /* EmailFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/EmailFormatter.swift; sourceTree = "<group>"; };
+		637CA8617BAD387328C5B9C2 /* RelatedNotesSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RelatedNotesSection.swift; path = Views/Components/RelatedNotesSection.swift; sourceTree = "<group>"; };
 		6FF65609DDFA199412CB81D3 /* ContactsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactsService.swift; path = Services/ContactsService.swift; sourceTree = "<group>"; };
 		703C7F02B1C5C368E72D303D /* ExpenseExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpenseExtractor.swift; path = ExpenseExtractor.swift; sourceTree = "<group>"; };
 		7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
@@ -306,6 +309,7 @@
 		DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkExportSheet.swift; sourceTree = "<group>"; };
 		DC54455C450B615A91D56C28 /* EmailExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmailExtractor.swift; path = EmailExtractor.swift; sourceTree = "<group>"; };
 		DD359D411778CA009AA8EC0F /* RecipeFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/RecipeFormatter.swift; sourceTree = "<group>"; };
+		DF96F89E9D40F8382C04CBA9 /* CrossLinkingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CrossLinkingService.swift; path = Services/CrossLinkingService.swift; sourceTree = "<group>"; };
 		DFBDE2D5B236875C058D9D95 /* IdeaFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/IdeaFormatter.swift; sourceTree = "<group>"; };
 		E002000000000001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
 		E002000000000002 /* ExportDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDestination.swift; sourceTree = "<group>"; };
@@ -596,6 +600,7 @@
 				8C8D4343F57D596EE5AE544F /* NoteLinkService.swift */,
 				58161D9CE69A9C68E3404A55 /* AnnotationService.swift */,
 				AC44C5D8F347298D03558E26 /* SectionDetector.swift */,
+				DF96F89E9D40F8382C04CBA9 /* CrossLinkingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -682,6 +687,7 @@
 				A7BB40F22B11F93336C736DC /* LearnedCorrectionToast.swift */,
 				FL0000000000000001 /* FlowLayout.swift */,
 				5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */,
+				637CA8617BAD387328C5B9C2 /* RelatedNotesSection.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1287,6 +1293,8 @@
 				3CF94EF31B7F3CE297A37C70 /* SectionPreviewSheet.swift in Sources */,
 				FCE8924F9E6B3017A8038780 /* NetworkMonitor.swift in Sources */,
 				099A2EA1670C86A4B3833E1F /* ProcessingQueue.swift in Sources */,
+				DB5CB441F351AB3B23353C84 /* CrossLinkingService.swift in Sources */,
+				20CC6FE64957D81FD2424740 /* RelatedNotesSection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

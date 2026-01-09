@@ -15,6 +15,8 @@ public class NoteLink: NSManagedObject, Identifiable {
     @NSManaged public var createdAt: Date
     @NSManaged public var linkType: String // LinkType enum rawValue
     @NSManaged public var label: String? // Optional custom label
+    @NSManaged public var confidence: Double // 0.0 to 1.0, for automatic links
+    @NSManaged public var isAutomatic: Bool // True if created by CrossLinkingService
 
     // Relationships
     @NSManaged public var sourceNote: Note
@@ -26,6 +28,8 @@ public class NoteLink: NSManagedObject, Identifiable {
         createdAt = Date()
         linkType = LinkType.reference.rawValue
         label = nil
+        confidence = 1.0 // Default to high confidence for manual links
+        isAutomatic = false // Default to manual
     }
 }
 
@@ -33,13 +37,19 @@ public class NoteLink: NSManagedObject, Identifiable {
 
 /// Types of relationships between notes
 public enum LinkType: String, Codable, CaseIterable {
-    case reference      // General reference
-    case parent         // Target is parent of source
-    case child          // Target is child of source
-    case related        // Bidirectional relationship
-    case duplicate      // Same content, different capture
-    case implements     // Target implements idea from source
-    case continues      // Target continues thought from source
+    case reference              // General reference
+    case parent                 // Target is parent of source
+    case child                  // Target is child of source
+    case related                // Bidirectional relationship
+    case duplicate              // Same content, different capture
+    case implements             // Target implements idea from source
+    case continues              // Target continues thought from source
+
+    // Automatic cross-linking types (QUI-161)
+    case mentionsSamePerson     // Both notes mention the same person
+    case sameTopic              // Both notes about the same topic
+    case temporalRelationship   // Follow-up or preparation
+    case semanticSimilarity     // Similar meaning/intent
 
     /// Human-readable description of the link type
     var description: String {
@@ -51,6 +61,10 @@ public enum LinkType: String, Codable, CaseIterable {
         case .duplicate: return "Duplicate of"
         case .implements: return "Implements"
         case .continues: return "Continues"
+        case .mentionsSamePerson: return "Mentions same person"
+        case .sameTopic: return "Same topic"
+        case .temporalRelationship: return "Follow-up"
+        case .semanticSimilarity: return "Similar content"
         }
     }
 
@@ -64,6 +78,10 @@ public enum LinkType: String, Codable, CaseIterable {
         case .duplicate: return "doc.on.doc"
         case .implements: return "checkmark.circle"
         case .continues: return "arrow.right.circle"
+        case .mentionsSamePerson: return "person.2"
+        case .sameTopic: return "tag"
+        case .temporalRelationship: return "clock.arrow.circlepath"
+        case .semanticSimilarity: return "sparkles"
         }
     }
 }
@@ -97,13 +115,17 @@ extension NoteLink {
         from source: Note,
         to target: Note,
         type: LinkType = .reference,
-        label: String? = nil
+        label: String? = nil,
+        confidence: Double = 1.0,
+        isAutomatic: Bool = false
     ) -> NoteLink {
         let link = NoteLink(context: context)
         link.sourceNote = source
         link.targetNote = target
         link.type = type
         link.label = label
+        link.confidence = confidence
+        link.isAutomatic = isAutomatic
         return link
     }
 }

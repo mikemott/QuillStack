@@ -113,6 +113,16 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                                 .frame(minHeight: 100)
                         }
                         .padding(16)
+
+                        // Related notes section (QUI-161)
+                        if note.linkCount > 0 {
+                            RelatedNotesSection(note: note) { selectedNote in
+                                // TODO: Navigate to selected note
+                                print("Selected related note: \(selectedNote.id)")
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                        }
                     }
                 }
                 .background(
