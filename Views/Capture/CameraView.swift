@@ -80,6 +80,24 @@ struct CameraView: View {
                 )
             }
         }
+        .sheet(isPresented: $viewModel.showSectionPreview) {
+            SectionPreviewSheet(
+                sections: viewModel.detectedSections,
+                detectionMethod: viewModel.sectionDetectionMethod,
+                onSplit: {
+                    Task {
+                        await viewModel.handleSplitNotes()
+                        dismiss()
+                    }
+                },
+                onKeepSingle: {
+                    Task {
+                        await viewModel.handleKeepSingleNote()
+                        dismiss()
+                    }
+                }
+            )
+        }
         .onChange(of: cameraManager.capturedImage) { _, newImage in
             if newImage != nil {
                 showingImagePreview = true
