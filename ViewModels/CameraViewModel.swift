@@ -326,6 +326,23 @@ final class CameraViewModel {
                     object: nil
                 )
 
+                // Extract structured data asynchronously (non-blocking)
+                Task { @MainActor in
+                    // Fetch the note in the view context for extraction
+                    let viewContext = CoreDataStack.shared.persistentContainer.viewContext
+                    let request = NSFetchRequest<Note>(entityName: "Note")
+                    request.predicate = NSPredicate(format: "id == %@", noteId as CVarArg)
+                    request.fetchLimit = 1
+
+                    if let savedNote = try? viewContext.fetch(request).first {
+                        let extractionService = DataExtractionService()
+                        await extractionService.extractData(from: savedNote)
+
+                        // Save the extracted data
+                        try? viewContext.save()
+                    }
+                }
+
                 return noteId
             } catch {
                 Task { @MainActor in
