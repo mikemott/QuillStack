@@ -211,118 +211,32 @@ export function getWelcomeEmailHTML(firstName: string): string {
     <div class="intro">
       <p>Hey ${firstName},</p>
 
-      <p>Welcome to QuillStack! You're among the first to experience handwriting capture that actually understands what you write.</p>
-
-      <p>Most OCR apps just convert text. QuillStack goes further—it reads your handwritten notes, recognizes what type of note it is, and routes it to the right place with purpose-built features.</p>
-
-      <a href="https://quillstack.io" class="intro-link">Visit quillstack.io to learn more →</a>
+      <p>Most note apps make you organize everything manually. QuillStack reads your handwriting and figures out what it is automatically.</p>
     </div>
 
-    <h2>What Makes QuillStack Different</h2>
-
+    <h2>Try This Right Now</h2>
     <div class="feature">
-      <div class="feature-header">
-        <div class="feature-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-            <circle cx="12" cy="13" r="3"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Intelligent OCR</h3>
-      </div>
       <p class="feature-description">
-        Advanced recognition powered by Apple Vision with per-word confidence scores. Low-confidence words are highlighted so you can correct what matters. The system learns from your corrections.
+        Write a quick todo list on paper. Open QuillStack, snap a photo. The app recognizes it's a todo list and syncs each item to Apple Reminders automatically. No hashtags, no manual categorizing—just write and capture.
       </p>
     </div>
 
-    <div class="feature">
-      <div class="feature-header">
-        <div class="feature-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" y1="9" x2="20" y2="9"/>
-            <line x1="4" y1="15" x2="20" y2="15"/>
-            <line x1="10" y1="3" x2="8" y2="21"/>
-            <line x1="16" y1="3" x2="14" y2="21"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Smart Classification</h3>
-      </div>
-      <p class="feature-description">
-        Write hashtag triggers to auto-route notes to specialized views:
-      </p>
-      <p class="feature-description">
-        <code>#todo#</code> Syncs tasks to Apple Reminders with checkboxes
-      </p>
-      <p class="feature-description">
-        <code>#meeting#</code> Converts to calendar events with parsed attendees
-      </p>
-      <p class="feature-description">
-        <code>#recipe#</code> Formatted recipe cards with ingredients and instructions
-      </p>
-      <p class="feature-description">
-        <code>#expense#</code> Photo a receipt to auto-parse amounts and categories
-      </p>
-      <p class="feature-description">
-        <code>#issue#</code> Creates GitHub Issues directly from your handwritten notes
-      </p>
-      <p class="feature-description">
-        <code>#email#</code> Drafts emails with recipient detection
-      </p>
-      <p class="feature-description">
-        <code>#shopping#</code> Checkable grocery lists exported to Apple Reminders
-      </p>
-      <p class="feature-description">
-        <code>#contact#</code> Creates phone contacts from handwriting or business cards
-      </p>
-      <p class="feature-description" style="margin-top: 15px; font-style: italic;">
-        Plus Event, Reminder, ClaudePrompt, and General note types—12 in total, each with custom features.
-      </p>
-    </div>
-
-    <div class="feature">
-      <div class="feature-header">
-        <div class="feature-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-            <path d="M5 3v4"/>
-            <path d="M19 17v4"/>
-            <path d="M3 5h4"/>
-            <path d="M17 19h4"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">AI Enhancement (Optional)</h3>
-      </div>
-      <p class="feature-description">
-        Clean up OCR errors with Claude API integration. Your API key, your control—data stays on-device with optional iCloud sync.
-      </p>
-    </div>
-
-    <div class="feature">
-      <div class="feature-header">
-        <div class="feature-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-            <polyline points="15 3 21 3 21 9"/>
-            <line x1="10" y1="14" x2="21" y2="3"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Export Everywhere</h3>
-      </div>
-      <p class="feature-description">
-        Send notes to Apple Notes, Notion, Obsidian, or PDF with type-specific formatting preserved.
-      </p>
-    </div>
-
-    <h2>Get Started</h2>
+    <h2>Getting Started</h2>
     <ol class="steps">
       <li>Open QuillStack from TestFlight</li>
+      <li>Go to Settings and add your Anthropic API key from <a href="https://console.anthropic.com" style="color: #1e4d2f; font-weight: 600;">console.anthropic.com</a></li>
       <li>Point your camera at any handwritten note</li>
-      <li>Add hashtag triggers to unlock smart features</li>
-      <li>Export or sync to your favorite tools</li>
+      <li>Watch it automatically organize itself</li>
     </ol>
 
-    <div class="cta-container">
-      <a href="https://quillstack.io" class="cta-button">Visit quillstack.io</a>
+    <h2>What Makes This Different</h2>
+    <div class="feature">
+      <p class="feature-description">
+        <strong>No manual organizing.</strong> QuillStack uses AI to detect whether you wrote a todo list, meeting notes, a recipe, an email draft, or one of 8 other note types. Each type gets custom formatting and actions.
+      </p>
+      <p class="feature-description" style="margin-top: 15px;">
+        <strong>Your privacy matters.</strong> Everything stays on your device. The optional Claude API enhancement uses your own API key—you're in control, and nothing is stored on our servers.
+      </p>
     </div>
 
     <h2>We Need Your Feedback</h2>
@@ -357,51 +271,32 @@ export function getWelcomeEmailText(firstName: string): string {
 
 Hey ${firstName},
 
-Welcome to QuillStack! You're among the first to experience handwriting capture that actually understands what you write.
-
-Most OCR apps just convert text. QuillStack goes further—it reads your handwritten notes, recognizes what type of note it is, and routes it to the right place with purpose-built features.
-
-Visit quillstack.io to learn more →
-https://quillstack.io
+Most note apps make you organize everything manually. QuillStack reads your handwriting and figures out what it is automatically.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-WHAT MAKES QUILLSTACK DIFFERENT
+TRY THIS RIGHT NOW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📷 INTELLIGENT OCR
-Advanced recognition powered by Apple Vision with per-word confidence scores. Low-confidence words are highlighted so you can correct what matters. The system learns from your corrections.
-
-# SMART CLASSIFICATION
-Write hashtag triggers to auto-route notes to specialized views:
-
-#todo# - Syncs tasks to Apple Reminders with checkboxes
-#meeting# - Converts to calendar events with parsed attendees
-#recipe# - Formatted recipe cards with ingredients and instructions
-#expense# - Photo a receipt to auto-parse amounts and categories
-#issue# - Creates GitHub Issues directly from your handwritten notes
-#email# - Drafts emails with recipient detection
-#shopping# - Checkable grocery lists exported to Apple Reminders
-#contact# - Creates phone contacts from handwriting or business cards
-
-Plus Event, Reminder, ClaudePrompt, and General note types—12 in total, each with custom features.
-
-✨ AI ENHANCEMENT (OPTIONAL)
-Clean up OCR errors with Claude API integration. Your API key, your control—data stays on-device with optional iCloud sync.
-
-↗ EXPORT EVERYWHERE
-Send notes to Apple Notes, Notion, Obsidian, or PDF with type-specific formatting preserved.
+Write a quick todo list on paper. Open QuillStack, snap a photo. The app recognizes it's a todo list and syncs each item to Apple Reminders automatically. No hashtags, no manual categorizing—just write and capture.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GET STARTED
+GETTING STARTED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. Open QuillStack from TestFlight
-2. Point your camera at any handwritten note
-3. Add hashtag triggers to unlock smart features
-4. Export or sync to your favorite tools
+2. Go to Settings and add your Anthropic API key from console.anthropic.com
+3. Point your camera at any handwritten note
+4. Watch it automatically organize itself
 
-Visit quillstack.io
-https://quillstack.io
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT MAKES THIS DIFFERENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NO MANUAL ORGANIZING
+QuillStack uses AI to detect whether you wrote a todo list, meeting notes, a recipe, an email draft, or one of 8 other note types. Each type gets custom formatting and actions.
+
+YOUR PRIVACY MATTERS
+Everything stays on your device. The optional Claude API enhancement uses your own API key—you're in control, and nothing is stored on our servers.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WE NEED YOUR FEEDBACK
