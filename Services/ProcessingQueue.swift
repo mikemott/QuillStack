@@ -100,8 +100,9 @@ final class ProcessingQueue {
         isProcessing = true
         defer { isProcessing = false }
 
-        await context.perform { [weak self] in
-            guard let self = self else { return }
+        // Fetch pending notes
+        let noteIDs: [UUID] = await context.perform { [weak self] in
+            guard let self = self else { return [] }
 
             let request = Note.fetchRequest()
             request.predicate = NSPredicate(
@@ -112,72 +113,83 @@ final class ProcessingQueue {
 
             do {
                 let pendingNotes = try self.context.fetch(request)
-
-                // Process each note sequentially
-                for note in pendingNotes {
-                    Task {
-                        await self.processNote(note)
-                    }
-                }
+                return pendingNotes.map { $0.id }
             } catch {
                 print("Error fetching pending notes: \(error)")
+                return []
             }
+        }
+
+        // Process each note sequentially (not concurrently) to avoid API call storm
+        for noteID in noteIDs {
+            // Check if still connected before each note
+            guard networkMonitor.isConnected else {
+                print("Lost connection, stopping queue processing")
+                break
+            }
+            await processNote(noteID: noteID)
         }
 
         await updatePendingCount()
     }
 
-    /// Process a single note
-    private func processNote(_ note: Note) async {
-        await context.perform { [weak self] in
-            guard let self = self else { return }
+    /// Process a single note by ID (thread-safe)
+    private func processNote(noteID: UUID) async {
+        // Get note content and type in background context
+        let noteData: (content: String, noteType: String)? = await context.perform { [weak self] in
+            guard let self = self else { return nil }
+
+            let request = Note.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
+            request.fetchLimit = 1
+
+            guard let note = try? self.context.fetch(request).first else {
+                return nil
+            }
 
             // Update state to processing
             note.processingState = .processing
+            try? self.context.save()
 
-            do {
-                try self.context.save()
-            } catch {
-                print("Error updating note state to processing: \(error)")
-                return
-            }
+            return (content: note.content, noteType: note.noteType)
         }
 
-        // Perform LLM enhancement
-        do {
-            let enhanced = try await llmService.enhanceOCRText(
-                note.content,
-                noteType: note.noteType
-            )
+        guard let (content, noteType) = noteData else { return }
 
+        // Perform LLM enhancement (outside CoreData context)
+        do {
+            let enhanced = try await llmService.enhanceOCRText(content, noteType: noteType)
+
+            // Update note with enhanced text
             await context.perform { [weak self] in
                 guard let self = self else { return }
 
-                // Update note with enhanced text
+                let request = Note.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
+                request.fetchLimit = 1
+
+                guard let note = try? self.context.fetch(request).first else { return }
+
                 note.content = enhanced.enhancedText
                 note.processingState = .enhanced
                 note.updatedAt = Date()
-
-                do {
-                    try self.context.save()
-                } catch {
-                    print("Error saving enhanced note: \(error)")
-                }
+                try? self.context.save()
             }
         } catch {
             print("Error enhancing note: \(error)")
 
+            // Mark as failed
             await context.perform { [weak self] in
                 guard let self = self else { return }
 
-                // Mark as failed
-                note.processingState = .failed
+                let request = Note.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
+                request.fetchLimit = 1
 
-                do {
-                    try self.context.save()
-                } catch {
-                    print("Error updating failed note: \(error)")
-                }
+                guard let note = try? self.context.fetch(request).first else { return }
+
+                note.processingState = .failed
+                try? self.context.save()
             }
         }
     }
