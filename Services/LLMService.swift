@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 // MARK: - LLM Service
 
@@ -620,6 +621,88 @@ struct MeetingDetails: Codable {
         }
         return date
     }
+
+    // MARK: - Tag Suggestion (QUI-157)
+
+    /// Result from tag suggestion
+    struct TagSuggestionResult: Codable {
+        let primaryTag: String
+        let secondaryTags: [String]
+        let confidence: Double
+
+        var allTags: [String] {
+            [primaryTag] + secondaryTags
+        }
+    }
+
+    /// Suggest tags for note content using LLM with vocabulary consistency
+    /// - Parameters:
+    ///   - content: The note content to analyze
+    ///   - existingTags: List of existing tags in the system to prefer
+    /// - Returns: TagSuggestionResult with primary and secondary tags
+    func suggestTags(for content: String, existingTags: [String]) async throws -> TagSuggestionResult {
+        // Format existing tags for prompt
+        let existingTagsPrompt: String
+        if existingTags.isEmpty {
+            existingTagsPrompt = "No existing tags in the system yet - you can suggest any appropriate tags."
+        } else {
+            existingTagsPrompt = """
+            Existing tags in the system (prefer these spellings):
+            \(existingTags.map { "• \($0)" }.joined(separator: "\n"))
+            """
+        }
+
+        // Build prompt that emphasizes vocabulary consistency
+        let prompt = """
+        You are helping suggest tags for a handwritten note that was captured via OCR.
+
+        Your task is to suggest 2-5 tags that categorize this note. Follow these rules:
+
+        1. **Primary Tag (Note Type)**: The first tag should represent the note type:
+           - "todo" for task lists
+           - "meeting" for meeting notes
+           - "email" for email drafts
+           - "contact" for contact information
+           - "reminder" for reminders
+           - "expense" for expense/receipt tracking
+           - "shopping" for shopping lists
+           - "recipe" for cooking recipes
+           - "event" for event planning
+           - "journal" for personal journal entries
+           - "idea" for brainstorming/ideas
+           - "general" for anything else
+
+        2. **Secondary Tags**: Add 1-4 more descriptive tags that help categorize the content
+           - These should be specific topics, projects, or contexts (e.g., "work", "groceries", "q4-planning")
+
+        3. **Vocabulary Consistency**: STRONGLY prefer existing tags from the system
+           - If the note is about work, and "work" already exists, use "work" (not "office" or "job")
+           - Match spelling and capitalization exactly
+           - Only create new tags if no existing tag fits
+
+        4. **Tag Format**: lowercase, use hyphens for multi-word tags (e.g., "project-x", "budget-2024")
+
+        \(existingTagsPrompt)
+
+        Note content:
+        \(content)
+
+        Return ONLY valid JSON with this exact structure, no markdown code blocks, no explanations:
+        {"primaryTag":"todo","secondaryTags":["work","project-alpha"],"confidence":0.95}
+
+        The confidence value should be 0.0 to 1.0 representing how certain you are about the primary tag classification.
+        """
+
+        let jsonText = try await performAPIRequest(prompt: prompt, maxTokens: 256)
+
+        // Parse the JSON response
+        guard let jsonData = jsonText.data(using: .utf8) else {
+            throw LLMError.invalidResponse
+        }
+
+        let decoder = JSONDecoder()
+        return try decoder.decode(TagSuggestionResult.self, from: jsonData)
+    }
 }
 
 // MARK: - Certificate Pinning
@@ -657,3 +740,4 @@ extension LLMService: URLSessionDelegate {
         }
     }
 }
+

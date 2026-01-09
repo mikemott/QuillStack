@@ -26,6 +26,9 @@ final class CameraViewModel {
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
 
+    // Cache existing tags for vocabulary consistency
+    private var existingTags: [String] = []
+
     /// Initialize with default shared services
     init() {
         self.ocrService = OCRService.shared
@@ -73,6 +76,14 @@ final class CameraViewModel {
     func processImage(_ image: UIImage) async {
         isProcessing = true
         error = nil
+
+        // Load existing tags for vocabulary consistency (if not already loaded)
+        if existingTags.isEmpty {
+            existingTags = await fetchExistingTags()
+            if !existingTags.isEmpty {
+                print("📋 Loaded \(existingTags.count) existing tags for vocabulary consistency")
+            }
+        }
 
         // Sentry: Track capture start
         let breadcrumb = Breadcrumb(level: .info, category: "capture")
@@ -195,6 +206,27 @@ final class CameraViewModel {
 
                 print("✏️ Final text: \(finalText)")
 
+                // Suggest tags if auto-enhancement is enabled and we have an API key
+                var suggestedTags: [String]? = nil
+                if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+                    if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                        do {
+                            let suggestion = try await LLMService.shared.suggestTags(
+                                for: finalText,
+                                existingTags: existingTags
+                            )
+                            suggestedTags = suggestion.allTags
+                            print("🏷️ Suggested tags: \(suggestedTags!.joined(separator: ", "))")
+
+                            // Record call for rate limiting
+                            LLMRateLimiter.shared.recordCall()
+                        } catch {
+                            print("⚠️ Tag suggestion failed: \(error.localizedDescription)")
+                            // Don't block note creation if tag suggestion fails
+                        }
+                    }
+                }
+
                 // Save this section as a separate note
                 // Only attach image to first section to avoid duplication
                 let noteId = await saveNote(
@@ -202,7 +234,8 @@ final class CameraViewModel {
                     noteType: section.noteType,
                     ocrResult: ocrResult,
                     originalImage: index == 0 ? image : nil,
-                    thumbnail: index == 0 ? thumbnail : nil
+                    thumbnail: index == 0 ? thumbnail : nil,
+                    suggestedTags: suggestedTags
                 )
 
                 // Queue enhancement if needed
@@ -265,7 +298,8 @@ final class CameraViewModel {
         noteType: NoteType,
         ocrResult: OCRResult,
         originalImage: UIImage?,
-        thumbnail: UIImage?
+        thumbnail: UIImage?,
+        suggestedTags: [String]? = nil
     ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
@@ -293,6 +327,13 @@ final class CameraViewModel {
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData
+            }
+
+            // Apply suggested tags if available
+            if let tags = suggestedTags {
+                for tagName in tags {
+                    note.addTagEntity(named: tagName, in: context)
+                }
             }
 
             // Parse based on note type
@@ -349,6 +390,25 @@ final class CameraViewModel {
             }
         } catch {
             // Non-critical error - don't fail the capture
+        }
+    }
+
+    /// Fetch existing tags for vocabulary consistency
+    private func fetchExistingTags() async -> [String] {
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        return await context.perform {
+            let request = Tag.fetchRequest()
+            request.sortDescriptors = [NSSortDescriptor(keyPath: \Tag.createdAt, ascending: false)]
+
+            guard let tags = try? context.fetch(request) else {
+                return []
+            }
+
+            // Sort by usage count and return top 50 tag names
+            return tags
+                .sorted { $0.noteCount > $1.noteCount }
+                .prefix(50)
+                .map { $0.name }
         }
     }
 }
