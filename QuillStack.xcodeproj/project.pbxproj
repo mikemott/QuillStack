@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
+		099A2EA1670C86A4B3833E1F /* ProcessingQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1D91437E3A8BF3AFE3CBF5 /* ProcessingQueue.swift */; };
 		0E8B9EEBC4BEFD11CAD58716 /* DateParsingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C42B046C56E7232F89EB98 /* DateParsingService.swift */; };
 		0F2FA59BBC1D2C79F0271690 /* TextClassifierProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE0AE1FBB4428D83C26DA73 /* TextClassifierProtocol.swift */; };
 		125A70BA99AA9323947512F8 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */; };
@@ -137,6 +138,7 @@
 		F00100000000001E /* OCRCorrection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000001E /* OCRCorrection.swift */; };
 		F192B8FB3CB4C8796DCD55C3 /* TitleExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */; };
 		F6244AF45A08EC483BD9CEDE /* AnnotationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58161D9CE69A9C68E3404A55 /* AnnotationService.swift */; };
+		FCE8924F9E6B3017A8038780 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E6F59494460A36A7DF8048 /* NetworkMonitor.swift */; };
 		FL0000000000000002 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FL0000000000000001 /* FlowLayout.swift */; };
 		G00100000000001F /* PromptRefinerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G00200000000001F /* PromptRefinerService.swift */; };
 		G001000000000020 /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G002000000000020 /* GitHubService.swift */; };
@@ -208,6 +210,7 @@
 		05C42B046C56E7232F89EB98 /* DateParsingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DateParsingService.swift; path = DateParsingService.swift; sourceTree = "<group>"; };
 		07232297C49D5ED086A1E66A /* NoteClassification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteClassification.swift; path = Models/NoteClassification.swift; sourceTree = "<group>"; };
 		0769835F4519A4CDD53060B7 /* ClaudePromptFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ClaudePromptFormatter.swift; sourceTree = "<group>"; };
+		07E6F59494460A36A7DF8048 /* NetworkMonitor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NetworkMonitor.swift; path = Services/NetworkMonitor.swift; sourceTree = "<group>"; };
 		0A65C2142F7D9D2ECD2916D1 /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodoFormatter.swift; sourceTree = "<group>"; };
 		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = ContactReviewSheet.swift; sourceTree = "<group>"; };
 		0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventExtractor.swift; path = Extraction/EventExtractor.swift; sourceTree = "<group>"; };
@@ -271,6 +274,7 @@
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		7A08139436B3B898EDDD3A0E /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoFormatter.swift; path = NoteFormatters/TodoFormatter.swift; sourceTree = "<group>"; };
+		7A1D91437E3A8BF3AFE3CBF5 /* ProcessingQueue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProcessingQueue.swift; path = Services/ProcessingQueue.swift; sourceTree = "<group>"; };
 		7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLinkServiceTests.swift; path = Tests/NoteLinkServiceTests.swift; sourceTree = "<group>"; };
 		821950025E3D8375366B71B3 /* ClassificationAnalyticsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClassificationAnalyticsService.swift; sourceTree = "<group>"; };
 		8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMCostTracker.swift; path = Services/LLMCostTracker.swift; sourceTree = "<group>"; };
@@ -794,6 +798,8 @@
 			children = (
 				FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */,
 				6FF65609DDFA199412CB81D3 /* ContactsService.swift */,
+				07E6F59494460A36A7DF8048 /* NetworkMonitor.swift */,
+				7A1D91437E3A8BF3AFE3CBF5 /* ProcessingQueue.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -1279,6 +1285,8 @@
 				52D18AFADB7ADEC3119880DD /* EmailExtractor.swift in Sources */,
 				3623F8A9B5C16644C809A436 /* SectionDetector.swift in Sources */,
 				3CF94EF31B7F3CE297A37C70 /* SectionPreviewSheet.swift in Sources */,
+				FCE8924F9E6B3017A8038780 /* NetworkMonitor.swift in Sources */,
+				099A2EA1670C86A4B3833E1F /* ProcessingQueue.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,6 +33,8 @@ final class CameraViewModel {
     private let imageProcessor = ImageProcessor()
     private let spellCorrector = SpellCorrector()
     private let settings = SettingsManager.shared
+    private let networkMonitor = NetworkMonitor.shared
+    private let processingQueue = ProcessingQueue.shared
 
     // Cache existing tags for vocabulary consistency
     private var existingTags: [String] = []
@@ -183,11 +185,11 @@ final class CameraViewModel {
 
                 // Apply LLM enhancement if enabled
                 var finalText = correctedText
-                var shouldQueueEnhancement = false
+                var processingState: NoteProcessingState = .enhanced
 
                 if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
                     // Check both online status AND rate limits
-                    if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+                    if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                         print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
 
                         // Sentry: Track LLM call
@@ -199,6 +201,7 @@ final class CameraViewModel {
                         do {
                             let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
                             finalText = result.enhancedText
+                            processingState = .enhanced
                             print("✨ LLM enhanced text")
 
                             // Record call for rate limiting
@@ -217,16 +220,20 @@ final class CameraViewModel {
                             failBreadcrumb.data = ["error": error.localizedDescription]
                             SentrySDK.addBreadcrumb(failBreadcrumb)
 
-                            shouldQueueEnhancement = true
+                            processingState = .pendingEnhancement
                         }
                     } else {
-                        if !offlineQueue.isOnline {
-                            print("📴 Offline - queueing enhancement for later")
+                        if !networkMonitor.isConnected {
+                            print("📴 Offline - note will be enhanced when online")
+                            processingState = .ocrOnly
                         } else {
                             print("🚫 Rate limited - queueing enhancement for later")
+                            processingState = .pendingEnhancement
                         }
-                        shouldQueueEnhancement = true
                     }
+                } else {
+                    // No auto-enhancement enabled, OCR only
+                    processingState = .enhanced
                 }
 
                 // Track OCR completion (metadata only, no content)
@@ -279,17 +286,9 @@ final class CameraViewModel {
                     ocrResult: ocrResult,
                     originalImage: index == 0 ? image : nil,
                     thumbnail: index == 0 ? thumbnail : nil,
-                    suggestedTags: suggestedTags
+                    suggestedTags: suggestedTags,
+                    processingState: processingState
                 )
-
-                // Queue enhancement if needed
-                if shouldQueueEnhancement, let noteId = noteId {
-                    await offlineQueue.enqueue(
-                        noteId: noteId,
-                        text: correctedText,
-                        noteType: section.noteType.rawValue
-                    )
-                }
 
                 // Apply image retention policy
                 if let noteId = noteId {
@@ -344,7 +343,8 @@ final class CameraViewModel {
         originalImage: UIImage?,
         thumbnail: UIImage?,
         suggestedTags: [String]? = nil,
-        sourceNoteID: UUID? = nil
+        sourceNoteID: UUID? = nil,
+        processingState: NoteProcessingState = .enhanced
     ) async -> UUID? {
         let context = CoreDataStack.shared.newBackgroundContext()
 
@@ -369,6 +369,7 @@ final class CameraViewModel {
             note.ocrConfidence = avgConfidence
             note.ocrResultData = ocrResultData
             note.sourceNoteID = sourceNoteID // Link to source note if this is a split section
+            note.processingState = processingState
             // note.captureSource = "camera" // TODO: Add this field to Note model
 
             if let thumbnailData = thumbnailData {
@@ -601,7 +602,6 @@ final class CameraViewModel {
             print("📚 Using \(learnedCount) learned corrections")
         }
 
-        let offlineQueue = OfflineQueueService.shared
         let thumbnail = imageProcessor.generateThumbnail(from: image)
 
         for (index, section) in sections.enumerated() {
@@ -612,8 +612,7 @@ final class CameraViewModel {
                 ocrResult: ocrResult,
                 image: image,
                 thumbnail: thumbnail,
-                learnedCorrections: learnedCorrections,
-                offlineQueue: offlineQueue
+                learnedCorrections: learnedCorrections
             )
         }
 
@@ -651,21 +650,27 @@ final class CameraViewModel {
 
         // Apply LLM enhancement if enabled
         var finalText = correctedText
-        let offlineQueue = OfflineQueueService.shared
-        var shouldQueueEnhancement = false
+        var processingState: NoteProcessingState = .enhanced
 
         if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
-            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+            if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                 do {
                     let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.suggestedType.rawValue)
                     finalText = result.enhancedText
+                    processingState = .enhanced
                     LLMRateLimiter.shared.recordCall()
                 } catch {
-                    shouldQueueEnhancement = true
+                    processingState = .pendingEnhancement
                 }
             } else {
-                shouldQueueEnhancement = true
+                if !networkMonitor.isConnected {
+                    processingState = .ocrOnly
+                } else {
+                    processingState = .pendingEnhancement
+                }
             }
+        } else {
+            processingState = .enhanced
         }
 
         // Generate thumbnail only for first section
@@ -682,17 +687,9 @@ final class CameraViewModel {
             originalImage: index == 0 ? image : nil,
             thumbnail: thumbnail,
             suggestedTags: tags,
-            sourceNoteID: sourceNoteID // All notes in the split group share the same sourceNoteID
+            sourceNoteID: sourceNoteID, // All notes in the split group share the same sourceNoteID
+            processingState: processingState
         )
-
-        // Queue enhancement if needed
-        if shouldQueueEnhancement, let noteId = noteId {
-            await offlineQueue.enqueue(
-                noteId: noteId,
-                text: correctedText,
-                noteType: section.suggestedType.rawValue
-            )
-        }
 
         // Apply image retention policy
         if let noteId = noteId {
@@ -708,8 +705,7 @@ final class CameraViewModel {
         ocrResult: OCRResult,
         image: UIImage,
         thumbnail: Data?,
-        learnedCorrections: [String: String],
-        offlineQueue: OfflineQueueService
+        learnedCorrections: [String: String]
     ) async {
         print("\n--- Section \(index + 1)/\(totalSections): \(section.noteType.displayName) ---")
 
@@ -731,30 +727,39 @@ final class CameraViewModel {
 
         // Apply LLM enhancement if enabled
         var finalText = correctedText
-        var shouldQueueEnhancement = false
+        var processingState: NoteProcessingState = .enhanced
 
         if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
-            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+            if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                 print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
 
                 do {
                     let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.noteType.rawValue)
                     finalText = result.enhancedText
+                    processingState = .enhanced
                     print("✨ LLM enhanced text")
                     LLMRateLimiter.shared.recordCall()
                 } catch {
                     print("⚠️ LLM enhancement failed: \(error.localizedDescription)")
-                    shouldQueueEnhancement = true
+                    processingState = .pendingEnhancement
                 }
             } else {
-                shouldQueueEnhancement = true
+                if !networkMonitor.isConnected {
+                    print("📴 Offline - note will be enhanced when online")
+                    processingState = .ocrOnly
+                } else {
+                    print("🚫 Rate limited - queueing enhancement for later")
+                    processingState = .pendingEnhancement
+                }
             }
+        } else {
+            processingState = .enhanced
         }
 
         // Suggest tags if auto-enhancement is enabled
         var suggestedTags: [String]? = nil
         if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
-            if offlineQueue.isOnline && LLMRateLimiter.shared.canMakeCall() {
+            if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                 do {
                     let suggestion = try await LLMService.shared.suggestTags(
                         for: finalText,
@@ -775,17 +780,9 @@ final class CameraViewModel {
             ocrResult: ocrResult,
             originalImage: index == 0 ? image : nil,
             thumbnail: index == 0 ? thumbnail : nil,
-            suggestedTags: suggestedTags
+            suggestedTags: suggestedTags,
+            processingState: processingState
         )
-
-        // Queue enhancement if needed
-        if shouldQueueEnhancement, let noteId = noteId {
-            await offlineQueue.enqueue(
-                noteId: noteId,
-                text: correctedText,
-                noteType: section.noteType.rawValue
-            )
-        }
 
         // Apply image retention policy
         if let noteId = noteId {
