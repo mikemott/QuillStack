@@ -3,9 +3,22 @@
  */
 
 /**
+ * Escape HTML special characters to prevent injection attacks
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Generate HTML version of welcome email
  */
 export function getWelcomeEmailHTML(firstName: string): string {
+  const safeName = escapeHtml(firstName);
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -209,7 +222,7 @@ export function getWelcomeEmailHTML(firstName: string): string {
 
   <div class="content">
     <div class="intro">
-      <p>Hey ${firstName},</p>
+      <p>Hey ${safeName},</p>
 
       <p>Most note apps make you organize everything manually. QuillStack reads your handwriting and figures out what it is automatically.</p>
     </div>
@@ -263,13 +276,15 @@ export function getWelcomeEmailHTML(firstName: string): string {
  * Generate plain text version of welcome email
  */
 export function getWelcomeEmailText(firstName: string): string {
+  // Text version doesn't need HTML escaping, but escape for safety
+  const safeName = firstName.replace(/[<>]/g, '');
   return `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   WELCOME TO QUILLSTACK BETA
   Transform Handwriting Into Action
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Hey ${firstName},
+Hey ${safeName},
 
 Most note apps make you organize everything manually. QuillStack reads your handwriting and figures out what it is automatically.
 
