@@ -14,12 +14,12 @@ final class DataExtractionService {
     /// - Returns: True if extraction was successful, false otherwise
     @discardableResult
     func extractData(from note: Note) async -> Bool {
-        guard let content = note.content, !content.isEmpty else {
+        guard !note.content.isEmpty else {
             print("[DataExtractionService] Note has no content, skipping extraction")
             return false
         }
 
-        let noteType = note.noteType ?? "general"
+        let noteType = note.noteType
         print("[DataExtractionService] Extracting data for note type: \(noteType)")
 
         do {
@@ -27,30 +27,30 @@ final class DataExtractionService {
 
             switch noteType {
             case "contact":
-                jsonString = try await extractContact(from: content)
+                jsonString = try await extractContact(from: note.content)
 
             case "todo":
-                jsonString = try await extractTodos(from: content)
+                jsonString = try await extractTodos(from: note.content)
 
             case "event":
-                jsonString = try await extractEvent(from: content)
+                jsonString = try await extractEvent(from: note.content)
 
             case "meeting":
                 // Meeting uses CoreData entity, not extractedDataJSON
-                try await extractMeeting(from: content, for: note)
+                try await extractMeeting(from: note.content, for: note)
                 jsonString = nil
 
             case "recipe":
-                jsonString = try await extractRecipe(from: content)
+                jsonString = try await extractRecipe(from: note.content)
 
             case "expense":
-                jsonString = try await extractExpense(from: content)
+                jsonString = try await extractExpense(from: note.content)
 
             case "shopping":
-                jsonString = try await extractShopping(from: content)
+                jsonString = try await extractShopping(from: note.content)
 
             case "email":
-                jsonString = try await extractEmail(from: content)
+                jsonString = try await extractEmail(from: note.content)
 
             default:
                 // No extraction needed for general, idea, reminder, claudePrompt types
@@ -93,10 +93,7 @@ final class DataExtractionService {
 
     private func extractTodos(from content: String) async throws -> String? {
         // TodoParser.extractHybrid returns [ExtractedTodo] which is what we need for JSON
-        guard let context = await CoreDataStack.shared.viewContext else {
-            throw DataExtractionError.noManagedObjectContext
-        }
-
+        let context = CoreDataStack.shared.context
         let todoParser = TodoParser(context: context)
         let todos = try await todoParser.extractHybrid(content)
 
@@ -131,7 +128,7 @@ final class DataExtractionService {
 
         // MeetingParser uses CoreData directly, not JSON
         let meetingParser = MeetingParser(context: context)
-        if let meeting = meetingParser.parseMeeting(from: content, note: note) {
+        if let meeting = meetingParser.parseMeeting(from: note.content, note: note) {
             meeting.note = note
             note.meeting = meeting
             print("[DataExtractionService] Created Meeting entity for note")

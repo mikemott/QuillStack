@@ -81,7 +81,7 @@ struct ShoppingExtractor {
         let lines = content.components(separatedBy: .newlines).map { $0.trimmingCharacters(in: .whitespaces) }
 
         var storeName: String?
-        var items: [ShoppingItem] = []
+        var items: [ExtractedShoppingItem] = []
         var notes: [String] = []
 
         for line in lines where !line.isEmpty {
@@ -144,7 +144,7 @@ struct ShoppingExtractor {
         return false
     }
 
-    private static func parseItem(from line: String) -> ShoppingItem? {
+    private static func parseItem(from line: String) -> ExtractedShoppingItem? {
         var cleaned = line.trimmingCharacters(in: .whitespaces)
         var isChecked = false
 
@@ -177,7 +177,7 @@ struct ShoppingExtractor {
         // Detect category
         let category = detectCategory(for: name.lowercased())
 
-        return ShoppingItem(
+        return ExtractedShoppingItem(
             name: name,
             quantity: quantity,
             isChecked: isChecked,
@@ -252,7 +252,7 @@ enum ShoppingExtractionError: LocalizedError {
 
 struct ExtractedShoppingList: Codable, Sendable, Equatable {
     let storeName: String?
-    let items: [ShoppingItem]
+    let items: [ExtractedShoppingItem]
     let notes: String?
 
     var hasMinimumData: Bool {
@@ -264,7 +264,7 @@ struct ExtractedShoppingList: Codable, Sendable, Equatable {
     }
 }
 
-struct ShoppingItem: Codable, Sendable, Equatable, Identifiable {
+struct ExtractedShoppingItem: Codable, Sendable, Equatable, Identifiable {
     let id: UUID
     let name: String
     let quantity: String?
