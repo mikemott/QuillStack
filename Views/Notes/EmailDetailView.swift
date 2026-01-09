@@ -22,6 +22,7 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
     @State private var showingExportSheet = false
     @State private var showingSummarySheet = false
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-162
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - NoteDetailViewProtocol
@@ -158,6 +159,10 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
         }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
     }
 
     // MARK: - Email Field
@@ -216,6 +221,9 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
                 onSummarize: { showingSummarySheet = true }
             ),
             customActions: [
+                DetailAction(icon: "tag") {
+                    showingTagEditor = true
+                },
                 DetailAction(icon: "arrow.left.arrow.right.circle") {
                     showingTypePicker = true
                 }
