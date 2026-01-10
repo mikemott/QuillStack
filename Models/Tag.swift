@@ -262,3 +262,129 @@ extension Tag {
         ("Blue Gray", "#546E7A")
     ]
 }
+
+// MARK: - Tag Display Helpers (QUI-153)
+
+extension Tag {
+    /// Returns the display color for a tag based on common tag names
+    /// Follows QUI-153 color specifications
+    func colorForDisplay() -> Color {
+        let normalized = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Check if tag has an explicit color set
+        if let hexColor = color, let customColor = Color(hex: hexColor) {
+            return customColor
+        }
+
+        // Map common tag names to their semantic colors
+        switch normalized {
+        case "contact", "contacts", "business-card":
+            return .blue
+        case "event", "events", "calendar":
+            return .purple
+        case "todo", "task", "tasks", "checklist":
+            return .orange
+        case "meeting", "meetings", "call", "calls":
+            return Color(red: 20/255, green: 100/255, blue: 100/255) // Teal
+        case "recipe", "recipes", "cooking":
+            return .red
+        case "general", "note", "notes":
+            return .forestDark
+        case "email", "draft", "message":
+            return Color(red: 139/255, green: 69/255, blue: 119/255) // Plum
+        case "reminder", "reminders":
+            return Color(red: 220/255, green: 88/255, blue: 88/255) // Coral red
+        case "expense", "expenses", "receipt":
+            return Color(red: 46/255, green: 139/255, blue: 87/255) // Sea green
+        case "shopping", "groceries":
+            return Color(red: 255/255, green: 140/255, blue: 0/255) // Dark orange
+        case "idea", "ideas", "brainstorm":
+            return Color(red: 255/255, green: 215/255, blue: 0/255) // Gold
+        case "journal", "diary":
+            return Color(red: 70/255, green: 130/255, blue: 180/255) // Steel blue
+        default:
+            // Default to forest green for unknown tags
+            return .forestMedium
+        }
+    }
+
+    /// Icon name for the tag (based on common tag names)
+    var iconName: String {
+        let normalized = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+
+        switch normalized {
+        case "contact", "contacts", "business-card":
+            return "person.crop.circle.fill"
+        case "event", "events", "calendar":
+            return "calendar"
+        case "todo", "task", "tasks", "checklist":
+            return "checkmark.circle.fill"
+        case "meeting", "meetings", "call", "calls":
+            return "person.2.fill"
+        case "recipe", "recipes", "cooking":
+            return "fork.knife"
+        case "email", "draft", "message":
+            return "envelope.fill"
+        case "reminder", "reminders":
+            return "bell.fill"
+        case "expense", "expenses", "receipt":
+            return "dollarsign.circle.fill"
+        case "shopping", "groceries":
+            return "cart.fill"
+        case "idea", "ideas", "brainstorm":
+            return "lightbulb.fill"
+        case "journal", "diary":
+            return "book.fill"
+        case "general", "note", "notes":
+            return "doc.text.fill"
+        default:
+            return "tag.fill"
+        }
+    }
+}
+
+// MARK: - Note Extensions for Tag Display (QUI-153)
+
+extension Note {
+    /// Primary tag for display (first tag entity)
+    var primaryTag: Tag? {
+        sortedTagEntities.first
+    }
+
+    /// Secondary tags (all tags except the first one)
+    var secondaryTags: [Tag] {
+        guard sortedTagEntities.count > 1 else { return [] }
+        return Array(sortedTagEntities.dropFirst())
+    }
+
+    /// Returns the primary tag color for borders and accents
+    var primaryTagColor: Color {
+        primaryTag?.colorForDisplay() ?? .forestMedium
+    }
+
+    /// Whether the note has been enhanced with LLM
+    var isLlmEnhanced: Bool {
+        processingState == .enhanced
+    }
+
+    /// Returns count of linked/related notes
+    var relatedNotesCount: Int {
+        (noteLinksFrom?.count ?? 0) + (noteLinksTo?.count ?? 0)
+    }
+
+    /// Word count for metadata display
+    var wordCount: Int {
+        content.components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .count
+    }
+
+    /// Preview text (first 2-3 lines)
+    var previewText: String {
+        let lines = content.components(separatedBy: .newlines)
+            .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+
+        // Return first 3 non-empty lines
+        return lines.prefix(3).joined(separator: "\n")
+    }
+}
