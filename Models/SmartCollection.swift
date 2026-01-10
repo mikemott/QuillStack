@@ -151,8 +151,13 @@ class SmartCollectionGenerator {
         request.predicate = collection.predicate
         request.fetchLimit = 1
 
-        let count = (try? context.count(for: request)) ?? 0
-        return count > 0
+        do {
+            let count = try context.count(for: request)
+            return count > 0
+        } catch {
+            print("⚠️ SmartCollection: Failed to count notes for collection '\(collection.id)': \(error)")
+            return false
+        }
     }
 
     /// Fetch notes for a specific collection
@@ -161,7 +166,12 @@ class SmartCollectionGenerator {
         request.predicate = collection.predicate
         request.sortDescriptors = collection.sortDescriptors
 
-        return (try? context.fetch(request)) ?? []
+        do {
+            return try context.fetch(request)
+        } catch {
+            print("⚠️ SmartCollection: Failed to fetch notes for collection '\(collection.id)': \(error)")
+            return []
+        }
     }
 
     /// Count notes in a collection
@@ -169,7 +179,12 @@ class SmartCollectionGenerator {
         let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
         request.predicate = collection.predicate
 
-        return (try? context.count(for: request)) ?? 0
+        do {
+            return try context.count(for: request)
+        } catch {
+            print("⚠️ SmartCollection: Failed to count notes for collection '\(collection.id)': \(error)")
+            return 0
+        }
     }
 
     // MARK: - Private Helpers
@@ -180,7 +195,10 @@ class SmartCollectionGenerator {
         let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
         request.predicate = NSPredicate(format: "isArchived == NO")
 
-        guard let notes = try? context.fetch(request) else { return [] }
+        guard let notes = try? context.fetch(request) else {
+            print("⚠️ SmartCollection: Failed to fetch notes for people collection generation")
+            return []
+        }
 
         var peopleSet = Set<String>()
         let mentionPattern = /@(\w+)/
@@ -188,31 +206,24 @@ class SmartCollectionGenerator {
         for note in notes {
             guard let content = note.value(forKey: "content") as? String else { continue }
 
-            // Extract @mentions
-            if let regex = try? NSRegularExpression(pattern: mentionPattern) {
-                let matches = regex.matches(in: content, range: NSRange(content.startIndex..., in: content))
-                for match in matches {
-                    if let range = Range(match.range(at: 1), in: content) {
-                        let name = String(content[range])
-                        peopleSet.insert(name)
-                    }
-                }
+            // Extract @mentions using modern Swift regex API
+            for match in content.matches(of: mentionPattern) {
+                let (_, nameSubstring) = match.output
+                peopleSet.insert(String(nameSubstring))
             }
         }
 
-        // Create collections for people with multiple mentions
-        var collections: [SmartCollection] = []
-        for person in peopleSet {
+        // Create collections for people with multiple mentions and pre-calculate counts
+        let collectionsWithCounts = peopleSet.compactMap { person -> (collection: SmartCollection, count: Int)? in
             let collection = SmartCollection.person(name: person)
-            if countNotes(for: collection) > 0 {
-                collections.append(collection)
-            }
+            let count = countNotes(for: collection)
+            return count > 0 ? (collection, count) : nil
         }
 
         // Sort by note count (descending)
-        return collections.sorted { collection1, collection2 in
-            countNotes(for: collection1) > countNotes(for: collection2)
-        }
+        return collectionsWithCounts
+            .sorted { $0.count > $1.count }
+            .map { $0.collection }
     }
 
     /// Generate tag collections from tag entities
@@ -220,23 +231,27 @@ class SmartCollectionGenerator {
         let request = NSFetchRequest<NSManagedObject>(entityName: "Tag")
         request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
 
-        guard let tags = try? context.fetch(request) else { return [] }
+        guard let tags = try? context.fetch(request) else {
+            print("⚠️ SmartCollection: Failed to fetch tags for collection generation")
+            return []
+        }
 
-        // Filter to tags with notes and create collections
-        let collections = tags.compactMap { tag -> SmartCollection? in
+        // Filter to tags with notes and create collections with pre-calculated counts
+        let collectionsWithCounts = tags.compactMap { tag -> (collection: SmartCollection, count: Int)? in
             guard let id = tag.value(forKey: "id") as? UUID,
                   let name = tag.value(forKey: "name") as? String,
                   let notes = tag.value(forKey: "notes") as? Set<NSManagedObject>,
                   !notes.isEmpty else {
                 return nil
             }
-            return SmartCollection.tagCollection(id: id, name: name)
+            let collection = SmartCollection.tagCollection(id: id, name: name)
+            let count = countNotes(for: collection)
+            return count > 0 ? (collection, count) : nil
         }
-        .filter { countNotes(for: $0) > 0 }
 
         // Sort by note count (descending)
-        return collections.sorted { collection1, collection2 in
-            countNotes(for: collection1) > countNotes(for: collection2)
-        }
+        return collectionsWithCounts
+            .sorted { $0.count > $1.count }
+            .map { $0.collection }
     }
 }

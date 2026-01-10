@@ -307,20 +307,25 @@ struct NoteListView: View {
 
     // MARK: - Note Grid
 
+    private var collectionsToDisplay: [(collection: SmartCollection, notes: [Note])] {
+        viewModel.collections.compactMap { collection in
+            let notes = viewModel.notesForCollection(collection.id)
+            if !notes.isEmpty || collection.id == "recent" || collection.id == "archive" {
+                return (collection, notes)
+            }
+            return nil
+        }
+    }
+
     private var noteGridContent: some View {
         ScrollView {
             VStack(spacing: 0) {
-                ForEach(viewModel.collections, id: \.id) { collection in
-                    let notes = viewModel.notesForCollection(collection.id)
-
-                    // Skip empty collections (except Recent and Archive)
-                    if !notes.isEmpty || collection.id == "recent" || collection.id == "archive" {
-                        SmartCollectionContainer(
-                            collection: collection,
-                            notes: notes
-                        )
-                        .padding(.bottom, 8)
-                    }
+                ForEach(collectionsToDisplay, id: \.collection.id) { item in
+                    SmartCollectionContainer(
+                        collection: item.collection,
+                        notes: item.notes
+                    )
+                    .padding(.bottom, 8)
                 }
             }
             .padding(.top, 8)

@@ -43,7 +43,8 @@ final class NoteViewModel {
         do {
             notes = try context.fetch(fetchRequest)
         } catch {
-            errorMessage = "Failed to load notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to fetch notes: \(error)")
+            errorMessage = "Unable to load notes. Please try again."
         }
 
         isLoading = false
@@ -87,7 +88,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete note: \(error)")
+            errorMessage = "Unable to delete note. Please try again."
             // Restore on failure
             fetchNotes()
         }
@@ -105,7 +107,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete note: \(error)")
+            errorMessage = "Unable to delete note. Please try again."
             fetchNotes()
         }
     }
@@ -126,7 +129,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete notes: \(error)")
+            errorMessage = "Unable to delete notes. Please try again."
             fetchNotes()
         }
     }
@@ -146,7 +150,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to archive note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to archive note: \(error)")
+            errorMessage = "Unable to archive note. Please try again."
             fetchNotes()
         }
     }
@@ -168,7 +173,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to archive notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to archive notes: \(error)")
+            errorMessage = "Unable to archive notes. Please try again."
             fetchNotes()
         }
     }
