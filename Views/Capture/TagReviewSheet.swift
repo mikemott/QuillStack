@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CoreData
+import OSLog
 
 /// Sheet for reviewing and accepting suggested tags after capture
 struct TagReviewSheet: View {
@@ -20,9 +21,12 @@ struct TagReviewSheet: View {
     @State private var selectedTags: Set<String> = []
     @State private var customTag: String = ""
     @State private var tagMetadata: [String: TagMetadata] = [:]
+    @State private var showErrorAlert: Bool = false
+    @State private var errorMessage: String = ""
     @FocusState private var isTextFieldFocused: Bool
 
     private let tagService = TagService.shared
+    private let logger = Logger(subsystem: "com.quillstack", category: "TagReview")
 
     init(note: Note, suggestedTags: [String]) {
         self.note = note
@@ -169,6 +173,11 @@ struct TagReviewSheet: View {
             .task {
                 await loadTagMetadata()
             }
+            .alert("Error Saving Tags", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
 
@@ -210,18 +219,26 @@ struct TagReviewSheet: View {
         // Save
         do {
             try viewContext.save()
+            logger.info("Successfully applied \(selectedTags.count) tags to note")
         } catch {
-            print("Error saving tags: \(error)")
+            logger.error("Failed to save tags: \(error.localizedDescription)")
+            errorMessage = "Failed to save tags. Please try again."
+            showErrorAlert = true
         }
     }
 
     // MARK: - Metadata Loading
 
     private func loadTagMetadata() async {
-        var metadata: [String: TagMetadata] = [:]
+        guard !suggestedTags.isEmpty else { return }
 
+        // Batch fetch all existing tags
+        let existingTags = Tag.find(names: suggestedTags, in: viewContext)
+        let existingTagsMap = Dictionary(uniqueKeysWithValues: existingTags.map { ($0.name, $0) })
+
+        var metadata: [String: TagMetadata] = [:]
         for tag in suggestedTags {
-            if let existingTag = Tag.find(name: tag, in: viewContext) {
+            if let existingTag = existingTagsMap[tag] {
                 metadata[tag] = TagMetadata(
                     usageCount: existingTag.noteCount,
                     isNew: false

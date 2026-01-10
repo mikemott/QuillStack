@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CoreData
+import OSLog
 
 /// Sheet for editing tags on a note
 struct TagEditorSheet: View {
@@ -19,9 +20,12 @@ struct TagEditorSheet: View {
     @State private var newTagText: String = ""
     @State private var suggestedTags: [TagSuggestion] = []
     @State private var isLoading: Bool = false
+    @State private var showErrorAlert: Bool = false
+    @State private var errorMessage: String = ""
     @FocusState private var isTextFieldFocused: Bool
 
     private let tagService = TagService.shared
+    private let logger = Logger(subsystem: "com.quillstack", category: "TagEditor")
 
     var body: some View {
         NavigationView {
@@ -154,6 +158,11 @@ struct TagEditorSheet: View {
                 await loadSuggestions()
                 isTextFieldFocused = true
             }
+            .alert("Error Saving Tag", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
 
@@ -185,6 +194,7 @@ struct TagEditorSheet: View {
         // Save immediately
         do {
             try viewContext.save()
+            logger.info("Successfully added tag: \(trimmed)")
             newTagText = ""
 
             // Reload suggestions
@@ -192,7 +202,9 @@ struct TagEditorSheet: View {
                 await loadSuggestions()
             }
         } catch {
-            print("Error saving tag: \(error)")
+            logger.error("Failed to save tag: \(error.localizedDescription)")
+            errorMessage = "Failed to add tag. Please try again."
+            showErrorAlert = true
         }
     }
 
@@ -202,13 +214,16 @@ struct TagEditorSheet: View {
         // Save immediately
         do {
             try viewContext.save()
+            logger.info("Successfully removed tag: \(tagName)")
 
             // Reload suggestions
             Task {
                 await loadSuggestions()
             }
         } catch {
-            print("Error removing tag: \(error)")
+            logger.error("Failed to remove tag: \(error.localizedDescription)")
+            errorMessage = "Failed to remove tag. Please try again."
+            showErrorAlert = true
         }
     }
 
@@ -226,29 +241,15 @@ struct TagEditorSheet: View {
         // 2. Tags not already applied to this note
         let topTags = Array(allTags.prefix(20))
 
-        // Fetch usage counts for each tag
-        let suggestions: [TagSuggestion] = await withTaskGroup(of: TagSuggestion?.self) { group in
-            for tagName in topTags {
-                group.addTask {
-                    guard let tag = Tag.find(name: tagName, in: viewContext) else {
-                        return nil
-                    }
-                    return TagSuggestion(
-                        tag: tagName,
-                        usageCount: tag.noteCount,
-                        isNew: false
-                    )
-                }
-            }
-
-            var results: [TagSuggestion] = []
-            for await suggestion in group {
-                if let suggestion = suggestion {
-                    results.append(suggestion)
-                }
-            }
-            return results.sorted { $0.usageCount > $1.usageCount }
-        }
+        // Batch fetch all tags
+        let existingTags = Tag.find(names: topTags, in: viewContext)
+        let suggestions = existingTags.map {
+            TagSuggestion(
+                tag: $0.name,
+                usageCount: $0.noteCount,
+                isNew: false
+            )
+        }.sorted { $0.usageCount > $1.usageCount }
 
         await MainActor.run {
             suggestedTags = suggestions

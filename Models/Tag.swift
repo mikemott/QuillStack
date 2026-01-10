@@ -83,6 +83,14 @@ extension Tag {
         return try? context.fetch(request).first
     }
 
+    /// Find multiple tags by names (batch fetch)
+    static func find(names: [String], in context: NSManagedObjectContext) -> [Tag] {
+        guard !names.isEmpty else { return [] }
+        let request = fetchRequest()
+        request.predicate = NSPredicate(format: "name IN[c] %@", names)
+        return (try? context.fetch(request)) ?? []
+    }
+
     /// Find or create a tag by name
     static func findOrCreate(
         name: String,
