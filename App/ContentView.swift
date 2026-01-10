@@ -14,21 +14,21 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
+            CameraView(isEmbeddedInTab: true)
+                .tabItem {
+                    Label("Capture", systemImage: "camera")
+                }
+                .tag(0)
+
             NoteListView()
                 .tabItem {
                     Label("Notes", systemImage: "doc.text")
                 }
-                .tag(0)
-
-            TypeGuideView()
-                .tabItem {
-                    Label("Type Guide", systemImage: "book.closed")
-                }
                 .tag(1)
 
-            StatisticsView()
+            NoteSearchView()
                 .tabItem {
-                    Label("Statistics", systemImage: "chart.bar.fill")
+                    Label("Search", systemImage: "magnifyingglass")
                 }
                 .tag(2)
 
