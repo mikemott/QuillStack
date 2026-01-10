@@ -21,7 +21,7 @@ final class CameraViewModel {
     private(set) var isProcessing = false
 
     // Section detection (QUI-159)
-    private(set) var showSectionPreview = false
+    var showSectionPreview = false
     private(set) var detectedSections: [DetectedSection] = []
     private(set) var sectionDetectionMethod: SectionDetectionResult.DetectionMethod = .none
     private var pendingProcessData: (ocrResult: OCRResult, image: UIImage)?
@@ -704,7 +704,7 @@ final class CameraViewModel {
         totalSections: Int,
         ocrResult: OCRResult,
         image: UIImage,
-        thumbnail: Data?,
+        thumbnail: UIImage?,
         learnedCorrections: [String: String]
     ) async {
         print("\n--- Section \(index + 1)/\(totalSections): \(section.noteType.displayName) ---")

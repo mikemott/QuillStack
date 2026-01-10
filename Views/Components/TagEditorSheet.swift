@@ -18,7 +18,7 @@ struct TagEditorSheet: View {
     @ObservedObject var note: Note
 
     @State private var newTagText: String = ""
-    @State private var suggestedTags: [TagSuggestion] = []
+    @State private var suggestedTags: [TagSuggestionItem] = []
     @State private var isLoading: Bool = false
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
@@ -244,7 +244,7 @@ struct TagEditorSheet: View {
         // Batch fetch all tags
         let existingTags = Tag.find(names: topTags, in: viewContext)
         let suggestions = existingTags.map {
-            TagSuggestion(
+            TagSuggestionItem(
                 tag: $0.name,
                 usageCount: $0.noteCount,
                 isNew: false
@@ -259,7 +259,7 @@ struct TagEditorSheet: View {
 
 // MARK: - Tag Suggestion Model
 
-struct TagSuggestion: Hashable {
+struct TagSuggestionItem: Hashable {
     let tag: String
     let usageCount: Int
     let isNew: Bool

@@ -706,17 +706,6 @@ struct MeetingDetails: Codable {
 
     // MARK: - Tag Suggestion (QUI-157)
 
-    /// Result from tag suggestion
-    struct TagSuggestionResult: Codable {
-        let primaryTag: String
-        let secondaryTags: [String]
-        let confidence: Double
-
-        var allTags: [String] {
-            [primaryTag] + secondaryTags
-        }
-    }
-
     /// Suggest tags for note content using LLM with vocabulary consistency
     /// - Parameters:
     ///   - content: The note content to analyze

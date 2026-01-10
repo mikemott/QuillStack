@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUI-146 Enhanced Visual Mockup - Type-Specific Treatments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f4f8f4 0%, #eef5ee 100%);
+            color: #2d4a2f;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e4d2f;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display';
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #4a6b4f;
+            margin-bottom: 48px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        /* Card Styles */
+        .note-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(30, 77, 47, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid;
+        }
+
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(30, 77, 47, 0.12);
+        }
+
+        .note-header {
+            padding: 20px 24px;
+            background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(250,248,246,0.5) 100%);
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .note-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e4d2f;
+            margin-bottom: 6px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display';
+        }
+
+        .note-meta {
+            font-size: 14px;
+            color: #4a6b4f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .note-content {
+            padding: 24px;
+            font-size: 16px;
+            line-height: 1.7;
+            background: #faf5f0;
+        }
+
+        /* Todo Specific */
+        .card-todo {
+            border-top-color: #b8860b;
+        }
+
+        .badge-todo { background: #b8860b; }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0e8d8;
+        }
+
+        .progress-arc {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: conic-gradient(#b8860b 0deg 154deg, #e8f0e8 154deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #b8860b;
+            position: relative;
+        }
+
+        .progress-arc::before {
+            content: '';
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            background: white;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .progress-arc span {
+            position: relative;
+            z-index: 1;
+            font-size: 13px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            transition: opacity 0.2s;
+        }
+
+        .checkbox-item.completed {
+            opacity: 0.6;
+        }
+
+        .checkbox-item.completed .checkbox-text {
+            text-decoration: line-through;
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #b8860b;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .checkbox.checked {
+            background: #b8860b;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .indent {
+            margin-left: 34px;
+            font-size: 14px;
+            color: #4a6b4f;
+        }
+
+        .priority-high {
+            border-left: 3px solid #dc5858;
+            padding-left: 10px;
+            margin-left: -10px;
+        }
+
+        /* Meeting Specific */
+        .card-meeting {
+            border-top-color: #146464;
+        }
+
+        .badge-meeting { background: #146464; }
+
+        .participants {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .participant-chip {
+            padding: 6px 12px;
+            background: rgba(20, 100, 100, 0.15);
+            color: #146464;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .section-header {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #146464;
+            margin: 20px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid rgba(20, 100, 100, 0.2);
+        }
+
+        .action-section {
+            border-left: 3px solid #146464;
+            padding-left: 16px;
+            margin: 16px 0;
+            background: rgba(20, 100, 100, 0.05);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 10px;
+            margin: 6px 0;
+        }
+
+        /* Email Specific */
+        .card-email {
+            border-top-color: #8b4577;
+        }
+
+        .badge-email { background: #8b4577; }
+
+        .email-header-fields {
+            background: rgba(139, 69, 119, 0.05);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .email-field {
+            margin: 6px 0;
+        }
+
+        .email-label {
+            color: #8b4577;
+            font-weight: 600;
+            display: inline-block;
+            width: 70px;
+        }
+
+        .email-quoted {
+            border-left: 3px solid #8b4577;
+            padding-left: 16px;
+            margin: 16px 0;
+            background: rgba(139, 69, 119, 0.05);
+            padding: 12px 16px;
+            font-style: italic;
+            color: #4a6b4f;
+        }
+
+        .email-signature {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed #d4e0d4;
+        }
+
+        /* Recipe Specific */
+        .card-recipe {
+            border-top-color: #cd5c5c;
+        }
+
+        .badge-recipe { background: #cd5c5c; }
+
+        .recipe-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: #4a6b4f;
+        }
+
+        .recipe-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-header-recipe {
+            font-size: 14px;
+            font-weight: 700;
+            color: #cd5c5c;
+            margin: 20px 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        .ingredient-qty {
+            font-weight: 700;
+            color: #2d4a2f;
+        }
+
+        .instruction-step {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #cd5c5c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 15px;
+        }
+
+        .temp-highlight {
+            background: rgba(205, 92, 92, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Contact Specific */
+        .card-contact {
+            border-top-color: #3478b4;
+        }
+
+        .badge-contact { background: #3478b4; }
+
+        .contact-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3478b4, #5a9fd4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 16px;
+        }
+
+        .contact-name {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e4d2f;
+            margin-bottom: 4px;
+        }
+
+        .contact-title {
+            text-align: center;
+            font-size: 15px;
+            color: #4a6b4f;
+            margin-bottom: 20px;
+        }
+
+        .contact-field {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #3478b4;
+            text-decoration: none;
+            transition: background 0.2s;
+            padding: 10px 12px;
+            margin: 0 -12px;
+            border-radius: 8px;
+        }
+
+        .contact-field:hover {
+            background: rgba(52, 120, 180, 0.1);
+        }
+
+        .contact-icon {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* Event Specific */
+        .card-event {
+            border-top-color: #4682b4;
+        }
+
+        .badge-event { background: #4682b4; }
+
+        .calendar-date {
+            width: 90px;
+            background: #4682b4;
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            padding: 12px 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(70, 130, 180, 0.3);
+        }
+
+        .calendar-month {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .calendar-day {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 4px 0;
+        }
+
+        .calendar-weekday {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .event-time {
+            font-size: 17px;
+            font-weight: 600;
+            color: #4682b4;
+            margin: 16px 0;
+        }
+
+        .event-duration {
+            font-size: 14px;
+            color: #4a6b4f;
+            margin-left: 28px;
+        }
+
+        .event-location {
+            color: #4682b4;
+            text-decoration: none;
+            margin: 12px 0;
+            display: block;
+        }
+
+        /* Shopping Specific */
+        .card-shopping {
+            border-top-color: #ff8c00;
+        }
+
+        .badge-shopping { background: #ff8c00; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ff8c00;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(255, 140, 0, 0.2);
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .shopping-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ff8c00;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .shopping-checkbox.checked {
+            background: #ff8c00;
+        }
+
+        .shopping-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .quantity-note {
+            color: #4a6b4f;
+            font-size: 14px;
+            margin-left: 4px;
+        }
+
+        .shopping-progress {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #f0e8d8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #4a6b4f;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #e8f0e8;
+            border-radius: 3px;
+            margin-left: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff8c00;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Expense/Receipt Specific */
+        .card-expense {
+            border-top-color: #2e8b57;
+        }
+
+        .badge-expense { background: #2e8b57; }
+
+        .receipt-merchant {
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #2d4a2f;
+            margin-bottom: 4px;
+        }
+
+        .receipt-address {
+            text-align: center;
+            font-size: 13px;
+            color: #4a6b4f;
+            margin-bottom: 2px;
+        }
+
+        .receipt-datetime {
+            text-align: center;
+            font-size: 13px;
+            color: #4a6b4f;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #d4e0d4;
+        }
+
+        .receipt-items {
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .receipt-item-name {
+            flex: 1;
+        }
+
+        .receipt-item-price {
+            font-weight: 600;
+            text-align: right;
+            min-width: 70px;
+        }
+
+        .receipt-divider {
+            border-top: 1px dashed #d4e0d4;
+            margin: 12px 0;
+        }
+
+        .receipt-subtotal {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .receipt-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 17px;
+            font-weight: 700;
+            border-top: 2px solid #2e8b57;
+            margin-top: 8px;
+            color: #2e8b57;
+        }
+
+        .receipt-payment {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed #d4e0d4;
+            font-size: 14px;
+            color: #4a6b4f;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(46, 139, 87, 0.15);
+            color: #2e8b57;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Code Specific */
+        .card-code {
+            border-top-color: #1e4d2f;
+        }
+
+        .badge-code { background: #1e4d2f; }
+
+        .code-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .language-tag {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e4d2f;
+            text-transform: lowercase;
+        }
+
+        .copy-button {
+            font-size: 12px;
+            padding: 6px 12px;
+            background: #1e4d2f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-content {
+            background: #1a1a1a;
+            color: #e8e8e8;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .code-line {
+            display: flex;
+            gap: 16px;
+        }
+
+        .line-number {
+            color: #666;
+            user-select: none;
+            text-align: right;
+            min-width: 24px;
+        }
+
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .function { color: #61afef; }
+        .comment { color: #5c6370; font-style: italic; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(30, 77, 47, 0.1);
+            color: #1e4d2f;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 6px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>Enhanced Type-Specific Designs</h1>
+            <p class="subtitle">Each note type gets distinctive, functional formatting</p>
+            <div>
+                <span class="feature-tag">Smart Titles</span>
+                <span class="feature-tag">OCR Cleanup</span>
+                <span class="feature-tag">Type-Specific Flourishes</span>
+                <span class="feature-tag">Visual Consistency</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- TODO CARD -->
+            <div class="note-card card-todo">
+                <div class="note-header">
+                    <span class="type-badge badge-todo">Todo</span>
+                    <div class="note-title">Weekend Errands</div>
+                    <div class="note-meta">
+                        <span>📅 Jan 6, 2026</span>
+                        <span>•</span>
+                        <span>3 of 7 tasks</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="progress-header">
+                        <span style="font-size: 15px; font-weight: 600; color: #b8860b;">Progress</span>
+                        <div class="progress-arc">
+                            <span>43%</span>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item completed">
+                        <div class="checkbox checked"></div>
+                        <div class="checkbox-text">Buy groceries</div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <div class="checkbox"></div>
+                        <div>
+                            <div class="checkbox-text">Call dentist for appointment</div>
+                            <div class="indent">📅 Due: Tomorrow</div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item priority-high">
+                        <div class="checkbox"></div>
+                        <div>
+                            <div class="checkbox-text">🔥 Submit tax documents (URGENT)</div>
+                            <div class="indent">⚠️ Priority: High</div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item completed">
+                        <div class="checkbox checked"></div>
+                        <div class="checkbox-text">Pick up dry cleaning</div>
+                    </div>
+
+                    <div class="checkbox-item completed">
+                        <div class="checkbox checked"></div>
+                        <div class="checkbox-text">Return library books</div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <div class="checkbox"></div>
+                        <div class="checkbox-text">Schedule car maintenance</div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <div class="checkbox"></div>
+                        <div class="checkbox-text">Plan birthday party</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEETING CARD -->
+            <div class="note-card card-meeting">
+                <div class="note-header">
+                    <span class="type-badge badge-meeting">Meeting</span>
+                    <div class="note-title">Meeting with Sarah - Q1 Planning</div>
+                    <div class="note-meta">
+                        <span>📅 Jan 6, 2026</span>
+                        <span>•</span>
+                        <span>2:30 PM</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="participants">
+                        <span class="participant-chip">👤 Mike</span>
+                        <span class="participant-chip">👤 Sarah</span>
+                        <span class="participant-chip">👤 Dev Team</span>
+                    </div>
+
+                    <div class="section-header">Discussion</div>
+                    <div class="bullet-item">
+                        <span>•</span>
+                        <span>Reviewed Q4 revenue metrics - exceeded targets by 15%</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span>•</span>
+                        <span>Platform migration timeline discussed</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span>•</span>
+                        <span>Need to prioritize mobile experience improvements</span>
+                    </div>
+
+                    <div class="action-section">
+                        <div class="section-header" style="border: none; margin-top: 0;">Action Items</div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-text"><strong>@Mike:</strong> Send revised proposal by Friday</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-text"><strong>@Sarah:</strong> Schedule follow-up with engineering</div>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <div class="checkbox-text"><strong>@Team:</strong> Begin migration testing</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 12px; background: rgba(20, 100, 100, 0.1); border-radius: 8px; font-size: 14px;">
+                        📌 <strong>Next Meeting:</strong> Jan 13 @ 2:30 PM
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMAIL CARD -->
+            <div class="note-card card-email">
+                <div class="note-header">
+                    <span class="type-badge badge-email">Email</span>
+                    <div class="note-title">Project Update</div>
+                    <div class="note-meta">
+                        <span>📧 Draft</span>
+                        <span>•</span>
+                        <span>Jan 6, 2026</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="email-header-fields">
+                        <div class="email-field">
+                            <span class="email-label">To:</span>
+                            <span>sarah@company.com</span>
+                        </div>
+                        <div class="email-field">
+                            <span class="email-label">Cc:</span>
+                            <span>team@company.com</span>
+                        </div>
+                        <div class="email-field">
+                            <span class="email-label">Subject:</span>
+                            <span>Re: Q4 Report Follow-up</span>
+                        </div>
+                    </div>
+
+                    <div style="margin: 20px 0;">
+                        <p style="margin-bottom: 12px;">Hi Sarah,</p>
+                        <p style="margin-bottom: 12px;">Thanks for sending over the Q4 numbers. They look great overall, but I have a few questions about the revenue figures.</p>
+
+                        <div class="email-quoted">
+                            &gt; The revenue figures seem off by about 15%. Can you double-check the source data from the finance team?
+                        </div>
+
+                        <p style="margin-top: 12px;">Could you verify this with accounting? I want to make sure we're presenting accurate data to the board.</p>
+                        <p style="margin-top: 12px;">Let me know if you need any help with the analysis.</p>
+                    </div>
+
+                    <div class="email-signature">
+                        <p>Best regards,</p>
+                        <p style="font-weight: 600;">Mike Johnson</p>
+                        <p style="font-size: 14px; color: #4a6b4f;">Senior Product Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECIPE CARD -->
+            <div class="note-card card-recipe">
+                <div class="note-header">
+                    <span class="type-badge badge-recipe">Recipe</span>
+                    <div class="note-title">🍪 Chocolate Chip Cookies</div>
+                    <div class="recipe-meta">
+                        <span class="recipe-meta-item">⏱ <strong>45 min</strong></span>
+                        <span>•</span>
+                        <span class="recipe-meta-item">🍽 <strong>24 cookies</strong></span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="section-header-recipe">Ingredients</div>
+
+                    <div class="ingredient-item">
+                        <div class="checkbox"></div>
+                        <span><span class="ingredient-qty">2 cups</span> all-purpose flour</span>
+                    </div>
+                    <div class="ingredient-item">
+                        <div class="checkbox"></div>
+                        <span><span class="ingredient-qty">1 cup</span> butter, softened</span>
+                    </div>
+                    <div class="ingredient-item">
+                        <div class="checkbox"></div>
+                        <span><span class="ingredient-qty">¾ cup</span> brown sugar</span>
+                    </div>
+                    <div class="ingredient-item">
+                        <div class="checkbox"></div>
+                        <span><span class="ingredient-qty">2</span> eggs</span>
+                    </div>
+                    <div class="ingredient-item">
+                        <div class="checkbox"></div>
+                        <span><span class="ingredient-qty">2 cups</span> chocolate chips</span>
+                    </div>
+
+                    <div class="section-header-recipe" style="margin-top: 24px;">Instructions</div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div>Preheat oven to <span class="temp-highlight">350°F</span> (175°C)</div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div>Mix butter and sugars until creamy, about <span class="temp-highlight">3 minutes</span></div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div>Beat in eggs one at a time, then stir in vanilla</div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">4</div>
+                        <div>Fold in chocolate chips and drop onto baking sheets</div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">5</div>
+                        <div>Bake for <span class="temp-highlight">10-12 min</span> until golden brown</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT CARD -->
+            <div class="note-card card-contact">
+                <div class="note-header">
+                    <span class="type-badge badge-contact">Contact</span>
+                    <div class="note-title">Business Card</div>
+                    <div class="note-meta">
+                        <span>📇 Jan 6, 2026</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="contact-avatar">MJ</div>
+                    <div class="contact-name">Mike Johnson</div>
+                    <div class="contact-title">Senior Product Manager</div>
+
+                    <a href="#" class="contact-field">
+                        <span class="contact-icon">🏢</span>
+                        <span>Acme Corporation</span>
+                    </a>
+
+                    <a href="tel:5551234567" class="contact-field">
+                        <span class="contact-icon">📱</span>
+                        <span>(555) 123-4567</span>
+                    </a>
+
+                    <a href="mailto:mike@acme.com" class="contact-field">
+                        <span class="contact-icon">✉️</span>
+                        <span>mike@acme.com</span>
+                    </a>
+
+                    <a href="#" class="contact-field">
+                        <span class="contact-icon">🔗</span>
+                        <span>linkedin.com/in/mikej</span>
+                    </a>
+
+                    <a href="#" class="contact-field">
+                        <span class="contact-icon">📍</span>
+                        <span>San Francisco, CA</span>
+                    </a>
+
+                    <div style="margin-top: 24px; text-align: center;">
+                        <button style="padding: 12px 24px; background: #3478b4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px;">
+                            📇 Add to Contacts
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVENT CARD -->
+            <div class="note-card card-event">
+                <div class="note-header">
+                    <span class="type-badge badge-event">Event</span>
+                    <div class="note-title">Team Offsite</div>
+                    <div class="note-meta">
+                        <span>📅 Upcoming</span>
+                        <span>•</span>
+                        <span>In 9 days</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div style="display: flex; gap: 20px; align-items: flex-start;">
+                        <div class="calendar-date">
+                            <div class="calendar-month">JAN</div>
+                            <div class="calendar-day">15</div>
+                            <div class="calendar-weekday">WED</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="event-time">
+                                ⏰ 9:00 AM - 5:00 PM
+                                <div class="event-duration">└─ 8 hours</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" class="event-location">
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">📍 Palo Alto Community Center</div>
+                        <div style="font-size: 14px; color: #4a6b4f; margin-left: 24px;">123 Main Street, Palo Alto, CA</div>
+                    </a>
+
+                    <div style="margin-top: 20px; padding: 12px; background: rgba(70, 130, 180, 0.1); border-radius: 8px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">👥 Attendees</div>
+                        <div style="font-size: 14px; color: #4a6b4f;">Mike, Sarah, Dev Team +12 others</div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e8f0e8;">
+                        <div style="font-weight: 600; margin-bottom: 8px; font-size: 14px;">📝 Notes</div>
+                        <div style="font-size: 15px; line-height: 1.6;">Bring laptop and presentation materials. Lunch will be provided. Dress code: business casual.</div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button style="padding: 12px 24px; background: #4682b4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px;">
+                            📅 Add to Calendar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOPPING CARD -->
+            <div class="note-card card-shopping">
+                <div class="note-header">
+                    <span class="type-badge badge-shopping">Shopping</span>
+                    <div class="note-title">🛒 Weekly Grocery Run</div>
+                    <div class="note-meta">
+                        <span>📅 Jan 6, 2026</span>
+                        <span>•</span>
+                        <span>Target Store</span>
+                    </div>
+                </div>
+                <div class="note-content">
+                    <div class="category-header">
+                        <span>🥛</span>
+                        <span>Dairy</span>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox"></div>
+                        <span>Milk <span class="quantity-note">(2%, 1 gallon)</span></span>
+                    </div>
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox checked"></div>
+                        <span style="text-decoration: line-through; opacity: 0.6;">Greek yogurt <span class="quantity-note">(×2)</span></span>
+                    </div>
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox checked"></div>
+                        <span style="text-decoration: line-through; opacity: 0.6;">Butter</span>
+                    </div>
+
+                    <div class="category-header">
+                        <span>🥬</span>
+                        <span>Produce</span>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox"></div>
+                        <span>Bananas</span>
+                    </div>
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox"></div>
+                        <span>Spinach <span class="quantity-note">(2 bags)</span></span>
+                    </div>
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox"></div>
+                        <span>Avocados <span class="quantity-note">(×4)</span></span>
+                    </div>
+
+                    <div class="category-header">
+                        <span>🍞</span>
+                        <span>Bakery</span>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-checkbox"></div>
+                        <span>Sourdough bread</span>
+                    </div>
+
+                    <div class="shopping-progress">
+                        <span class="progress-text">✓ 2 of 8 items</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPENSE/RECEIPT CARD -->
+            <div class="note-card card-expense">
+                <div class="note-header">
+                    <span class="type-badge badge-expense">Expense</span>
+                    <div class="note-title">Coffee Shop Receipt</div>
+                    <div class="note-meta">
+                        <span>💳 Jan 6, 2026</span>
+                        <span>•</span>
+                        <span>$10.04</span>
+                    </div>
+                </div>
+                <div class="note-content" style="background: linear-gradient(to bottom, #faf9f7 0%, #f8f6f4 100%);">
+                    <div class="receipt-merchant">COFFEE HOUSE</div>
+                    <div class="receipt-address">123 Main Street</div>
+                    <div class="receipt-address">San Francisco, CA 94102</div>
+                    <div class="receipt-datetime">Jan 6, 2026 • 2:34 PM</div>
+
+                    <div class="receipt-items">
+                        <div class="receipt-item">
+                            <span class="receipt-item-name">Latte (Grande)</span>
+                            <span class="receipt-item-price">$5.50</span>
+                        </div>
+                        <div class="receipt-item">
+                            <span class="receipt-item-name">Almond Croissant</span>
+                            <span class="receipt-item-price">$3.75</span>
+                        </div>
+                        <div class="receipt-item">
+                            <span class="receipt-item-name">Tip (20%)</span>
+                            <span class="receipt-item-price">$2.00</span>
+                        </div>
+
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-subtotal">
+                            <span>Subtotal</span>
+                            <span>$9.25</span>
+                        </div>
+                        <div class="receipt-subtotal">
+                            <span>Tax (8.5%)</span>
+                            <span>$0.79</span>
+                        </div>
+
+                        <div class="receipt-total">
+                            <span>TOTAL</span>
+                            <span>$10.04</span>
+                        </div>
+                    </div>
+
+                    <div class="receipt-payment">
+                        <div style="margin-bottom: 8px;">💳 Visa ****4242</div>
+                        <div>
+                            <span class="category-tag">📁 Food & Dining</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button style="padding: 10px 20px; background: #2e8b57; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                            💼 Export to Expenses
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CODE CARD -->
+            <div class="note-card card-code">
+                <div class="note-header">
+                    <span class="type-badge badge-code">Code</span>
+                    <div class="note-title">Swift Greeting Function</div>
+                    <div class="note-meta">
+                        <span>💻 Jan 6, 2026</span>
+                    </div>
+                </div>
+                <div class="note-content" style="padding: 0;">
+                    <div class="code-header-bar">
+                        <span class="language-tag">swift</span>
+                        <button class="copy-button">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <div class="code-content">
+<div class="code-line"><span class="line-number">1</span><span><span class="keyword">func</span> <span class="function">greet</span>(name: <span class="keyword">String</span>) {</span></div>
+<div class="code-line"><span class="line-number">2</span><span>    <span class="keyword">let</span> message = <span class="string">"Hello, "</span></span></div>
+<div class="code-line"><span class="line-number">3</span><span>        + name + <span class="string">"!"</span></span></div>
+<div class="code-line"><span class="line-number">4</span><span>    <span class="function">print</span>(message)</span></div>
+<div class="code-line"><span class="line-number">5</span><span>}</span></div>
+<div class="code-line"><span class="line-number">6</span><span></span></div>
+<div class="code-line"><span class="line-number">7</span><span class="comment">// Usage for welcome screen</span></div>
+<div class="code-line"><span class="line-number">8</span><span><span class="function">greet</span>(name: <span class="string">"User"</span>)</span></div>
+                    </div>
+                    <div style="padding: 16px; background: #faf5f0; border-top: 1px solid #e0e0e0; font-size: 14px; color: #4a6b4f;">
+                        📝 <strong>Note:</strong> Use this for the welcome screen personalization
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 16px rgba(30, 77, 47, 0.08); text-align: center;">
+            <h2 style="font-size: 28px; margin-bottom: 16px; color: #1e4d2f;">Key Features in This Design</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 32px; text-align: left;">
+                <div>
+                    <div style="font-size: 20px; margin-bottom: 8px;">🎯</div>
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #1e4d2f;">Type-Specific Layouts</h3>
+                    <p style="font-size: 14px; color: #4a6b4f; line-height: 1.6;">Each type has unique structure optimized for its content</p>
+                </div>
+                <div>
+                    <div style="font-size: 20px; margin-bottom: 8px;">✨</div>
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #1e4d2f;">Functional Flourishes</h3>
+                    <p style="font-size: 14px; color: #4a6b4f; line-height: 1.6;">Visual elements that enhance usability, not just decorate</p>
+                </div>
+                <div>
+                    <div style="font-size: 20px; margin-bottom: 8px;">🎨</div>
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #1e4d2f;">Consistent Color System</h3>
+                    <p style="font-size: 14px; color: #4a6b4f; line-height: 1.6;">Badge colors used thoughtfully throughout each type</p>
+                </div>
+                <div>
+                    <div style="font-size: 20px; margin-bottom: 8px;">📱</div>
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #1e4d2f;">iOS-Native Feel</h3>
+                    <p style="font-size: 14px; color: #4a6b4f; line-height: 1.6;">Design language that feels at home on iOS</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 32px; border-top: 2px solid #e8f0e8;">
+                <p style="font-size: 18px; font-weight: 600; color: #1e4d2f; margin-bottom: 12px;">Ready to implement this design system?</p>
+                <p style="font-size: 15px; color: #4a6b4f;">Combines consistency with distinctive character for each note type</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
