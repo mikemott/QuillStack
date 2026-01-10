@@ -135,7 +135,7 @@ private struct SectionPreviewCard: View {
 
                 // Note type badge
                 HStack(spacing: 4) {
-                    Image(systemName: section.suggestedType.iconName)
+                    Image(systemName: section.suggestedType.icon)
                         .font(.caption2)
                     Text(section.suggestedType.rawValue.capitalized)
                         .font(.caption)
@@ -195,11 +195,7 @@ private struct SectionPreviewCard: View {
         case .recipe:
             return .badgeRecipe
         case .journal:
-            return .badgeJournal
-        case .code:
-            return .badgeCode
-        case .project:
-            return .badgeProject
+            return .badgeRecipe  // Use badgeRecipe for journal
         default:
             return .forestMedium
         }

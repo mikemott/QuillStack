@@ -62,7 +62,7 @@ struct TagReviewSheet: View {
                                 .textCase(.uppercase)
                                 .tracking(0.5)
 
-                            FlowLayout(spacing: 10) {
+                            WrapFlowLayout(spacing: 10) {
                                 ForEach(suggestedTags, id: \.self) { tag in
                                     TagChip(
                                         tag: tag,
@@ -125,7 +125,7 @@ struct TagReviewSheet: View {
                     // Custom tags added
                     if !customTags.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            FlowLayout(spacing: 10) {
+                            WrapFlowLayout(spacing: 10) {
                                 ForEach(Array(customTags), id: \.self) { tag in
                                     TagChip(
                                         tag: tag,
