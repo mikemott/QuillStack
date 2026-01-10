@@ -19,10 +19,11 @@ final class NoteViewModel {
     var errorMessage: String?
 
     private let context = CoreDataStack.shared.persistentContainer.viewContext
-    private lazy var collectionGenerator = SmartCollectionGenerator(context: context)
+    @ObservationIgnored private var collectionGenerator: SmartCollectionGenerator
     private var cancellables = Set<AnyCancellable>()
 
     init() {
+        self.collectionGenerator = SmartCollectionGenerator(context: context)
         fetchNotes()
         generateSmartCollections()
         observeExternalChanges()

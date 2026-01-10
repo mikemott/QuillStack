@@ -258,7 +258,7 @@
 		2796C1EE2EEB800000E05291 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		2796C1EF2EEB800000E05291 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicePrewarmer.swift; sourceTree = "<group>"; };
-		29801D67A848D650DD113539 /* SmartCollectionSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmartCollectionSection.swift; path = Views/Notes/SmartCollectionSection.swift; sourceTree = "<group>"; };
+		29801D67A848D650DD113539 /* SmartCollectionSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmartCollectionSection.swift; path = SmartCollectionSection.swift; sourceTree = "<group>"; };
 		2D2E7B8EA2CEB1599D41CA8B /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoFormatter.swift; path = NoteFormatters/TodoFormatter.swift; sourceTree = "<group>"; };
 		337962D879C8484B0303AE51 /* DataExtractionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DataExtractionService.swift; path = Services/DataExtractionService.swift; sourceTree = "<group>"; };
 		386F4916249868701DAC4452 /* ContactFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ContactFormatter.swift; sourceTree = "<group>"; };
@@ -357,7 +357,7 @@
 		F7D2B95E93FD91C22122AC50 /* ShoppingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ShoppingFormatter.swift; sourceTree = "<group>"; };
 		F9E341F9369CC4BE46FF32EA /* ShoppingExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShoppingExtractor.swift; path = ShoppingExtractor.swift; sourceTree = "<group>"; };
 		FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationAnalytics.swift; path = Services/ClassificationAnalytics.swift; sourceTree = "<group>"; };
-		FC88059732A71C880E86274B /* SmartCollection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmartCollection.swift; path = Models/SmartCollection.swift; sourceTree = "<group>"; };
+		FC88059732A71C880E86274B /* SmartCollection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmartCollection.swift; path = SmartCollection.swift; sourceTree = "<group>"; };
 		FD93D4AC20AA54EDCC5B2DCC /* NoteLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLink.swift; path = NoteLink.swift; sourceTree = "<group>"; };
 		FF994FFEA388D998DB681214 /* NetworkAvailability.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NetworkAvailability.swift; path = Services/NetworkAvailability.swift; sourceTree = "<group>"; };
 		FL0000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
