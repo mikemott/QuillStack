@@ -50,7 +50,9 @@
 		2796C1F02EEB800000E05291 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EE2EEB800000E05291 /* LLMService.swift */; };
 		2796C1F12EEB800000E05291 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1EF2EEB800000E05291 /* SettingsView.swift */; };
 		2796C1FF2EEB810000E05291 /* ServicePrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2796C1FE2EEB810000E05291 /* ServicePrewarmer.swift */; };
+		28A4A272CEAAC8D6FF162F9A /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BECB7ECF766886EF538E0D1 /* TagChip.swift */; };
 		29CBCDDE52F823B896AD7A0C /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70B286A2AC36CA436C77ACE /* StatisticsView.swift */; };
+		2DC2589DF5F2534E54DF3096 /* TagEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9F0B1FE5164EA9348256CA /* TagEditorSheet.swift */; };
 		30B2A2DC36408817230AE3E2 /* CalendarServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */; };
 		33C82A33FA609305832D5420 /* IdeaFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBDE2D5B236875C058D9D95 /* IdeaFormatter.swift */; };
 		3623F8A9B5C16644C809A436 /* SectionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC44C5D8F347298D03558E26 /* SectionDetector.swift */; };
@@ -73,6 +75,7 @@
 		76196027B23F99473691C734 /* LLMCostTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8527FC86F0BDC08F8D2722AA /* LLMCostTracker.swift */; };
 		7BBA236D7D0C755FFF969A3A /* NoteTypePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */; };
 		7F8AFA2A88D58A9D9729204B /* DetailViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135689AE59463E16DB510DA6 /* DetailViewFactory.swift */; };
+		87482E0E50795EABAF745640 /* TagReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75923A77DDBBA104329A1510 /* TagReviewSheet.swift */; };
 		8B13E42E8380F11789CB9881 /* TodoFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D2E7B8EA2CEB1599D41CA8B /* TodoFormatter.swift */; };
 		8CC9CAC1B76D51B8129A8E61 /* TypeGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CBC205145101FF179EBE6E /* TypeGuideView.swift */; };
 		913ADB2ED128AEA3957A143B /* ClassificationAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */; };
@@ -224,6 +227,7 @@
 		0E8E64E16D79BD59263523EC /* FormatterRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FormatterRegistry.swift; path = NoteFormatters/FormatterRegistry.swift; sourceTree = "<group>"; };
 		10B01C18510FA7EF4FB1FBA9 /* LearnedCorrectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LearnedCorrectionsView.swift; sourceTree = "<group>"; };
 		135689AE59463E16DB510DA6 /* DetailViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DetailViewFactory.swift; path = Services/DetailViewFactory.swift; sourceTree = SOURCE_ROOT; };
+		1BECB7ECF766886EF538E0D1 /* TagChip.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
 		21E4ACB1D4664F76A0AF8827 /* TitleExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TitleExtractor.swift; path = TitleExtractor.swift; sourceTree = "<group>"; };
 		2796C1572EEB51D800E05291 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2796C1852EEB552B00E05291 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -281,6 +285,7 @@
 		71C1472FFE3770507EE2E439 /* FormatterRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FormatterRegistry.swift; path = NoteFormatters/FormatterRegistry.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
 		747D69009C07CE6E7FD6BC75 /* WrapFlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WrapFlowLayout.swift; path = Views/Components/WrapFlowLayout.swift; sourceTree = "<group>"; };
+		75923A77DDBBA104329A1510 /* TagReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagReviewSheet.swift; sourceTree = "<group>"; };
 		775095B1C35805CEE7B7369D /* OCRServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OCRServiceProtocol.swift; path = Services/Protocols/OCRServiceProtocol.swift; sourceTree = SOURCE_ROOT; };
 		7A08139436B3B898EDDD3A0E /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TodoFormatter.swift; path = NoteFormatters/TodoFormatter.swift; sourceTree = "<group>"; };
 		7A1D91437E3A8BF3AFE3CBF5 /* ProcessingQueue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProcessingQueue.swift; path = Services/ProcessingQueue.swift; sourceTree = "<group>"; };
@@ -332,6 +337,7 @@
 		E6CBC205145101FF179EBE6E /* TypeGuideView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeGuideView.swift; sourceTree = "<group>"; };
 		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedTodo.swift; path = ExtractedTodo.swift; sourceTree = "<group>"; };
+		EB9F0B1FE5164EA9348256CA /* TagEditorSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagEditorSheet.swift; sourceTree = "<group>"; };
 		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		F00200000000000D /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
@@ -633,6 +639,7 @@
 				2796C19E2EEB55EC00E05291 /* ImagePreviewView.swift */,
 				F002000000000019 /* PageNavigatorView.swift */,
 				D89A006CFE01BCF40C6A4AE5 /* SectionPreviewSheet.swift */,
+				75923A77DDBBA104329A1510 /* TagReviewSheet.swift */,
 			);
 			path = Capture;
 			sourceTree = "<group>";
@@ -699,6 +706,8 @@
 				FL0000000000000001 /* FlowLayout.swift */,
 				5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */,
 				637CA8617BAD387328C5B9C2 /* RelatedNotesSection.swift */,
+				EB9F0B1FE5164EA9348256CA /* TagEditorSheet.swift */,
+				1BECB7ECF766886EF538E0D1 /* TagChip.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1311,6 +1320,9 @@
 				02DA8BE8153C5E6E809F26BB /* WrapFlowLayout.swift in Sources */,
 				9ABD9CEDEE1503109DEC65EB /* SmartCollection.swift in Sources */,
 				93A4595617B3F0D6EE6283DB /* SmartCollectionSection.swift in Sources */,
+				87482E0E50795EABAF745640 /* TagReviewSheet.swift in Sources */,
+				2DC2589DF5F2534E54DF3096 /* TagEditorSheet.swift in Sources */,
+				28A4A272CEAAC8D6FF162F9A /* TagChip.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
