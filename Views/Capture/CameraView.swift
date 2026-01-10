@@ -19,6 +19,9 @@ struct CameraView: View {
     @State private var showingPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
 
+    /// When true, hides the close button (for use in tab bar)
+    var isEmbeddedInTab: Bool = false
+
     var body: some View {
         ZStack {
             // Dark background
@@ -131,24 +134,27 @@ struct CameraView: View {
 
     // MARK: - Camera Header
 
+    @ViewBuilder
     private var cameraHeader: some View {
-        HStack {
-            // Close button
-            Button(action: { dismiss() }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.forestLight)
-                    .frame(width: 40, height: 40)
-                    .background(Color.forestDark.opacity(0.3))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.forestMedium.opacity(0.3), lineWidth: 1)
-                    )
-                    .cornerRadius(10)
-            }
-            .accessibilityLabel("Close camera")
+        // Close button (only shown when presented as sheet/fullScreenCover)
+        if !isEmbeddedInTab {
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.forestLight)
+                        .frame(width: 40, height: 40)
+                        .background(Color.forestDark.opacity(0.3))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.forestMedium.opacity(0.3), lineWidth: 1)
+                        )
+                        .cornerRadius(10)
+                }
+                .accessibilityLabel("Close camera")
 
-            Spacer()
+                Spacer()
+            }
         }
     }
 
