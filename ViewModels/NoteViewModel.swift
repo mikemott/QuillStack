@@ -13,14 +13,19 @@ import Combine
 @Observable
 final class NoteViewModel {
     private(set) var notes: [Note] = []
+    private(set) var collections: [SmartCollection] = []
+    private(set) var collectionNotes: [String: [Note]] = [:] // Collection ID -> Notes
     private(set) var isLoading = false
     var errorMessage: String?
 
     private let context = CoreDataStack.shared.persistentContainer.viewContext
+    @ObservationIgnored private var collectionGenerator: SmartCollectionGenerator
     private var cancellables = Set<AnyCancellable>()
 
     init() {
+        self.collectionGenerator = SmartCollectionGenerator(context: context)
         fetchNotes()
+        generateSmartCollections()
         observeExternalChanges()
     }
 
@@ -39,10 +44,30 @@ final class NoteViewModel {
         do {
             notes = try context.fetch(fetchRequest)
         } catch {
-            errorMessage = "Failed to load notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to fetch notes: \(error)")
+            errorMessage = "Unable to load notes. Please try again."
         }
 
         isLoading = false
+    }
+
+    // MARK: - Smart Collections
+
+    func generateSmartCollections() {
+        // Generate all collections
+        collections = collectionGenerator.generateCollections()
+
+        // Fetch notes for each collection
+        collectionNotes = [:]
+        for collection in collections {
+            let notes = collectionGenerator.fetchNotes(for: collection)
+                .compactMap { $0 as? Note }
+            collectionNotes[collection.id] = notes
+        }
+    }
+
+    func notesForCollection(_ collectionId: String) -> [Note] {
+        collectionNotes[collectionId] ?? []
     }
 
     // MARK: - Delete Operations
@@ -64,7 +89,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete note: \(error)")
+            errorMessage = "Unable to delete note. Please try again."
             // Restore on failure
             fetchNotes()
         }
@@ -82,7 +108,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete note: \(error)")
+            errorMessage = "Unable to delete note. Please try again."
             fetchNotes()
         }
     }
@@ -103,7 +130,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to delete notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to delete notes: \(error)")
+            errorMessage = "Unable to delete notes. Please try again."
             fetchNotes()
         }
     }
@@ -123,7 +151,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to archive note: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to archive note: \(error)")
+            errorMessage = "Unable to archive note. Please try again."
             fetchNotes()
         }
     }
@@ -145,7 +174,8 @@ final class NoteViewModel {
         do {
             try CoreDataStack.shared.saveViewContext()
         } catch {
-            errorMessage = "Failed to archive notes: \(error.localizedDescription)"
+            print("⚠️ NoteViewModel: Failed to archive notes: \(error)")
+            errorMessage = "Unable to archive notes. Please try again."
             fetchNotes()
         }
     }
@@ -163,6 +193,7 @@ final class NoteViewModel {
                     return
                 }
                 self?.fetchNotes()
+                self?.generateSmartCollections()
             }
             .store(in: &cancellables)
 
@@ -171,6 +202,7 @@ final class NoteViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.fetchNotes()
+                self?.generateSmartCollections()
             }
             .store(in: &cancellables)
     }
