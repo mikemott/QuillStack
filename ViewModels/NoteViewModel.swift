@@ -13,14 +13,18 @@ import Combine
 @Observable
 final class NoteViewModel {
     private(set) var notes: [Note] = []
+    private(set) var collections: [SmartCollection] = []
+    private(set) var collectionNotes: [String: [Note]] = [:] // Collection ID -> Notes
     private(set) var isLoading = false
     var errorMessage: String?
 
     private let context = CoreDataStack.shared.persistentContainer.viewContext
+    private lazy var collectionGenerator = SmartCollectionGenerator(context: context)
     private var cancellables = Set<AnyCancellable>()
 
     init() {
         fetchNotes()
+        generateSmartCollections()
         observeExternalChanges()
     }
 
@@ -43,6 +47,25 @@ final class NoteViewModel {
         }
 
         isLoading = false
+    }
+
+    // MARK: - Smart Collections
+
+    func generateSmartCollections() {
+        // Generate all collections
+        collections = collectionGenerator.generateCollections()
+
+        // Fetch notes for each collection
+        collectionNotes = [:]
+        for collection in collections {
+            let notes = collectionGenerator.fetchNotes(for: collection)
+                .compactMap { $0 as? Note }
+            collectionNotes[collection.id] = notes
+        }
+    }
+
+    func notesForCollection(_ collectionId: String) -> [Note] {
+        collectionNotes[collectionId] ?? []
     }
 
     // MARK: - Delete Operations
@@ -163,6 +186,7 @@ final class NoteViewModel {
                     return
                 }
                 self?.fetchNotes()
+                self?.generateSmartCollections()
             }
             .store(in: &cancellables)
 
@@ -171,6 +195,7 @@ final class NoteViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.fetchNotes()
+                self?.generateSmartCollections()
             }
             .store(in: &cancellables)
     }

@@ -308,90 +308,23 @@ struct NoteListView: View {
     // MARK: - Note Grid
 
     private var noteGridContent: some View {
-        List {
-            ForEach(viewModel.notes, id: \.objectID) { note in
-                HStack(spacing: 12) {
-                    // Selection indicator (shown in edit mode)
-                    if isEditing {
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if selectedNotes.contains(note) {
-                                    selectedNotes.remove(note)
-                                } else {
-                                    selectedNotes.insert(note)
-                                }
-                            }
-                        }) {
-                            Image(systemName: selectedNotes.contains(note) ? "checkmark.circle.fill" : "circle")
-                                .font(.system(size: 24))
-                                .foregroundColor(selectedNotes.contains(note) ? .forestDark : .textLight)
-                        }
-                        .buttonStyle(.plain)
-                        .transition(.scale.combined(with: .opacity))
-                    }
+        ScrollView {
+            VStack(spacing: 0) {
+                ForEach(viewModel.collections, id: \.id) { collection in
+                    let notes = viewModel.notesForCollection(collection.id)
 
-                    NoteCardView(note: note, isSelected: isEditing && selectedNotes.contains(note))
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if isEditing {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            if selectedNotes.contains(note) {
-                                selectedNotes.remove(note)
-                            } else {
-                                selectedNotes.insert(note)
-                            }
-                        }
-                    } else {
-                        selectedNote = note
-                    }
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: !isEditing) {
-                    if !isEditing {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                viewModel.deleteNote(note)
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
-                }
-                .swipeActions(edge: .leading, allowsFullSwipe: !isEditing) {
-                    if !isEditing {
-                        Button {
-                            withAnimation {
-                                viewModel.archiveNote(note)
-                            }
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
-                        .tint(.orange)
-                    }
-                }
-                .contextMenu {
-                    if !isEditing {
-                        Button(role: .destructive) {
-                            viewModel.deleteNote(note)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-
-                        Button {
-                            viewModel.archiveNote(note)
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
+                    // Skip empty collections (except Recent and Archive)
+                    if !notes.isEmpty || collection.id == "recent" || collection.id == "archive" {
+                        SmartCollectionContainer(
+                            collection: collection,
+                            notes: notes
+                        )
+                        .padding(.bottom, 8)
                     }
                 }
             }
+            .padding(.top, 8)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .animation(.easeInOut(duration: 0.2), value: isEditing)
     }
 
     // MARK: - Bulk Action Toolbar
