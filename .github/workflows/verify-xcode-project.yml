@@ -22,8 +22,8 @@ jobs:
         run: |
           echo "🔍 Checking for Swift files not added to Xcode project..."
 
-          # Find all Swift files (excluding Tests, Packages, and hidden directories)
-          SWIFT_FILES=$(find . -name "*.swift" -not -path "*/Tests/*" -not -path "*/.*/*" -not -path "*/Package.swift" -not -path "*/Packages/*" | sed 's|^\./||')
+          # Find all Swift files (excluding Tests, Packages, build, and hidden directories)
+          SWIFT_FILES=$(find . -name "*.swift" -not -path "*/Tests/*" -not -path "*/.*/*" -not -path "*/Package.swift" -not -path "*/Packages/*" -not -path "*/build/*" -not -path "*/DerivedData/*" | sed 's|^\./||')
 
           MISSING_FILES=""
 
