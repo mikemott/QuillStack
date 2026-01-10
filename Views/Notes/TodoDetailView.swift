@@ -16,6 +16,7 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
     @State private var showingSummarySheet: Bool = false
     @State private var showingRemindersSheet: Bool = false
     @State private var showingTypePicker: Bool = false
+    @State private var showingTagEditor: Bool = false // QUI-162
     @FocusState private var isAddingTask: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -101,6 +102,10 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
         }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
     }
 
     // MARK: - Add Task Row
@@ -135,6 +140,9 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
                 onSummarize: { showingSummarySheet = true }
             ),
             customActions: [
+                DetailAction(icon: "tag") {
+                    showingTagEditor = true
+                },
                 DetailAction(icon: "arrow.left.arrow.right.circle") {
                     showingTypePicker = true
                 }

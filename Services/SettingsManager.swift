@@ -132,6 +132,9 @@ final class SettingsManager {
         static let classificationConfidenceThreshold = "classificationConfidenceThreshold"
         static let alwaysAskForClassification = "alwaysAskForClassification"
         static let enableLLMClassification = "enableLLMClassification"
+
+        // Tag Settings (QUI-162)
+        static let showTagReviewAfterCapture = "showTagReviewAfterCapture"
     }
 
     // MARK: - Initialization
@@ -301,6 +304,17 @@ final class SettingsManager {
         }
     }
 
+    // MARK: - Tag Settings (QUI-162)
+
+    /// Show tag review sheet after capturing a note
+    /// When enabled, users can review and edit suggested tags before saving
+    /// Default: false
+    var showTagReviewAfterCapture: Bool = false {
+        didSet {
+            defaults.set(showTagReviewAfterCapture, forKey: Keys.showTagReviewAfterCapture)
+        }
+    }
+
     // MARK: - Computed Properties
 
     var hasAPIKey: Bool {
@@ -368,6 +382,9 @@ final class SettingsManager {
         classificationConfidenceThreshold = min(max(loadedThreshold, 0.5), 0.95) // Clamp to valid range
         alwaysAskForClassification = defaults.bool(forKey: Keys.alwaysAskForClassification)
         enableLLMClassification = defaults.object(forKey: Keys.enableLLMClassification) as? Bool ?? true
+
+        // Tag Settings (QUI-162)
+        showTagReviewAfterCapture = defaults.bool(forKey: Keys.showTagReviewAfterCapture)
     }
 
     // MARK: - Migration

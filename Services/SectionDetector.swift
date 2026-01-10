@@ -50,9 +50,9 @@ final class SectionDetector {
     private let textClassifier: TextClassifierProtocol
 
     init(llmService: LLMServiceProtocol = LLMService.shared,
-         textClassifier: TextClassifierProtocol = TextClassifier()) {
+         textClassifier: TextClassifierProtocol? = nil) {
         self.llmService = llmService
-        self.textClassifier = textClassifier
+        self.textClassifier = textClassifier ?? MainActor.assumeIsolated { TextClassifier() }
     }
 
     // MARK: - Public API
@@ -169,7 +169,7 @@ final class SectionDetector {
         let prompt = buildSectionDetectionPrompt(text: text)
 
         do {
-            let response = try await llmService.performAPIRequest(prompt: prompt, maxTokens: 1000)
+            let response = try await llmService.performRequest(prompt: prompt, maxTokens: 1000)
             return parseLLMSectionResponse(response: response, originalText: text)
         } catch {
             print("❌ LLM section detection failed: \(error.localizedDescription)")
@@ -351,9 +351,9 @@ extension NoteType {
         case "journal", "diary":
             return .journal
         case "code", "snippet":
-            return .code
+            return .general  // Code type removed, map to general
         case "project":
-            return .project
+            return .general  // Project type removed, map to general
         case "general", "note":
             return .general
         default:

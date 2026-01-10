@@ -35,11 +35,11 @@ final class ProcessingQueue {
     private var autoProcessTask: Task<Void, Never>?
 
     private init(
-        context: NSManagedObjectContext = CoreDataStack.shared.backgroundContext,
+        context: NSManagedObjectContext? = nil,
         llmService: LLMService = LLMService.shared,
         networkMonitor: NetworkMonitor = NetworkMonitor.shared
     ) {
-        self.context = context
+        self.context = context ?? CoreDataStack.shared.persistentContainer.newBackgroundContext()
         self.llmService = llmService
         self.networkMonitor = networkMonitor
 
@@ -104,7 +104,7 @@ final class ProcessingQueue {
         let noteIDs: [UUID] = await context.perform { [weak self] in
             guard let self = self else { return [] }
 
-            let request = Note.fetchRequest()
+            let request = NSFetchRequest<Note>(entityName: "Note")
             request.predicate = NSPredicate(
                 format: "processingStateRaw == %@",
                 NoteProcessingState.pendingEnhancement.rawValue
@@ -139,12 +139,12 @@ final class ProcessingQueue {
         let noteData: (content: String, noteType: String)? = await context.perform { [weak self] in
             guard let self = self else { return nil }
 
-            let request = Note.fetchRequest()
+            let request = NSFetchRequest<Note>(entityName: "Note")
             request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
             request.fetchLimit = 1
 
             guard let note = try? self.context.fetch(request).first else {
-                return nil
+                return nil as (content: String, noteType: String)?
             }
 
             // Update state to processing
@@ -164,7 +164,7 @@ final class ProcessingQueue {
             await context.perform { [weak self] in
                 guard let self = self else { return }
 
-                let request = Note.fetchRequest()
+                let request = NSFetchRequest<Note>(entityName: "Note")
                 request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
                 request.fetchLimit = 1
 
@@ -182,7 +182,7 @@ final class ProcessingQueue {
             await context.perform { [weak self] in
                 guard let self = self else { return }
 
-                let request = Note.fetchRequest()
+                let request = NSFetchRequest<Note>(entityName: "Note")
                 request.predicate = NSPredicate(format: "id == %@", noteID as CVarArg)
                 request.fetchLimit = 1
 
@@ -199,7 +199,7 @@ final class ProcessingQueue {
         await context.perform { [weak self] in
             guard let self = self else { return }
 
-            let request = Note.fetchRequest()
+            let request = NSFetchRequest<Note>(entityName: "Note")
             request.predicate = NSPredicate(
                 format: "processingStateRaw == %@",
                 NoteProcessingState.failed.rawValue
@@ -220,7 +220,8 @@ final class ProcessingQueue {
     }
 
     deinit {
-        autoProcessTask?.cancel()
+        // Note: Cannot cancel autoProcessTask in deinit due to MainActor isolation
+        // The task will be cleaned up when the object is deallocated
         NotificationCenter.default.removeObserver(self)
     }
 }
