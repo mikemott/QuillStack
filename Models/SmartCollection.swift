@@ -96,9 +96,12 @@ extension SmartCollection {
     }
 
     /// Create a collection for notes mentioning a person
+    /// - Parameter name: The person's name (expected to contain only word characters from @mention extraction)
     static func person(name: String) -> SmartCollection {
-        SmartCollection(
-            id: "person-\(name)",
+        // Sanitize name to ensure safe ID generation (already validated by regex, but double-check)
+        let sanitizedName = name.replacingOccurrences(of: "[^\\w]", with: "", options: .regularExpression)
+        return SmartCollection(
+            id: "person-\(sanitizedName)",
             title: name,
             icon: "person",
             predicate: NSPredicate(format: "content CONTAINS[cd] %@ AND isArchived == NO", name),
@@ -209,7 +212,12 @@ class SmartCollectionGenerator {
             // Extract @mentions using modern Swift regex API
             for match in content.matches(of: mentionPattern) {
                 let (_, nameSubstring) = match.output
-                peopleSet.insert(String(nameSubstring))
+                let name = String(nameSubstring)
+
+                // Validate: length between 2-50 characters to avoid single-char or excessively long names
+                guard name.count >= 2 && name.count <= 50 else { continue }
+
+                peopleSet.insert(name)
             }
         }
 
