@@ -38,6 +38,48 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
     }
 
     var body: some View {
+        mainContent
+            .navigationBarHidden(true)
+            .onAppear {
+                parseEmailContent()
+            }
+            .onChange(of: toField) { _, _ in saveChanges() }
+            .onChange(of: ccField) { _, _ in saveChanges() }
+            .onChange(of: bccField) { _, _ in saveChanges() }
+            .onChange(of: subjectField) { _, _ in saveChanges() }
+            .onChange(of: bodyContent) { _, _ in saveChanges() }
+            .sheet(isPresented: $showingMailComposer) {
+                MailComposerView(
+                    toRecipients: parseRecipients(toField),
+                    ccRecipients: parseRecipients(ccField),
+                    bccRecipients: parseRecipients(bccField),
+                    subject: subjectField,
+                    body: bodyContent
+                )
+            }
+            .alert("Cannot Send Email", isPresented: $showingMailError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Mail is not configured on this device. Please set up a mail account in Settings.")
+            }
+            .sheet(isPresented: $showingExportSheet) {
+                ExportSheet(note: note)
+                    .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showingSummarySheet) {
+                SummarySheet(note: note)
+                    .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showingTypePicker) {
+                NoteTypePickerSheet(note: note)
+            }
+            .sheet(isPresented: $showingTagEditor) {
+                TagEditorSheet(note: note)
+                    .presentationDetents([.medium, .large])
+            }
+    }
+
+    private var mainContent: some View {
         ZStack {
             Color.creamLight.ignoresSafeArea()
 
@@ -52,116 +94,101 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
                     classification: note.classification
                 )
 
-                // Email fields
-                ScrollView {
-                    VStack(spacing: 0) {
-                        // To field
-                        emailField(label: "To:", text: $toField, placeholder: "recipient@example.com")
-
-                        // CC/BCC toggle
-                        if !showCcBcc {
-                            Button(action: { withAnimation { showCcBcc = true } }) {
-                                HStack {
-                                    Spacer()
-                                    Text("Add Cc/Bcc")
-                                        .font(.serifCaption(13, weight: .medium))
-                                        .foregroundColor(.badgeEmail)
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                            }
-                        }
-
-                        if showCcBcc {
-                            Divider()
-                                .background(Color.forestDark.opacity(0.1))
-
-                            emailField(label: "Cc:", text: $ccField, placeholder: "cc@example.com")
-
-                            Divider()
-                                .background(Color.forestDark.opacity(0.1))
-
-                            emailField(label: "Bcc:", text: $bccField, placeholder: "bcc@example.com")
-                        }
-
-                        Divider()
-                            .background(Color.forestDark.opacity(0.1))
-
-                        // Subject field
-                        emailField(label: "Subject:", text: $subjectField, placeholder: "Email subject")
-
-                        Divider()
-                            .background(Color.forestDark.opacity(0.1))
-
-                        // Body - always editable
-                        TextEditor(text: $bodyContent)
-                            .font(.serifBody(16, weight: .regular))
-                            .foregroundColor(.textDark)
-                            .lineSpacing(6)
-                            .scrollContentBackground(.hidden)
-                            .frame(minHeight: 300)
-                            .padding(16)
-
-                        // Related notes section (QUI-161)
-                        if note.linkCount > 0 {
-                            RelatedNotesSection(note: note) { selectedNote in
-                                // TODO: Navigate to selected note
-                                print("Selected related note: \(selectedNote.id)")
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                        }
-                    }
-                }
-                .background(
-                    LinearGradient(
-                        colors: [Color.paperBeige.opacity(0.98), Color.paperTan.opacity(0.98)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                emailFieldsScrollView
 
                 // Bottom bar
                 bottomBar
             }
         }
-        .navigationBarHidden(true)
-        .onAppear {
-            parseEmailContent()
+    }
+
+    private var emailFieldsScrollView: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                // To field
+                emailField(label: "To:", text: $toField, placeholder: "recipient@example.com")
+
+                // CC/BCC toggle
+                ccBccToggleSection
+
+                if showCcBcc {
+                    ccBccFieldsSection
+                }
+
+                Divider()
+                    .background(Color.forestDark.opacity(0.1))
+
+                // Subject field
+                emailField(label: "Subject:", text: $subjectField, placeholder: "Email subject")
+
+                Divider()
+                    .background(Color.forestDark.opacity(0.1))
+
+                // Body - always editable
+                bodyEditorSection
+
+                // Related notes section (QUI-161)
+                relatedNotesSection
+            }
         }
-        .onChange(of: toField) { _, _ in saveChanges() }
-        .onChange(of: ccField) { _, _ in saveChanges() }
-        .onChange(of: bccField) { _, _ in saveChanges() }
-        .onChange(of: subjectField) { _, _ in saveChanges() }
-        .onChange(of: bodyContent) { _, _ in saveChanges() }
-        .sheet(isPresented: $showingMailComposer) {
-            MailComposerView(
-                toRecipients: parseRecipients(toField),
-                ccRecipients: parseRecipients(ccField),
-                bccRecipients: parseRecipients(bccField),
-                subject: subjectField,
-                body: bodyContent
+        .background(
+            LinearGradient(
+                colors: [Color.paperBeige.opacity(0.98), Color.paperTan.opacity(0.98)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
+        )
+    }
+
+    @ViewBuilder
+    private var ccBccToggleSection: some View {
+        if !showCcBcc {
+            Button(action: { withAnimation { showCcBcc = true } }) {
+                HStack {
+                    Spacer()
+                    Text("Add Cc/Bcc")
+                        .font(.serifCaption(13, weight: .medium))
+                        .foregroundColor(.badgeEmail)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
         }
-        .alert("Cannot Send Email", isPresented: $showingMailError) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Mail is not configured on this device. Please set up a mail account in Settings.")
+    }
+
+    private var ccBccFieldsSection: some View {
+        Group {
+            Divider()
+                .background(Color.forestDark.opacity(0.1))
+
+            emailField(label: "Cc:", text: $ccField, placeholder: "cc@example.com")
+
+            Divider()
+                .background(Color.forestDark.opacity(0.1))
+
+            emailField(label: "Bcc:", text: $bccField, placeholder: "bcc@example.com")
         }
-        .sheet(isPresented: $showingExportSheet) {
-            ExportSheet(note: note)
-                .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showingSummarySheet) {
-            SummarySheet(note: note)
-                .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showingTypePicker) {
-            NoteTypePickerSheet(note: note)
-        }
-        .sheet(isPresented: $showingTagEditor) {
-            TagEditorSheet(note: note)
-                .presentationDetents([.medium, .large])
+    }
+
+    private var bodyEditorSection: some View {
+        TextEditor(text: $bodyContent)
+            .font(.serifBody(16, weight: .regular))
+            .foregroundColor(.textDark)
+            .lineSpacing(6)
+            .scrollContentBackground(.hidden)
+            .frame(minHeight: 300)
+            .padding(16)
+    }
+
+    @ViewBuilder
+    private var relatedNotesSection: some View {
+        if note.linkCount > 0 {
+            RelatedNotesSection(note: note) { selectedNote in
+                // TODO: Navigate to selected note
+                print("Selected related note: \(selectedNote.id)")
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
         }
     }
 
