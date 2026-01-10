@@ -134,10 +134,11 @@ struct CameraView: View {
 
     // MARK: - Camera Header
 
+    @ViewBuilder
     private var cameraHeader: some View {
-        HStack {
-            // Close button (only shown when presented as sheet/fullScreenCover)
-            if !isEmbeddedInTab {
+        // Close button (only shown when presented as sheet/fullScreenCover)
+        if !isEmbeddedInTab {
+            HStack {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark")
                         .font(.system(size: 20, weight: .semibold))
@@ -151,9 +152,9 @@ struct CameraView: View {
                         .cornerRadius(10)
                 }
                 .accessibilityLabel("Close camera")
-            }
 
-            Spacer()
+                Spacer()
+            }
         }
     }
 
