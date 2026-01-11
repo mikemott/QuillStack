@@ -225,7 +225,6 @@
 		07232297C49D5ED086A1E66A /* NoteClassification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteClassification.swift; path = Models/NoteClassification.swift; sourceTree = "<group>"; };
 		0769835F4519A4CDD53060B7 /* ClaudePromptFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ClaudePromptFormatter.swift; sourceTree = "<group>"; };
 		07E6F59494460A36A7DF8048 /* NetworkMonitor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NetworkMonitor.swift; path = Services/NetworkMonitor.swift; sourceTree = "<group>"; };
-		09679EADB80526644E9EE222 /* SimpleWelcomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleWelcomeView.swift; path = Views/Onboarding/SimpleWelcomeView.swift; sourceTree = "<group>"; };
 		0A65C2142F7D9D2ECD2916D1 /* TodoFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodoFormatter.swift; sourceTree = "<group>"; };
 		0A8F4DDAE5FEEA7E9C76A236 /* ContactReviewSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactReviewSheet.swift; path = ContactReviewSheet.swift; sourceTree = "<group>"; };
 		0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventExtractor.swift; path = Extraction/EventExtractor.swift; sourceTree = "<group>"; };
@@ -274,7 +273,6 @@
 		386F4916249868701DAC4452 /* ContactFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ContactFormatter.swift; sourceTree = "<group>"; };
 		3A0750FC1DA17F5BABE085CA /* DependencyContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		3D42C1FE9085BA26990F8C4A /* UsageMetricsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UsageMetricsView.swift; sourceTree = "<group>"; };
-		3DA75A557001A1B9BD8A3E77 /* SimpleAPIKeySetupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleAPIKeySetupView.swift; path = Views/Onboarding/SimpleAPIKeySetupView.swift; sourceTree = "<group>"; };
 		446C5DEC8A600DE409E66C99 /* ExpenseFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ExpenseFormatter.swift; sourceTree = "<group>"; };
 		44FCC4A5617A1739F3890D5E /* JournalFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/JournalFormatter.swift; sourceTree = "<group>"; };
 		4615E33E3211A56DB3FCEBE3 /* MeetingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/MeetingFormatter.swift; sourceTree = "<group>"; };
@@ -348,7 +346,6 @@
 		E6CBC205145101FF179EBE6E /* TypeGuideView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TypeGuideView.swift; sourceTree = "<group>"; };
 		E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemindersServiceProtocol.swift; path = Protocols/RemindersServiceProtocol.swift; sourceTree = "<group>"; };
 		E9810C9B1A07EFD2C73649A6 /* ExtractedTodo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtractedTodo.swift; path = ExtractedTodo.swift; sourceTree = "<group>"; };
-		EAD567973CA7B50D92B3CE3B /* SimpleWelcomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleWelcomeView.swift; path = Views/Onboarding/SimpleWelcomeView.swift; sourceTree = "<group>"; };
 		EB9F0B1FE5164EA9348256CA /* TagEditorSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagEditorSheet.swift; sourceTree = "<group>"; };
 		F00200000000000B /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		F00200000000000C /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
@@ -375,11 +372,8 @@
 		F6E21F9CA4CFBAB20368840C /* CalendarServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarServiceProtocol.swift; path = Protocols/CalendarServiceProtocol.swift; sourceTree = "<group>"; };
 		F7D2B95E93FD91C22122AC50 /* ShoppingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/ShoppingFormatter.swift; sourceTree = "<group>"; };
 		F9E341F9369CC4BE46FF32EA /* ShoppingExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShoppingExtractor.swift; path = ShoppingExtractor.swift; sourceTree = "<group>"; };
-		F9F35129E294744E62C3066E /* SimpleOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleOnboardingView.swift; path = Views/Onboarding/SimpleOnboardingView.swift; sourceTree = "<group>"; };
-		FAFA37D70D6B2D46F83EAE6F /* SimpleOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleOnboardingView.swift; path = Views/Onboarding/SimpleOnboardingView.swift; sourceTree = "<group>"; };
 		FC24AFC5058E41E54029CC91 /* ClassificationAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationAnalytics.swift; path = Services/ClassificationAnalytics.swift; sourceTree = "<group>"; };
 		FC88059732A71C880E86274B /* SmartCollection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmartCollection.swift; path = SmartCollection.swift; sourceTree = "<group>"; };
-		FD201114B6BD52EAB5ADF2EF /* SimpleAPIKeySetupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SimpleAPIKeySetupView.swift; path = Views/Onboarding/SimpleAPIKeySetupView.swift; sourceTree = "<group>"; };
 		FD93D4AC20AA54EDCC5B2DCC /* NoteLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLink.swift; path = NoteLink.swift; sourceTree = "<group>"; };
 		FF994FFEA388D998DB681214 /* NetworkAvailability.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NetworkAvailability.swift; path = Services/NetworkAvailability.swift; sourceTree = "<group>"; };
 		FL0000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
@@ -938,14 +932,8 @@
 				H00200000000002B /* OnboardingCalendarPage.swift */,
 				H00200000000002C /* OnboardingCompletePage.swift */,
 				5423237352E1415368F6C059 /* SimpleWelcomeView.swift */,
-				FD201114B6BD52EAB5ADF2EF /* SimpleAPIKeySetupView.swift */,
-				FAFA37D70D6B2D46F83EAE6F /* SimpleOnboardingView.swift */,
-				EAD567973CA7B50D92B3CE3B /* SimpleWelcomeView.swift */,
 				F0E6E0F9775E1DD5D300B031 /* SimpleAPIKeySetupView.swift */,
 				ABCB309F767F4C1EF1FA668E /* SimpleOnboardingView.swift */,
-				09679EADB80526644E9EE222 /* SimpleWelcomeView.swift */,
-				3DA75A557001A1B9BD8A3E77 /* SimpleAPIKeySetupView.swift */,
-				F9F35129E294744E62C3066E /* SimpleOnboardingView.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
