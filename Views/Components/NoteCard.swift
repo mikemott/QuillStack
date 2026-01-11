@@ -23,6 +23,19 @@ struct NoteCard: View {
     var isSelected: Bool = false
     @State private var isPressed = false
 
+    // Cached formatters for performance
+    private static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }()
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             // Header: Primary tag badge + State indicators
@@ -114,7 +127,7 @@ struct NoteCard: View {
 
                 // OCR confidence
                 HStack(spacing: 6) {
-                    Text("\(Int(note.ocrConfidence * 100))%")
+                    Text("\(Int(max(0, min(1, note.ocrConfidence)) * 100))%")
                         .font(.serifCaption(12, weight: .medium))
                         .foregroundColor(.textMedium)
 
@@ -136,7 +149,7 @@ struct NoteCard: View {
                                         endPoint: .trailing
                                     )
                                 )
-                                .frame(width: geometry.size.width * CGFloat(note.ocrConfidence), height: 3)
+                                .frame(width: geometry.size.width * CGFloat(max(0, min(1, note.ocrConfidence))), height: 3)
                                 .cornerRadius(2)
                         }
                     }
@@ -228,15 +241,11 @@ struct NoteCard: View {
     private var formattedDate: String {
         let calendar = Calendar.current
         if calendar.isDateInToday(note.createdAt) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "h:mm a"
-            return "Today, \(formatter.string(from: note.createdAt))"
+            return "Today, \(Self.timeFormatter.string(from: note.createdAt))"
         } else if calendar.isDateInYesterday(note.createdAt) {
             return "Yesterday"
         } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return formatter.string(from: note.createdAt)
+            return Self.dateFormatter.string(from: note.createdAt)
         }
     }
 }
