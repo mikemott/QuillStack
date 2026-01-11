@@ -22,6 +22,11 @@ struct SimpleAPIKeySetupView: View {
     enum TestResult {
         case success
         case failure(String)
+
+        var isSuccess: Bool {
+            if case .success = self { return true }
+            return false
+        }
     }
 
     var body: some View {
@@ -98,8 +103,14 @@ struct SimpleAPIKeySetupView: View {
                         Group {
                             if showingAPIKey {
                                 TextField("sk-ant-...", text: $apiKeyInput)
+                                    .onChange(of: apiKeyInput) { _, _ in
+                                        testResult = nil
+                                    }
                             } else {
                                 SecureField("sk-ant-...", text: $apiKeyInput)
+                                    .onChange(of: apiKeyInput) { _, _ in
+                                        testResult = nil
+                                    }
                             }
                         }
                         .textFieldStyle(.plain)
@@ -123,14 +134,16 @@ struct SimpleAPIKeySetupView: View {
                     )
 
                     // Get key link
-                    Link(destination: URL(string: "https://console.anthropic.com")!) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "arrow.up.right.square")
-                                .font(.system(size: 12))
-                            Text("Get your API key (free tier available)")
-                                .font(.serifCaption(13, weight: .medium))
+                    if let consoleURL = URL(string: "https://console.anthropic.com") {
+                        Link(destination: consoleURL) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.system(size: 12))
+                                Text("Get your API key (free tier available)")
+                                    .font(.serifCaption(13, weight: .medium))
+                            }
+                            .foregroundColor(.forestDark)
                         }
-                        .foregroundColor(.forestDark)
                     }
 
                     // Test result
@@ -181,7 +194,7 @@ struct SimpleAPIKeySetupView: View {
                         .padding(.vertical, 18)
                         .background(
                             LinearGradient(
-                                colors: testingAPI
+                                colors: (testingAPI || testResult?.isSuccess == true)
                                     ? [Color.gray.opacity(0.5)]
                                     : [Color.forestDark, Color.forestMedium.opacity(0.9)],
                                 startPoint: .leading,
@@ -191,7 +204,7 @@ struct SimpleAPIKeySetupView: View {
                         .cornerRadius(14)
                         .shadow(color: .forestDark.opacity(0.2), radius: 6, x: 0, y: 3)
                     }
-                    .disabled(testingAPI)
+                    .disabled(testingAPI || testResult?.isSuccess == true)
 
                     // Skip button
                     Button(action: onSkip) {
@@ -199,6 +212,7 @@ struct SimpleAPIKeySetupView: View {
                             .font(.serifBody(15, weight: .medium))
                             .foregroundColor(.textMedium)
                     }
+                    .disabled(testingAPI || testResult?.isSuccess == true)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 32)
@@ -222,27 +236,37 @@ struct SimpleAPIKeySetupView: View {
     }
 
     private func saveAndContinue() {
+        // Trim whitespace from input
+        let trimmedKey = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+
         // If no API key, just continue (skip)
-        if apiKeyInput.isEmpty {
+        if trimmedKey.isEmpty {
             onContinue()
             return
         }
 
-        // Validate API key
+        // Basic format validation
+        guard trimmedKey.hasPrefix("sk-ant-") else {
+            testResult = .failure("API key should start with 'sk-ant-'")
+            return
+        }
+
+        // Validate API key before storing
         testingAPI = true
         testResult = nil
 
-        settings.claudeAPIKey = apiKeyInput
-
         Task {
-            let isValid = await settings.validateClaudeAPIKey()
+            let isValid = await LLMService.shared.validateAPIKey(trimmedKey)
             await MainActor.run {
                 testingAPI = false
                 if isValid {
+                    // Only store after successful validation
+                    settings.claudeAPIKey = trimmedKey
                     testResult = .success
 
                     // Brief delay to show success, then continue
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    Task {
+                        try? await Task.sleep(nanoseconds: 800_000_000)
                         onContinue()
                     }
                 } else {
