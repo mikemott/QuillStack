@@ -62,6 +62,7 @@
 		3E065E96161C05869F566CC7 /* LLMServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */; };
 		3F0F7AED3A70BDE27E9F49A9 /* EventExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E371EA26DD1A11EEF03D8A3 /* EventExtractor.swift */; };
 		483CB6E94C62664F03E95662 /* NetworkAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF994FFEA388D998DB681214 /* NetworkAvailability.swift */; };
+		4DE7D9CED445E5C6342BD24C /* TagBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBA297DD0F73F243B0B5C59 /* TagBadge.swift */; };
 		52D18AFADB7ADEC3119880DD /* EmailExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC54455C450B615A91D56C28 /* EmailExtractor.swift */; };
 		546B770950DD133042920854 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C297376A19DEB99BDF5675 /* StatisticsViewModel.swift */; };
 		546F2F8E7516FB2AB0B1A1EF /* NoteClassification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07232297C49D5ED086A1E66A /* NoteClassification.swift */; };
@@ -69,6 +70,7 @@
 		60221FB0AB9940FC245F4D39 /* RemindersServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF8D919607450456C9B843 /* RemindersServiceProtocol.swift */; };
 		62C859B82290314EF6B39D8D /* ClassificationAccuracyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17EE4BDDA973386E2F46F3E /* ClassificationAccuracyTest.swift */; };
 		637D9BF5DCD149FCEEFF1E3B /* ClassificationMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27FE11B8C3018561B5D49C5 /* ClassificationMetrics.swift */; };
+		64E8DD890D4E546FE367B301 /* NoteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704A35D4E10E0185BF181D11 /* NoteCard.swift */; };
 		665FDB539CA49B30BF4BA108 /* NoteLinkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3229D52F889DFAF9E15470 /* NoteLinkServiceTests.swift */; };
 		66ECB603D5460F059DB645A2 /* DataExtractionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337962D879C8484B0303AE51 /* DataExtractionService.swift */; };
 		7323932D06013BF9820E3792 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF65609DDFA199412CB81D3 /* ContactsService.swift */; };
@@ -272,6 +274,7 @@
 		44FCC4A5617A1739F3890D5E /* JournalFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/JournalFormatter.swift; sourceTree = "<group>"; };
 		4615E33E3211A56DB3FCEBE3 /* MeetingFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoteFormatters/MeetingFormatter.swift; sourceTree = "<group>"; };
 		49A16136444729219B272D1E /* EditableTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EditableTask.swift; path = EditableTask.swift; sourceTree = "<group>"; };
+		4EBA297DD0F73F243B0B5C59 /* TagBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TagBadge.swift; path = Views/Components/TagBadge.swift; sourceTree = "<group>"; };
 		4FB5E92C24AA2AAA9D607A7A /* NoteFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteFormatter.swift; path = NoteFormatters/NoteFormatter.swift; sourceTree = "<group>"; };
 		58161D9CE69A9C68E3404A55 /* AnnotationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnnotationService.swift; sourceTree = "<group>"; };
 		5B02186C839D97ED42525E9C /* AnnotationCanvasView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnnotationCanvasView.swift; sourceTree = "<group>"; };
@@ -281,6 +284,7 @@
 		637CA8617BAD387328C5B9C2 /* RelatedNotesSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RelatedNotesSection.swift; path = RelatedNotesSection.swift; sourceTree = "<group>"; };
 		6FF65609DDFA199412CB81D3 /* ContactsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContactsService.swift; path = Services/ContactsService.swift; sourceTree = "<group>"; };
 		703C7F02B1C5C368E72D303D /* ExpenseExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpenseExtractor.swift; path = ExpenseExtractor.swift; sourceTree = "<group>"; };
+		704A35D4E10E0185BF181D11 /* NoteCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteCard.swift; path = Views/Components/NoteCard.swift; sourceTree = "<group>"; };
 		7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassificationBadge.swift; path = Views/Components/ClassificationBadge.swift; sourceTree = "<group>"; };
 		71C1472FFE3770507EE2E439 /* FormatterRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FormatterRegistry.swift; path = NoteFormatters/FormatterRegistry.swift; sourceTree = "<group>"; };
 		73A8EB6B4089DB1C6BA238A7 /* LLMServiceProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceProtocol.swift; path = Protocols/LLMServiceProtocol.swift; sourceTree = "<group>"; };
@@ -836,6 +840,8 @@
 			children = (
 				7092AC080D4871D19156CFD5 /* ClassificationBadge.swift */,
 				B7B682E842B2E5DD0CAB69FF /* NoteTypePickerSheet.swift */,
+				704A35D4E10E0185BF181D11 /* NoteCard.swift */,
+				4EBA297DD0F73F243B0B5C59 /* TagBadge.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -1323,6 +1329,8 @@
 				87482E0E50795EABAF745640 /* TagReviewSheet.swift in Sources */,
 				2DC2589DF5F2534E54DF3096 /* TagEditorSheet.swift in Sources */,
 				28A4A272CEAAC8D6FF162F9A /* TagChip.swift in Sources */,
+				64E8DD890D4E546FE367B301 /* NoteCard.swift in Sources */,
+				4DE7D9CED445E5C6342BD24C /* TagBadge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
