@@ -104,7 +104,7 @@ struct TagBadge: View {
         // Contact
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "contact"
                 return tag
             }(),
@@ -114,7 +114,7 @@ struct TagBadge: View {
         // Event
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "event"
                 return tag
             }(),
@@ -124,7 +124,7 @@ struct TagBadge: View {
         // Todo
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "todo"
                 return tag
             }(),
@@ -134,7 +134,7 @@ struct TagBadge: View {
         // Meeting
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "meeting"
                 return tag
             }(),
@@ -144,7 +144,7 @@ struct TagBadge: View {
         // Recipe
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "recipe"
                 return tag
             }(),
@@ -154,7 +154,7 @@ struct TagBadge: View {
         // General
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "general"
                 return tag
             }(),
@@ -170,7 +170,7 @@ struct TagBadge: View {
         // Large
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "meeting"
                 return tag
             }(),
@@ -180,7 +180,7 @@ struct TagBadge: View {
         // Medium
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "meeting"
                 return tag
             }(),
@@ -190,7 +190,7 @@ struct TagBadge: View {
         // Small
         TagBadge(
             tag: {
-                let tag = Tag(context: CoreDataStack.preview.viewContext)
+                let tag = Tag(context: CoreDataStack.preview.context)
                 tag.name = "meeting"
                 return tag
             }(),

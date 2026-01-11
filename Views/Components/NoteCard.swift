@@ -207,7 +207,7 @@ struct NoteCard: View {
     }
 
     private var secondaryTagsView: some View {
-        WrapFlowLayout(horizontalSpacing: 6, verticalSpacing: 6) {
+        WrapFlowLayout(spacing: 6) {
             ForEach(note.secondaryTags, id: \.id) { tag in
                 TagChip(tag: tag.name, removable: false, isPrimary: false)
             }
@@ -244,7 +244,7 @@ struct NoteCard: View {
 // MARK: - Preview
 
 #Preview("Note Card with Tags") {
-    let context = CoreDataStack.preview.viewContext
+    let context = CoreDataStack.preview.context
 
     // Create a sample note with tags
     let note = Note(context: context)
@@ -268,7 +268,7 @@ struct NoteCard: View {
 }
 
 #Preview("Note Card - Processing States") {
-    let context = CoreDataStack.preview.viewContext
+    let context = CoreDataStack.preview.context
 
     // Offline note
     let offlineNote = Note(context: context)
@@ -297,7 +297,7 @@ struct NoteCard: View {
 }
 
 #Preview("Different Tag Types") {
-    let context = CoreDataStack.preview.viewContext
+    let context = CoreDataStack.preview.context
 
     // Contact note
     let contactNote = Note(context: context)

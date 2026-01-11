@@ -369,7 +369,7 @@ extension Note {
 
     /// Returns count of linked/related notes
     var relatedNotesCount: Int {
-        (noteLinksFrom?.count ?? 0) + (noteLinksTo?.count ?? 0)
+        (incomingLinks?.count ?? 0) + (outgoingLinks?.count ?? 0)
     }
 
     /// Word count for metadata display
