@@ -67,7 +67,7 @@ struct ContentView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
         .fullScreenCover(isPresented: $showingOnboarding) {
-            OnboardingView()
+            SimpleOnboardingView()
         }
     }
 }
