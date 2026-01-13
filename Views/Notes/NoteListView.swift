@@ -103,11 +103,12 @@ struct NoteListView: View {
                 }
             }
             .onChange(of: deepLinkNoteId) { _, newValue in
-                if let noteId = newValue,
-                   let note = viewModel.notes.first(where: { $0.id == noteId }) {
+                guard let noteId = newValue else { return }
+
+                if let note = viewModel.notes.first(where: { $0.id == noteId }) {
                     navigationPath.append(note)
-                    deepLinkNoteId = nil
                 }
+                deepLinkNoteId = nil
             }
             .confirmationDialog(
                 "Delete \(selectedNotes.count) note\(selectedNotes.count == 1 ? "" : "s")?",

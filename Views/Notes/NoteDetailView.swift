@@ -55,7 +55,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                 ScrollView {
                     VStack(spacing: 0) {
                         // Tags section
-                        if note.tagEntities != nil && !note.sortedTagEntities.isEmpty {
+                        if note.primaryTag != nil || !note.secondaryTags.isEmpty {
                             tagsSection
                                 .padding(.horizontal, 20)
                                 .padding(.top, 16)
