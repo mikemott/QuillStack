@@ -241,78 +241,74 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
 
     private var bottomBar: some View {
         HStack(spacing: 20) {
-            // AI menu (only show if API key configured)
-            if settings.hasAPIKey {
-                Menu {
-                    Button(action: { showingEnhanceSheet = true }) {
-                        Label("Enhance Text", systemImage: "wand.and.stars")
-                    }
-                    Button(action: { showingSummarySheet = true }) {
-                        Label("Summarize", systemImage: "text.quote")
-                    }
-                } label: {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.forestDark)
-                }
-            }
-
-            // Annotate button (only show if note has original image)
-            if note.originalImageData != nil {
-                Button(action: { showingAnnotationMode = true }) {
-                    Image(systemName: note.hasAnnotations ? "pencil.tip.crop.circle.fill" : "pencil.tip.crop.circle")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(note.hasAnnotations ? .forestDark : .textDark)
-                }
-                .accessibilityLabel("Annotate note")
-            }
-
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            // Multi-page menu
-            Menu {
-                Button(action: { showingAddPageSheet = true }) {
-                    Label("Add Page", systemImage: "plus.rectangle.on.rectangle")
-                }
-                if note.pageCount > 0 {
-                    Button(action: { showingPageNavigator = true }) {
-                        Label("View Pages (\(note.pageCount))", systemImage: "doc.on.doc")
-                    }
-                }
-            } label: {
-                Image(systemName: note.pageCount > 1 ? "doc.on.doc.fill" : "doc.on.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.forestDark)
-            }
-
             Spacer()
 
-            // Export
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Share
+            // Share button (kept prominent)
             Button(action: shareNote) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
+            .accessibilityLabel("Share note")
 
-            // Copy
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
+            // More menu (consolidated actions)
+            Menu {
+                // AI actions (only show if API key configured)
+                if settings.hasAPIKey {
+                    Section {
+                        Button(action: { showingEnhanceSheet = true }) {
+                            Label("Enhance Text", systemImage: "wand.and.stars")
+                        }
+                        Button(action: { showingSummarySheet = true }) {
+                            Label("Summarize", systemImage: "text.quote")
+                        }
+                    }
+                }
+
+                // Annotate (only show if note has original image)
+                if note.originalImageData != nil {
+                    Button(action: { showingAnnotationMode = true }) {
+                        Label(
+                            note.hasAnnotations ? "Edit Annotations" : "Annotate",
+                            systemImage: note.hasAnnotations ? "pencil.tip.crop.circle.fill" : "pencil.tip.crop.circle"
+                        )
+                    }
+                }
+
+                Section {
+                    // Change Type
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+
+                    // Multi-page actions
+                    Button(action: { showingAddPageSheet = true }) {
+                        Label("Add Page", systemImage: "plus.rectangle.on.rectangle")
+                    }
+                    if note.pageCount > 0 {
+                        Button(action: { showingPageNavigator = true }) {
+                            Label("View Pages (\(note.pageCount))", systemImage: "doc.on.doc")
+                        }
+                    }
+                }
+
+                Section {
+                    // Copy
+                    Button(action: copyContent) {
+                        Label("Copy Text", systemImage: "doc.on.clipboard")
+                    }
+
+                    // Export
+                    Button(action: { showingExportSheet = true }) {
+                        Label("Export", systemImage: "arrow.up.doc")
+                    }
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.textDark)
             }
+            .accessibilityLabel("More actions")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
