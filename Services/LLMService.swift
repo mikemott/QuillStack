@@ -579,6 +579,27 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
         - Hiring 5 engineers"
         → {"primaryTag":"journal","secondaryTags":["presentation-notes","work"],"confidence":0.85}
 
+        Example 4 - Meeting summary (IS journal if informational):
+        "Meeting recap:
+        - Discussed new API design
+        - Sarah presented mockups
+        - Timeline: 3 weeks for MVP"
+        → {"primaryTag":"journal","secondaryTags":["meeting-notes","work"],"confidence":0.85}
+
+        Example 5 - Meeting action items ONLY (IS todo):
+        "Team standup follow-ups:
+        - Deploy staging environment
+        - Review PR #234
+        - Update API docs"
+        → {"primaryTag":"todo","secondaryTags":["work","team"],"confidence":0.9}
+
+        Example 6 - Learning notes (IS journal):
+        Text: "Python course notes:
+        - Functions are first-class objects
+        - Use list comprehensions for cleaner code
+        - Decorators modify function behavior"
+        → {"primaryTag":"journal","secondaryTags":["programming","python","learning"],"confidence":0.9}
+
         Return ONLY valid JSON with this exact structure, no markdown code blocks, no explanations:
         {"primaryTag":"journal","secondaryTags":["book-notes"],"confidence":0.9}
 
