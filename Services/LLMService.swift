@@ -594,7 +594,7 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
         → {"primaryTag":"todo","secondaryTags":["work","team"],"confidence":0.9}
 
         Example 6 - Learning notes (IS journal):
-        Text: "Python course notes:
+        "Python course notes:
         - Functions are first-class objects
         - Use list comprehensions for cleaner code
         - Decorators modify function behavior"

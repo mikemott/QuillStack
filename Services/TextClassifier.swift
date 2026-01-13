@@ -360,6 +360,11 @@ final class TextClassifier: TextClassifierProtocol {
         Type: idea
         Reasoning: Brainstorming/feature concept
 
+        Example 11 - AI prompt:
+        Text: "Write a poem about autumn leaves"
+        Type: claudePrompt
+        Reasoning: Direct instruction or request for an AI assistant
+
         **Text to classify:**
         \(text)
 
