@@ -3,49 +3,24 @@
 //  QuillStack
 //
 //  Architecture refactoring: factory pattern for detail view routing.
-//  Uses config-based routing via NoteTypeConfigRegistry.
+//  Delegates to config closures for view creation (Open/Closed Principle).
 //
 
 import SwiftUI
 
 /// Factory for creating type-specific detail views.
-/// Uses NoteTypeConfigRegistry for config-based view routing.
+/// Delegates view creation to NoteTypeConfig closures, eliminating the need
+/// for a switch statement and enabling extensibility without modification.
 @MainActor
 struct DetailViewFactory {
 
     /// Creates the appropriate detail view for a note.
-    /// Uses the config's detailViewType to route to the correct view.
+    /// Delegates to the config's makeView closure for view creation.
     /// Falls back to plugin registry for backward compatibility, then to NoteDetailView.
     static func makeView(for note: Note) -> AnyView {
-        // Try config-based routing first
+        // Try config-based routing first (delegates to closure)
         if let config = NoteTypeConfigRegistry.shared.config(for: note.type) {
-            // Route based on detail view type
-            switch config.detailViewType {
-            case .general:
-                return AnyView(NoteDetailView(note: note))
-            case .todo:
-                return AnyView(TodoDetailView(note: note))
-            case .email:
-                return AnyView(EmailDetailView(note: note))
-            case .meeting:
-                return AnyView(MeetingDetailView(note: note))
-            case .reminder:
-                return AnyView(ReminderDetailView(note: note))
-            case .contact:
-                return AnyView(ContactDetailView(note: note))
-            case .event:
-                return AnyView(EventDetailView(note: note))
-            case .expense:
-                return AnyView(ExpenseDetailView(note: note))
-            case .shopping:
-                return AnyView(ShoppingDetailView(note: note))
-            case .recipe:
-                return AnyView(RecipeDetailView(note: note))
-            case .idea:
-                return AnyView(IdeaDetailView(note: note))
-            case .claudePrompt:
-                return AnyView(ClaudePromptDetailView(note: note))
-            }
+            return config.makeView(note)
         }
 
         // Fallback to plugin registry for backward compatibility
