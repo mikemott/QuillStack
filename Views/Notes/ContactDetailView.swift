@@ -16,6 +16,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     @State private var saveSuccess = false
     @State private var errorMessage: String?
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @State private var isContactsAccessDenied = false
     @Environment(\.dismiss) private var dismiss
 
@@ -34,6 +35,9 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+
                         // Contact card preview
                         contactCard
 
@@ -96,6 +100,10 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingReviewSheet) {
             ContactReviewSheet(

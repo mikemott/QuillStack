@@ -45,6 +45,12 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
                 // Task list
                 ScrollView {
                     VStack(spacing: 0) {
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                            .padding(.bottom, 8)
+
                         ForEach($tasks) { $task in
                             TaskRowView(task: $task, onToggle: { saveChanges() })
                         }
@@ -140,9 +146,6 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
                 onSummarize: { showingSummarySheet = true }
             ),
             customActions: [
-                DetailAction(icon: "tag") {
-                    showingTagEditor = true
-                },
                 DetailAction(icon: "arrow.left.arrow.right.circle") {
                     showingTypePicker = true
                 }

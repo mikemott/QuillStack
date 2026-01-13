@@ -16,6 +16,7 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
     @State private var showingExportSheet: Bool = false
     @State private var showingShareSheet: Bool = false
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -31,6 +32,9 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
                         recipeMetaCard
                         ingredientsCard
                         stepsCard
+
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
 
                         // Related notes section (QUI-161)
                         if note.linkCount > 0 {
@@ -65,6 +69,10 @@ struct RecipeDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 

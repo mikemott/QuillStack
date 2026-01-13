@@ -18,6 +18,7 @@ struct ShoppingDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @FocusState private var isAddingItem: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -35,6 +36,11 @@ struct ShoppingDetailView: View, NoteDetailViewProtocol {
                         }
 
                         addItemRow
+
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
 
                         // Related notes section (QUI-161)
                         if note.linkCount > 0 {
@@ -78,6 +84,10 @@ struct ShoppingDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 

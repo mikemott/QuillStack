@@ -35,6 +35,7 @@ struct ClaudePromptDetailView: View {
 
     @State private var showOriginal = false
     @State private var showingDeviceCodeSheet = false
+    @State private var showingTagEditor = false // QUI-184
     @State private var isEditing = false
     @State private var editedTitle = ""
     @State private var editedBody = ""
@@ -72,6 +73,9 @@ struct ClaudePromptDetailView: View {
                     if let error = refineError ?? createError {
                         errorSection(message: error)
                     }
+
+                    // Tags section (QUI-184)
+                    TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
 
                     // Related notes section (QUI-161)
                     if note.linkCount > 0 {
@@ -121,6 +125,10 @@ struct ClaudePromptDetailView: View {
         }
         .sheet(isPresented: $showingDeviceCodeSheet) {
             DeviceCodeSheet()
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
         .onChange(of: gitHubService.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated {

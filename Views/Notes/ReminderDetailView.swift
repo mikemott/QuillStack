@@ -19,6 +19,7 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -95,6 +96,9 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
                                 .stroke(Color.forestDark.opacity(0.15), lineWidth: 1)
                         )
 
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+
                     // Related notes section (QUI-161)
                     if note.linkCount > 0 {
                         RelatedNotesSection(note: note) { selectedNote in
@@ -134,6 +138,10 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 

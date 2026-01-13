@@ -219,10 +219,29 @@ struct NoteCard: View {
         .shadow(color: Color.forestMedium.opacity(0.3), radius: 2, x: 0, y: 1)
     }
 
+    /// Maximum number of secondary tags to display before showing "+N more"
+    private static let maxVisibleTags = 3
+
     private var secondaryTagsView: some View {
-        WrapFlowLayout(spacing: 6) {
-            ForEach(note.secondaryTags, id: \.id) { tag in
+        let tags = note.secondaryTags
+        let visibleTags = Array(tags.prefix(Self.maxVisibleTags))
+        let remainingCount = tags.count - Self.maxVisibleTags
+
+        return WrapFlowLayout(spacing: 6) {
+            ForEach(visibleTags, id: \.id) { tag in
                 TagChip(tag: tag.name, removable: false, isPrimary: false)
+            }
+
+            // Show "+N more" indicator if there are additional tags (QUI-184)
+            if remainingCount > 0 {
+                Text("+\(remainingCount) more")
+                    .font(.serifCaption(11, weight: .medium))
+                    .foregroundColor(.textMedium)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.forestDark.opacity(0.08))
+                    .cornerRadius(4)
+                    .accessibilityLabel("\(remainingCount) more tags")
             }
         }
     }
