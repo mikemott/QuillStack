@@ -267,11 +267,13 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
 
                 // Annotate (only show if note has original image)
                 if note.originalImageData != nil {
-                    Button(action: { showingAnnotationMode = true }) {
-                        Label(
-                            note.hasAnnotations ? "Edit Annotations" : "Annotate",
-                            systemImage: note.hasAnnotations ? "pencil.tip.crop.circle.fill" : "pencil.tip.crop.circle"
-                        )
+                    Section {
+                        Button(action: { showingAnnotationMode = true }) {
+                            Label(
+                                note.hasAnnotations ? "Edit Annotations" : "Annotate",
+                                systemImage: note.hasAnnotations ? "pencil.tip.crop.circle.fill" : "pencil.tip.crop.circle"
+                            )
+                        }
                     }
                 }
 
@@ -287,7 +289,10 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     }
                     if note.pageCount > 0 {
                         Button(action: { showingPageNavigator = true }) {
-                            Label("View Pages (\(note.pageCount))", systemImage: "doc.on.doc")
+                            Label(
+                                "View Pages (\(note.pageCount))",
+                                systemImage: note.pageCount > 1 ? "doc.on.doc.fill" : "doc.on.doc"
+                            )
                         }
                     }
                 }
