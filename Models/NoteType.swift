@@ -26,34 +26,66 @@ enum NoteType: String, CaseIterable, Codable, Sendable {
     case journal = "journal"
     case idea = "idea"
 
-    // MARK: - Display Properties (via Registry)
+    // MARK: - Display Properties (via Config Registry)
 
     /// Human-readable name for display in UI
-    /// Provided by the registered plugin for this type.
+    /// Provided by the registered config for this type.
     @MainActor
     var displayName: String {
-        NoteTypeRegistry.shared.displayInfo(for: self)?.name ?? rawValue.capitalized
+        // Try config first
+        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
+            return config.displayName
+        }
+        // Fallback to plugin registry (backward compatibility)
+        if let name = NoteTypeRegistry.shared.displayInfo(for: self)?.name {
+            return name
+        }
+        return rawValue.capitalized
     }
 
     /// SF Symbol icon name for this note type
-    /// Provided by the registered plugin for this type.
+    /// Provided by the registered config for this type.
     @MainActor
     var icon: String {
-        NoteTypeRegistry.shared.displayInfo(for: self)?.icon ?? "doc.text"
+        // Try config first
+        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
+            return config.icon
+        }
+        // Fallback to plugin registry (backward compatibility)
+        if let icon = NoteTypeRegistry.shared.displayInfo(for: self)?.icon {
+            return icon
+        }
+        return "doc.text"
     }
 
     /// Badge color for note type indicators
-    /// Provided by the registered plugin for this type.
+    /// Provided by the registered config for this type.
     @MainActor
     var badgeColor: Color {
-        NoteTypeRegistry.shared.displayInfo(for: self)?.color ?? .gray
+        // Try config first
+        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
+            return config.badgeColor
+        }
+        // Fallback to plugin registry (backward compatibility)
+        if let color = NoteTypeRegistry.shared.displayInfo(for: self)?.color {
+            return color
+        }
+        return .gray
     }
 
     /// Footer icon for card display (may differ from badge icon)
-    /// Provided by the registered plugin for this type.
+    /// Provided by the registered config for this type.
     @MainActor
     var footerIcon: String {
-        NoteTypeRegistry.shared.footerIcon(for: self) ?? "text.alignleft"
+        // Try config first
+        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
+            return config.footerIcon
+        }
+        // Fallback to plugin registry (backward compatibility)
+        if let footerIcon = NoteTypeRegistry.shared.footerIcon(for: self) {
+            return footerIcon
+        }
+        return "text.alignleft"
     }
 
     // MARK: - Initialization
