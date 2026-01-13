@@ -12,7 +12,7 @@ struct NoteListView: View {
     @State private var showingCamera = false
     @State private var showingVoice = false
     @State private var showingSearch = false
-    @State private var selectedNote: Note?
+    @State private var navigationPath = NavigationPath()
 
     // Multi-select state
     @State private var isEditing = false
@@ -40,7 +40,7 @@ struct NoteListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ZStack {
                 // Background with subtle gradient
                 Color.creamLight.ignoresSafeArea()
@@ -87,7 +87,7 @@ struct NoteListView: View {
                     exitEditMode()
                 }
             }
-            .navigationDestination(item: $selectedNote) { note in
+            .navigationDestination(for: Note.self) { note in
                 destinationView(for: note)
             }
             .onChange(of: showingCameraFromDeepLink) { _, newValue in
@@ -105,7 +105,7 @@ struct NoteListView: View {
             .onChange(of: deepLinkNoteId) { _, newValue in
                 if let noteId = newValue,
                    let note = viewModel.notes.first(where: { $0.id == noteId }) {
-                    selectedNote = note
+                    navigationPath.append(note)
                     deepLinkNoteId = nil
                 }
             }

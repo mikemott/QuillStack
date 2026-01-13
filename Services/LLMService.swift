@@ -514,19 +514,32 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
 
         Your task is to suggest 2-5 tags that categorize this note. Follow these rules:
 
-        1. **Primary Tag (Note Type)**: The first tag should represent the note type:
-           - "todo" for task lists
-           - "meeting" for meeting notes
-           - "email" for email drafts
-           - "contact" for contact information
-           - "reminder" for reminders
+        1. **Primary Tag (Note Type)**: The first tag should represent the note type. CAREFULLY consider the INTENT and CONTEXT:
+
+           - "todo" for ACTIONABLE task lists - things the user needs to DO
+             ✓ Examples: "Buy groceries", "Call dentist", "Submit expense report"
+             ✗ NOT for: Lists of information, book notes, summaries, reference material
+
+           - "journal" for personal reflections, thoughts, observations, and notes about books/articles/content
+             ✓ Examples: Notes from a book, thoughts on an article, learning summaries, observations
+             ✗ NOT for: Action items, meeting notes, structured data
+
+           - "meeting" for meeting notes with attendees, agendas, or discussion points
+           - "email" for email drafts with To/From/Subject structure
+           - "contact" for contact information (names, phone numbers, addresses)
+           - "reminder" for time-based reminders or alerts
            - "expense" for expense/receipt tracking
-           - "shopping" for shopping lists
-           - "recipe" for cooking recipes
-           - "event" for event planning
-           - "journal" for personal journal entries
-           - "idea" for brainstorming/ideas
-           - "general" for anything else
+           - "shopping" for shopping lists (items to purchase)
+           - "recipe" for cooking recipes with ingredients and instructions
+           - "event" for event planning (parties, conferences, gatherings)
+           - "idea" for brainstorming/creative ideas/feature requests
+           - "general" for anything else that doesn't fit the above categories
+
+           **CRITICAL**: Format does NOT determine type! A bulleted list could be:
+           - Book notes → "journal"
+           - Shopping items → "shopping"
+           - Tasks to complete → "todo"
+           Look at the CONTENT and INTENT, not just the format!
 
         2. **Secondary Tags**: Add 1-4 more descriptive tags that help categorize the content
            - These should be specific topics, projects, or contexts (e.g., "work", "groceries", "q4-planning")
@@ -543,8 +556,31 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
         Note content:
         \(content)
 
+        **Examples to guide your classification**:
+
+        Example 1 - Book notes (NOT a todo):
+        "Notes from Checklist Manifesto:
+        - Checklists reduce errors
+        - Two types: DO-CONFIRM and READ-DO
+        - Keep checklists short and simple"
+        → {"primaryTag":"journal","secondaryTags":["book-notes","checklist-manifesto"],"confidence":0.9}
+
+        Example 2 - Actual tasks (IS a todo):
+        "Today's tasks:
+        - Buy milk and eggs
+        - Call the dentist
+        - Finish project proposal"
+        → {"primaryTag":"todo","secondaryTags":["errands","work"],"confidence":0.95}
+
+        Example 3 - Informational list (NOT a todo):
+        "Key points from the presentation:
+        - Revenue up 15%
+        - New product launch Q3
+        - Hiring 5 engineers"
+        → {"primaryTag":"journal","secondaryTags":["presentation-notes","work"],"confidence":0.85}
+
         Return ONLY valid JSON with this exact structure, no markdown code blocks, no explanations:
-        {"primaryTag":"todo","secondaryTags":["work","project-alpha"],"confidence":0.95}
+        {"primaryTag":"journal","secondaryTags":["book-notes"],"confidence":0.9}
 
         The confidence value should be 0.0 to 1.0 representing how certain you are about the primary tag classification.
         """
