@@ -196,14 +196,14 @@ struct NoteListView: View {
                                 .foregroundColor(.forestLight)
                         }
                     } else {
-                        // Edit button
+                        // Select button (for multi-select mode)
                         if !viewModel.notes.isEmpty {
                             Button(action: {
                                 withAnimation {
                                     isEditing = true
                                 }
                             }) {
-                                Text("Edit")
+                                Text("Select")
                                     .font(.serifBody(17, weight: .medium))
                                     .foregroundColor(.forestLight)
                             }
