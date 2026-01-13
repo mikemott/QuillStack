@@ -3,36 +3,63 @@
 //  QuillStack
 //
 //  Architecture refactoring: factory pattern for detail view routing.
-//  Delegates to NoteTypeRegistry for plugin-based view creation.
+//  Uses config-based routing via NoteTypeConfigRegistry.
 //
 
 import SwiftUI
 
 /// Factory for creating type-specific detail views.
-/// Delegates to NoteTypeRegistry which holds the registered plugins.
+/// Uses NoteTypeConfigRegistry for config-based view routing.
 @MainActor
 struct DetailViewFactory {
 
     /// Creates the appropriate detail view for a note.
-    /// Uses the plugin's makeDetailView method via NoteTypeRegistry.
-    /// Falls back to NoteDetailView for unregistered types.
+    /// Uses the config's detailViewType to route to the correct view.
+    /// Falls back to plugin registry for backward compatibility, then to NoteDetailView.
     static func makeView(for note: Note) -> AnyView {
-        // Delegate to the registry, which holds all the plugins
+        // Try config-based routing first
+        if let config = NoteTypeConfigRegistry.shared.config(for: note.type) {
+            // Route based on detail view type
+            switch config.detailViewType {
+            case .general:
+                return AnyView(NoteDetailView(note: note))
+            case .todo:
+                return AnyView(TodoDetailView(note: note))
+            case .email:
+                return AnyView(EmailDetailView(note: note))
+            case .meeting:
+                return AnyView(MeetingDetailView(note: note))
+            case .reminder:
+                return AnyView(ReminderDetailView(note: note))
+            case .contact:
+                return AnyView(ContactDetailView(note: note))
+            case .event:
+                return AnyView(EventDetailView(note: note))
+            case .expense:
+                return AnyView(ExpenseDetailView(note: note))
+            case .shopping:
+                return AnyView(ShoppingDetailView(note: note))
+            case .recipe:
+                return AnyView(RecipeDetailView(note: note))
+            case .idea:
+                return AnyView(IdeaDetailView(note: note))
+            case .claudePrompt:
+                return AnyView(ClaudePromptDetailView(note: note))
+            }
+        }
+
+        // Fallback to plugin registry for backward compatibility
         if let view = NoteTypeRegistry.shared.makeDetailView(for: note) {
             return view
         }
 
-        // Fallback for unregistered types (should rarely happen)
+        // Final fallback for unregistered types
         return AnyView(NoteDetailView(note: note))
     }
 
-    /// Returns true if a custom view is registered for the type.
-    static func hasCustomView(for type: NoteType) -> Bool {
-        NoteTypeRegistry.shared.hasPlugin(for: type)
-    }
-
-    /// Returns all registered note types.
-    static var registeredTypes: [NoteType] {
-        NoteTypeRegistry.shared.availableTypes
+    /// Returns display info for a note type.
+    /// Uses NoteTypeConfigRegistry for display information.
+    static func displayInfo(for type: String) -> (name: String, icon: String, color: Color)? {
+        NoteTypeConfigRegistry.shared.displayInfo(for: NoteType(from: type))
     }
 }
