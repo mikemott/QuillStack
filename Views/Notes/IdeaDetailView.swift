@@ -17,6 +17,7 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
     @State private var showingExpandSheet: Bool = false
     @State private var showingExportSheet: Bool = false
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @State private var tags: [String] = []
     @State private var newTag: String = ""
     @Bindable private var settings = SettingsManager.shared
@@ -34,8 +35,8 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
                         // Original idea section
                         originalIdeaSection
 
-                        // Tags section
-                        tagsSection
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
 
                         // Expanded idea section (if available)
                         if !expandedIdea.isEmpty {
@@ -78,6 +79,10 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 

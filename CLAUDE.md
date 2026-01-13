@@ -35,15 +35,24 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
    gh pr create --title "..." --body "Closes QUI-XXX\n\n[description]"
    ```
    - Include `Closes QUI-XXX` in PR body
-   - PR-Agent will auto-review
+   - PR-Agent will auto-review (~30s)
    - Linear issue auto-updates to "In Review"
 
-4. **Address PR-Agent Feedback** (Automated)
-   - Wait for PR-Agent review to complete (~30s)
-   - If issues found, notification comment appears
-   - Ask Claude: "Can you take a look at the PR Agent's feedback and see if any changes need to be made?"
-   - Or use: `./bin/pr-review-feedback` to check and get prompt
-   - Claude will automatically apply security/compliance fixes
+4. **Review PR-Agent Feedback** (AUTOMATIC - Claude does this)
+   - **Claude automatically checks PR comments after creating PR**
+   - Uses: `gh pr view <number> --comments --json comments --jq '.comments[] | "**\(.author.login)**...'`
+   - Waits ~30-60s for PR-Agent (qodo-code-review bot) to complete review
+   - Reviews all compliance checks and code suggestions
+
+   **Claude uses judgment to prioritize feedback:**
+   - ✅ **Always fix:** Security issues, bugs, backward compatibility breaks
+   - ✅ **Fix if straightforward:** High-impact improvements that are quick wins
+   - 📝 **Document for later:** Larger architectural refactorings (create Linear issue)
+   - ⏭️ **Skip:** Minor style preferences, subjective suggestions, or conflicts with project patterns
+
+   **Not all PR-Agent feedback requires action** - Claude makes pragmatic decisions about what adds value vs. what's noise. The goal is to catch real issues, not to satisfy every bot suggestion.
+
+   - **User doesn't need to ask - Claude does this proactively**
 
 5. **Merge After Review**
    - Verify all checks pass
@@ -66,10 +75,9 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
 
 - **Git Hook**: Blocks commits to `main` (`.git/hooks/pre-commit`)
 - **PR-Agent**: AI code review with Claude Sonnet 4.5 (`.github/workflows/pr-agent.yml`)
-- **PR Feedback Notification**: Auto-notifies when PR-Agent finds issues (`.github/workflows/pr-feedback-notification.yml`)
+- **Claude Auto-Review**: Automatically checks and addresses PR-Agent feedback after creating PRs
 - **Linear Sync**: Auto-updates issue to "In Review" when PR opens (`.github/workflows/linear-sync.yml`)
 - **GitHub Webhook**: Auto-links commits and closes issues via magic words (`Fixes/Closes QUI-XX`)
-- **Helper Script**: `./bin/pr-review-feedback` - Wait for PR-Agent and get Claude prompt
 
 ## Key Concepts
 

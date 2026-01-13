@@ -22,6 +22,7 @@ struct ExpenseDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -36,6 +37,9 @@ struct ExpenseDetailView: View, NoteDetailViewProtocol {
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+
                         // Receipt image preview
                         receiptImageSection
 
@@ -93,6 +97,10 @@ struct ExpenseDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
     }
 

@@ -24,6 +24,7 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     @State private var showingSaveError: Bool = false
     @State private var saveErrorMessage: String = ""
     @State private var showingTypePicker = false
+    @State private var showingTagEditor = false // QUI-184
     @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
@@ -37,6 +38,12 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                 slimHeader
                 ScrollView {
                     VStack(spacing: 0) {
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                            .padding(.bottom, 8)
+
                         // Title field
                         eventField(label: "What:", placeholder: "Event title") {
                             TextField("Meeting, appointment, etc.", text: $eventTitle)
@@ -154,6 +161,10 @@ struct EventDetailView: View, NoteDetailViewProtocol {
         }
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
+        }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingReviewSheet) {
             EventReviewSheet(

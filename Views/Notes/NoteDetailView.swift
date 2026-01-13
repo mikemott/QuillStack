@@ -26,6 +26,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
     @State private var saveTask: Task<Void, Never>?
     @State private var showingTypePicker = false
     @State private var showingAnnotationMode = false
+    @State private var showingTagEditor = false // QUI-184
     @State private var annotationDrawing = PKDrawing()
     @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
@@ -54,13 +55,11 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                 // Content area - scrollable with related notes
                 ScrollView {
                     VStack(spacing: 0) {
-                        // Tags section
-                        if note.primaryTag != nil || !note.secondaryTags.isEmpty {
-                            tagsSection
-                                .padding(.horizontal, 20)
-                                .padding(.top, 16)
-                                .padding(.bottom, 12)
-                        }
+                        // Tags section (QUI-184)
+                        TagDisplaySection(note: note, showingTagEditor: $showingTagEditor)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
+                            .padding(.bottom, 12)
 
                         // Editable content
                         TextEditor(text: $editedContent)
@@ -139,6 +138,10 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
         .sheet(isPresented: $showingTypePicker) {
             NoteTypePickerSheet(note: note)
         }
+        .sheet(isPresented: $showingTagEditor) {
+            TagEditorSheet(note: note)
+                .presentationDetents([.medium, .large])
+        }
         .fullScreenCover(isPresented: $showingAnnotationMode) {
             AnnotationModeView(
                 note: note,
@@ -154,44 +157,6 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
             colors: [Color.paperBeige.opacity(0.98), Color.paperTan.opacity(0.98)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
-        )
-    }
-
-    // MARK: - Tags Section
-
-    private var tagsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "tag.fill")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.textMedium)
-                Text("Tags")
-                    .font(.serifBody(14, weight: .semibold))
-                    .foregroundColor(.textMedium)
-            }
-
-            // Primary tag badge
-            if let primaryTag = note.primaryTag {
-                TagBadge(tag: primaryTag, size: .medium)
-            }
-
-            // Secondary tags
-            if !note.secondaryTags.isEmpty {
-                WrapFlowLayout(spacing: 8) {
-                    ForEach(note.secondaryTags, id: \.id) { tag in
-                        TagChip(tag: tag.name, removable: false, isPrimary: false)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.creamLight.opacity(0.5))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.forestDark.opacity(0.1), lineWidth: 1)
         )
     }
 
