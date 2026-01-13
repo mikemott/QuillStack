@@ -265,4 +265,41 @@ final class NoteTypeConfigRegistry {
             return Array(configs.values)
         }
     }
+
+    // MARK: - Trigger Methods
+
+    /// Get all triggers from all registered configs.
+    /// - Returns: Array of all trigger strings
+    var allTriggers: [String] {
+        accessQueue.sync {
+            return configs.values.flatMap { $0.triggers }
+        }
+    }
+
+    /// Get triggers for a specific note type.
+    /// - Parameter noteType: The note type to look up
+    /// - Returns: Array of trigger strings, or empty array if not found
+    func triggers(for noteType: NoteType) -> [String] {
+        accessQueue.sync {
+            return configs[noteType.rawValue]?.triggers ?? []
+        }
+    }
+
+    /// Detect note type from content by checking for trigger patterns.
+    /// - Parameter content: The content to check for triggers
+    /// - Returns: The detected NoteType, or nil if no trigger found
+    func detectType(from content: String) -> NoteType? {
+        let lowercased = content.lowercased()
+
+        return accessQueue.sync {
+            for (typeName, config) in configs {
+                for trigger in config.triggers {
+                    if lowercased.contains(trigger.lowercased()) {
+                        return NoteType(rawValue: typeName)
+                    }
+                }
+            }
+            return nil
+        }
+    }
 }

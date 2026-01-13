@@ -4,13 +4,13 @@
 //
 //  Architecture refactoring: extracted from TextClassifier.swift
 //  Provides type-safe note classification.
-//  Display properties now delegate to NoteTypeRegistry plugins.
+//  Display properties are provided by NoteTypeConfigRegistry.
 //
 
 import SwiftUI
 
 /// Type-safe enumeration of all supported note types.
-/// Display properties (name, icon, color) are provided by registered plugins.
+/// Display properties (name, icon, color) are provided by NoteTypeConfigRegistry.
 enum NoteType: String, CaseIterable, Codable, Sendable {
     case general = "general"
     case todo = "todo"
@@ -32,60 +32,28 @@ enum NoteType: String, CaseIterable, Codable, Sendable {
     /// Provided by the registered config for this type.
     @MainActor
     var displayName: String {
-        // Try config first
-        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
-            return config.displayName
-        }
-        // Fallback to plugin registry (backward compatibility)
-        if let name = NoteTypeRegistry.shared.displayInfo(for: self)?.name {
-            return name
-        }
-        return rawValue.capitalized
+        NoteTypeConfigRegistry.shared.config(for: self)?.displayName ?? rawValue.capitalized
     }
 
     /// SF Symbol icon name for this note type
     /// Provided by the registered config for this type.
     @MainActor
     var icon: String {
-        // Try config first
-        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
-            return config.icon
-        }
-        // Fallback to plugin registry (backward compatibility)
-        if let icon = NoteTypeRegistry.shared.displayInfo(for: self)?.icon {
-            return icon
-        }
-        return "doc.text"
+        NoteTypeConfigRegistry.shared.config(for: self)?.icon ?? "doc.text"
     }
 
     /// Badge color for note type indicators
     /// Provided by the registered config for this type.
     @MainActor
     var badgeColor: Color {
-        // Try config first
-        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
-            return config.badgeColor
-        }
-        // Fallback to plugin registry (backward compatibility)
-        if let color = NoteTypeRegistry.shared.displayInfo(for: self)?.color {
-            return color
-        }
-        return .gray
+        NoteTypeConfigRegistry.shared.config(for: self)?.badgeColor ?? .gray
     }
 
     /// Footer icon for card display (may differ from badge icon)
     /// Provided by the registered config for this type.
     @MainActor
     var footerIcon: String {
-        // Try config first
-        if let config = NoteTypeConfigRegistry.shared.config(for: self) {
-            return config.footerIcon
-        }
-        // Fallback to plugin registry (backward compatibility)
-        if let footerIcon = NoteTypeRegistry.shared.footerIcon(for: self) {
-            return footerIcon
-        }
-        return "text.alignleft"
+        NoteTypeConfigRegistry.shared.config(for: self)?.footerIcon ?? "text.alignleft"
     }
 
     // MARK: - Initialization
