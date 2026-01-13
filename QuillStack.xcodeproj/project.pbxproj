@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05B0FAB770F778228A8CE7B9 /* NoteTypeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9D907268B92B6920205B73 /* NoteTypeConfig.swift */; };
 		01C7A169C61EA570EE2ED30C /* ClassificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E27A6B7AFBCB257A3CB0F /* ClassificationTestView.swift */; };
 		02DA8BE8153C5E6E809F26BB /* WrapFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747D69009C07CE6E7FD6BC75 /* WrapFlowLayout.swift */; };
 		061F3C399AA5AF2059F10445 /* BulkExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA760FE9DEBAF0EC0BF6A1D2 /* BulkExportSheet.swift */; };
@@ -241,6 +242,7 @@
 		2796C18C2EEB558200E05291 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		2796C18D2EEB558200E05291 /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meeting.swift; sourceTree = "<group>"; };
 		2796C18E2EEB558200E05291 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		2F9D907268B92B6920205B73 /* NoteTypeConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypeConfig.swift; sourceTree = "<group>"; };
 		2796C18F2EEB558200E05291 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		2796C1902EEB55A300E05291 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		2796C1912EEB55A300E05291 /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
@@ -531,6 +533,7 @@
 				2796C18C2EEB558200E05291 /* CoreDataStack.swift */,
 				2796C18D2EEB558200E05291 /* Meeting.swift */,
 				2796C18E2EEB558200E05291 /* Note.swift */,
+				2F9D907268B92B6920205B73 /* NoteTypeConfig.swift */,
 				F00200000000000F /* NotePage.swift */,
 				F00200000000001E /* OCRCorrection.swift */,
 				K00200000000003D /* Tag.swift */,
@@ -1160,6 +1163,7 @@
 				2796C1AA2EEB570000E05291 /* CoreDataStack.swift in Sources */,
 				2796C1AB2EEB570000E05291 /* Meeting.swift in Sources */,
 				2796C1AC2EEB570000E05291 /* Note.swift in Sources */,
+				05B0FAB770F778228A8CE7B9 /* NoteTypeConfig.swift in Sources */,
 				2796C1AD2EEB570000E05291 /* TodoItem.swift in Sources */,
 				2796C1AE2EEB570000E05291 /* CameraManager.swift in Sources */,
 				2796C1AF2EEB570000E05291 /* ImageProcessor.swift in Sources */,

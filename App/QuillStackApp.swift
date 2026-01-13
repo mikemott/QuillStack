@@ -55,6 +55,9 @@ struct QuillStackApp: App {
         // Register all built-in note type plugins
         NoteTypeRegistry.shared.registerBuiltInPlugins()
 
+        // Initialize note type config registry (coexists with plugin system)
+        _ = NoteTypeConfigRegistry.shared
+
         // Warm up expensive OCR dependencies off the main thread to avoid launch stalls
         ServicePrewarmer.warmHeavyServices()
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import SwiftUI
 
 /// Processing state for notes captured offline
 public enum NoteProcessingState: String, CaseIterable {
@@ -247,7 +248,7 @@ extension Note {
             classificationMethod = newValue?.rawValue
         }
     }
-    
+
     /// Get the classification result for this note
     var classification: NoteClassification {
         NoteClassification(
@@ -257,12 +258,40 @@ extension Note {
             reasoning: nil
         )
     }
-    
+
     /// Set the classification result for this note
     func setClassification(_ classification: NoteClassification) {
         type = classification.type
         classificationConfidence = classification.confidence
         classificationMethodEnum = classification.method
         updatedAt = Date()
+    }
+}
+
+// MARK: - Type Config Extensions
+
+extension Note {
+    /// Get the configuration for this note's type from the registry
+    @MainActor
+    var typeConfig: NoteTypeConfig? {
+        NoteTypeConfigRegistry.shared.config(for: type)
+    }
+
+    /// Human-readable display name for the note type
+    @MainActor
+    var typeDisplayName: String {
+        typeConfig?.displayName ?? type.rawValue.capitalized
+    }
+
+    /// Icon for the note type
+    @MainActor
+    var typeIcon: String {
+        typeConfig?.icon ?? "doc.text"
+    }
+
+    /// Badge color for the note type
+    @MainActor
+    var typeBadgeColor: Color {
+        typeConfig?.badgeColor ?? .gray
     }
 }
