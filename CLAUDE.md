@@ -43,9 +43,15 @@ A git pre-commit hook is installed to prevent this. Follow this workflow:
    - Uses: `gh pr view <number> --comments --json comments --jq '.comments[] | "**\(.author.login)**...'`
    - Waits ~30-60s for PR-Agent (qodo-code-review bot) to complete review
    - Reviews all compliance checks and code suggestions
-   - **Automatically fixes high-impact issues** (security, backward compatibility, bugs)
-   - Creates follow-up Linear issues for larger architectural suggestions
-   - Commits and pushes fixes to the PR branch
+
+   **Claude uses judgment to prioritize feedback:**
+   - ✅ **Always fix:** Security issues, bugs, backward compatibility breaks
+   - ✅ **Fix if straightforward:** High-impact improvements that are quick wins
+   - 📝 **Document for later:** Larger architectural refactorings (create Linear issue)
+   - ⏭️ **Skip:** Minor style preferences, subjective suggestions, or conflicts with project patterns
+
+   **Not all PR-Agent feedback requires action** - Claude makes pragmatic decisions about what adds value vs. what's noise. The goal is to catch real issues, not to satisfy every bot suggestion.
+
    - **User doesn't need to ask - Claude does this proactively**
 
 5. **Merge After Review**
