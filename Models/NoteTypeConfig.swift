@@ -9,29 +9,14 @@
 
 import SwiftUI
 
-// MARK: - Detail View Type
-
-/// Enumeration of all detail view types available for notes.
-/// Maps note types to their corresponding detail view implementations.
-enum DetailViewType: String, CaseIterable, Sendable {
-    case general
-    case todo
-    case email
-    case meeting
-    case reminder
-    case contact
-    case expense
-    case shopping
-    case recipe
-    case event
-    case idea
-    case claudePrompt
-}
-
 // MARK: - Note Type Configuration
 
 /// Configuration for a note type, defining its display properties and behavior.
 /// This struct provides a simplified, declarative alternative to the plugin protocol.
+///
+/// Each config includes a `makeView` closure that creates the appropriate detail view,
+/// following the Open/Closed Principle: new types can be added without modifying
+/// the DetailViewFactory.
 struct NoteTypeConfig: Sendable {
     /// Internal identifier for the config (e.g., "contact")
     let name: String
@@ -51,8 +36,9 @@ struct NoteTypeConfig: Sendable {
     /// Hashtag triggers that activate this note type
     let triggers: [String]
 
-    /// The detail view type to use for this note type
-    let detailViewType: DetailViewType
+    /// Closure that creates the detail view for this note type.
+    /// Encapsulates view creation logic within the config itself.
+    let makeView: @MainActor @Sendable (Note) -> AnyView
 
     init(
         name: String,
@@ -61,7 +47,7 @@ struct NoteTypeConfig: Sendable {
         badgeColor: Color,
         footerIcon: String,
         triggers: [String] = [],
-        detailViewType: DetailViewType
+        makeView: @MainActor @Sendable @escaping (Note) -> AnyView
     ) {
         self.name = name
         self.displayName = displayName
@@ -69,7 +55,7 @@ struct NoteTypeConfig: Sendable {
         self.badgeColor = badgeColor
         self.footerIcon = footerIcon
         self.triggers = triggers
-        self.detailViewType = detailViewType
+        self.makeView = makeView
     }
 }
 
@@ -111,7 +97,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeGeneral,
             footerIcon: "text.alignleft",
             triggers: [],
-            detailViewType: .general
+            makeView: { note in AnyView(NoteDetailView(note: note)) }
         ))
 
         // Todo/Task list
@@ -122,7 +108,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeTodo,
             footerIcon: "checkmark.square",
             triggers: ["#todo#", "#to-do#", "#tasks#", "#task#"],
-            detailViewType: .todo
+            makeView: { note in AnyView(TodoDetailView(note: note)) }
         ))
 
         // Email drafts
@@ -133,7 +119,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeEmail,
             footerIcon: "paperplane",
             triggers: ["#email#", "#mail#"],
-            detailViewType: .email
+            makeView: { note in AnyView(EmailDetailView(note: note)) }
         ))
 
         // Meeting notes
@@ -144,7 +130,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeMeeting,
             footerIcon: "person.2",
             triggers: ["#meeting#", "#notes#", "#minutes#"],
-            detailViewType: .meeting
+            makeView: { note in AnyView(MeetingDetailView(note: note)) }
         ))
 
         // Reminders
@@ -155,7 +141,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeReminder,
             footerIcon: "clock",
             triggers: ["#reminder#", "#remind#", "#remindme#"],
-            detailViewType: .reminder
+            makeView: { note in AnyView(ReminderDetailView(note: note)) }
         ))
 
         // Calendar events
@@ -166,7 +152,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeEvent,
             footerIcon: "clock",
             triggers: ["#event#", "#appointment#", "#schedule#", "#appt#"],
-            detailViewType: .event
+            makeView: { note in AnyView(EventDetailView(note: note)) }
         ))
 
         // Expense/Receipt tracking
@@ -177,7 +163,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeExpense,
             footerIcon: "creditcard",
             triggers: ["#expense#", "#receipt#", "#spent#", "#paid#"],
-            detailViewType: .expense
+            makeView: { note in AnyView(ExpenseDetailView(note: note)) }
         ))
 
         // Shopping lists
@@ -188,7 +174,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeShopping,
             footerIcon: "bag",
             triggers: ["#shopping#", "#shop#", "#grocery#", "#groceries#", "#list#"],
-            detailViewType: .shopping
+            makeView: { note in AnyView(ShoppingDetailView(note: note)) }
         ))
 
         // Recipes
@@ -199,7 +185,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeRecipe,
             footerIcon: "list.bullet",
             triggers: ["#recipe#", "#cook#", "#bake#"],
-            detailViewType: .recipe
+            makeView: { note in AnyView(RecipeDetailView(note: note)) }
         ))
 
         // Ideas/brainstorming
@@ -210,7 +196,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeIdea,
             footerIcon: "brain",
             triggers: ["#idea#", "#thought#", "#note-to-self#", "#notetoself#"],
-            detailViewType: .idea
+            makeView: { note in AnyView(IdeaDetailView(note: note)) }
         ))
 
         // Claude prompts/feature requests
@@ -221,7 +207,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgePrompt,
             footerIcon: "arrow.up.circle",
             triggers: ["#claude#", "#feature#", "#prompt#", "#request#", "#issue#"],
-            detailViewType: .claudePrompt
+            makeView: { note in AnyView(ClaudePromptDetailView(note: note)) }
         ))
 
         // Contact/business cards
@@ -232,7 +218,7 @@ final class NoteTypeConfigRegistry {
             badgeColor: .badgeContact,
             footerIcon: "person",
             triggers: ["#contact#", "#person#", "#phone#"],
-            detailViewType: .contact
+            makeView: { note in AnyView(ContactDetailView(note: note)) }
         ))
     }
 
