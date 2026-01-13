@@ -77,7 +77,7 @@ struct NoteTypeConfig: Sendable {
 
 /// Singleton registry for note type configurations.
 /// Provides centralized access to note type display properties and view types.
-@MainActor
+/// Thread-safe via concurrent dispatch queue.
 final class NoteTypeConfigRegistry {
 
     // MARK: - Singleton
@@ -87,6 +87,10 @@ final class NoteTypeConfigRegistry {
     // MARK: - Storage
 
     private var configs: [String: NoteTypeConfig] = [:]
+    private let accessQueue = DispatchQueue(
+        label: "com.quillstack.NoteTypeConfigRegistry.accessQueue",
+        attributes: .concurrent
+    )
 
     // MARK: - Initialization
 
@@ -235,7 +239,9 @@ final class NoteTypeConfigRegistry {
     /// Register a custom note type configuration.
     /// - Parameter config: The configuration to register
     func register(_ config: NoteTypeConfig) {
-        configs[config.name] = config
+        accessQueue.async(flags: .barrier) {
+            self.configs[config.name] = config
+        }
     }
 
     // MARK: - Lookup Methods
@@ -244,14 +250,18 @@ final class NoteTypeConfigRegistry {
     /// - Parameter noteType: The note type to look up
     /// - Returns: The configuration, or nil if not found
     func config(for noteType: NoteType) -> NoteTypeConfig? {
-        return configs[noteType.rawValue]
+        accessQueue.sync {
+            return configs[noteType.rawValue]
+        }
     }
 
     /// Get the configuration by type name string.
     /// - Parameter name: The note type name (e.g., "todo")
     /// - Returns: The configuration, or nil if not found
     func config(forName name: String) -> NoteTypeConfig? {
-        return configs[name]
+        accessQueue.sync {
+            return configs[name.lowercased()]
+        }
     }
 
     /// Get display information for a note type.
@@ -265,6 +275,8 @@ final class NoteTypeConfigRegistry {
     /// Get all registered configurations.
     /// - Returns: Array of all registered configs
     func allConfigs() -> [NoteTypeConfig] {
-        return Array(configs.values)
+        accessQueue.sync {
+            return Array(configs.values)
+        }
     }
 }

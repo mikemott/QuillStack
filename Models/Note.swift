@@ -272,25 +272,21 @@ extension Note {
 
 extension Note {
     /// Get the configuration for this note's type from the registry
-    @MainActor
     var typeConfig: NoteTypeConfig? {
         NoteTypeConfigRegistry.shared.config(for: type)
     }
 
     /// Human-readable display name for the note type
-    @MainActor
     var typeDisplayName: String {
         typeConfig?.displayName ?? type.rawValue.capitalized
     }
 
     /// Icon for the note type
-    @MainActor
     var typeIcon: String {
         typeConfig?.icon ?? "doc.text"
     }
 
     /// Badge color for the note type
-    @MainActor
     var typeBadgeColor: Color {
         typeConfig?.badgeColor ?? .gray
     }
