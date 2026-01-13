@@ -406,10 +406,10 @@ final class TextClassifier: TextClassifierProtocol {
         return detectFuzzyTrigger(prefix)
     }
 
-    /// Exact trigger matching using NoteTypeRegistry
+    /// Exact trigger matching using NoteTypeConfigRegistry
     private func detectExactTrigger(_ prefix: String) -> NoteType? {
-        // Use the registry to detect type from exact triggers
-        return NoteTypeRegistry.shared.detectType(from: prefix)
+        // Use the config registry to detect type from exact triggers
+        return NoteTypeConfigRegistry.shared.detectType(from: prefix)
     }
 
     /// Fuzzy trigger matching to handle common OCR errors
@@ -794,8 +794,8 @@ final class TextClassifier: TextClassifierProtocol {
 
     /// Extracts the trigger tag from content (for display/removal purposes)
     func extractTriggerTag(from content: String) -> (tag: String, cleanedContent: String)? {
-        // Get all triggers from the registry
-        let patterns = NoteTypeRegistry.shared.allTriggers
+        // Get all triggers from the config registry
+        let patterns = NoteTypeConfigRegistry.shared.allTriggers
 
         let lowercased = content.lowercased()
 
@@ -820,8 +820,8 @@ final class TextClassifier: TextClassifierProtocol {
     /// Removes ALL occurrences of matched trigger tags from content
     /// Returns the cleaned content with all tags stripped
     func extractAllTriggerTags(from content: String, for noteType: NoteType) -> String {
-        // Get the patterns that match this note type from the registry
-        let patternsToRemove = NoteTypeRegistry.shared.triggers(for: noteType)
+        // Get the patterns that match this note type from the config registry
+        let patternsToRemove = NoteTypeConfigRegistry.shared.triggers(for: noteType)
 
         // No tags to remove if empty (e.g., general notes)
         if patternsToRemove.isEmpty {
@@ -863,12 +863,12 @@ final class TextClassifier: TextClassifierProtocol {
         // Find all tag positions
         var tagPositions: [(range: Range<String.Index>, type: NoteType)] = []
 
-        // Get all triggers from registry and check for each
+        // Get all triggers from config registry and check for each
         let allTypes: [NoteType] = [.todo, .email, .meeting, .contact, .reminder,
                                      .expense, .shopping, .recipe, .event, .idea, .claudePrompt]
 
         for noteType in allTypes {
-            let triggers = NoteTypeRegistry.shared.triggers(for: noteType)
+            let triggers = NoteTypeConfigRegistry.shared.triggers(for: noteType)
 
             for trigger in triggers {
                 var searchStart = lowercased.startIndex

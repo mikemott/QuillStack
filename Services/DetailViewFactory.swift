@@ -16,19 +16,13 @@ struct DetailViewFactory {
 
     /// Creates the appropriate detail view for a note.
     /// Delegates to the config's makeView closure for view creation.
-    /// Falls back to plugin registry for backward compatibility, then to NoteDetailView.
     static func makeView(for note: Note) -> AnyView {
-        // Try config-based routing first (delegates to closure)
+        // Use config-based routing (delegates to closure)
         if let config = NoteTypeConfigRegistry.shared.config(for: note.type) {
             return config.makeView(note)
         }
 
-        // Fallback to plugin registry for backward compatibility
-        if let view = NoteTypeRegistry.shared.makeDetailView(for: note) {
-            return view
-        }
-
-        // Final fallback for unregistered types
+        // Fallback for unregistered types
         return AnyView(NoteDetailView(note: note))
     }
 

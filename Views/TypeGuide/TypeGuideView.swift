@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TypeGuideView: View {
-    @State private var selectedType: (any NoteTypePlugin)?
+    @State private var selectedConfig: NoteTypeConfig?
     @State private var showingExample = false
 
     private let columns = [
@@ -20,10 +20,10 @@ struct TypeGuideView: View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(NoteTypeRegistry.shared.allPlugins(), id: \.id) { plugin in
-                        TypeCard(plugin: plugin)
+                    ForEach(NoteTypeConfigRegistry.shared.allConfigs(), id: \.name) { config in
+                        TypeCard(config: config)
                             .onTapGesture {
-                                selectedType = plugin
+                                selectedConfig = config
                                 showingExample = true
                             }
                     }
@@ -33,8 +33,8 @@ struct TypeGuideView: View {
             .navigationTitle("Note Types")
             .background(Color.creamLight)
             .sheet(isPresented: $showingExample) {
-                if let plugin = selectedType {
-                    TypeExampleSheet(plugin: plugin)
+                if let config = selectedConfig {
+                    TypeExampleSheet(config: config)
                 }
             }
         }
@@ -42,21 +42,21 @@ struct TypeGuideView: View {
 }
 
 struct TypeCard: View {
-    let plugin: any NoteTypePlugin
+    let config: NoteTypeConfig
 
     var body: some View {
         VStack(spacing: 12) {
-            Image(systemName: plugin.icon)
+            Image(systemName: config.icon)
                 .font(.system(size: 36))
-                .foregroundColor(plugin.badgeColor)
+                .foregroundColor(config.badgeColor)
                 .frame(height: 44)
 
-            Text(plugin.displayName)
+            Text(config.displayName)
                 .font(.headline)
                 .foregroundColor(.textDark)
 
             VStack(spacing: 4) {
-                ForEach(plugin.triggers.prefix(2), id: \.self) { trigger in
+                ForEach(Array(config.triggers.prefix(2)), id: \.self) { trigger in
                     Text(trigger)
                         .font(.caption)
                         .foregroundColor(.textMedium)
@@ -65,14 +65,14 @@ struct TypeCard: View {
                         .background(Color.paperBeige)
                         .cornerRadius(4)
                 }
-                if plugin.triggers.count > 2 {
-                    Text("+\(plugin.triggers.count - 2) more")
+                if config.triggers.count > 2 {
+                    Text("+\(config.triggers.count - 2) more")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }
 
-            Text(descriptionFor(plugin.type))
+            Text(descriptionFor(config.name))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -86,40 +86,42 @@ struct TypeCard: View {
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
 
-    private func descriptionFor(_ type: NoteType) -> String {
-        switch type {
-        case .general:
+    private func descriptionFor(_ typeName: String) -> String {
+        switch typeName {
+        case "general":
             return "Unstructured notes and freeform content"
-        case .todo:
+        case "todo":
             return "Task lists with checkboxes"
-        case .meeting:
+        case "meeting":
             return "Meeting notes → Calendar"
-        case .email:
+        case "email":
             return "Draft emails for sending"
-        case .reminder:
+        case "reminder":
             return "Quick reminders with alerts"
-        case .contact:
+        case "contact":
             return "Contact info → Contacts"
-        case .expense:
+        case "expense":
             return "Track spending and receipts"
-        case .shopping:
+        case "shopping":
             return "Shopping and grocery lists"
-        case .recipe:
+        case "recipe":
             return "Cooking instructions and ingredients"
-        case .event:
+        case "event":
             return "Events → Calendar"
-        case .journal:
+        case "journal":
             return "Personal journal entries"
-        case .idea:
+        case "idea":
             return "Capture thoughts and ideas"
-        case .claudePrompt:
+        case "claudePrompt":
             return "Feature requests → Linear"
+        default:
+            return "Custom note type"
         }
     }
 }
 
 struct TypeExampleSheet: View {
-    let plugin: any NoteTypePlugin
+    let config: NoteTypeConfig
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -127,12 +129,12 @@ struct TypeExampleSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
-                        Image(systemName: plugin.icon)
+                        Image(systemName: config.icon)
                             .font(.system(size: 32))
-                            .foregroundColor(plugin.badgeColor)
+                            .foregroundColor(config.badgeColor)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(plugin.displayName)
+                            Text(config.displayName)
                                 .font(.title2)
                                 .fontWeight(.bold)
 
@@ -149,13 +151,13 @@ struct TypeExampleSheet: View {
                             .foregroundColor(.textDark)
 
                         FlowLayout(spacing: 8) {
-                            ForEach(plugin.triggers, id: \.self) { trigger in
+                            ForEach(config.triggers, id: \.self) { trigger in
                                 Text(trigger)
                                     .font(.subheadline)
                                     .foregroundColor(.textDark)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(plugin.badgeColor.opacity(0.15))
+                                    .background(config.badgeColor.opacity(0.15))
                                     .cornerRadius(6)
                             }
                         }
@@ -168,7 +170,7 @@ struct TypeExampleSheet: View {
                             .font(.headline)
                             .foregroundColor(.textDark)
 
-                        Text(exampleContentFor(plugin.type))
+                        Text(exampleContentFor(config.name))
                             .font(.body)
                             .foregroundColor(.textMedium)
                             .padding()
@@ -182,7 +184,7 @@ struct TypeExampleSheet: View {
                             .font(.headline)
                             .foregroundColor(.textDark)
 
-                        Text(actionDescriptionFor(plugin.type))
+                        Text(actionDescriptionFor(config.name))
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -202,65 +204,69 @@ struct TypeExampleSheet: View {
         }
     }
 
-    private func exampleContentFor(_ type: NoteType) -> String {
-        switch type {
-        case .general:
+    private func exampleContentFor(_ typeName: String) -> String {
+        switch typeName {
+        case "general":
             return "Just some quick thoughts I wanted to capture. No specific structure needed, just freeform notes."
-        case .todo:
+        case "todo":
             return "☐ Buy groceries\n☐ Call dentist\n☐ Finish project report\n☐ Exercise for 30 min"
-        case .meeting:
+        case "meeting":
             return "Q1 Planning Meeting\nJan 15, 2026 at 2:00 PM\nWith: Sarah, Mike, Alex\n\n- Discussed new feature roadmap\n- Reviewed budget\n- Action: Sarah to draft timeline"
-        case .email:
+        case "email":
             return "To: team@company.com\nRe: Project Update\n\nHi team, wanted to share a quick update on the launch timeline..."
-        case .reminder:
+        case "reminder":
             return "Reminder: Pick up dry cleaning\nToday at 5:00 PM"
-        case .contact:
+        case "contact":
             return "John Smith\nPhone: (555) 123-4567\nEmail: john@example.com\nCompany: Acme Corp"
-        case .expense:
+        case "expense":
             return "Lunch meeting\n$45.00\nJan 12, 2026\nCategory: Meals"
-        case .shopping:
+        case "shopping":
             return "Shopping List:\n- Milk\n- Eggs\n- Bread\n- Chicken\n- Apples"
-        case .recipe:
+        case "recipe":
             return "Chocolate Chip Cookies\n\nIngredients:\n- 2 cups flour\n- 1 cup butter\n- 1 cup chocolate chips\n\nBake at 350°F for 12 min"
-        case .event:
+        case "event":
             return "Dinner with friends\nSaturday, Jan 18 at 7:00 PM\nLocation: The Garden Bistro"
-        case .journal:
+        case "journal":
             return "January 12, 2026\n\nToday was a productive day. Finally finished the project I've been working on for weeks. Feeling accomplished!"
-        case .idea:
+        case "idea":
             return "What if we added a dark mode toggle? Could help with battery life and eye strain at night."
-        case .claudePrompt:
+        case "claudePrompt":
             return "Feature Request: Add ability to search notes by date range. Would be super helpful for finding old meeting notes."
+        default:
+            return "Example content for this note type."
         }
     }
 
-    private func actionDescriptionFor(_ type: NoteType) -> String {
-        switch type {
-        case .general:
+    private func actionDescriptionFor(_ typeName: String) -> String {
+        switch typeName {
+        case "general":
             return "Saved as a general note with no special processing"
-        case .todo:
+        case "todo":
             return "Extracts checkbox items and tracks completion status"
-        case .meeting:
+        case "meeting":
             return "Parses meeting details and offers to add to your calendar"
-        case .email:
+        case "email":
             return "Creates an email draft you can send from Mail"
-        case .reminder:
+        case "reminder":
             return "Creates a reminder with optional time-based alert"
-        case .contact:
+        case "contact":
             return "Extracts contact details and offers to save to Contacts"
-        case .expense:
+        case "expense":
             return "Tracks amount and categorizes for expense reporting"
-        case .shopping:
+        case "shopping":
             return "Creates a checkable shopping list"
-        case .recipe:
+        case "recipe":
             return "Organizes ingredients and instructions for cooking"
-        case .event:
+        case "event":
             return "Parses event details and offers to add to your calendar"
-        case .journal:
+        case "journal":
             return "Saves your journal entry with elegant formatting"
-        case .idea:
+        case "idea":
             return "Saves your idea for future reference"
-        case .claudePrompt:
+        case "claudePrompt":
             return "Creates a Linear issue for the development team"
+        default:
+            return "Custom processing for this note type"
         }
     }
 }
