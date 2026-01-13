@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct NoteListView: View {
     @State private var viewModel = NoteViewModel()
@@ -23,6 +24,14 @@ struct NoteListView: View {
     // Offline mode state
     @State private var processingQueue = ProcessingQueue.shared
     @State private var networkMonitor = NetworkMonitor.shared
+
+    // Tag filtering state (QUI-185)
+    @State private var selectedTagIds: Set<UUID> = []
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)],
+        animation: .default
+    )
+    private var allTags: FetchedResults<Tag>
 
     // Deep link bindings (optional, for widget support)
     @Binding var showingCameraFromDeepLink: Bool
@@ -54,9 +63,20 @@ struct NoteListView: View {
                         processingQueueBanner
                     }
 
+                    // Tag Filter Bar (QUI-185)
+                    if !availableTags.isEmpty && !viewModel.notes.isEmpty {
+                        TagFilterBar(
+                            selectedTagIds: $selectedTagIds,
+                            availableTags: availableTags
+                        )
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+
                     // Content
                     if viewModel.notes.isEmpty {
                         emptyStateView
+                    } else if filteredNotes.isEmpty && !selectedTagIds.isEmpty {
+                        noFilterResultsView
                     } else {
                         noteGridContent
                     }
@@ -131,6 +151,53 @@ struct NoteListView: View {
     private func exitEditMode() {
         isEditing = false
         selectedNotes.removeAll()
+    }
+
+    // MARK: - Tag Filtering (QUI-185)
+
+    /// Available tags that have at least one note (sorted by usage)
+    private var availableTags: [Tag] {
+        allTags
+            .filter { $0.noteCount > 0 }
+            .sorted { $0.noteCount > $1.noteCount }
+    }
+
+    /// Notes filtered by selected tags (OR logic: notes with ANY selected tag)
+    private var filteredNotes: [Note] {
+        guard !selectedTagIds.isEmpty else { return viewModel.notes }
+
+        return viewModel.notes.filter { note in
+            guard let noteTags = note.tagEntities else { return false }
+            return noteTags.contains { selectedTagIds.contains($0.id) }
+        }
+    }
+
+    /// Empty state when filters yield no results
+    private var noFilterResultsView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "tag.slash")
+                .font(.system(size: 48, weight: .light))
+                .foregroundColor(.textLight)
+
+            Text("No notes match selected tags")
+                .font(.serifBody(17, weight: .medium))
+                .foregroundColor(.textMedium)
+
+            Button(action: {
+                withAnimation {
+                    selectedTagIds.removeAll()
+                }
+            }) {
+                Text("Clear Filters")
+                    .font(.serifBody(15, weight: .semibold))
+                    .foregroundColor(.forestDark)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color.forestLight.opacity(0.2))
+                    .cornerRadius(8)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Custom Navigation Bar
@@ -310,8 +377,17 @@ struct NoteListView: View {
 
     private var collectionsToDisplay: [(collection: SmartCollection, notes: [Note])] {
         viewModel.collections.compactMap { collection in
-            let notes = viewModel.notesForCollection(collection.id)
-            if !notes.isEmpty || collection.id == "recent" || collection.id == "archive" {
+            var notes = viewModel.notesForCollection(collection.id)
+
+            // Apply tag filtering (QUI-185)
+            if !selectedTagIds.isEmpty {
+                notes = notes.filter { note in
+                    guard let noteTags = note.tagEntities else { return false }
+                    return noteTags.contains { selectedTagIds.contains($0.id) }
+                }
+            }
+
+            if !notes.isEmpty || (collection.id == "recent" && selectedTagIds.isEmpty) {
                 return (collection, notes)
             }
             return nil
