@@ -18,7 +18,7 @@ final class TextClassifier: TextClassifierProtocol {
     /// Current LLM prompt version for classification
     /// Increment this when making significant prompt changes to track accuracy improvements
     /// Format: "v{major}.{minor}" where major = breaking changes, minor = improvements
-    private static let PROMPT_VERSION = "v2.0"
+    private static let PROMPT_VERSION = "v2.1"
 
     // MARK: - LLM Classification Cache
 
@@ -254,60 +254,116 @@ final class TextClassifier: TextClassifierProtocol {
         Classify this handwritten note into one of these types:
 
         **Note Types:**
-        - **todo**: Tasks, checklists, action items (e.g., "Buy milk", "Call dentist")
-        - **meeting**: Meeting notes, agendas, discussion summaries
-        - **email**: Draft emails, messages to send
-        - **contact**: Contact information with name and details (phone/email/address)
-        - **reminder**: Time-based reminders for future actions
+        - **todo**: ACTIONABLE tasks - things the user must DO
+          ✓ Examples: "Buy milk", "Call dentist", "Submit report by Friday"
+          ✗ NOT for: Lists of information, book notes, reference material, meeting summaries
+
+        - **journal**: Personal thoughts, notes ABOUT content, reflections, learning summaries
+          ✓ Examples: Book chapter notes, article summaries, observations, thoughts
+          ✗ NOT for: Action items, structured data, meeting action items
+
+        - **meeting**: Meeting notes with attendees, agendas, or discussion points
+          Note: If meeting notes contain ONLY action items, classify as "todo" instead
+
+        - **email**: Draft emails with To/From/Subject structure
+        - **contact**: Contact information with name + contact details (phone/email/address)
+        - **reminder**: Time-based reminders or alerts with dates/times
         - **expense**: Receipts, purchases, financial tracking
-        - **shopping**: Shopping lists, items to buy
-        - **recipe**: Cooking instructions, ingredient lists
-        - **event**: Calendar events, appointments, celebrations
-        - **idea**: Creative ideas, brainstorming, concepts
+        - **shopping**: Shopping lists - items to purchase at a store
+        - **recipe**: Cooking recipes with ingredients and instructions
+        - **event**: Calendar events, appointments, celebrations (with date/time/location)
+        - **idea**: Creative ideas, brainstorming, concepts, feature requests
         - **claudePrompt**: Requests or prompts for AI assistants like Claude
         - **general**: General notes that don't fit other categories
 
-        **Classification Rules:**
-        1. Return ONLY the type name (lowercase), nothing else
-        2. Choose the MOST SPECIFIC type that matches
-        3. Contact requires name + contact details (phone/email/address)
-        4. Todo needs actionable tasks or checkboxes
-        5. Shopping is specifically for purchasing items
-        6. If unsure or doesn't fit a category, return "general"
+        **CRITICAL CLASSIFICATION RULES:**
+        1. **Format does NOT determine type!** A bulleted list could be:
+           - Book notes (informational) → journal
+           - Shopping items (purchases) → shopping
+           - Tasks to complete (actionable) → todo
+           **Classify by CONTENT and INTENT, not format!**
 
-        **Examples:**
+        2. Return ONLY the type name (lowercase), nothing else
+        3. Choose the MOST SPECIFIC type that matches
+        4. Contact requires name + at least one contact detail (phone/email/address)
+        5. Temporal markers (dates/times) suggest reminder or event
+        6. Structured email format (To/From/Subject) indicates email type
+        7. If unsure or doesn't fit a category, return "general"
 
-        Example 1:
+        **Examples with Edge Cases:**
+
+        Example 1 - Book notes (NOT a todo, IS journal):
+        Text: "Notes from Chapter 3:
+        - Protagonist faces moral dilemma
+        - Theme of redemption emerges
+        - Foreshadowing of final conflict"
+        Type: journal
+        Reasoning: Informational notes ABOUT content, not actionable tasks
+
+        Example 2 - Actual tasks (IS a todo):
+        Text: "Today:
+        - Buy milk and eggs
+        - Call the dentist
+        - Finish project proposal"
+        Type: todo
+        Reasoning: Clear actionable items the user must complete
+
+        Example 3 - Information list (NOT a todo, IS journal):
+        Text: "Key takeaways from presentation:
+        - Revenue up 15% YoY
+        - New product launch Q3
+        - Hiring 5 engineers"
+        Type: journal
+        Reasoning: Summary of information, not action items
+
+        Example 4 - Time-based reminder:
         Text: "Call mom tomorrow at 3pm about birthday party"
         Type: reminder
+        Reasoning: Contains specific date/time for future action
 
-        Example 2:
-        Text: "John Smith\n555-123-4567\njohn@example.com\nSales Manager at Acme Corp"
+        Example 5 - Contact info:
+        Text: "John Smith
+        555-123-4567
+        john@example.com
+        Sales Manager at Acme Corp"
         Type: contact
+        Reasoning: Name + contact details present
 
-        Example 3:
-        Text: "Discussed Q4 roadmap\nAction items: Update docs, schedule follow-up\nAttendees: Sarah, Mike"
+        Example 6 - Meeting with action items:
+        Text: "Discussed Q4 roadmap
+        Action items: Update docs, schedule follow-up
+        Attendees: Sarah, Mike"
         Type: meeting
+        Reasoning: Meeting context with attendees, despite having action items
 
-        Example 4:
-        Text: "□ Buy milk\n□ Get eggs\n□ Pick up prescription"
+        Example 7 - Pure action list from meeting (IS todo):
+        Text: "Meeting follow-ups:
+        □ Update documentation
+        □ Schedule Q2 review
+        □ Send proposal to client"
         Type: todo
+        Reasoning: Only contains actionable tasks, no meeting context
 
-        Example 5:
-        Text: "Milk, bread, eggs, cheese, bananas"
+        Example 8 - Shopping list:
+        Text: "Grocery store: Milk, bread, eggs, cheese, bananas"
         Type: shopping
+        Reasoning: Items to purchase
 
-        Example 6:
-        Text: "Spent $45.99 at Target for office supplies\nReceipt #12345"
+        Example 9 - Expense tracking:
+        Text: "Spent $45.99 at Target for office supplies
+        Receipt #12345"
         Type: expense
+        Reasoning: Financial transaction with amount
 
-        Example 7:
+        Example 10 - Creative idea:
         Text: "What if we built a feature that automatically summarizes meeting notes?"
         Type: idea
+        Reasoning: Brainstorming/feature concept
 
-        Example 8:
+        Example 11 - AI prompt:
         Text: "Write a poem about autumn leaves"
         Type: claudePrompt
+        Reasoning: Direct instruction or request for an AI assistant
 
         **Text to classify:**
         \(text)
