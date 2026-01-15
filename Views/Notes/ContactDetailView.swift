@@ -323,20 +323,6 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
             alignment: .top
         )
     }
-                .cornerRadius(10)
-            }
-            .disabled(contact.displayName.isEmpty)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(Color.creamLight)
-        .overlay(
-            Rectangle()
-                .fill(Color.forestDark.opacity(0.1))
-                .frame(height: 1),
-            alignment: .top
-        )
-    }
 
     // MARK: - NoteDetailViewProtocol
 

@@ -114,7 +114,7 @@ struct SmartCollectionContainer: View {
                 VStack(spacing: 8) {
                     ForEach(notes, id: \.objectID) { note in
                         NavigationLink(value: note) {
-                            NoteCardView(note: note)
+                            NoteCard(note: note)
                                 .padding(.horizontal, 16)
                         }
                         .buttonStyle(.plain)
