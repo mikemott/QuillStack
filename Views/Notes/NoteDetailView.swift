@@ -205,19 +205,28 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
+        HStack {
             Spacer()
-
-            // Share button (kept prominent)
-            Button(action: shareNote) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Share note")
-
-            // More menu (consolidated actions)
+            
+            // Single Actions menu consolidating all actions
             Menu {
+                // Share
+                Button(action: shareNote) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
+                // Copy
+                Button(action: copyContent) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                // Export
+                Button(action: { showingExportSheet = true }) {
+                    Label("Export", systemImage: "arrow.up.doc")
+                }
+                
+                Divider()
+                
                 // AI actions (only show if API key configured)
                 if settings.hasAPIKey {
                     Section {
@@ -229,7 +238,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                         }
                     }
                 }
-
+                
                 // Annotate (only show if note has original image)
                 if note.originalImageData != nil {
                     Section {
@@ -241,13 +250,12 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                         }
                     }
                 }
-
+                
                 Section {
-                    // Change Type
                     Button(action: { showingTypePicker = true }) {
                         Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
                     }
-
+                    
                     // Multi-page actions
                     Button(action: { showingAddPageSheet = true }) {
                         Label("Add Page", systemImage: "plus.rectangle.on.rectangle")
@@ -261,24 +269,28 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                         }
                     }
                 }
-
-                Section {
-                    // Copy
-                    Button(action: copyContent) {
-                        Label("Copy Text", systemImage: "doc.on.clipboard")
-                    }
-
-                    // Export
-                    Button(action: { showingExportSheet = true }) {
-                        Label("Export", systemImage: "arrow.up.doc")
-                    }
-                }
             } label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.forestDark, Color.forestMedium],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(10)
             }
-            .accessibilityLabel("More actions")
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

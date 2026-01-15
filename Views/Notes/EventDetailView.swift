@@ -278,41 +278,49 @@ struct EventDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
+        HStack {
             Spacer()
-
-            // Add to Calendar button
-            Button(action: { showingReviewSheet = true }) {
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Add to Calendar
+                Button(action: { showingReviewSheet = true }) {
+                    Label(
+                        eventCreated ? "Added to Calendar" : "Add to Calendar",
+                        systemImage: eventCreated ? "checkmark.circle.fill" : "calendar.badge.plus"
+                    )
+                }
+                .disabled(eventTitle.isEmpty)
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
                 HStack(spacing: 8) {
-                    Image(systemName: eventCreated ? "checkmark.circle.fill" : "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text(eventCreated ? "Added" : "Add to Calendar")
-                        .font(.serifBody(15, weight: .semibold))
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
                 }
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .background(
                     LinearGradient(
-                        colors: eventCreated
-                            ? [Color.green, Color.green.opacity(0.8)]
-                            : [Color.badgeEvent, Color.badgeEvent.opacity(0.8)],
+                        colors: [Color.forestDark, Color.forestMedium],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .cornerRadius(10)
             }
+            .accessibilityLabel("Actions menu")
             .disabled(eventTitle.isEmpty)
             .opacity(eventTitle.isEmpty ? 0.5 : 1)
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

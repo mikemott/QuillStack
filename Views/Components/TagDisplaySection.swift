@@ -55,16 +55,19 @@ struct TagDisplaySection: View {
                 }
 
                 if hasTags {
-                    // Primary tag badge
-                    if let primaryTag = note.primaryTag {
-                        TagBadge(tag: primaryTag, size: compact ? .small : .medium)
-                    }
+                    // Tags container - groups primary and secondary tags together
+                    VStack(alignment: .leading, spacing: compact ? 8 : 10) {
+                        // Primary tag badge
+                        if let primaryTag = note.primaryTag {
+                            TagBadge(tag: primaryTag, size: compact ? .small : .medium)
+                        }
 
-                    // Secondary tags
-                    if !note.secondaryTags.isEmpty {
-                        WrapFlowLayout(spacing: compact ? 6 : 8) {
-                            ForEach(note.secondaryTags, id: \.id) { tag in
-                                TagChip(tag: tag.name, removable: false, isPrimary: false)
+                        // Secondary tags - properly contained within the VStack
+                        if !note.secondaryTags.isEmpty {
+                            WrapFlowLayout(spacing: compact ? 6 : 8) {
+                                ForEach(note.secondaryTags, id: \.id) { tag in
+                                    TagChip(tag: tag.name, removable: false, isPrimary: false)
+                                }
                             }
                         }
                     }

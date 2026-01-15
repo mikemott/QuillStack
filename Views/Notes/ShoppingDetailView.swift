@@ -202,49 +202,60 @@ struct ShoppingDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Button(action: shareList) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
+        HStack {
             Spacer()
-
-            Button(action: { showingRemindersSheet = true }) {
-                Image(systemName: "checklist")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.badgeShopping, Color.badgeShopping.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Add to Reminders
+                Button(action: { showingRemindersSheet = true }) {
+                    Label("Add to Reminders", systemImage: "checklist")
+                }
+                
+                Divider()
+                
+                // Share
+                Button(action: shareList) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
+                // Copy
+                Button(action: copyContent) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                // Export
+                Button(action: { showingExportSheet = true }) {
+                    Label("Export", systemImage: "arrow.up.doc")
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.forestDark, Color.forestMedium],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                    .cornerRadius(10)
+                )
+                .cornerRadius(10)
             }
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

@@ -426,74 +426,75 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // AI menu (only show if API key configured)
-            if settings.hasAPIKey {
-                Menu {
-                    Button(action: { showingSummarySheet = true }) {
-                        Label("Summarize", systemImage: "text.quote")
-                    }
-                } label: {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.forestDark)
-                }
-            }
-
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            // Export
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Copy
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
+        HStack {
             Spacer()
-
-            // Calendar menu
+            
+            // Single Actions menu consolidating all actions
             Menu {
-                Button(action: { showingCreateEventSheet = true }) {
-                    Label("Create New Event", systemImage: "calendar.badge.plus")
+                // Calendar actions
+                Section {
+                    Button(action: { showingCreateEventSheet = true }) {
+                        Label("Create New Event", systemImage: "calendar.badge.plus")
+                    }
+                    Button(action: { showingEventPicker = true }) {
+                        Label("Link to Existing Event", systemImage: "link")
+                    }
+                    if note.meeting?.calendarEventIdentifier != nil {
+                        Divider()
+                        Button(role: .destructive, action: unlinkCalendarEvent) {
+                            Label("Unlink Event", systemImage: "link.badge.minus")
+                        }
+                    }
                 }
-                Button(action: { showingEventPicker = true }) {
-                    Label("Link to Existing Event", systemImage: "link")
+                
+                Divider()
+                
+                // Copy
+                Button(action: copyContent) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
                 }
-                if note.meeting?.calendarEventIdentifier != nil {
-                    Divider()
-                    Button(role: .destructive, action: unlinkCalendarEvent) {
-                        Label("Unlink Event", systemImage: "link.badge.minus")
+                
+                // Export
+                Button(action: { showingExportSheet = true }) {
+                    Label("Export", systemImage: "arrow.up.doc")
+                }
+                
+                // AI actions (only show if API key configured)
+                if settings.hasAPIKey {
+                    Section {
+                        Button(action: { showingSummarySheet = true }) {
+                            Label("Summarize", systemImage: "text.quote")
+                        }
+                    }
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
                     }
                 }
             } label: {
-                Image(systemName: note.meeting?.calendarEventIdentifier != nil ? "calendar.badge.checkmark" : "calendar.badge.plus")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: note.meeting?.calendarEventIdentifier != nil
-                                ? [Color.green, Color.green.opacity(0.8)]
-                                : [Color.badgeMeeting, Color.badgeMeeting.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.forestDark, Color.forestMedium],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                    .cornerRadius(10)
+                )
+                .cornerRadius(10)
             }
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
