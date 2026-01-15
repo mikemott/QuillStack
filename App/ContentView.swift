@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable private var settings = SettingsManager.shared
-    @State private var selectedTab = 0
+    @State private var selectedTab = 1  // Default to Notes list instead of Camera
     @State private var showingOnboarding = false
 
     var body: some View {

@@ -23,6 +23,7 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
     @State private var showingSummarySheet = false
     @State private var showingTypePicker = false
     @State private var showingTagEditor = false // QUI-162
+    @Bindable private var settings = SettingsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - NoteDetailViewProtocol
@@ -247,21 +248,73 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        DetailBottomBar(
-            onExport: { showingExportSheet = true },
-            onCopy: { copyToClipboard() },
-            aiActions: DetailBottomBar.summarizeOnlyAIActions(
-                onSummarize: { showingSummarySheet = true }
-            ),
-            customActions: [
-                DetailAction(icon: "arrow.left.arrow.right.circle") {
-                    showingTypePicker = true
+        HStack {
+            Spacer()
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Open in Mail
+                Button(action: openInMail) {
+                    Label("Open in Mail", systemImage: "paperplane.fill")
                 }
-            ],
-            primaryAction: DetailAction(
-                icon: "paperplane.fill",
-                color: .badgeEmail
-            ) { openInMail() }
+                
+                Divider()
+                
+                // Copy
+                Button(action: copyToClipboard) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                // Export
+                Button(action: { showingExportSheet = true }) {
+                    Label("Export", systemImage: "arrow.up.doc")
+                }
+                
+                // AI actions (only show if API key configured)
+                if settings.hasAPIKey {
+                    Section {
+                        Button(action: { showingSummarySheet = true }) {
+                            Label("Summarize", systemImage: "text.quote")
+                        }
+                    }
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.forestDark, Color.forestMedium],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(10)
+            }
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(Color.creamLight)
+        .overlay(
+            Rectangle()
+                .fill(Color.forestDark.opacity(0.1))
+                .frame(height: 1),
+            alignment: .top
         )
     }
 
