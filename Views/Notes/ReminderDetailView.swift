@@ -148,49 +148,55 @@ struct ReminderDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            Button(action: shareNote) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
+        HStack {
             Spacer()
-
-            // Export to Reminders
-            Button(action: { showingExportSheet = true }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "bell.badge")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Add to Reminders")
-                        .font(.serifBody(14, weight: .semibold))
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Add to Reminders
+                Button(action: { showingExportSheet = true }) {
+                    Label("Add to Reminders", systemImage: "bell.badge")
+                }
+                
+                Divider()
+                
+                // Share
+                Button(action: shareNote) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
+                // Copy
+                Button(action: copyContent) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
                 .background(
                     LinearGradient(
-                        colors: [Color.badgeReminder, Color.badgeReminder.opacity(0.8)],
+                        colors: [Color.forestDark, Color.forestMedium],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .cornerRadius(10)
             }
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

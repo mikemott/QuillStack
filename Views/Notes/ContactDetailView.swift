@@ -256,58 +256,62 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 16) {
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            Button(action: shareContact) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            Button(action: copyContact) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            if !contact.website.isEmpty {
-                Button(action: openWebsite) {
-                    Image(systemName: "safari")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.badgeContact)
-                }
-            }
-
+        HStack {
             Spacer()
-
-            // Create Contact button
-            Button(action: { showingReviewSheet = true }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "person.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Create Contact")
-                        .font(.serifBody(14, weight: .semibold))
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Create Contact
+                Button(action: { showingReviewSheet = true }) {
+                    Label("Create Contact", systemImage: "person.badge.plus")
+                }
+                
+                Divider()
+                
+                // Share
+                Button(action: shareContact) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
+                // Copy
+                Button(action: copyContact) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                // Open Website (if available)
+                if !contact.website.isEmpty {
+                    Button(action: openWebsite) {
+                        Label("Open Website", systemImage: "safari")
+                    }
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
                 .background(
                     LinearGradient(
-                        colors: [Color.badgeContact, Color.badgeContact.opacity(0.8)],
+                        colors: [Color.forestDark, Color.forestMedium],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .cornerRadius(10)
             }
-            .disabled(contact.displayName.isEmpty)
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

@@ -293,53 +293,62 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
     // MARK: - Bottom Bar
 
     private var bottomBar: some View {
-        HStack(spacing: 20) {
-            // Change Type button
-            Button(action: { showingTypePicker = true }) {
-                Image(systemName: "arrow.left.arrow.right.circle")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-            .accessibilityLabel("Change note type")
-
-            // Expand with AI (main action)
-            if settings.hasAPIKey {
-                Button(action: { showingExpandSheet = true }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "sparkles")
-                        Text("Expand")
-                    }
-                    .font(.serifBody(15, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(Color.badgeIdea)
-                    .cornerRadius(8)
-                }
-            }
-
+        HStack {
             Spacer()
-
-            // Export
-            Button(action: { showingExportSheet = true }) {
-                Image(systemName: "arrow.up.doc")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
+            
+            // Single Actions menu consolidating all actions
+            Menu {
+                // Primary action - Expand with AI
+                if settings.hasAPIKey {
+                    Button(action: { showingExpandSheet = true }) {
+                        Label("Expand with AI", systemImage: "sparkles")
+                    }
+                }
+                
+                Divider()
+                
+                // Share
+                Button(action: shareIdea) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
+                // Copy
+                Button(action: copyContent) {
+                    Label("Copy Text", systemImage: "doc.on.clipboard")
+                }
+                
+                // Export
+                Button(action: { showingExportSheet = true }) {
+                    Label("Export", systemImage: "arrow.up.doc")
+                }
+                
+                Section {
+                    Button(action: { showingTypePicker = true }) {
+                        Label("Change Type", systemImage: "arrow.left.arrow.right.circle")
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Actions")
+                        .font(.serifBody(16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.forestDark, Color.forestMedium],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(10)
             }
-
-            // Share
-            Button(action: shareIdea) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
-
-            // Copy
-            Button(action: copyContent) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.textDark)
-            }
+            .accessibilityLabel("Actions menu")
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
