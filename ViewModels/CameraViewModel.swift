@@ -355,6 +355,9 @@ final class CameraViewModel {
         let avgConfidence = ocrResult.averageConfidence
         let lowConfidenceCount = ocrResult.lowConfidenceWords.count
 
+        // Get classification with confidence and method before entering context
+        let classification = await textClassifier.classifyNoteAsync(content: text, image: originalImage)
+
         return await context.perform {
             // Create note
             let note = Note.create(
@@ -371,6 +374,10 @@ final class CameraViewModel {
             note.sourceNoteID = sourceNoteID // Link to source note if this is a split section
             note.processingState = processingState
             // note.captureSource = "camera" // TODO: Add this field to Note model
+
+            // Set classification with confidence and method
+            // This ensures the classification badge shows proper confidence
+            note.setClassification(classification)
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData

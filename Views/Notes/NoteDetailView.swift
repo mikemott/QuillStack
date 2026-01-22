@@ -51,6 +51,7 @@ struct NoteDetailView: View, NoteDetailViewProtocol {
                     hasPendingEnhancement: hasPendingEnhancement,
                     classification: note.classification
                 )
+                .zIndex(1) // Ensure header stays on top
 
                 // Content area - scrollable with related notes
                 ScrollView {

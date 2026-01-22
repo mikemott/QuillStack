@@ -155,6 +155,7 @@ struct MeetingDetailView: View, NoteDetailViewProtocol {
                     onBack: { dismiss() },
                     classification: note.classification
                 )
+                .zIndex(1) // Ensure header stays on top
 
                 // Content
                 if isLoading {

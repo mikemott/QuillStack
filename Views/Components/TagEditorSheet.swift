@@ -30,7 +30,7 @@ struct TagEditorSheet: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 24) {
                     // Current tags section
                     if !currentTags.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
@@ -52,7 +52,6 @@ struct TagEditorSheet: View {
                             }
                         }
                         .padding(.horizontal, 16)
-                        .padding(.top, 16)
                     }
 
                     // Add new tag section
@@ -138,8 +137,10 @@ struct TagEditorSheet: View {
                         .padding(.bottom, 16)
                     }
 
-                    Spacer()
+                    Spacer(minLength: 20)
                 }
+                .padding(.top, 20)
+                .padding(.bottom, 20)
                 .background(Color.creamLight)
             }
             .background(Color.creamLight)
