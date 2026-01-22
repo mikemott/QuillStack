@@ -358,12 +358,15 @@ final class CameraViewModel {
         // Get classification with confidence and method before entering context
         let classification = await textClassifier.classifyNoteAsync(content: text, image: originalImage)
 
+        // Use the classified type for consistency (may differ from initial section detection)
+        let effectiveNoteType = classification.type
+
         return await context.perform {
-            // Create note
+            // Create note with the classified type
             let note = Note.create(
                 in: context,
                 content: text,
-                noteType: noteType.rawValue,
+                noteType: effectiveNoteType.rawValue,
                 originalImage: imageData
             )
 
@@ -400,8 +403,8 @@ final class CameraViewModel {
                 }
             }
 
-            // Parse based on note type
-            switch noteType {
+            // Parse based on the effective (classified) note type
+            switch effectiveNoteType {
             case .todo:
                 let parser = TodoParser(context: context)
                 let todos = parser.parseTodos(from: text, note: note)
