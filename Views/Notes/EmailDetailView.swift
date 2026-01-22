@@ -94,6 +94,7 @@ struct EmailDetailView: View, NoteDetailViewProtocol {
                     customLabel: "Draft",
                     classification: note.classification
                 )
+                .zIndex(1) // Ensure header stays on top
 
                 emailFieldsScrollView
 

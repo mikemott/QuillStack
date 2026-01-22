@@ -255,42 +255,95 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
         switch noteType.lowercased() {
         case "email":
             return """
-            You are helping format a handwritten email that was scanned with OCR. The text may have recognition errors and formatting issues.
+            You are helping format a handwritten email draft that was scanned with OCR. Apple Vision has processed it, but needs fixes for email-specific patterns.
 
-            Please:
-            1. Fix OCR errors (misspellings, wrong characters)
-            2. Merge lines that were incorrectly split by OCR (e.g., "Return\\nto sender" → "Return to sender")
-            3. Add appropriate punctuation:
-               - Greetings should have commas (e.g., "Hello" → "Hello,")
-               - Sentences should end with periods
-               - Closings should have punctuation (e.g., "Thanks" → "Thanks!")
-            4. Preserve the email structure: greeting, body paragraphs, closing, signature
-            5. Keep the #EMAIL# tag, To:, and Subject: lines intact
-            6. Preserve bullet points and lists
-            7. Keep email addresses exactly as written
+            COMMON EMAIL OCR ERRORS:
+            1. Email addresses corrupted: "j0hn@examp1e.c0m" → "john@example.com"
+            2. Header fields split: "To.\\nBob Smith" → "To: Bob Smith"
+            3. Letter confusion in names: "Matt" → "Mott", "Sara" → "Sarah"
+            4. Split sentences in paragraphs need merging
+            5. Missing punctuation in greetings/closings
+
+            EMAIL-SPECIFIC FIXES:
+            - Fix email addresses: lowercase, fix O→0, l→1, etc.
+            - Header fields (To:, From:, Subject:, Cc:, Bcc:):
+              * Keep on their own lines
+              * Ensure colon after field name
+              * Fix capitalization in names
+            - Greeting punctuation:
+              * "Hi Bob" → "Hi Bob," or "Hello" → "Hello,"
+              * "Dear John Smith" → "Dear John Smith,"
+            - Body paragraphs:
+              * Merge lines split mid-sentence
+              * Keep paragraph breaks (double newline)
+              * Ensure sentences end with periods
+            - Closing punctuation:
+              * "Thanks" → "Thanks," or "Best regards" → "Best regards,"
+            - Signature: Fix name capitalization, preserve contact info
+
+            EXAMPLES:
+
+            Example 1:
+            Input: "To. Bob Smith\\nSubject ca11\\n\\nHi Bob\\n1 wanted to fo11ow up on the\\nrneeting yesterday"
+            Output: "To: Bob Smith\\nSubject: Call\\n\\nHi Bob,\\nI wanted to follow up on the meeting yesterday."
+
+            Example 2:
+            Input: "Dear j0hn@examp1e.c0m\\nThank you for your ernail\\nBest\\nMike Matt"
+            Output: "To: john@example.com\\n\\nDear John,\\nThank you for your email.\\n\\nBest,\\nMike Mott"
+
+            RULES:
+            1. Fix OCR errors in addresses, names, content
+            2. Preserve email structure: headers, greeting, body, closing, signature
+            3. Keep #EMAIL# trigger tag if present
+            4. Merge lines split mid-sentence, preserve paragraph breaks
+            5. Add appropriate punctuation for email conventions
+            6. Return ONLY the corrected email - no explanations
 
             Original OCR text:
             \(text)
 
-            Return ONLY the corrected and formatted email text. No explanations.
+            Corrected email:
             """
 
         case "todo":
             return """
-            You are helping correct a handwritten to-do list that was scanned with OCR.
+            You are helping correct a handwritten to-do list that was scanned with OCR. Apple Vision has processed it, but needs fixes for common handwriting errors.
 
-            Please:
-            1. Fix OCR errors (misspellings, wrong characters)
-            2. Preserve checkbox markers like [ ], [x], •, -, etc.
-            3. Keep each task item on its own line
-            4. Fix punctuation within tasks if needed
-            5. Keep the #TODO# or similar tag if present
-            6. Don't merge lines - each task should stay separate
+            COMMON TODO-SPECIFIC OCR ERRORS:
+            1. Checkbox markers corrupted: "El" → "[ ]", "lxl" → "[x]", "O" → "•"
+            2. Letter confusion in tasks: "ca11" → "call", "rnail" → "mail", "buv" → "buy"
+            3. Split tasks: "Pick up\\ngroceries" → "Pick up groceries" (merge unless clearly separate tasks)
+            4. Numbers mixed: "Ca11 Bob at 3O0 PM" → "Call Bob at 3:00 PM"
+            5. Start-of-line capitalization: "call bob" → "Call Bob"
+
+            FIXES TO APPLY:
+            - Fix checkbox/bullet markers: [ ], [x], ☑, •, -, → (standardize formatting)
+            - Fix OCR errors in task text (misspellings, character confusion)
+            - Add periods only if tasks are complete sentences
+            - Keep each task on its own line - don't merge distinct tasks
+            - Preserve priority markers if present (!, ⭐, numbers)
+            - Keep hashtag triggers like #TODO# intact
+            - Capitalize first word of each task
+
+            EXAMPLES:
+
+            Input: "El Ca11 Mike Matt about pr0ject\\n- Ernail report to Bob\\nlxl Buy groceries"
+            Output: "[ ] Call Mike Mott about project\\n- Email report to Bob\\n[x] Buy groceries"
+
+            Input: "1. Finish the\\nreport by Friday\\n2. ca11 client at 3O0"
+            Output: "1. Finish the report by Friday\\n2. Call client at 3:00"
+
+            RULES:
+            1. Preserve task structure - each task stays on its own line
+            2. Don't merge tasks unless clearly split mid-sentence
+            3. Keep checkbox/bullet formatting intact
+            4. Fix OCR errors but keep original task meaning
+            5. Return ONLY the corrected todo list - no explanations
 
             Original OCR text:
             \(text)
 
-            Return ONLY the corrected text. No explanations.
+            Corrected text:
             """
 
         case "meeting":
@@ -346,20 +399,58 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
 
         default:
             return """
-            You are helping correct OCR errors from a handwritten note. The text was scanned from handwriting and may contain recognition errors.
+            You are helping correct OCR errors from a handwritten note. Apple Vision OCR has already processed it, but handwriting recognition has predictable error patterns you need to fix.
 
-            Please:
-            1. Fix obvious OCR errors (misspellings, wrong characters)
-            2. Preserve the original meaning and structure
-            3. Keep proper nouns, email addresses, phone numbers as accurate as possible
-            4. Fix punctuation where clearly missing
-            5. Merge lines that were incorrectly split mid-sentence
-            6. Don't add or remove content, only correct errors
+            COMMON HANDWRITING OCR ERROR PATTERNS TO FIX:
+            1. Letter confusion: I/l/1, O/0/Q, rn/m, cl/d, vv/w, ii/u, nn/m
+            2. Word boundaries: "the re" → "there", "to day" → "today", "any one" → "anyone"
+            3. Capitalization: Proper nouns often lowercase: "mike mott" → "Mike Mott", "apple" → "Apple" (company)
+            4. Number/letter mix: "3O0" → "300", "1O" → "10", "O5" → "05" (in dates/times)
+            5. Sentence starters: "1 went" → "I went", "1t was" → "It was"
+            6. Common words: "teh" → "the", "adn" → "and", "tiem" → "time", "thier" → "their"
+
+            CONTEXT-AWARE CORRECTIONS:
+            - Start of sentence: "1 met" → "I met" (not "1 met")
+            - Time format: "3O0 PM" → "3:00 PM", "2.3O" → "2:30"
+            - Dates: "1O/15" → "10/15", "O3/2O" → "03/20"
+            - Email addresses: Lowercase and fix: "j0hn@example.c0m" → "john@example.com"
+            - Phone numbers: Fix digit confusion: "555-O123" → "555-0123"
+            - URLs: "goog1e.com" → "google.com", "http.//site.c0m" → "http://site.com"
+
+            STRUCTURAL FIXES:
+            - Add periods to end sentences (identify sentence boundaries by capitalization and content)
+            - Fix greeting punctuation: "Hello Bob" → "Hello Bob," or "Dear John" → "Dear John,"
+            - Merge lines split mid-word: "under\\nstand" → "understand"
+            - Merge lines split mid-phrase if they don't end with punctuation
+            - Preserve intentional line breaks (lists, bullet points, paragraphs)
+            - Keep email/letter formatting intact (To:, From:, Subject:)
+
+            EXAMPLES OF GOOD CORRECTIONS:
+
+            Example 1:
+            Input: "1 need to ca11 Mike Matt about the pr0ject to day at 3O0 PM"
+            Output: "I need to call Mike Mott about the project today at 3:00 PM."
+
+            Example 2:
+            Input: "Meeting\\nat 2.3O PM\\nwith Bob and Sarah"
+            Output: "Meeting at 2:30 PM with Bob and Sarah"
+
+            Example 3:
+            Input: "Email j0hn.d0e@examp1e.c0m about\\nthe report by Friday"
+            Output: "Email john.doe@example.com about the report by Friday."
+
+            RULES:
+            1. Fix obvious OCR errors but preserve original meaning
+            2. Don't add or remove content - only correct errors
+            3. Keep proper nouns, names, places as accurate as possible
+            4. If uncertain about a correction, leave it as-is
+            5. Preserve lists, bullet points, and intentional formatting
+            6. Return ONLY the corrected text - no explanations, no markdown formatting
 
             Original OCR text:
             \(text)
 
-            Return ONLY the corrected text, nothing else. No explanations.
+            Corrected text:
             """
         }
     }

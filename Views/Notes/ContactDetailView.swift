@@ -32,6 +32,7 @@ struct ContactDetailView: View, NoteDetailViewProtocol {
                     onBack: { dismiss() },
                     classification: note.classification
                 )
+                .zIndex(1) // Ensure header stays on top
 
                 ScrollView {
                     VStack(spacing: 16) {

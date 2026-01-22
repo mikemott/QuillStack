@@ -42,6 +42,7 @@ struct TodoDetailView: View, NoteDetailViewProtocol {
                     totalCount: tasks.count,
                     classification: note.classification
                 )
+                .zIndex(1) // Ensure header stays on top
 
                 // Task list
                 ScrollView {

@@ -355,12 +355,18 @@ final class CameraViewModel {
         let avgConfidence = ocrResult.averageConfidence
         let lowConfidenceCount = ocrResult.lowConfidenceWords.count
 
+        // Get classification with confidence and method before entering context
+        let classification = await textClassifier.classifyNoteAsync(content: text, image: originalImage)
+
+        // Use the classified type for consistency (may differ from initial section detection)
+        let effectiveNoteType = classification.type
+
         return await context.perform {
-            // Create note
+            // Create note with the classified type
             let note = Note.create(
                 in: context,
                 content: text,
-                noteType: noteType.rawValue,
+                noteType: effectiveNoteType.rawValue,
                 originalImage: imageData
             )
 
@@ -371,6 +377,10 @@ final class CameraViewModel {
             note.sourceNoteID = sourceNoteID // Link to source note if this is a split section
             note.processingState = processingState
             // note.captureSource = "camera" // TODO: Add this field to Note model
+
+            // Set classification with confidence and method
+            // This ensures the classification badge shows proper confidence
+            note.setClassification(classification)
 
             if let thumbnailData = thumbnailData {
                 note.thumbnail = thumbnailData
@@ -393,8 +403,8 @@ final class CameraViewModel {
                 }
             }
 
-            // Parse based on note type
-            switch noteType {
+            // Parse based on the effective (classified) note type
+            switch effectiveNoteType {
             case .todo:
                 let parser = TodoParser(context: context)
                 let todos = parser.parseTodos(from: text, note: note)
