@@ -54,15 +54,16 @@ final class NoteViewModel {
     // MARK: - Smart Collections
 
     func generateSmartCollections() {
-        // Generate all collections
+        // Generate all collections (this populates the cache)
         collections = collectionGenerator.generateCollections()
 
-        // Fetch notes for each collection
+        // Fetch notes for all collections in a single batched operation
+        let allCollectionNotes = collectionGenerator.fetchNotesForAllCollections(collections)
+        
+        // Convert to Note array and store
         collectionNotes = [:]
-        for collection in collections {
-            let notes = collectionGenerator.fetchNotes(for: collection)
-                .compactMap { $0 as? Note }
-            collectionNotes[collection.id] = notes
+        for (collectionId, notes) in allCollectionNotes {
+            collectionNotes[collectionId] = notes.compactMap { $0 as? Note }
         }
     }
 

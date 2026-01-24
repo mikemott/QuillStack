@@ -118,12 +118,19 @@ extension SmartCollection {
 class SmartCollectionGenerator {
     private let context: NSManagedObjectContext
 
+    // Cache for batched queries
+    private var cachedNotes: [NSManagedObject]?
+    private var cachedTags: [NSManagedObject]?
+
     init(context: NSManagedObjectContext) {
         self.context = context
     }
 
     /// Generate all collections, hiding empty ones
     func generateCollections() -> [SmartCollection] {
+        // Fetch all data once for batched processing
+        fetchAllData()
+
         var collections: [SmartCollection] = []
 
         // Always show Recent (even if empty)
@@ -145,11 +152,54 @@ class SmartCollectionGenerator {
         // Always show Archive at the end
         collections.append(.archive)
 
+        // Don't clear cache yet - it will be used by fetchNotesForAllCollections
         return collections
+    }
+
+    /// Fetch notes for all collections in a single batched operation
+    /// This should be called after generateCollections() to benefit from cached data
+    func fetchNotesForAllCollections(_ collections: [SmartCollection]) -> [String: [NSManagedObject]] {
+        // Ensure cache is populated
+        if cachedNotes == nil {
+            fetchAllData()
+        }
+
+        var result: [String: [NSManagedObject]] = [:]
+
+        for collection in collections {
+            result[collection.id] = fetchNotes(for: collection)
+        }
+
+        // Clear cache after all fetches are complete
+        clearCache()
+
+        return result
+    }
+
+    /// Fetch all data needed for collection generation in batch
+    private func fetchAllData() {
+        // Fetch all notes (archived and non-archived)
+        let notesRequest = NSFetchRequest<NSManagedObject>(entityName: "Note")
+        cachedNotes = (try? context.fetch(notesRequest)) ?? []
+
+        // Fetch all tags
+        let tagsRequest = NSFetchRequest<NSManagedObject>(entityName: "Tag")
+        cachedTags = (try? context.fetch(tagsRequest)) ?? []
+    }
+
+    /// Clear cached data
+    private func clearCache() {
+        cachedNotes = nil
+        cachedTags = nil
     }
 
     /// Check if a collection has notes
     func hasNotesForCollection(_ collection: SmartCollection) -> Bool {
+        // Use cached data if available, otherwise query
+        if let cached = cachedNotes {
+            return cached.contains { collection.predicate.evaluate(with: $0) }
+        }
+
         let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
         request.predicate = collection.predicate
         request.fetchLimit = 1
@@ -165,6 +215,13 @@ class SmartCollectionGenerator {
 
     /// Fetch notes for a specific collection
     func fetchNotes(for collection: SmartCollection) -> [NSManagedObject] {
+        // Use cached data if available, otherwise query
+        if let cached = cachedNotes {
+            let filtered = cached.filter { collection.predicate.evaluate(with: $0) }
+            // Sort using NSSortDescriptor's compare method
+            return (filtered as NSArray).sortedArray(using: collection.sortDescriptors) as? [NSManagedObject] ?? filtered
+        }
+
         let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
         request.predicate = collection.predicate
         request.sortDescriptors = collection.sortDescriptors
@@ -179,6 +236,11 @@ class SmartCollectionGenerator {
 
     /// Count notes in a collection
     func countNotes(for collection: SmartCollection) -> Int {
+        // Use cached data if available, otherwise query
+        if let cached = cachedNotes {
+            return cached.filter { collection.predicate.evaluate(with: $0) }.count
+        }
+
         let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
         request.predicate = collection.predicate
 
@@ -194,19 +256,22 @@ class SmartCollectionGenerator {
 
     /// Generate people collections from mentions
     private func generatePeopleCollections() -> [SmartCollection] {
-        // Extract people mentions from notes (look for @mentions or common names)
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Note")
-        request.predicate = NSPredicate(format: "isArchived == NO")
-
-        guard let notes = try? context.fetch(request) else {
-            print("⚠️ SmartCollection: Failed to fetch notes for people collection generation")
+        // Use cached notes to avoid extra query
+        guard let notes = cachedNotes else {
+            print("⚠️ SmartCollection: No cached notes for people collection generation")
             return []
+        }
+
+        // Filter to non-archived notes
+        let activeNotes = notes.filter { note in
+            guard let isArchived = note.value(forKey: "isArchived") as? Bool else { return false }
+            return !isArchived
         }
 
         var peopleSet = Set<String>()
         let mentionPattern = /@(\w+)/
 
-        for note in notes {
+        for note in activeNotes {
             guard let content = note.value(forKey: "content") as? String else { continue }
 
             // Extract @mentions using modern Swift regex API
@@ -224,7 +289,7 @@ class SmartCollectionGenerator {
         // Create collections for people with multiple mentions and pre-calculate counts
         let collectionsWithCounts = peopleSet.compactMap { person -> (collection: SmartCollection, count: Int)? in
             let collection = SmartCollection.person(name: person)
-            let count = countNotes(for: collection)
+            let count = countNotes(for: collection) // Uses cached data
             return count > 0 ? (collection, count) : nil
         }
 
@@ -236,11 +301,9 @@ class SmartCollectionGenerator {
 
     /// Generate tag collections from tag entities
     private func generateTagCollections() -> [SmartCollection] {
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Tag")
-        request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-
-        guard let tags = try? context.fetch(request) else {
-            print("⚠️ SmartCollection: Failed to fetch tags for collection generation")
+        // Use cached tags to avoid extra query
+        guard let tags = cachedTags else {
+            print("⚠️ SmartCollection: No cached tags for collection generation")
             return []
         }
 
@@ -253,7 +316,7 @@ class SmartCollectionGenerator {
                 return nil
             }
             let collection = SmartCollection.tagCollection(id: id, name: name)
-            let count = countNotes(for: collection)
+            let count = countNotes(for: collection) // Uses cached data
             return count > 0 ? (collection, count) : nil
         }
 
