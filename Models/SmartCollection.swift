@@ -152,10 +152,28 @@ class SmartCollectionGenerator {
         // Always show Archive at the end
         collections.append(.archive)
 
-        // Clear cache after generation
+        // Don't clear cache yet - it will be used by fetchNotesForAllCollections
+        return collections
+    }
+
+    /// Fetch notes for all collections in a single batched operation
+    /// This should be called after generateCollections() to benefit from cached data
+    func fetchNotesForAllCollections(_ collections: [SmartCollection]) -> [String: [NSManagedObject]] {
+        // Ensure cache is populated
+        if cachedNotes == nil {
+            fetchAllData()
+        }
+
+        var result: [String: [NSManagedObject]] = [:]
+
+        for collection in collections {
+            result[collection.id] = fetchNotes(for: collection)
+        }
+
+        // Clear cache after all fetches are complete
         clearCache()
 
-        return collections
+        return result
     }
 
     /// Fetch all data needed for collection generation in batch
