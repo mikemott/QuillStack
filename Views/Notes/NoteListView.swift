@@ -263,19 +263,6 @@ struct NoteListView: View {
                                 .foregroundColor(.forestLight)
                         }
                     } else {
-                        // Select button (for multi-select mode)
-                        if !viewModel.notes.isEmpty {
-                            Button(action: {
-                                withAnimation {
-                                    isEditing = true
-                                }
-                            }) {
-                                Text("Select")
-                                    .font(.serifBody(17, weight: .medium))
-                                    .foregroundColor(.forestLight)
-                            }
-                        }
-
                         // Search button
                         Button(action: { showingSearch = true }) {
                             Image(systemName: "magnifyingglass")
@@ -400,7 +387,9 @@ struct NoteListView: View {
                 ForEach(collectionsToDisplay, id: \.collection.id) { item in
                     SmartCollectionContainer(
                         collection: item.collection,
-                        notes: item.notes
+                        notes: item.notes,
+                        isEditing: $isEditing,
+                        selectedNotes: $selectedNotes
                     )
                     .padding(.bottom, 8)
                 }

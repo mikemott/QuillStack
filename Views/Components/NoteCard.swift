@@ -21,7 +21,7 @@ import CoreData
 struct NoteCard: View {
     @ObservedObject var note: Note
     var isSelected: Bool = false
-    @State private var isPressed = false
+    @GestureState private var isPressed = false
 
     // Cached formatters for performance
     private static let timeFormatter: DateFormatter = {
@@ -188,9 +188,12 @@ struct NoteCard: View {
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         .scaleEffect(isPressed ? 0.98 : 1.0)
         .animation(.easeInOut(duration: 0.15), value: isPressed)
-        .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
-            isPressed = pressing
-        }, perform: {})
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: .infinity)
+                .updating($isPressed) { value, state, _ in
+                    state = value
+                }
+        )
     }
 
     // MARK: - Subviews
