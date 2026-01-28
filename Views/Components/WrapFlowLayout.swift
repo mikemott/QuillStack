@@ -30,7 +30,11 @@ struct WrapFlowLayout: Layout {
             spacing: spacing
         )
         for (index, subview) in subviews.enumerated() {
-            subview.place(at: result.positions[index], proposal: .unspecified)
+            let position = CGPoint(
+                x: bounds.minX + result.positions[index].x,
+                y: bounds.minY + result.positions[index].y
+            )
+            subview.place(at: position, proposal: .unspecified)
         }
     }
 

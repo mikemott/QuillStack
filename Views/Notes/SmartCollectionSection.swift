@@ -87,11 +87,15 @@ struct SmartCollectionSection: View {
 struct SmartCollectionContainer: View {
     let collection: SmartCollection
     let notes: [Note]
+    @Binding var isEditing: Bool
+    @Binding var selectedNotes: Set<Note>
     @State private var isExpanded: Bool
 
-    init(collection: SmartCollection, notes: [Note]) {
+    init(collection: SmartCollection, notes: [Note], isEditing: Binding<Bool> = .constant(false), selectedNotes: Binding<Set<Note>> = .constant([])) {
         self.collection = collection
         self.notes = notes
+        self._isEditing = isEditing
+        self._selectedNotes = selectedNotes
         self._isExpanded = State(initialValue: collection.defaultExpanded)
     }
 
@@ -113,11 +117,33 @@ struct SmartCollectionContainer: View {
             if isExpanded && !notes.isEmpty {
                 VStack(spacing: 8) {
                     ForEach(notes, id: \.objectID) { note in
-                        NavigationLink(value: note) {
-                            NoteCard(note: note)
-                                .padding(.horizontal, 16)
+                        if isEditing {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    if selectedNotes.contains(note) {
+                                        selectedNotes.remove(note)
+                                    } else {
+                                        selectedNotes.insert(note)
+                                    }
+                                }
+                            } label: {
+                                NoteCard(note: note, isSelected: selectedNotes.contains(note))
+                                    .padding(.horizontal, 16)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            NavigationLink(value: note) {
+                                NoteCard(note: note)
+                                    .padding(.horizontal, 16)
+                            }
+                            .buttonStyle(.plain)
+                            .onLongPressGesture {
+                                withAnimation {
+                                    isEditing = true
+                                    selectedNotes.insert(note)
+                                }
+                            }
                         }
-                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.top, 8)
