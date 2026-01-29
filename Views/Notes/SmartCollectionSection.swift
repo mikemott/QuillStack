@@ -137,10 +137,14 @@ struct SmartCollectionContainer: View {
                                     .padding(.horizontal, 16)
                             }
                             .buttonStyle(.plain)
-                            .onLongPressGesture {
-                                withAnimation {
-                                    isEditing = true
-                                    selectedNotes.insert(note)
+                            .contextMenu {
+                                Button {
+                                    withAnimation {
+                                        isEditing = true
+                                        selectedNotes.insert(note)
+                                    }
+                                } label: {
+                                    Label("Select", systemImage: "checkmark.circle")
                                 }
                             }
                         }
