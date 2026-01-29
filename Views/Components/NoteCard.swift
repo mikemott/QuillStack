@@ -21,7 +21,6 @@ import CoreData
 struct NoteCard: View {
     @ObservedObject var note: Note
     var isSelected: Bool = false
-    @GestureState private var isPressed = false
 
     // Cached formatters for performance
     private static let timeFormatter: DateFormatter = {
@@ -171,8 +170,7 @@ struct NoteCard: View {
                 // Color-coded left border (based on primary tag)
                 Rectangle()
                     .fill(note.primaryTagColor)
-                    .frame(width: (isPressed || isSelected) ? 4 : 0)
-                    .animation(.easeInOut(duration: 0.2), value: isPressed)
+                    .frame(width: isSelected ? 4 : 0)
                     .animation(.easeInOut(duration: 0.15), value: isSelected)
             }
         )
@@ -186,14 +184,6 @@ struct NoteCard: View {
                 .animation(.easeInOut(duration: 0.15), value: isSelected)
         )
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-        .scaleEffect(isPressed ? 0.98 : 1.0)
-        .animation(.easeInOut(duration: 0.15), value: isPressed)
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: .infinity)
-                .updating($isPressed) { value, state, _ in
-                    state = value
-                }
-        )
     }
 
     // MARK: - Subviews

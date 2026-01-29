@@ -230,18 +230,18 @@ struct NoteListView: View {
                         .font(.serifTitle(24, weight: .bold))
                         .foregroundColor(.forestLight)
                 } else {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 10) {
                         // Logo
                         Image("Logo")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 44, height: 44)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                            .frame(width: 36, height: 36)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
 
                         // App name
                         Text("QuillStack")
-                            .font(.serifTitle(28, weight: .bold))
+                            .font(.serifTitle(24, weight: .bold))
                             .foregroundColor(.forestLight)
                     }
                 }
@@ -266,9 +266,9 @@ struct NoteListView: View {
                         // Search button
                         Button(action: { showingSearch = true }) {
                             Image(systemName: "magnifyingglass")
-                                .font(.system(size: 18, weight: .semibold))
+                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.forestLight)
-                                .frame(width: 44, height: 44)
+                                .frame(width: 36, height: 36)
                                 .background(
                                     LinearGradient(
                                         colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
@@ -276,17 +276,19 @@ struct NoteListView: View {
                                         endPoint: .bottomTrailing
                                     )
                                 )
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                .cornerRadius(8)
+                                .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                         .accessibilityLabel("Search notes")
 
                         // Voice button
                         Button(action: { showingVoice = true }) {
                             Image(systemName: "mic.fill")
-                                .font(.system(size: 20, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                                 .foregroundColor(.forestLight)
-                                .frame(width: 44, height: 44)
+                                .frame(width: 36, height: 36)
                                 .background(
                                     LinearGradient(
                                         colors: [Color.forestDark.opacity(0.9), Color.forestMedium.opacity(0.95)],
@@ -294,17 +296,19 @@ struct NoteListView: View {
                                         endPoint: .bottomTrailing
                                     )
                                 )
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                .cornerRadius(8)
+                                .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                         .accessibilityLabel("Record voice note")
                     }
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 12)
+            .padding(.bottom, 8)
         }
-        .frame(height: 110)
+        .frame(height: 80)
     }
 
     // MARK: - Empty State
