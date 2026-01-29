@@ -137,12 +137,15 @@ struct SmartCollectionContainer: View {
                                     .padding(.horizontal, 16)
                             }
                             .buttonStyle(.plain)
-                            .onLongPressGesture {
-                                withAnimation {
-                                    isEditing = true
-                                    selectedNotes.insert(note)
-                                }
-                            }
+                            .simultaneousGesture(
+                                LongPressGesture(minimumDuration: 0.5)
+                                    .onEnded { _ in
+                                        withAnimation {
+                                            isEditing = true
+                                            selectedNotes.insert(note)
+                                        }
+                                    }
+                            )
                         }
                     }
                 }
