@@ -217,6 +217,37 @@ extension UIImage {
     func compressed(quality: CGFloat = 0.8) -> Data? {
         jpegData(compressionQuality: quality)
     }
+
+    /// Converts image to base64 JPEG string for Claude Vision API.
+    /// Handles size limits by progressively reducing quality and resizing if needed.
+    /// - Parameter maxSizeBytes: Maximum size in bytes (default 4.5MB, leaving buffer for base64 overhead)
+    /// - Returns: Base64 encoded JPEG string, or nil if conversion fails
+    func toBase64JPEG(maxSizeBytes: Int = 4_500_000) -> String? {
+        var quality: CGFloat = 0.8
+        var imageData = jpegData(compressionQuality: quality)
+
+        while let data = imageData, data.count > maxSizeBytes, quality > 0.1 {
+            quality -= 0.1
+            imageData = jpegData(compressionQuality: quality)
+        }
+
+        if let data = imageData, data.count > maxSizeBytes {
+            let scale = sqrt(Double(maxSizeBytes) / Double(data.count))
+            let newSize = CGSize(
+                width: size.width * scale,
+                height: size.height * scale
+            )
+
+            UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+            draw(in: CGRect(origin: .zero, size: newSize))
+            let resized = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            imageData = resized?.jpegData(compressionQuality: 0.8)
+        }
+
+        return imageData?.base64EncodedString()
+    }
 }
 
 // MARK: - Array Extensions

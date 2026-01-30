@@ -24,7 +24,7 @@ final class CameraViewModel {
     var showSectionPreview = false
     private(set) var detectedSections: [DetectedSection] = []
     private(set) var sectionDetectionMethod: SectionDetectionResult.DetectionMethod = .none
-    private var pendingProcessData: (ocrResult: OCRResult, image: UIImage)?
+    private var pendingProcessData: (ocrResult: OCRResult, image: UIImage, usedVisionOCR: Bool)?
 
     // Dependencies (protocol-based for testability)
     private let ocrService: OCRServiceProtocol
@@ -109,9 +109,32 @@ final class CameraViewModel {
             // Step 1: Just correct orientation - OCRService handles full preprocessing
             let correctedImage = imageProcessor.correctOrientation(image: image)
 
-            // Step 2: Perform OCR with detailed word-level confidence
-            // OCRService internally applies full preprocessing pipeline
-            let ocrResult = try await ocrService.recognizeTextWithConfidence(from: correctedImage)
+            // Step 2: Perform OCR - use Claude Vision if API key available, otherwise Apple Vision
+            let ocrResult: OCRResult
+            var usedVisionOCR = false
+
+            if settings.claudeAPIKey != nil && networkMonitor.isConnected {
+                print("📷 Using Claude Vision API for OCR...")
+                do {
+                    ocrResult = try await LLMService.shared.recognizeTextFromImage(correctedImage)
+                    usedVisionOCR = true
+                    print("✅ Claude Vision OCR completed")
+
+                    let visionBreadcrumb = Breadcrumb(level: .info, category: "ocr")
+                    visionBreadcrumb.message = "Used Claude Vision for OCR"
+                    SentrySDK.addBreadcrumb(visionBreadcrumb)
+                } catch {
+                    print("⚠️ Claude Vision failed, falling back to Apple Vision: \(error.localizedDescription)")
+                    ocrResult = try await ocrService.recognizeTextWithConfidence(from: correctedImage)
+
+                    let fallbackBreadcrumb = Breadcrumb(level: .warning, category: "ocr")
+                    fallbackBreadcrumb.message = "Fell back to Apple Vision OCR"
+                    fallbackBreadcrumb.data = ["reason": error.localizedDescription]
+                    SentrySDK.addBreadcrumb(fallbackBreadcrumb)
+                }
+            } else {
+                ocrResult = try await ocrService.recognizeTextWithConfidence(from: correctedImage)
+            }
 
             print("🔍 Raw OCR result: \(ocrResult.fullText)")
             print("🔍 Average confidence: \(Int(ocrResult.averageConfidence * 100))%")
@@ -131,7 +154,7 @@ final class CameraViewModel {
 
             if sectionResult.shouldAutoSplit && sectionResult.sections.count >= 2 {
                 // Multiple sections detected - show preview for user decision
-                pendingProcessData = (ocrResult, correctedImage)
+                pendingProcessData = (ocrResult, correctedImage, usedVisionOCR)
                 detectedSections = sectionResult.sections
                 sectionDetectionMethod = sectionResult.detectionMethod
                 showSectionPreview = true
@@ -183,11 +206,14 @@ final class CameraViewModel {
                     }
                 }
 
-                // Apply LLM enhancement if enabled
+                // Apply LLM enhancement if enabled (skip if Vision OCR was used - already enhanced)
                 var finalText = correctedText
                 var processingState: NoteProcessingState = .enhanced
 
-                if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+                if usedVisionOCR {
+                    // Vision OCR already includes semantic correction, skip enhancement
+                    print("⏭️ Skipping LLM enhancement (Vision OCR already applied)")
+                } else if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
                     // Check both online status AND rate limits
                     if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                         print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
@@ -547,7 +573,7 @@ final class CameraViewModel {
 
     /// User chose to split into multiple notes
     func handleSplitNotes() async {
-        guard let (ocrResult, image) = pendingProcessData else { return }
+        guard let (ocrResult, image, usedVisionOCR) = pendingProcessData else { return }
 
         showSectionPreview = false
         isProcessing = true
@@ -564,7 +590,8 @@ final class CameraViewModel {
                 index: index,
                 sourceNoteID: sourceNoteID,
                 ocrResult: ocrResult,
-                image: image
+                image: image,
+                usedVisionOCR: usedVisionOCR
             )
         }
 
@@ -576,7 +603,7 @@ final class CameraViewModel {
 
     /// User chose to keep as single note
     func handleKeepSingleNote() async {
-        guard let (ocrResult, image) = pendingProcessData else { return }
+        guard let (ocrResult, image, usedVisionOCR) = pendingProcessData else { return }
 
         showSectionPreview = false
         pendingProcessData = nil
@@ -585,11 +612,11 @@ final class CameraViewModel {
         print("📋 User chose to keep as single note - processing normally")
 
         // Continue with existing processImage logic
-        await continueProcessing(ocrResult: ocrResult, image: image)
+        await continueProcessing(ocrResult: ocrResult, image: image, usedVisionOCR: usedVisionOCR)
     }
 
     /// Continue processing with existing logic (extracted from processImage)
-    private func continueProcessing(ocrResult: OCRResult, image: UIImage) async {
+    private func continueProcessing(ocrResult: OCRResult, image: UIImage, usedVisionOCR: Bool) async {
         isProcessing = true
 
         // Step 3: Split into sections based on detected tags (existing logic)
@@ -622,7 +649,8 @@ final class CameraViewModel {
                 ocrResult: ocrResult,
                 image: image,
                 thumbnail: thumbnail,
-                learnedCorrections: learnedCorrections
+                learnedCorrections: learnedCorrections,
+                usedVisionOCR: usedVisionOCR
             )
         }
 
@@ -641,7 +669,8 @@ final class CameraViewModel {
         index: Int,
         sourceNoteID: UUID,
         ocrResult: OCRResult,
-        image: UIImage
+        image: UIImage,
+        usedVisionOCR: Bool
     ) async {
         print("\n--- Processing section \(index + 1): \(section.suggestedType.displayName) ---")
 
@@ -658,11 +687,13 @@ final class CameraViewModel {
             correctedText = correction.correctedText
         }
 
-        // Apply LLM enhancement if enabled
+        // Apply LLM enhancement if enabled (skip if Vision OCR was used)
         var finalText = correctedText
         var processingState: NoteProcessingState = .enhanced
 
-        if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+        if usedVisionOCR {
+            print("⏭️ Skipping LLM enhancement (Vision OCR already applied)")
+        } else if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
             if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                 do {
                     let result = try await LLMService.shared.enhanceOCRText(correctedText, noteType: section.suggestedType.rawValue)
@@ -679,8 +710,6 @@ final class CameraViewModel {
                     processingState = .pendingEnhancement
                 }
             }
-        } else {
-            processingState = .enhanced
         }
 
         // Generate thumbnail only for first section
@@ -715,7 +744,8 @@ final class CameraViewModel {
         ocrResult: OCRResult,
         image: UIImage,
         thumbnail: UIImage?,
-        learnedCorrections: [String: String]
+        learnedCorrections: [String: String],
+        usedVisionOCR: Bool
     ) async {
         print("\n--- Section \(index + 1)/\(totalSections): \(section.noteType.displayName) ---")
 
@@ -735,11 +765,13 @@ final class CameraViewModel {
             }
         }
 
-        // Apply LLM enhancement if enabled
+        // Apply LLM enhancement if enabled (skip if Vision OCR was used)
         var finalText = correctedText
         var processingState: NoteProcessingState = .enhanced
 
-        if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
+        if usedVisionOCR {
+            print("⏭️ Skipping LLM enhancement (Vision OCR already applied)")
+        } else if settings.autoEnhanceOCR && settings.claudeAPIKey != nil {
             if networkMonitor.isConnected && LLMRateLimiter.shared.canMakeCall() {
                 print("🤖 Auto-enhance enabled, calling LLM for \(section.noteType.rawValue) note...")
 
@@ -762,8 +794,6 @@ final class CameraViewModel {
                     processingState = .pendingEnhancement
                 }
             }
-        } else {
-            processingState = .enhanced
         }
 
         // Suggest tags if auto-enhancement is enabled
