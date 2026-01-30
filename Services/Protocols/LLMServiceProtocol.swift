@@ -7,10 +7,18 @@
 //
 
 import Foundation
+import UIKit
 
 /// Protocol defining LLM service capabilities.
 /// Implement this protocol to provide alternative LLM implementations or mocks for testing.
 protocol LLMServiceProtocol: Sendable {
+    /// Recognizes text from an image using Claude Vision API.
+    /// Provides superior handwriting recognition compared to Apple Vision OCR.
+    /// - Parameter image: The image containing handwritten text
+    /// - Returns: OCRResult compatible with existing pipeline
+    /// - Throws: LLMService.LLMError on failure
+    func recognizeTextFromImage(_ image: UIImage) async throws -> OCRResult
+
     /// Validates an API key by making a minimal test request.
     /// - Parameter apiKey: The API key to validate
     /// - Returns: True if the API key is valid

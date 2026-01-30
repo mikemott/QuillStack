@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 // MARK: - LLM Service
 
@@ -205,6 +206,146 @@ final class LLMService: NSObject, LLMServiceProtocol, @unchecked Sendable {
             enhancedText: enhancedText,
             changes: changes
         )
+    }
+
+    // MARK: - Vision-Based OCR
+
+    /// Recognizes text from an image using Claude Vision API.
+    /// Provides superior handwriting recognition with semantic context understanding.
+    /// - Parameter image: The image containing handwritten text
+    /// - Returns: OCRResult compatible with existing pipeline
+    func recognizeTextFromImage(_ image: UIImage) async throws -> OCRResult {
+        let offlineQueue = await OfflineQueueService.shared
+        guard await offlineQueue.isOnline else {
+            throw LLMError.offline
+        }
+
+        let settings = await SettingsManager.shared
+        guard await settings.hasAcceptedAIDisclosure || !settings.needsAIDisclosure else {
+            throw LLMError.consentRequired
+        }
+
+        guard let apiKey = await settings.claudeAPIKey, !apiKey.isEmpty else {
+            throw LLMError.noAPIKey
+        }
+
+        guard let base64Image = image.toBase64JPEG() else {
+            throw LLMError.invalidResponse
+        }
+
+        let prompt = buildVisionPrompt()
+
+        let requestBody: [String: Any] = [
+            "model": model,
+            "max_tokens": 4096,
+            "messages": [
+                [
+                    "role": "user",
+                    "content": [
+                        [
+                            "type": "image",
+                            "source": [
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": base64Image
+                            ]
+                        ],
+                        [
+                            "type": "text",
+                            "text": prompt
+                        ]
+                    ]
+                ]
+            ]
+        ]
+
+        var request = URLRequest(url: apiURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
+        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+
+        let (data, response) = try await pinnedSession.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw LLMError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            break
+        case 429:
+            throw LLMError.rateLimited
+        default:
+            throw LLMError.networkError("Vision request failed with status \(httpResponse.statusCode)")
+        }
+
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let content = json["content"] as? [[String: Any]],
+              let firstContent = content.first,
+              let text = firstContent["text"] as? String else {
+            throw LLMError.invalidResponse
+        }
+
+        if let usage = json["usage"] as? [String: Any],
+           let inputTokens = usage["input_tokens"] as? Int,
+           let outputTokens = usage["output_tokens"] as? Int {
+            guard inputTokens >= 0 && outputTokens >= 0,
+                  inputTokens < 1_000_000 && outputTokens < 1_000_000 else {
+                return convertToOCRResult(text)
+            }
+            await LLMCostTracker.shared.recordUsage(inputTokens: inputTokens, outputTokens: outputTokens)
+        }
+
+        return convertToOCRResult(text)
+    }
+
+    /// Builds the prompt for vision-based handwriting recognition
+    private func buildVisionPrompt() -> String {
+        """
+        You are an expert at reading handwritten text. Transcribe all handwritten text from this image.
+
+        CRITICAL RULES:
+        1. Read ALL text visible in the image, preserving the original structure
+        2. Maintain line breaks where they appear in the original
+        3. Preserve formatting like bullet points, numbers, or checkboxes:
+           - Empty checkbox: [ ]
+           - Checked checkbox: [x]
+        4. Use semantic context to interpret unclear words - if something looks like "gamble elf" but makes no sense, consider what the writer likely meant (e.g., "capable of")
+        5. Fix obvious spelling errors common in handwriting
+        6. Preserve any special characters or symbols
+        7. If text is unclear, make your best interpretation based on surrounding context
+        8. Do NOT add commentary, headers, or explanations
+        9. Do NOT wrap the text in quotes or code blocks
+
+        Return ONLY the transcribed text, exactly as written, with nothing else.
+        """
+    }
+
+    /// Converts raw text from vision API to OCRResult structure
+    private func convertToOCRResult(_ text: String) -> OCRResult {
+        let lines = text.components(separatedBy: .newlines)
+
+        let recognizedLines: [RecognizedLine] = lines.compactMap { lineText in
+            let trimmed = lineText.trimmingCharacters(in: .whitespaces)
+            guard !trimmed.isEmpty else { return nil }
+
+            let words = trimmed.components(separatedBy: .whitespaces)
+                .filter { !$0.isEmpty }
+                .map { word in
+                    RecognizedWord(
+                        text: word,
+                        confidence: 0.95,
+                        alternatives: [],
+                        boundingBox: nil
+                    )
+                }
+
+            return RecognizedLine(words: words)
+        }
+
+        return OCRResult(lines: recognizedLines)
     }
 
     /// Extract structured meeting details from text using LLM
