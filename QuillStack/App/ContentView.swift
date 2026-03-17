@@ -60,7 +60,7 @@ struct ContentView: View {
                 }
             }
             .fullScreenCover(isPresented: $showCamera) {
-                CameraPlaceholder()
+                CaptureFlowView()
             }
         }
     }
