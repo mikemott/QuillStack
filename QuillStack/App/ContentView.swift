@@ -109,7 +109,7 @@ struct ContentView: View {
 
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(captures) { capture in
-                    NavigationLink(destination: DetailPlaceholder(capture: capture)) {
+                    NavigationLink(destination: CaptureDetailView(capture: capture)) {
                         CaptureCard(capture: capture)
                     }
                     .buttonStyle(.plain)
@@ -144,25 +144,5 @@ struct SettingsPlaceholder: View {
     var body: some View {
         Text("Settings")
             .navigationTitle("Settings")
-    }
-}
-
-struct CameraPlaceholder: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack {
-            Text("Camera")
-            Button("Dismiss") { dismiss() }
-        }
-    }
-}
-
-struct DetailPlaceholder: View {
-    let capture: Capture
-
-    var body: some View {
-        Text("Detail for \(capture.extractedTitle ?? "Capture")")
-            .navigationTitle("Detail")
     }
 }
