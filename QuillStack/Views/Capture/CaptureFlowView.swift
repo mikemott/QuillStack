@@ -179,6 +179,11 @@ struct CaptureFlowView: View {
 
         modelContext.insert(capture)
         try? modelContext.save()
+
+        // Run OCR in background after save
+        let processor = CaptureProcessor()
+        processor.process(capture, in: modelContext)
+
         dismiss()
     }
 }
