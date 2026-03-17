@@ -1,109 +1,63 @@
-# QuillStack
+# QuillStack v2
 
-SwiftUI iOS app for handwritten note capture via camera, OCR, and type-based organization.
+Fast image capture app for real-world information — receipts, posters, tickets, notes. Tag, organize by date, export to Obsidian.
 
-**Target:** iOS 26.2+ | **Swift:** 6.0 | **Xcode:** 26.1+
+**Target:** iOS 26+ | **Swift:** 6.0 | **Xcode:** 26.1+
 
-## Token Optimization
+## Architecture
 
-- Use `limit: 10` for Linear queries unless more needed
-- Start fresh conversations for unrelated tasks
-- Use `/compact` when context builds up
+- **SwiftData** for persistence (not Core Data)
+- **MVVM** with `@Observable` ViewModels
+- **XcodeGen** for project generation (`project.yml` → `QuillStack.xcodeproj`)
+- Single-screen timeline architecture with modal capture flow
 
-## Development Workflow
+## Data Model
 
-**⚠️ CRITICAL: NEVER commit directly to `main` branch!**
-
-A git pre-commit hook is installed to prevent this. Follow this workflow:
-
-### Required Steps for All Non-Trivial Work
-
-1. **Create Feature Branch FIRST**
-   ```bash
-   git checkout -b qui-XXX-short-description
-   ```
-   Branch naming: Linear's format (`qui-XX-short-description`, lowercase, hyphens)
-
-2. **Implement & Commit**
-   - Make changes on feature branch
-   - Commit with clear messages
-   - Multiple commits are fine
-
-3. **Push & Create PR**
-   ```bash
-   git push -u origin qui-XXX-short-description
-   gh pr create --title "..." --body "Closes QUI-XXX\n\n[description]"
-   ```
-   - Include `Closes QUI-XXX` in PR body
-   - PR-Agent will auto-review (~30s)
-   - Linear issue auto-updates to "In Review"
-
-4. **Review PR-Agent Feedback** (AUTOMATIC - Claude does this)
-   - **Claude automatically checks PR comments after creating PR**
-   - Uses: `gh pr view <number> --comments --json comments --jq '.comments[] | "**\(.author.login)**...'`
-   - Waits ~30-60s for PR-Agent (qodo-code-review bot) to complete review
-   - Reviews all compliance checks and code suggestions
-
-   **Claude uses judgment to prioritize feedback:**
-   - ✅ **Always fix:** Security issues, bugs, backward compatibility breaks
-   - ✅ **Fix if straightforward:** High-impact improvements that are quick wins
-   - 📝 **Document for later:** Larger architectural refactorings (create Linear issue)
-   - ⏭️ **Skip:** Minor style preferences, subjective suggestions, or conflicts with project patterns
-
-   **Not all PR-Agent feedback requires action** - Claude makes pragmatic decisions about what adds value vs. what's noise. The goal is to catch real issues, not to satisfy every bot suggestion.
-
-   - **User doesn't need to ask - Claude does this proactively**
-
-5. **Merge After Review**
-   - Verify all checks pass
-   - Merge when ready (Linear issue auto-closes)
-
-### When to Use This Workflow
-
-**ALWAYS use for:**
-- New features or significant changes
-- Bug fixes requiring testing
-- Refactoring touching multiple files
-- Anything that benefits from code review
-- **Any work on Linear issues**
-
-**Can skip ONLY for:**
-- Trivial typo fixes in documentation
-- Emergency hotfixes explicitly requested by user
-
-### Automation in Place
-
-- **Git Hook**: Blocks commits to `main` (`.git/hooks/pre-commit`)
-- **PR-Agent**: AI code review with Claude Sonnet 4.5 (`.github/workflows/pr-agent.yml`)
-- **Claude Auto-Review**: Automatically checks and addresses PR-Agent feedback after creating PRs
-- **Linear Sync**: Auto-updates issue to "In Review" when PR opens (`.github/workflows/linear-sync.yml`)
-- **GitHub Webhook**: Auto-links commits and closes issues via magic words (`Fixes/Closes QUI-XX`)
-
-## Key Concepts
-
-**Note Types:** Automatically detected using AI-powered classification in `TextClassifier.swift`. The system intelligently recognizes todo lists, meeting notes, emails, and more from natural handwriting. 12 types total, implemented as plugins in `Services/Plugins/BuiltIn/`. Hashtag triggers (e.g., `#todo#`, `#email#`) remain supported for backward compatibility.
-
-**OCR Pipeline:** Apple Vision (VNRecognizeTextRequestRevision3) → optional LLM enhancement (Claude API) → user correction for low-confidence words.
-
-**Architecture:** MVVM with service layer. Core Data for persistence. NoteTypePlugin protocol for extensible note types. NoteEventBus for loose coupling.
-
-## Build Notes
-
-- Camera requires physical device
-- If xcodebuild fails: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
-- Uses `@MainActor` default isolation, `@Observable` for ViewModels
+- **Capture** — date, extractedTitle, ocrText, location, tags, images
+- **CaptureImage** — imageData, thumbnailData, pageIndex, ocrText (for stacks)
+- **Tag** — name, colorHex (8 defaults seeded on first launch)
 
 ## Key Files
 
 | Area | Files |
 |------|-------|
-| Entry | `App/QuillStackApp.swift`, `App/ContentView.swift` |
-| OCR | `Services/OCRService.swift`, `Services/LLMService.swift` |
-| Classification | `Services/TextClassifier.swift`, `Services/Plugins/` |
-| Camera | `Services/CameraManager.swift`, `ViewModels/CameraViewModel.swift` |
-| Data | `Models/Note.swift`, `Models/CoreDataStack.swift` |
-| UI | `Views/Notes/`, `Views/Components/DetailBottomBar.swift` |
+| Entry | `QuillStack/App/QuillStackApp.swift`, `QuillStack/App/ContentView.swift` |
+| Models | `QuillStack/Models/Capture.swift`, `QuillStack/Models/Tag.swift`, `QuillStack/Models/CaptureImage.swift` |
+| Views | `QuillStack/Views/Components/CaptureCard.swift`, `QuillStack/Views/Components/TagChip.swift` |
+| Utilities | `QuillStack/Utilities/Extensions.swift` |
 
-## Custom Colors
+## Design Principles
 
-`.forestDark/.forestMedium/.forestLight` (greens), `.creamLight/.paperBeige/.paperTan` (backgrounds), `.badgeTodo/.badgeEmail/etc` (type badges) - defined in `Extensions.swift`.
+- **Minimal, utilitarian UI** — system fonts, system colors, no decorative chrome
+- **Monochrome UI, colorful data** — only tags bring color (via colored chips and thumbnail borders)
+- **One-handed capture** — camera → tag → done in under 3 seconds
+- **Tag-only organization** — no folders, no note types. Tags are the sole organizing concept
+- **Discourage tag sprawl** — ship with 8 curated defaults, make creating new tags deliberate
+
+## Build & Project Generation
+
+```bash
+# Regenerate Xcode project after changing project.yml
+xcodegen generate
+
+# Build
+xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+```
+
+Camera requires physical device for full functionality.
+
+## Development Workflow
+
+**NEVER commit directly to `main` branch** — git hook enforced.
+
+Branch naming: `quillstack-{issue#}-short-description`
+
+### Automation
+
+- **Git Hook**: Blocks commits to `main`
+- **PR-Agent**: AI code review
+- **Forge**: Issue tracking (QUILLSTACK-1 through QUILLSTACK-12)
+
+## Default Tags
+
+Receipt (amber), Event (blue), Note (green), Work (slate), Personal (gray), Ticket (purple), Document (teal), Reference (orange)
