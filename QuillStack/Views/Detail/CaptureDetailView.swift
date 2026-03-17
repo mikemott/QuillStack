@@ -8,6 +8,7 @@ struct CaptureDetailView: View {
     @State private var currentPage = 0
     @State private var showTagEditor = false
     @State private var showDeleteConfirm = false
+    @State private var showExportResult: ExportResult?
     @State private var selectedTags: [Tag] = []
 
     var body: some View {
@@ -26,16 +27,24 @@ struct CaptureDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button(role: .destructive) {
-                        showDeleteConfirm = true
+                    Button {
+                        exportToObsidian()
                     } label: {
-                        Label("Delete", systemImage: "trash")
+                        Label("Export to Obsidian", systemImage: "square.and.arrow.up")
                     }
 
                     ShareLink(item: shareImage, preview: SharePreview(
                         capture.extractedTitle ?? "Capture",
                         image: shareImage
                     ))
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .foregroundStyle(.white)
@@ -52,6 +61,17 @@ struct CaptureDetailView: View {
         }
         .sheet(isPresented: $showTagEditor) {
             tagEditorSheet
+        }
+        .alert(
+            showExportResult?.title ?? "",
+            isPresented: Binding(
+                get: { showExportResult != nil },
+                set: { if !$0 { showExportResult = nil } }
+            )
+        ) {
+            Button("OK") { showExportResult = nil }
+        } message: {
+            Text(showExportResult?.message ?? "")
         }
         .onAppear {
             selectedTags = capture.tags
@@ -196,4 +216,28 @@ struct CaptureDetailView: View {
         }
         return Image(systemName: "photo")
     }
+
+    // MARK: - Export
+
+    private func exportToObsidian() {
+        let exporter = ObsidianExporter()
+        do {
+            try exporter.export(capture)
+            showExportResult = ExportResult(
+                title: "Exported",
+                message: "Capture added to your Obsidian daily note."
+            )
+        } catch {
+            showExportResult = ExportResult(
+                title: "Export Failed",
+                message: error.localizedDescription
+            )
+        }
+    }
+}
+
+struct ExportResult: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
 }

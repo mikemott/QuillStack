@@ -5,6 +5,7 @@ struct CaptureFlowView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var cameraService = CameraService()
+    @State private var locationService = LocationService()
     @State private var capturedImages: [UIImage] = []
     @State private var selectedTags: [Tag] = []
     @State private var phase: CapturePhase = .camera
@@ -183,6 +184,16 @@ struct CaptureFlowView: View {
         // Run OCR in background after save
         let processor = CaptureProcessor()
         processor.process(capture, in: modelContext)
+
+        // Attach location if enabled
+        Task {
+            if let location = await locationService.currentLocation() {
+                capture.latitude = location.coordinate.latitude
+                capture.longitude = location.coordinate.longitude
+                capture.locationName = await locationService.reverseGeocode(location)
+                try? modelContext.save()
+            }
+        }
 
         dismiss()
     }

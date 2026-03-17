@@ -54,7 +54,7 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(destination: SettingsPlaceholder()) {
+                    NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape")
                     }
                 }
@@ -138,11 +138,3 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Placeholder Views
-
-struct SettingsPlaceholder: View {
-    var body: some View {
-        Text("Settings")
-            .navigationTitle("Settings")
-    }
-}
