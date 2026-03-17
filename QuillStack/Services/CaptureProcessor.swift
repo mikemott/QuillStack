@@ -18,16 +18,16 @@ final class CaptureProcessor {
             var title: String?
 
             for (index, snapshot) in imageSnapshots.enumerated() {
-                let text = await ocrService.recognizeText(in: snapshot.data)
+                let result = await ocrService.recognizeText(in: snapshot.data)
 
                 if let image = context.model(for: snapshot.id) as? CaptureImage {
-                    image.ocrText = text
+                    image.ocrText = result.fullText
                 }
 
-                if let text { pageTexts.append(text) }
+                if let text = result.fullText { pageTexts.append(text) }
 
                 if index == 0 {
-                    title = await ocrService.extractTitle(in: snapshot.data)
+                    title = result.title
                 }
             }
 

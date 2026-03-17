@@ -158,9 +158,7 @@ struct CaptureFlowView: View {
         let corrected = await CameraService.detectAndCorrectDocument(in: image)
         capturedImages.append(corrected)
 
-        if capturedImages.count == 1 {
-            phase = .tagging
-        }
+        // Don't auto-transition — let user tap "Done" or keep adding pages
     }
 
     private func saveCapture() {
@@ -185,16 +183,16 @@ struct CaptureFlowView: View {
         let processor = CaptureProcessor()
         processor.process(capture, in: modelContext)
 
-        // Attach location if enabled
+        // Attach location if enabled, then dismiss
+        let ctx = modelContext
         Task {
             if let location = await locationService.currentLocation() {
                 capture.latitude = location.coordinate.latitude
                 capture.longitude = location.coordinate.longitude
                 capture.locationName = await locationService.reverseGeocode(location)
-                try? modelContext.save()
+                try? ctx.save()
             }
+            dismiss()
         }
-
-        dismiss()
     }
 }

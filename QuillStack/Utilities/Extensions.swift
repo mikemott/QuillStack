@@ -8,7 +8,10 @@ extension Color {
         let hex = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
         let scanner = Scanner(string: hex)
         var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
+        guard scanner.scanHexInt64(&rgb) else {
+            self.init(.gray)
+            return
+        }
         let r = Double((rgb >> 16) & 0xFF) / 255
         let g = Double((rgb >> 8) & 0xFF) / 255
         let b = Double(rgb & 0xFF) / 255

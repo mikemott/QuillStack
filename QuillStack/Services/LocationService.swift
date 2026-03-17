@@ -25,7 +25,7 @@ final class LocationService: NSObject {
     }
 
     func currentLocation() async -> CLLocation? {
-        guard isEnabled, isAuthorized else { return nil }
+        guard isEnabled, isAuthorized, continuation == nil else { return nil }
         return await withCheckedContinuation { continuation in
             self.continuation = continuation
             manager.requestLocation()

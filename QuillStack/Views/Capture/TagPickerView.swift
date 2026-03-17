@@ -114,6 +114,7 @@ struct TagPickerView: View {
         }
         let tag = Tag(name: name, colorHex: newTagColor)
         modelContext.insert(tag)
+        try? modelContext.save()
         selectedTags.append(tag)
         newTagName = ""
     }
