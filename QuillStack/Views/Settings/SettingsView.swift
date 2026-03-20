@@ -336,6 +336,9 @@ struct SettingsView: View {
                 try? FileManager.default.removeItem(at: dir)
             }
         }
+        Task {
+            await VLMService.shared.clearModel()
+        }
         VLMStatus.shared.state = .idle
     }
 

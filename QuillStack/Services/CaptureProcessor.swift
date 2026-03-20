@@ -22,6 +22,18 @@ final class CaptureProcessor {
 
             if vlmReady, let primaryImage = imageSnapshots.first {
                 await runTwoStageEnrichment(imageData: primaryImage.data, captureID: captureID, context: context)
+
+                // OCR remaining pages for multi-page documents
+                if imageSnapshots.count > 1 {
+                    let remainingImages = Array(imageSnapshots.dropFirst())
+                    for snapshot in remainingImages {
+                        let result = await ocrService.recognizeText(in: snapshot.data)
+                        if let image = context.model(for: snapshot.id) as? CaptureImage {
+                            image.ocrText = result.fullText
+                            image.ocrConfidence = result.averageConfidence
+                        }
+                    }
+                }
             } else {
                 await runAppleVisionFallback(snapshots: imageSnapshots, captureID: captureID, context: context)
             }
@@ -66,12 +78,11 @@ final class CaptureProcessor {
             capture.ocrText = enrichment.text
             capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
 
-            // Auto-apply tags
+            // Auto-apply tags (exact match only to avoid false positives)
             let allTags = fetchTags(in: context)
             for tagName in enrichment.tags {
                 let normalized = tagName.lowercased()
                 let match = allTags.first(where: { $0.name.lowercased() == normalized })
-                    ?? allTags.first(where: { normalized.contains($0.name.lowercased()) })
                 if let match, !capture.tags.contains(where: { $0.id == match.id }) {
                     capture.tags.append(match)
                 }

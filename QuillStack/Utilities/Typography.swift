@@ -9,21 +9,25 @@ import SwiftUI
 // - Body/labels: Plex Sans Regular for readability
 // - Data/timestamps: Plex Mono for technical precision
 // - NEVER use pure white for body text — use QSColor.onSurfaceVariant
+//
+// Note: Custom font usage is an approved design exception to the
+// "use system fonts" guideline for editorial/utilitarian aesthetic.
 // ============================================================
 
 enum QSFont {
     // MARK: - IBM Plex Sans
+    // Using abbreviated PostScript names per IBM Plex v6.0.0+ convention
 
     static func sans(size: CGFloat) -> Font {
         .custom("IBMPlexSans-Regular", size: size)
     }
 
     static func sansLight(size: CGFloat) -> Font {
-        .custom("IBMPlexSans-Light", size: size)
+        .custom("IBMPlexSans-Lt", size: size)  // v6+ abbrev: Light → Lt
     }
 
     static func sansMedium(size: CGFloat) -> Font {
-        .custom("IBMPlexSans-Medium", size: size)
+        .custom("IBMPlexSans-Medm", size: size)  // v6+ abbrev: Medium → Medm
     }
 
     // MARK: - IBM Plex Mono
@@ -33,7 +37,7 @@ enum QSFont {
     }
 
     static func monoLight(size: CGFloat) -> Font {
-        .custom("IBMPlexMono-Light", size: size)
+        .custom("IBMPlexMono-Lt", size: size)  // v6+ abbrev: Light → Lt
     }
 
     // MARK: - Display (large, editorial — tight tracking)

@@ -9,6 +9,7 @@ struct CaptureFlowView: View {
     var body: some View {
         DocumentScannerView { images in
             saveCapture(images: images)
+            dismiss()
         }
     }
 

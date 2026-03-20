@@ -3,6 +3,7 @@ import SwiftData
 
 struct TagChip: View {
     let tag: Tag
+    /// Retained for API compatibility. Per STYLE_GUIDE.md: "All chips fully vibrant at all times (no dimming)"
     var isSelected: Bool = false
     var size: ChipSize = .regular
     var action: (() -> Void)? = nil

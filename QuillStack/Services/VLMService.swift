@@ -30,6 +30,11 @@ actor VLMService {
 
     var isReady: Bool { modelContainer != nil }
 
+    func clearModel() {
+        modelContainer = nil
+        Self.logger.info("VLM model cleared from memory")
+    }
+
     func loadModel() async throws {
         guard modelContainer == nil, !isLoading else { return }
         isLoading = true
@@ -40,18 +45,24 @@ actor VLMService {
 
         await MainActor.run { VLMStatus.shared.state = .downloading(progress: 0) }
 
-        let container = try await loadModelContainer(id: Self.modelID) { progress in
-            Task { @MainActor in
-                VLMStatus.shared.state = .downloading(progress: progress.fractionCompleted)
+        do {
+            let container = try await loadModelContainer(id: Self.modelID) { progress in
+                Task { @MainActor in
+                    VLMStatus.shared.state = .downloading(progress: progress.fractionCompleted)
+                }
             }
+
+            await MainActor.run { VLMStatus.shared.state = .loading }
+
+            modelContainer = container
+
+            await MainActor.run { VLMStatus.shared.state = .ready }
+            Self.logger.info("VLM model loaded")
+        } catch {
+            await MainActor.run { VLMStatus.shared.state = .failed(error.localizedDescription) }
+            Self.logger.error("Failed to load VLM model: \(error.localizedDescription)")
+            throw error
         }
-
-        await MainActor.run { VLMStatus.shared.state = .loading }
-
-        modelContainer = container
-
-        await MainActor.run { VLMStatus.shared.state = .ready }
-        Self.logger.info("VLM model loaded")
     }
 
     func describeImage(_ imageData: Data) async throws -> String {

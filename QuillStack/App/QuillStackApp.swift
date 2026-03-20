@@ -37,16 +37,23 @@ struct QuillStackApp: App {
         let existing = (try? context.fetch(descriptor)) ?? []
 
         if existing.isEmpty {
+            // First launch: create default tags
             for tag in Tag.defaults {
                 context.insert(Tag(name: tag.name, colorHex: tag.hex))
             }
+            UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
         } else {
-            // Sync colors for existing default tags
-            let defaultsByName = Dictionary(uniqueKeysWithValues: Tag.defaults.map { ($0.name, $0.hex) })
-            for tag in existing {
-                if let expectedHex = defaultsByName[tag.name], tag.colorHex != expectedHex {
-                    tag.colorHex = expectedHex
+            // Only sync colors if we haven't done so for this install
+            // This preserves user customizations after initial setup
+            let hasEverSynced = UserDefaults.standard.bool(forKey: "hasSeededDefaultTags")
+            if !hasEverSynced {
+                let defaultsByName = Dictionary(uniqueKeysWithValues: Tag.defaults.map { ($0.name, $0.hex) })
+                for tag in existing {
+                    if let expectedHex = defaultsByName[tag.name], tag.colorHex != expectedHex {
+                        tag.colorHex = expectedHex
+                    }
                 }
+                UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
             }
         }
         try? context.save()

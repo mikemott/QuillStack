@@ -2,7 +2,7 @@ name: QuillStack
 options:
   bundleIdPrefix: com.quillstack
   deploymentTarget:
-    iOS: "26.0"
+    iOS: "16.0"
   defaultConfig: Debug
 settings:
   SWIFT_VERSION: "6.0"
