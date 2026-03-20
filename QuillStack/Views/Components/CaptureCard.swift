@@ -3,61 +3,148 @@ import SwiftData
 
 struct CaptureCard: View {
     let capture: Capture
+    var onShare: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            ZStack(alignment: .topTrailing) {
-                thumbnailImage
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(1, contentMode: .fill)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(borderColor, lineWidth: 2)
-                    )
+        GeometryReader { geo in
+            let imageHeight = geo.size.height * 0.58
+            VStack(spacing: 0) {
+                // Image section
+                ZStack(alignment: .topTrailing) {
+                    thumbnailImage(width: geo.size.width, height: imageHeight)
 
-                if capture.isStack {
-                    Text("\(capture.pageCount)")
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .padding(6)
+                    // Utility action overlay — glass style
+                    if onShare != nil {
+                        VStack(spacing: 10) {
+                            Button {
+                                onShare?()
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(QSColor.onSurfaceVariant)
+                                    .frame(width: 36, height: 36)
+                                    .background(QSSurface.base.opacity(0.70))
+                                    .background(.ultraThinMaterial.opacity(0.4))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                            }
+                        }
+                        .padding(14)
+                    }
                 }
-            }
 
+                // Metadata — glass & gradient recipe from the design doc
+                metadataArea(width: geo.size.width)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .qsGlass(
+                        glow: QSColor.tertiaryDim,
+                        center: .topLeading,
+                        intensity: 0.20,
+                        surfaceOpacity: 0.65
+                    )
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .qsAmbientShadow(radius: 50, opacity: 0.10)
+        }
+    }
+
+    // MARK: - Metadata
+
+    private func metadataArea(width: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Title
             if let title = capture.extractedTitle {
                 Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .font(QSFont.cardTitle)
+                    .foregroundStyle(QSColor.onSurface)
+                    .lineLimit(2)
+                    .padding(.bottom, 4)
+            }
+
+            // Summary
+            if let summary = capture.enrichment?.summary {
+                Text(summary)
+                    .font(QSFont.cardBody)
+                    .foregroundStyle(QSColor.onSurfaceVariant)
+                    .lineLimit(2)
+                    .padding(.bottom, 6)
+            }
+
+            // Timestamp — Plex Mono for data
+            HStack(spacing: 5) {
+                Image(systemName: "clock")
+                    .font(.system(size: 9))
+                Text(capture.createdAt.cardDetailTimestamp)
+                    .font(QSFont.cardTimestamp)
+            }
+            .foregroundStyle(QSColor.onSurfaceMuted)
+            .padding(.bottom, 16)
+
+            // Tags — generous spacing between them
+            if !capture.tags.isEmpty {
+                FlowLayout(spacing: 8) {
+                    ForEach(capture.tags) { tag in
+                        TagChip(tag: tag, isSelected: true)
+                    }
+                }
+                .padding(.bottom, 16)
+            }
+
+            // Bottom row: location + stack info
+            HStack(alignment: .bottom) {
+                if let location = capture.locationName {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("LOCATION")
+                            .font(QSFont.cardLabel)
+                            .tracking(1.8)
+                            .foregroundStyle(QSColor.onSurfaceMuted)
+                        Text(location)
+                            .font(QSFont.cardBody)
+                            .foregroundStyle(QSColor.onSurfaceVariant)
+                    }
+                }
+
+                Spacer(minLength: 12)
+
+                if capture.isStack {
+                    HStack(spacing: 4) {
+                        Image(systemName: "doc.on.doc.fill")
+                            .font(.system(size: 10))
+                        Text("\(capture.pageCount) pages")
+                            .font(QSFont.cardPageCount)
+                    }
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+                }
             }
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 20)
     }
 
-    @ViewBuilder
-    private var thumbnailImage: some View {
-        if let data = capture.thumbnail, let uiImage = UIImage(data: data) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFill()
-        } else {
-            Rectangle()
-                .fill(Color(.systemGray5))
-                .overlay {
-                    Image(systemName: "photo")
-                        .foregroundStyle(.quaternary)
-                }
-        }
-    }
+    // MARK: - Thumbnail
 
-    private var borderColor: Color {
-        if let tag = capture.primaryTag {
-            return Color(hex: tag.colorHex)
+    private func thumbnailImage(width: CGFloat, height: CGFloat) -> some View {
+        Group {
+            if let data = capture.thumbnail, let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: width, height: height)
+                    .clipped()
+            } else {
+                Rectangle()
+                    .fill(QSSurface.container)
+                    .frame(width: width, height: height)
+                    .overlay {
+                        VStack(spacing: 8) {
+                            Image(systemName: "photo")
+                                .font(.system(size: 36, weight: .ultraLight))
+                            Text("NO IMAGE")
+                                .font(QSFont.cardLabel)
+                                .tracking(2)
+                        }
+                        .foregroundStyle(QSColor.onSurfaceMuted.opacity(0.3))
+                    }
+            }
         }
-        return .clear
     }
 }

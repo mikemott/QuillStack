@@ -23,38 +23,41 @@ struct TagPickerView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Quick access row
+        // No dividers. Spacing and tonal shifts define structure.
+        VStack(alignment: .leading, spacing: 28) {
+            // Quick access tags
             if !frequentTags.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Quick Tags")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("QUICK TAGS")
+                        .font(QSFont.sectionHeader)
+                        .tracking(2)
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+                        .padding(.horizontal, 20)
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 10) {
                             ForEach(frequentTags) { tag in
                                 TagChip(
-                                    name: tag.name,
-                                    colorHex: tag.colorHex,
-                                    isSelected: isSelected(tag)
+                                    tag: tag,
+                                    isSelected: isSelected(tag),
+                                    size: .large
                                 ) {
                                     toggle(tag)
                                 }
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
                     }
                 }
             }
 
             // All tags
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("All Tags")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("ALL TAGS")
+                        .font(QSFont.sectionHeader)
+                        .tracking(2)
+                        .foregroundStyle(QSColor.onSurfaceMuted)
 
                     Spacer()
 
@@ -62,24 +65,24 @@ struct TagPickerView: View {
                         showNewTag = true
                     } label: {
                         Image(systemName: "plus.circle")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 16))
+                            .foregroundStyle(QSColor.tertiary)
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
 
-                FlowLayout(spacing: 8) {
+                FlowLayout(spacing: 10) {
                     ForEach(remainingTags) { tag in
                         TagChip(
-                            name: tag.name,
-                            colorHex: tag.colorHex,
-                            isSelected: isSelected(tag)
+                            tag: tag,
+                            isSelected: isSelected(tag),
+                            size: .large
                         ) {
                             toggle(tag)
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
             }
         }
         .alert("New Tag", isPresented: $showNewTag) {

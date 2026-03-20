@@ -36,6 +36,24 @@ extension Date {
     var startOfDay: Date {
         Calendar.current.startOfDay(for: self)
     }
+
+    var cardTimestamp: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: self)
+    }
+
+    var detailTimestamp: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, h:mm a"
+        return formatter.string(from: self)
+    }
+
+    var cardDetailTimestamp: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy • h:mm a"
+        return formatter.string(from: self).uppercased()
+    }
 }
 
 // MARK: - Data to UIImage
@@ -44,15 +62,24 @@ extension Data {
     var uiImage: UIImage? { UIImage(data: self) }
 }
 
-// MARK: - UIImage Thumbnail
+// MARK: - UIImage Helpers
 
 extension UIImage {
+    func normalizedOrientation() -> UIImage {
+        guard imageOrientation != .up else { return self }
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
+
     func thumbnail(maxDimension: CGFloat = 300) -> Data? {
-        let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
-        let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+        let normalized = normalizedOrientation()
+        let scale = min(maxDimension / normalized.size.width, maxDimension / normalized.size.height, 1.0)
+        let newSize = CGSize(width: normalized.size.width * scale, height: normalized.size.height * scale)
         let renderer = UIGraphicsImageRenderer(size: newSize)
         let image = renderer.image { _ in
-            draw(in: CGRect(origin: .zero, size: newSize))
+            normalized.draw(in: CGRect(origin: .zero, size: newSize))
         }
         return image.jpegData(compressionQuality: 0.7)
     }
