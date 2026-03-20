@@ -8,6 +8,8 @@ struct SettingsView: View {
     @State private var showNewTag = false
     @State private var newTagName = ""
     @State private var newTagColor = "#6B7280"
+    @State private var showResetConfirm = false
+    private var vlmStatus = VLMStatus.shared
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
@@ -20,14 +22,21 @@ struct SettingsView: View {
     ]
 
     var body: some View {
-        Form {
-            tagSection
-            locationSection
-            obsidianSection
-            storageSection
-            aboutSection
+        ScrollView {
+            VStack(spacing: 32) {
+                tagSection
+                locationSection
+                obsidianSection
+                storageSection
+                vlmSection
+                aboutSection
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 24)
         }
+        .background(QSSurface.base)
         .navigationTitle("Settings")
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .alert("New Tag", isPresented: $showNewTag) {
             TextField("Tag name", text: $newTagName)
             Button("Cancel", role: .cancel) { newTagName = "" }
@@ -38,128 +47,325 @@ struct SettingsView: View {
     }
 
     // MARK: - Tags
+    // No dividers between items. Use spacing-8 (28pt) between section groups.
 
     private var tagSection: some View {
-        Section {
-            ForEach(tags) { tag in
-                HStack {
-                    Circle()
-                        .fill(Color(hex: tag.colorHex))
-                        .frame(width: 12, height: 12)
-                    Text(tag.name)
-                    Spacer()
-                    Text("\(tag.captureCount)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("TAGS")
+
+            // Tag list — grouped in a tonal tray
+            VStack(spacing: 0) {
+                ForEach(tags) { tag in
+                    HStack(spacing: 12) {
+                        RoundedRectangle(cornerRadius: 3, style: .continuous)
+                            .fill(Color(hex: tag.colorHex))
+                            .frame(width: 14, height: 14)
+                            .shadow(color: Color(hex: tag.colorHex).opacity(0.3), radius: 4)
+                        Text(tag.name)
+                            .font(QSFont.sans(size: 15))
+                            .foregroundStyle(QSColor.onSurface)
+                        Spacer()
+                        Text("\(tag.captureCount)")
+                            .font(QSFont.monoLight(size: 13))
+                            .foregroundStyle(QSColor.onSurfaceMuted)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
                 }
             }
-            .onDelete(perform: deleteTags)
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             Button {
                 showNewTag = true
             } label: {
-                Label("Add Tag", systemImage: "plus")
+                HStack(spacing: 8) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .medium))
+                    Text("ADD TAG")
+                        .font(QSFont.sectionHeader)
+                        .tracking(1.5)
+                }
+                .foregroundStyle(QSColor.tertiary)
             }
-        } header: {
-            Text("Tags")
-        } footer: {
+            .padding(.leading, 4)
+
             Text("Tags with 0 captures can be safely deleted.")
+                .font(QSFont.monoLight(size: 11))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .padding(.leading, 4)
         }
     }
 
     // MARK: - Location
 
     private var locationSection: some View {
-        Section("Location") {
-            Toggle("Capture Location", isOn: Binding(
-                get: { locationService.isEnabled },
-                set: { newValue in
-                    locationService.isEnabled = newValue
-                    if newValue && !locationService.isAuthorized {
-                        locationService.requestPermission()
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("LOCATION")
+
+            VStack(spacing: 0) {
+                settingsRow("Capture Location") {
+                    Toggle("", isOn: Binding(
+                        get: { locationService.isEnabled },
+                        set: { newValue in
+                            locationService.isEnabled = newValue
+                            if newValue && !locationService.isAuthorized {
+                                locationService.requestPermission()
+                            }
+                        }
+                    ))
+                    .tint(QSColor.primary)
+                    .labelsHidden()
+                }
+
+                if locationService.isEnabled {
+                    settingsRow("Permission") {
+                        Text(locationService.isAuthorized ? "Granted" : "Not Granted")
+                            .font(QSFont.mono(size: 13))
+                            .foregroundStyle(QSColor.onSurfaceMuted)
                     }
                 }
-            ))
-
-            if locationService.isEnabled {
-                HStack {
-                    Text("Permission")
-                    Spacer()
-                    Text(locationService.isAuthorized ? "Granted" : "Not Granted")
-                        .foregroundStyle(.secondary)
-                }
             }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
     }
 
     // MARK: - Obsidian
 
     private var obsidianSection: some View {
-        Section {
-            TextField("Vault Path", text: $vaultPath)
-                .textContentType(.URL)
-                .autocorrectionDisabled()
-                .onChange(of: vaultPath) { _, newValue in
-                    UserDefaults.standard.set(newValue, forKey: "obsidianVaultPath")
-                }
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("OBSIDIAN")
 
-            TextField("Attachment Folder", text: $attachmentFolder)
-                .autocorrectionDisabled()
-                .onChange(of: attachmentFolder) { _, newValue in
-                    UserDefaults.standard.set(newValue, forKey: "obsidianAttachmentFolder")
-                }
+            VStack(spacing: 0) {
+                settingsInput("Vault Path", text: $vaultPath, key: "obsidianVaultPath")
+                settingsInput("Attachment Folder", text: $attachmentFolder, key: "obsidianAttachmentFolder")
+                settingsInput("Daily Note Folder", text: $dailyNoteFolder, key: "obsidianDailyNoteFolder")
 
-            TextField("Daily Note Folder (optional)", text: $dailyNoteFolder)
-                .autocorrectionDisabled()
-                .onChange(of: dailyNoteFolder) { _, newValue in
-                    UserDefaults.standard.set(newValue, forKey: "obsidianDailyNoteFolder")
+                settingsRow("Include OCR Text") {
+                    Toggle("", isOn: $includeOCR)
+                        .tint(QSColor.primary)
+                        .labelsHidden()
+                        .onChange(of: includeOCR) { _, newValue in
+                            UserDefaults.standard.set(newValue, forKey: "obsidianIncludeOCR")
+                        }
                 }
+            }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Toggle("Include OCR Text", isOn: $includeOCR)
-                .onChange(of: includeOCR) { _, newValue in
-                    UserDefaults.standard.set(newValue, forKey: "obsidianIncludeOCR")
-                }
-        } header: {
-            Text("Obsidian")
-        } footer: {
             Text("Set the full path to your Obsidian vault folder.")
+                .font(QSFont.monoLight(size: 11))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .padding(.leading, 4)
         }
     }
 
     // MARK: - Storage
 
     private var storageSection: some View {
-        Section("Storage") {
-            HStack {
-                Text("Captures")
-                Spacer()
-                let descriptor = FetchDescriptor<Capture>()
-                let count = (try? modelContext.fetchCount(descriptor)) ?? 0
-                Text("\(count)")
-                    .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("STORAGE")
+
+            VStack(spacing: 0) {
+                settingsRow("Captures") {
+                    let descriptor = FetchDescriptor<Capture>()
+                    let count = (try? modelContext.fetchCount(descriptor)) ?? 0
+                    Text("\(count)")
+                        .font(QSFont.mono(size: 13))
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+                }
+
+                Button {
+                    showResetConfirm = true
+                } label: {
+                    HStack {
+                        Text("Reset All Data")
+                            .font(QSFont.sans(size: 15))
+                            .foregroundStyle(.red)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                }
+                .confirmationDialog("Delete all captures and reset tags to defaults?", isPresented: $showResetConfirm, titleVisibility: .visible) {
+                    Button("Reset All Data", role: .destructive) { resetData() }
+                }
             }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            Text("Reset deletes all captures but keeps the VLM model cache.")
+                .font(QSFont.monoLight(size: 11))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .padding(.leading, 4)
+        }
+    }
+
+    // MARK: - VLM
+
+    private var vlmSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("AI MODEL")
+
+            VStack(spacing: 0) {
+                settingsRow("Model") {
+                    Text("Qwen2-VL 2B + Apple FM")
+                        .font(QSFont.mono(size: 13))
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+                }
+
+                settingsRow("Status") {
+                    HStack(spacing: 8) {
+                        switch vlmStatus.state {
+                        case .idle:
+                            Text("Not started")
+                                .font(QSFont.mono(size: 13))
+                                .foregroundStyle(QSColor.onSurfaceMuted)
+                        case .downloading(let progress):
+                            Text("Downloading \(Int(progress * 100))%")
+                                .font(QSFont.mono(size: 13))
+                                .foregroundStyle(QSColor.onSurfaceMuted)
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(QSColor.onSurfaceMuted)
+                        case .loading:
+                            Text("Loading")
+                                .font(QSFont.mono(size: 13))
+                                .foregroundStyle(QSColor.onSurfaceMuted)
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(QSColor.onSurfaceMuted)
+                        case .ready:
+                            Text("Ready")
+                                .font(QSFont.mono(size: 13))
+                                .foregroundStyle(.green)
+                        case .failed(let error):
+                            Text("Failed")
+                                .font(QSFont.mono(size: 13))
+                                .foregroundStyle(.red)
+                                .help(error)
+                        }
+                    }
+                }
+            }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            Button {
+                clearModelCache()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 12, weight: .medium))
+                    Text("CLEAR MODEL CACHE")
+                        .font(QSFont.sectionHeader)
+                        .tracking(1.5)
+                }
+                .foregroundStyle(.red)
+            }
+            .padding(.leading, 4)
         }
     }
 
     // MARK: - About
 
     private var aboutSection: some View {
-        Section("About") {
-            HStack {
-                Text("Version")
-                Spacer()
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "2.0")
-                    .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("ABOUT")
+
+            VStack(spacing: 0) {
+                settingsRow("Version") {
+                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "2.0")
+                        .font(QSFont.mono(size: 13))
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+                }
             }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
+    }
+
+    // MARK: - Reusable Components
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(QSFont.sectionHeader)
+            .tracking(2.5)
+            .foregroundStyle(QSColor.secondary)
+    }
+
+    private func settingsRow<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack {
+            Text(label)
+                .font(QSFont.sans(size: 15))
+                .foregroundStyle(QSColor.onSurface)
+            Spacer()
+            content()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+    }
+
+    private func settingsInput(_ placeholder: String, text: Binding<String>, key: String) -> some View {
+        HStack {
+            Text(placeholder)
+                .font(QSFont.sans(size: 15))
+                .foregroundStyle(QSColor.onSurface)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            TextField("", text: text)
+                .font(QSFont.mono(size: 13))
+                .foregroundStyle(QSColor.onSurfaceVariant)
+                .multilineTextAlignment(.trailing)
+                .autocorrectionDisabled()
+                .onChange(of: text.wrappedValue) { _, newValue in
+                    UserDefaults.standard.set(newValue, forKey: key)
+                }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 
     // MARK: - Actions
 
-    private func deleteTags(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(tags[index])
+    private func clearModelCache() {
+        let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+        let possiblePaths = ["huggingface", "models"]
+        for name in possiblePaths {
+            if let dir = cacheDir?.appendingPathComponent(name) {
+                try? FileManager.default.removeItem(at: dir)
+            }
         }
+        Task {
+            await VLMService.shared.clearModel()
+        }
+        VLMStatus.shared.state = .idle
+    }
+
+    private func resetData() {
+        // Delete images first to avoid external storage fault on cascade
+        let imageDescriptor = FetchDescriptor<CaptureImage>()
+        if let images = try? modelContext.fetch(imageDescriptor) {
+            for image in images { modelContext.delete(image) }
+        }
+        try? modelContext.save()
+
+        // Now delete captures
+        let captureDescriptor = FetchDescriptor<Capture>()
+        if let captures = try? modelContext.fetch(captureDescriptor) {
+            for capture in captures { modelContext.delete(capture) }
+        }
+        try? modelContext.save()
+
+        // Delete all tags and re-seed defaults
+        let tagDescriptor = FetchDescriptor<Tag>()
+        if let existingTags = try? modelContext.fetch(tagDescriptor) {
+            for tag in existingTags { modelContext.delete(tag) }
+        }
+        for tag in Tag.defaults {
+            modelContext.insert(Tag(name: tag.name, colorHex: tag.hex))
+        }
+
         try? modelContext.save()
     }
 

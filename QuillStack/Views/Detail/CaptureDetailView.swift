@@ -13,13 +13,11 @@ struct CaptureDetailView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.ignoresSafeArea()
+            QSSurface.base.ignoresSafeArea()
 
-            // Image viewer
             imageViewer
                 .ignoresSafeArea()
 
-            // Metadata overlay
             metadataOverlay
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -47,7 +45,7 @@ struct CaptureDetailView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(QSColor.onSurfaceVariant)
                 }
             }
         }
@@ -110,22 +108,23 @@ struct CaptureDetailView: View {
     }
 
     // MARK: - Metadata Overlay
+    // Glass recipe: primary glow bleeding from bottom-left
 
     private var metadataOverlay: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Title
+        VStack(alignment: .leading, spacing: 16) {
+            // Title — onSurface, not pure white
             if let title = capture.extractedTitle {
                 Text(title)
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                    .font(QSFont.detailTitle)
+                    .foregroundStyle(QSColor.onSurface)
             }
 
-            // Tags
+            // Tags row
             HStack {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         ForEach(capture.tags) { tag in
-                            TagChip(name: tag.name, colorHex: tag.colorHex, isSelected: true)
+                            TagChip(tag: tag, isSelected: true)
                         }
                     }
                 }
@@ -136,47 +135,43 @@ struct CaptureDetailView: View {
                 } label: {
                     Image(systemName: "pencil.circle.fill")
                         .font(.title3)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(QSColor.secondary)
                 }
             }
 
-            // Location
-            if let location = capture.locationName {
-                Label(location, systemImage: "location.fill")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-
-            // OCR text (expandable)
-            if let ocrText = capture.ocrText, !ocrText.isEmpty {
-                DisclosureGroup {
-                    Text(ocrText)
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.8))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } label: {
-                    Label("Recognized Text", systemImage: "doc.text")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+            // Location & timestamp — use spacing, not dividers
+            HStack(spacing: 12) {
+                if let location = capture.locationName {
+                    Label {
+                        Text(location)
+                            .font(QSFont.detailLocation)
+                    } icon: {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 11))
+                    }
+                    .foregroundStyle(QSColor.onSurfaceMuted)
                 }
-                .tint(.white.opacity(0.7))
+
+                Spacer()
+
+                Text(capture.createdAt.detailTimestamp)
+                    .font(QSFont.detailTimestamp)
+                    .foregroundStyle(QSColor.onSurfaceMuted)
             }
 
-            // Stack indicator
             if capture.isStack {
                 Text("Page \(currentPage + 1) of \(capture.pageCount)")
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .font(QSFont.detailPageIndicator)
+                    .foregroundStyle(QSColor.onSurfaceMuted)
             }
         }
-        .padding()
-        .background(
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.7)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+        .padding(.horizontal, 20)
+        .padding(.vertical, 20)
+        .qsGlass(
+            glow: QSColor.tertiaryDim,
+            center: .bottomLeading,
+            intensity: 0.15,
+            surfaceOpacity: 0.65
         )
     }
 
@@ -188,6 +183,7 @@ struct CaptureDetailView: View {
                 TagPickerView(selectedTags: $selectedTags)
                     .padding(.top)
             }
+            .background(QSSurface.base)
             .navigationTitle("Edit Tags")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

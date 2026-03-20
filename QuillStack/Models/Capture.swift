@@ -11,6 +11,7 @@ final class Capture {
     var longitude: Double?
     var locationName: String?
     var isProcessingOCR: Bool
+    var enrichmentJSON: Data?
 
     @Relationship(deleteRule: .cascade, inverse: \CaptureImage.capture)
     var images: [CaptureImage]
@@ -38,9 +39,8 @@ final class Capture {
 
     var primaryTag: Tag? { tags.first }
 
-    var combinedOCRText: String {
-        sortedImages
-            .compactMap(\.ocrText)
-            .joined(separator: "\n")
+    var enrichment: Enrichment? {
+        guard let data = enrichmentJSON else { return nil }
+        return try? JSONDecoder().decode(Enrichment.self, from: data)
     }
 }

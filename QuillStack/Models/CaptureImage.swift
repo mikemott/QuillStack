@@ -7,6 +7,7 @@ final class CaptureImage {
     @Attribute(.externalStorage) var thumbnailData: Data?
     var pageIndex: Int
     var ocrText: String?
+    var ocrConfidence: Double?
     var capture: Capture?
 
     init(imageData: Data, pageIndex: Int, thumbnailData: Data? = nil) {

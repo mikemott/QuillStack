@@ -19,6 +19,14 @@ struct QuillStackApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    do {
+                        try await VLMService.shared.loadModel()
+                    } catch {
+                        print("VLM load error: \(error)")
+                        VLMStatus.shared.state = .failed(error.localizedDescription)
+                    }
+                }
         }
         .modelContainer(container)
     }
@@ -26,11 +34,27 @@ struct QuillStackApp: App {
     private func seedDefaultTags(in container: ModelContainer) {
         let context = container.mainContext
         let descriptor = FetchDescriptor<Tag>()
-        let existingCount = (try? context.fetchCount(descriptor)) ?? 0
-        guard existingCount == 0 else { return }
+        let existing = (try? context.fetch(descriptor)) ?? []
 
-        for tag in Tag.defaults {
-            context.insert(Tag(name: tag.name, colorHex: tag.hex))
+        if existing.isEmpty {
+            // First launch: create default tags
+            for tag in Tag.defaults {
+                context.insert(Tag(name: tag.name, colorHex: tag.hex))
+            }
+            UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
+        } else {
+            // Only sync colors if we haven't done so for this install
+            // This preserves user customizations after initial setup
+            let hasEverSynced = UserDefaults.standard.bool(forKey: "hasSeededDefaultTags")
+            if !hasEverSynced {
+                let defaultsByName = Dictionary(uniqueKeysWithValues: Tag.defaults.map { ($0.name, $0.hex) })
+                for tag in existing {
+                    if let expectedHex = defaultsByName[tag.name], tag.colorHex != expectedHex {
+                        tag.colorHex = expectedHex
+                    }
+                }
+                UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
+            }
         }
         try? context.save()
     }
