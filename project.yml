@@ -7,10 +7,6 @@ options:
 settings:
   SWIFT_VERSION: "6.0"
   SWIFT_STRICT_CONCURRENCY: complete
-packages:
-  mlx-swift-lm:
-    url: https://github.com/ml-explore/mlx-swift-lm
-    minorVersion: 2.30.6
 targets:
   QuillStack:
     type: application
@@ -19,9 +15,6 @@ targets:
       - path: QuillStack
         excludes:
           - Info.plist
-    dependencies:
-      - package: mlx-swift-lm
-        product: MLXVLM
     settings:
       base:
         INFOPLIST_FILE: QuillStack/Info.plist

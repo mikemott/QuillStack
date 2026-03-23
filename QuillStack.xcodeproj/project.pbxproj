@@ -8,16 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		0D51927EF2182B3554AB682C /* EnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */; };
+		101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */; };
 		1171088212D4885CEBC52F2F /* IBMPlexMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */; };
+		142552AD97F78CA2DE45C13D /* OCRQueueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */; };
 		18B99221501B9088B896EB31 /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D41AB88F26A245C79AAC7FC /* TagChip.swift */; };
 		2C35FD888C2D154153877D2B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C21F408FCDD056482FDC727 /* LocationService.swift */; };
-		33AE9DD46B3DBF42B691E303 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2FEA7589891ABF051F01EEF0 /* MLXVLM */; };
 		467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */; };
 		4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84704540B805D88979BF52CD /* Typography.swift */; };
 		50C2AF91CE131807998DEE51 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF1A4950689E86FEDAA8FF4 /* Capture.swift */; };
 		55932922712289AB36418C79 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AB099BAAA9ED35A206FDE2 /* ContentView.swift */; };
 		6031DF40116E06AB7F5BF168 /* IBMPlexSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1A30FB6B084F1B94BEE0D6D6 /* IBMPlexSans-Regular.ttf */; };
 		672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6499B4EDA579471C027B8B /* QuillStackApp.swift */; };
+		796B6BE3A307BF5FB2D7412F /* RemoteOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */; };
 		7D712EB29B747417C5122CC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FB76058408D13419B7BE321 /* Assets.xcassets */; };
 		7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD81AE056AC7E1A2498C619A /* Enrichment.swift */; };
 		83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */; };
@@ -27,7 +29,6 @@
 		93B5D3BA7FBC716CDA95890B /* CaptureDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */; };
 		9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CCF501CFC82F4F42461A30 /* DesignSystem.swift */; };
 		9FAF19B6E64542E895FB2FA5 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F0C9F7F2944D13A9B17A0 /* OCRService.swift */; };
-		A7248C1445F94D2BCE4D3857 /* VLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D9FF2ACFDA753649C6A916 /* VLMService.swift */; };
 		A8D75CAD90CCC45017B9402B /* CaptureCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */; };
 		A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6280494C3FF19CC00F604 /* TagPickerView.swift */; };
 		C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */; };
@@ -44,9 +45,10 @@
 		17CCF501CFC82F4F42461A30 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		1A30FB6B084F1B94BEE0D6D6 /* IBMPlexSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Regular.ttf"; sourceTree = "<group>"; };
 		1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCard.swift; sourceTree = "<group>"; };
-		20D9FF2ACFDA753649C6A916 /* VLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMService.swift; sourceTree = "<group>"; };
 		2A151C6C1C1BE00FD00702BB /* IBMPlexSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Light.ttf"; sourceTree = "<group>"; };
 		3D41AB88F26A245C79AAC7FC /* TagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
+		3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRQueueService.swift; sourceTree = "<group>"; };
+		3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingOCRRequest.swift; sourceTree = "<group>"; };
 		3FB76058408D13419B7BE321 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4BF1A4950689E86FEDAA8FF4 /* Capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
 		4E54C5FE42B060A37AC0D3EA /* CaptureFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFlowView.swift; sourceTree = "<group>"; };
@@ -64,22 +66,12 @@
 		A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporter.swift; sourceTree = "<group>"; };
 		B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
+		BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOCRService.swift; sourceTree = "<group>"; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
 		FD81AE056AC7E1A2498C619A /* Enrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrichment.swift; sourceTree = "<group>"; };
 		FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Light.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		3DCF1E145DC6854477FE9B23 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				33AE9DD46B3DBF42B691E303 /* MLXVLM in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0C37BF2F7D4D252B9E612A73 /* Products */ = {
@@ -203,6 +195,7 @@
 				4BF1A4950689E86FEDAA8FF4 /* Capture.swift */,
 				7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */,
 				FD81AE056AC7E1A2498C619A /* Enrichment.swift */,
+				3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */,
 				BE6DD8C80E9AA138C4F0460C /* Tag.swift */,
 			);
 			path = Models;
@@ -215,8 +208,9 @@
 				1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
+				3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */,
 				804F0C9F7F2944D13A9B17A0 /* OCRService.swift */,
-				20D9FF2ACFDA753649C6A916 /* VLMService.swift */,
+				BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -230,7 +224,6 @@
 			buildPhases = (
 				1D891DEED3465CFB17A6D95A /* Sources */,
 				A19D3ABF7F6B458337656FA3 /* Resources */,
-				3DCF1E145DC6854477FE9B23 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -238,7 +231,6 @@
 			);
 			name = QuillStack;
 			packageProductDependencies = (
-				2FEA7589891ABF051F01EEF0 /* MLXVLM */,
 			);
 			productName = QuillStack;
 			productReference = 817E6AAE6434F0F869ED3954 /* QuillStack.app */;
@@ -262,9 +254,6 @@
 			);
 			mainGroup = DFE5CD96A4FC166CA560C928;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				4529AE1B50904225359B8403 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0C37BF2F7D4D252B9E612A73 /* Products */;
 			projectDirPath = "";
@@ -309,15 +298,17 @@
 				0D51927EF2182B3554AB682C /* EnrichmentService.swift in Sources */,
 				93150BFD7F960AF463D425F7 /* Extensions.swift in Sources */,
 				2C35FD888C2D154153877D2B /* LocationService.swift in Sources */,
+				142552AD97F78CA2DE45C13D /* OCRQueueService.swift in Sources */,
 				9FAF19B6E64542E895FB2FA5 /* OCRService.swift in Sources */,
 				F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */,
+				101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */,
 				672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */,
+				796B6BE3A307BF5FB2D7412F /* RemoteOCRService.swift in Sources */,
 				C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */,
 				F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */,
 				18B99221501B9088B896EB31 /* TagChip.swift in Sources */,
 				A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */,
 				4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */,
-				A7248C1445F94D2BCE4D3857 /* VLMService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +324,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				INFOPLIST_FILE = QuillStack/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -395,7 +387,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -453,7 +445,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -474,6 +466,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HZQB6JS358;
 				INFOPLIST_FILE = QuillStack/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -507,25 +500,6 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		4529AE1B50904225359B8403 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
-			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 2.30.6;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		2FEA7589891ABF051F01EEF0 /* MLXVLM */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4529AE1B50904225359B8403 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
-			productName = MLXVLM;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A37481913C0479A999F1272F /* Project object */;
 }

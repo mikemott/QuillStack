@@ -6,7 +6,7 @@ struct QuillStackApp: App {
     let container: ModelContainer
 
     init() {
-        let schema = Schema([Capture.self, CaptureImage.self, Tag.self])
+        let schema = Schema([Capture.self, CaptureImage.self, Tag.self, PendingOCRRequest.self])
         let config = ModelConfiguration("QuillStack", isStoredInMemoryOnly: false)
         do {
             container = try ModelContainer(for: schema, configurations: [config])
@@ -14,21 +14,35 @@ struct QuillStackApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         seedDefaultTags(in: container)
+        configureMacMini()
+    }
+
+    private func configureMacMini() {
+        if let savedHost = UserDefaults.standard.string(forKey: "macMiniHost") {
+            Task {
+                await RemoteOCRService.shared.setMacMiniHost(savedHost)
+            }
+        }
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .task {
-                    do {
-                        try await VLMService.shared.loadModel()
-                    } catch {
-                        print("VLM load error: \(error)")
-                        VLMStatus.shared.state = .failed(error.localizedDescription)
-                    }
+                    await processQueuePeriodically()
                 }
         }
         .modelContainer(container)
+    }
+
+    private func processQueuePeriodically() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(30))
+
+            if await RemoteOCRService.shared.checkAvailability() {
+                await OCRQueueService.shared.processQueue(in: container.mainContext)
+            }
+        }
     }
 
     private func seedDefaultTags(in container: ModelContainer) {

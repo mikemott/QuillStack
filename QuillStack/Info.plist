@@ -22,6 +22,12 @@
 	<string>QuillStack uses the camera to capture notes and documents.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>QuillStack can tag captures with your location for easier organization.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<!-- TODO: Switch to HTTPS with Tailscale cert before production -->
+	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
