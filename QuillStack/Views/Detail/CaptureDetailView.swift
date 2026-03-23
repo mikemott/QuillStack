@@ -139,6 +139,17 @@ struct CaptureDetailView: View {
                 }
             }
 
+            // AI topic tags
+            if let aiTags = capture.enrichment?.aiTags, !aiTags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(aiTags, id: \.self) { tag in
+                            AITagChip(label: tag)
+                        }
+                    }
+                }
+            }
+
             // Location & timestamp — use spacing, not dividers
             HStack(spacing: 12) {
                 if let location = capture.locationName {

@@ -33,6 +33,7 @@
 		A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6280494C3FF19CC00F604 /* TagPickerView.swift */; };
 		C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */; };
 		D92F60E053C90FF44A37AF57 /* IBMPlexMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */; };
+		DC09856D39B244902C7F8D6F /* AITagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB6CBB1585D65A2820B654D /* AITagChip.swift */; };
 		E24B9BFBABD48CE54562CBFC /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */; };
 		E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */; };
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
@@ -59,7 +60,7 @@
 		786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Medium.ttf"; sourceTree = "<group>"; };
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
 		804F0C9F7F2944D13A9B17A0 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
-		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84704540B805D88979BF52CD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureDetailView.swift; sourceTree = "<group>"; };
 		9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentScannerView.swift; sourceTree = "<group>"; };
@@ -68,6 +69,7 @@
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOCRService.swift; sourceTree = "<group>"; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
 		FD81AE056AC7E1A2498C619A /* Enrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrichment.swift; sourceTree = "<group>"; };
 		FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Light.ttf"; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 		171E24937E05D50289ADE08B /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				DFB6CBB1585D65A2820B654D /* AITagChip.swift */,
 				1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */,
 				3D41AB88F26A245C79AAC7FC /* TagChip.swift */,
 			);
@@ -244,6 +247,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = F6AFC3A57067B7E8467C388E /* Build configuration list for PBXProject "QuillStack" */;
 			developmentRegion = en;
@@ -285,6 +290,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC09856D39B244902C7F8D6F /* AITagChip.swift in Sources */,
 				50C2AF91CE131807998DEE51 /* Capture.swift in Sources */,
 				A8D75CAD90CCC45017B9402B /* CaptureCard.swift in Sources */,
 				93B5D3BA7FBC716CDA95890B /* CaptureDetailView.swift in Sources */,
@@ -322,9 +328,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				INFOPLIST_FILE = QuillStack/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -387,7 +391,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -445,7 +449,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -464,9 +468,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				INFOPLIST_FILE = QuillStack/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

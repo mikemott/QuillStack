@@ -15,6 +15,9 @@ struct Enrichment: Codable, Sendable {
     @Guide(description: "1-2 tags from the allowed list that best categorize this image")
     var tags: [String]
 
+    @Guide(description: "Up to 4 descriptive topic tags about the subject matter and content, not the physical format. Lowercase, 1-2 words each.")
+    var aiTags: [String]
+
     @Guide(description: "Actionable items extracted from the image, if any")
     var actions: [Action]
 

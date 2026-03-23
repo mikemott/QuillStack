@@ -86,6 +86,16 @@ struct CaptureCard: View {
                         TagChip(tag: tag, isSelected: true)
                     }
                 }
+                .padding(.bottom, capture.enrichment?.aiTags.isEmpty == false ? 8 : 16)
+            }
+
+            // AI topic tags
+            if let aiTags = capture.enrichment?.aiTags, !aiTags.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(aiTags, id: \.self) { tag in
+                        AITagChip(label: tag)
+                    }
+                }
                 .padding(.bottom, 16)
             }
 
