@@ -62,8 +62,23 @@ actor RemoteOCRService {
             throw RemoteOCRError.notConfigured
         }
 
-        guard let image = UIImage(data: imageData),
-              let base64 = image.toBase64JPEG(quality: 0.8) else {
+        guard let image = UIImage(data: imageData) else {
+            throw RemoteOCRError.imageEncodingFailed
+        }
+
+        // Downscale for OCR — full resolution is unnecessary and slow
+        let maxDimension: CGFloat = 1536
+        let scale = min(maxDimension / max(image.size.width, image.size.height), 1.0)
+        let scaledImage: UIImage
+        if scale < 1.0 {
+            let newSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+            let renderer = UIGraphicsImageRenderer(size: newSize)
+            scaledImage = renderer.image { _ in image.draw(in: CGRect(origin: .zero, size: newSize)) }
+        } else {
+            scaledImage = image
+        }
+
+        guard let base64 = scaledImage.toBase64JPEG(quality: 0.7) else {
             throw RemoteOCRError.imageEncodingFailed
         }
 
