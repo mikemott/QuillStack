@@ -45,8 +45,12 @@ actor RemoteOCRService {
 
             if !hasModel {
                 logger.debug("Model \(self.modelName) not found on Mac Mini")
+                return false
             }
-            return hasModel
+
+            // Preload the model so it's warm for OCR requests
+            Task { await preloadModel() }
+            return true
         } catch {
             logger.debug("Mac Mini unreachable: \(error.localizedDescription)")
             return false
@@ -69,7 +73,7 @@ actor RemoteOCRService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 120
+        request.timeoutInterval = 300
 
         let body: [String: Any] = [
             "model": modelName,
@@ -113,6 +117,20 @@ actor RemoteOCRService {
 
         logger.info("OCR completed successfully, text length: \(text.count) chars")
         return text
+    }
+
+    private func preloadModel() async {
+        guard let url = buildURL(path: "/api/generate") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 300
+
+        let body: [String: Any] = ["model": modelName, "keep_alive": "10m"]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        _ = try? await URLSession.shared.data(for: request)
+        logger.info("Model preload requested")
     }
 
     private func buildURL(path: String) -> URL? {
