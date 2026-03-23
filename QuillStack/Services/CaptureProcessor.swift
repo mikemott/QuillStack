@@ -5,7 +5,6 @@ import os
 @MainActor
 final class CaptureProcessor {
     private let remoteOCRService = RemoteOCRService.shared
-    private let enrichmentService = EnrichmentService.shared
     private let queueService = OCRQueueService.shared
     private let logger = Logger(subsystem: "com.quillstack", category: "CaptureProcessor")
 
@@ -30,31 +29,38 @@ final class CaptureProcessor {
                     return
                 }
 
-                // Process each page with remote OCR
+                // Process each page with remote OCR + tags
                 var allText: [String] = []
+                var allAITags: [String] = []
+                var firstTitle: String?
                 for image in capture.sortedImages {
-                    let pageText = try await remoteOCRService.recognizeText(from: image.imageData)
-                    image.ocrText = pageText
-                    allText.append(pageText)
+                    let result = try await remoteOCRService.recognizeText(from: image.imageData)
+                    image.ocrText = result.text
+                    allText.append(result.text)
+                    allAITags.append(contentsOf: result.aiTags)
+                    if firstTitle == nil { firstTitle = result.title }
                 }
                 let description = allText.joined(separator: "\n\n---\n\n")
-                logger.info("OCR complete: \(allText.count) pages, \(description.count) chars")
+                // Deduplicate AI tags, keep max 4
+                var seen = Set<String>()
+                let uniqueAITags = allAITags.filter { seen.insert($0.lowercased()).inserted }.prefix(4)
 
-                // Persist OCR text immediately
+                logger.info("OCR complete: \(allText.count) pages, \(description.count) chars, \(uniqueAITags.count) tags")
+
+                // Persist OCR + Ollama-generated metadata
                 capture.ocrText = description
+                capture.extractedTitle = firstTitle
                 capture.isProcessingOCR = false
-                try context.save()
 
-                // Run enrichment (best-effort, OCR already saved)
-                let tagNames = fetchTagNames(in: context)
-                logger.info("Running enrichment with \(tagNames.count) available tags")
-                let enrichment = try await enrichmentService.enrich(
-                    imageDescription: description,
-                    tagNames: tagNames
+                // Build enrichment with Ollama tags
+                let enrichment = Enrichment(
+                    title: firstTitle ?? "",
+                    summary: String(description.prefix(200)),
+                    text: description,
+                    tags: [],
+                    aiTags: Array(uniqueAITags),
+                    actions: []
                 )
-                logger.info("Enrichment complete: title=\(enrichment.title)")
-
-                capture.extractedTitle = enrichment.title
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
                 try context.save()
                 logger.info("Capture processed successfully")
@@ -65,12 +71,5 @@ final class CaptureProcessor {
                 try? queueService.enqueue(capture: capture, imageData: imageData, in: context)
             }
         }
-    }
-
-    // MARK: - Tag Fetching
-
-    private func fetchTagNames(in context: ModelContext) -> [String] {
-        let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.name)])
-        return ((try? context.fetch(descriptor)) ?? []).map(\.name)
     }
 }

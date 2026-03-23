@@ -57,7 +57,13 @@ actor RemoteOCRService {
         }
     }
 
-    func recognizeText(from imageData: Data) async throws -> String {
+    struct OCRResult {
+        let text: String
+        let title: String?
+        let aiTags: [String]
+    }
+
+    func recognizeText(from imageData: Data) async throws -> OCRResult {
         guard !macMiniHost.isEmpty else {
             throw RemoteOCRError.notConfigured
         }
@@ -93,17 +99,19 @@ actor RemoteOCRService {
         let body: [String: Any] = [
             "model": modelName,
             "prompt": """
-                Read this image carefully. Transcribe all visible text exactly as written, including:
-                - Handwritten text (cursive or print)
-                - Printed text
-                - Numbers, dates, phone numbers, emails, URLs
-                - Preserve formatting and structure
+                /no_think
+                Read this image carefully and respond with a JSON object containing:
 
-                Also describe:
-                - What type of document or item this is
-                - Any names, addresses, or contact information
+                1. "text": Transcribe ALL visible text exactly as written (handwritten, printed, numbers, dates, phone numbers, emails, URLs). Preserve formatting and structure.
+
+                2. "tags": Up to 4 short tags describing the SUBJECT MATTER and TOPICS (not the physical format). Lowercase, 1-2 words each. Do not use tags like "handwritten", "notebook", "notes", or "page".
+
+                3. "title": A short descriptive title, under 10 words.
+
+                Respond ONLY with the JSON object.
                 """,
             "images": [base64],
+            "format": "json",
             "stream": false
         ]
 
@@ -125,13 +133,36 @@ actor RemoteOCRService {
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let text = json?["response"] as? String, !text.isEmpty else {
-            logger.error("Empty or invalid response from Ollama. JSON keys: \(json?.keys.joined(separator: ", ") ?? "none")")
+        let responseText = json?["response"] as? String
+        let thinkingText = json?["thinking"] as? String
+
+        // Parse structured JSON from response or thinking field (Qwen3 thinking mode)
+        var parsed: [String: Any]?
+        for candidate in [responseText, thinkingText] {
+            guard let candidate, !candidate.isEmpty,
+                  let candidateData = candidate.data(using: .utf8),
+                  let obj = try? JSONSerialization.jsonObject(with: candidateData) as? [String: Any] else {
+                continue
+            }
+            parsed = obj
+            break
+        }
+
+        guard let parsed else {
+            logger.error("Empty or unparseable response from Ollama")
             throw RemoteOCRError.emptyResponse
         }
 
-        logger.info("OCR completed successfully, text length: \(text.count) chars")
-        return text
+        let text = parsed["text"] as? String ?? responseText ?? ""
+        let tags = parsed["tags"] as? [String] ?? []
+        let title = parsed["title"] as? String
+
+        guard !text.isEmpty else {
+            throw RemoteOCRError.emptyResponse
+        }
+
+        logger.info("OCR completed: \(text.count) chars, \(tags.count) tags, title=\(title ?? "none")")
+        return OCRResult(text: text, title: title, aiTags: tags)
     }
 
     private func preloadModel() async {

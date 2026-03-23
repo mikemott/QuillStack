@@ -34,7 +34,6 @@ final class OCRQueueService {
         defer { isProcessing = false }
 
         let remoteOCR = RemoteOCRService.shared
-        let enrichmentService = EnrichmentService.shared
 
         guard await remoteOCR.checkAvailability() else {
             logger.debug("Mac Mini not available, skipping queue processing")
@@ -58,23 +57,23 @@ final class OCRQueueService {
             }
 
             do {
-                let description = try await remoteOCR.recognizeText(from: request.imageData)
+                let result = try await remoteOCR.recognizeText(from: request.imageData)
 
-                // Persist OCR text immediately
-                capture.ocrText = description
+                capture.ocrText = result.text
+                capture.extractedTitle = result.title
                 capture.isProcessingOCR = false
-                context.delete(request)
-                try context.save()
 
-                // Run enrichment (best-effort, OCR already saved)
-                let tagNames = fetchTagNames(in: context)
-                let enrichment = try await enrichmentService.enrich(
-                    imageDescription: description,
-                    tagNames: tagNames
+                let enrichment = Enrichment(
+                    title: result.title ?? "",
+                    summary: String(result.text.prefix(200)),
+                    text: result.text,
+                    tags: [],
+                    aiTags: Array(result.aiTags.prefix(4)),
+                    actions: []
                 )
-
-                capture.extractedTitle = enrichment.title
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
+
+                context.delete(request)
                 try context.save()
                 logger.info("Processed OCR for capture")
 
@@ -95,8 +94,4 @@ final class OCRQueueService {
         logger.info("Queue processing complete")
     }
 
-    private func fetchTagNames(in context: ModelContext) -> [String] {
-        let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.name)])
-        return ((try? context.fetch(descriptor)) ?? []).map(\.name)
-    }
 }
