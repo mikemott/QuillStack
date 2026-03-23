@@ -6,6 +6,7 @@ actor RemoteOCRService {
     static let shared = RemoteOCRService()
 
     private let logger = Logger(subsystem: "com.quillstack", category: "RemoteOCR")
+    private let requiredModel = "qwen3-vl:8b"
     private var macMiniHost: String
 
     init(macMiniHost: String = "") {
@@ -27,10 +28,20 @@ actor RemoteOCRService {
         request.timeoutInterval = 3
 
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            let available = (response as? HTTPURLResponse)?.statusCode == 200
-            logger.debug("Mac Mini availability: \(available)")
-            return available
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+                logger.debug("Mac Mini unavailable")
+                return false
+            }
+
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let models = json?["models"] as? [[String: Any]] ?? []
+            let hasModel = models.contains { ($0["name"] as? String)?.hasPrefix(requiredModel) == true }
+
+            if !hasModel {
+                logger.debug("Model \(self.requiredModel) not found on Mac Mini")
+            }
+            return hasModel
         } catch {
             logger.debug("Mac Mini unreachable: \(error.localizedDescription)")
             return false
@@ -56,7 +67,7 @@ actor RemoteOCRService {
         request.timeoutInterval = 120
 
         let body: [String: Any] = [
-            "model": "qwen3-vl:8b",
+            "model": requiredModel,
             "prompt": """
                 Read this image carefully. Transcribe all visible text exactly as written, including:
                 - Handwritten text (cursive or print)

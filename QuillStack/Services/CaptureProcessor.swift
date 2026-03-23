@@ -38,7 +38,7 @@ final class CaptureProcessor {
                     allText.append(pageText)
                 }
                 let description = allText.joined(separator: "\n\n---\n\n")
-                logger.info("OCR text received: \(description.prefix(100))...")
+                logger.info("OCR complete: \(allText.count) pages, \(description.count) chars")
 
                 // Persist OCR text immediately
                 capture.ocrText = description
@@ -52,7 +52,7 @@ final class CaptureProcessor {
                     imageDescription: description,
                     tagNames: tagNames
                 )
-                logger.info("Enrichment complete: title=\(enrichment.title ?? "none")")
+                logger.info("Enrichment complete: title=\(enrichment.title)")
 
                 capture.extractedTitle = enrichment.title
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
