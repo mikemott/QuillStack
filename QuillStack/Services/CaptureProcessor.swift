@@ -25,15 +25,27 @@ final class CaptureProcessor {
                 // Check if Mac Mini is available
                 guard await remoteOCRService.checkAvailability() else {
                     logger.info("Mac Mini unavailable, queueing OCR request")
+                    capture.isProcessingOCR = false
                     try queueService.enqueue(capture: capture, imageData: imageData, in: context)
                     return
                 }
 
-                // Process with remote OCR
-                let description = try await remoteOCRService.recognizeText(from: imageData)
+                // Process each page with remote OCR
+                var allText: [String] = []
+                for image in capture.sortedImages {
+                    let pageText = try await remoteOCRService.recognizeText(from: image.imageData)
+                    image.ocrText = pageText
+                    allText.append(pageText)
+                }
+                let description = allText.joined(separator: "\n\n---\n\n")
                 logger.info("OCR text received: \(description.prefix(100))...")
 
-                // Run enrichment
+                // Persist OCR text immediately
+                capture.ocrText = description
+                capture.isProcessingOCR = false
+                try context.save()
+
+                // Run enrichment (best-effort, OCR already saved)
                 let tagNames = fetchTagNames(in: context)
                 logger.info("Running enrichment with \(tagNames.count) available tags")
                 let enrichment = try await enrichmentService.enrich(
@@ -42,11 +54,8 @@ final class CaptureProcessor {
                 )
                 logger.info("Enrichment complete: title=\(enrichment.title ?? "none")")
 
-                // Update capture
                 capture.extractedTitle = enrichment.title
-                capture.ocrText = enrichment.text
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
-                capture.isProcessingOCR = false
 
                 // Auto-apply tags
                 let allTags = fetchTags(in: context)
@@ -63,6 +72,7 @@ final class CaptureProcessor {
 
             } catch {
                 logger.error("OCR failed, queueing for retry: \(error.localizedDescription)")
+                capture.isProcessingOCR = false
                 try? queueService.enqueue(capture: capture, imageData: imageData, in: context)
             }
         }

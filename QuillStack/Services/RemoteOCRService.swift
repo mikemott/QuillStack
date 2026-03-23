@@ -19,7 +19,10 @@ actor RemoteOCRService {
     func checkAvailability() async -> Bool {
         guard !macMiniHost.isEmpty else { return false }
 
-        let url = URL(string: "http://\(macMiniHost):11434/api/tags")!
+        guard let url = buildURL(path: "/api/tags") else {
+            logger.debug("Invalid Mac Mini host: \(self.macMiniHost)")
+            return false
+        }
         var request = URLRequest(url: url)
         request.timeoutInterval = 3
 
@@ -44,7 +47,9 @@ actor RemoteOCRService {
             throw RemoteOCRError.imageEncodingFailed
         }
 
-        let url = URL(string: "http://\(macMiniHost):11434/api/generate")!
+        guard let url = buildURL(path: "/api/generate") else {
+            throw RemoteOCRError.notConfigured
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -92,6 +97,15 @@ actor RemoteOCRService {
 
         logger.info("OCR completed successfully, text length: \(text.count) chars")
         return text
+    }
+
+    private func buildURL(path: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = "http"
+        components.host = macMiniHost
+        components.port = 11434
+        components.path = path
+        return components.url
     }
 }
 

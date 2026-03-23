@@ -49,28 +49,32 @@ final class OCRQueueService {
         logger.info("Processing \(requests.count) pending OCR requests")
 
         for request in requests {
+            // Check for orphaned requests before doing network work
+            guard let capture = request.capture else {
+                logger.warning("Capture not found for pending request, removing from queue")
+                context.delete(request)
+                try? context.save()
+                continue
+            }
+
             do {
                 let description = try await remoteOCR.recognizeText(from: request.imageData)
 
-                // Get the capture from the relationship
-                guard let capture = request.capture else {
-                    logger.warning("Capture not found for pending request, removing from queue")
-                    context.delete(request)
-                    continue
-                }
+                // Persist OCR text immediately
+                capture.ocrText = description
+                capture.isProcessingOCR = false
+                context.delete(request)
+                try context.save()
 
-                // Run enrichment
+                // Run enrichment (best-effort, OCR already saved)
                 let tagNames = fetchTagNames(in: context)
                 let enrichment = try await enrichmentService.enrich(
                     imageDescription: description,
                     tagNames: tagNames
                 )
 
-                // Update capture
                 capture.extractedTitle = enrichment.title
-                capture.ocrText = enrichment.text
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
-                capture.isProcessingOCR = false
 
                 // Auto-apply tags
                 let allTags = fetchTags(in: context)
@@ -82,10 +86,7 @@ final class OCRQueueService {
                     }
                 }
 
-                // Remove from queue
-                context.delete(request)
                 try context.save()
-
                 logger.info("Processed OCR for capture")
 
             } catch {
@@ -94,6 +95,7 @@ final class OCRQueueService {
 
                 if request.retryCount > 5 {
                     logger.warning("Max retries exceeded, removing request")
+                    capture.isProcessingOCR = false
                     context.delete(request)
                 }
 

@@ -11,7 +11,9 @@ struct SettingsView: View {
     @State private var showResetConfirm = false
     @State private var macMiniHost = UserDefaults.standard.string(forKey: "macMiniHost") ?? ""
     @State private var isConnected = false
+    @State private var isCheckingConnection = false
     @State private var pendingCount = 0
+    @State private var connectionCheckTask: Task<Void, Never>?
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
@@ -219,20 +221,17 @@ struct SettingsView: View {
 
                 settingsRow("Status") {
                     HStack(spacing: 6) {
-                        if isConnected {
-                            Circle()
-                                .fill(.green)
-                                .frame(width: 8, height: 8)
-                            Text("Connected")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(.green)
+                        if isCheckingConnection {
+                            ProgressView()
+                                .controlSize(.mini)
                         } else {
                             Circle()
-                                .fill(.red)
+                                .fill(QSColor.onSurfaceMuted)
                                 .frame(width: 8, height: 8)
-                            Text("Offline")
+                                .opacity(isConnected ? 1.0 : 0.3)
+                            Text(isConnected ? "Connected" : "Offline")
                                 .font(QSFont.mono(size: 13))
-                                .foregroundStyle(.red)
+                                .foregroundStyle(QSColor.onSurfaceMuted)
                         }
                     }
                 }
@@ -327,7 +326,10 @@ struct SettingsView: View {
                 .onChange(of: text.wrappedValue) { _, newValue in
                     UserDefaults.standard.set(newValue, forKey: key)
                     if key == "macMiniHost" {
-                        Task {
+                        connectionCheckTask?.cancel()
+                        connectionCheckTask = Task {
+                            try? await Task.sleep(for: .milliseconds(500))
+                            guard !Task.isCancelled else { return }
                             await RemoteOCRService.shared.setMacMiniHost(newValue)
                             await checkConnection()
                         }
@@ -341,7 +343,9 @@ struct SettingsView: View {
     // MARK: - Actions
 
     private func checkConnection() async {
+        isCheckingConnection = true
         isConnected = await RemoteOCRService.shared.checkAvailability()
+        isCheckingConnection = false
     }
 
     private func resetData() {

@@ -24,9 +24,8 @@
 	<string>QuillStack can tag captures with your location for easier organization.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
-		<!-- TODO: Switch to HTTPS with Tailscale cert before production -->
 	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
@@ -42,6 +41,14 @@
 		<string>IBMPlexSans-Medium.ttf</string>
 		<string>IBMPlexMono-Light.ttf</string>
 		<string>IBMPlexMono-Regular.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.quillstack.ocr-queue-processing</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
