@@ -122,17 +122,27 @@ struct QuillStackApp: App {
             for tag in Tag.defaults {
                 context.insert(Tag(name: tag.name, colorHex: tag.hex))
             }
-            UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
         } else {
-            let hasEverSynced = UserDefaults.standard.bool(forKey: "hasSeededDefaultTags")
-            if !hasEverSynced {
-                let defaultsByName = Dictionary(uniqueKeysWithValues: Tag.defaults.map { ($0.name, $0.hex) })
-                for tag in existing {
-                    if let expectedHex = defaultsByName[tag.name], tag.colorHex != expectedHex {
-                        tag.colorHex = expectedHex
-                    }
+            // Rename old tags — captures follow automatically via the relationship
+            let renames = ["Note": "Project", "Document": "Reference", "Travel": "Ticket"]
+            for tag in existing {
+                if let newName = renames[tag.name] {
+                    tag.name = newName
                 }
-                UserDefaults.standard.set(true, forKey: "hasSeededDefaultTags")
+            }
+
+            // Add any missing default tags
+            let existingNames = Set(existing.map(\.name)).union(renames.values)
+            for tag in Tag.defaults where !existingNames.contains(tag.name) {
+                context.insert(Tag(name: tag.name, colorHex: tag.hex))
+            }
+
+            // Sync colors to latest defaults
+            let defaultsByName = Dictionary(uniqueKeysWithValues: Tag.defaults.map { ($0.name, $0.hex) })
+            for tag in existing {
+                if let expectedHex = defaultsByName[tag.name], tag.colorHex != expectedHex {
+                    tag.colorHex = expectedHex
+                }
             }
         }
         try? context.save()
