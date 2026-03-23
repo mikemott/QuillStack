@@ -24,9 +24,12 @@ struct QuillStackApp: App {
     }
 
     private func configureMacMini() {
-        if let savedHost = UserDefaults.standard.string(forKey: "macMiniHost") {
-            Task {
+        Task {
+            if let savedHost = UserDefaults.standard.string(forKey: "macMiniHost") {
                 await RemoteOCRService.shared.setMacMiniHost(savedHost)
+            }
+            if let savedModel = UserDefaults.standard.string(forKey: "ollamaModel") {
+                await RemoteOCRService.shared.setModelName(savedModel)
             }
         }
     }

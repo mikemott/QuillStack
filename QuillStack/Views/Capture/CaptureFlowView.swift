@@ -5,16 +5,19 @@ struct CaptureFlowView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var locationService = LocationService()
+    var onCapture: ((Capture) -> Void)?
 
     var body: some View {
         DocumentScannerView { images in
-            saveCapture(images: images)
+            let capture = saveCapture(images: images)
+            if let capture { onCapture?(capture) }
             dismiss()
         }
     }
 
-    private func saveCapture(images: [UIImage]) {
-        guard !images.isEmpty else { return }
+    @discardableResult
+    private func saveCapture(images: [UIImage]) -> Capture? {
+        guard !images.isEmpty else { return nil }
 
         let capture = Capture()
 
@@ -44,5 +47,7 @@ struct CaptureFlowView: View {
                 try? ctx.save()
             }
         }
+
+        return capture
     }
 }

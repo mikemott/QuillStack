@@ -75,17 +75,6 @@ final class OCRQueueService {
 
                 capture.extractedTitle = enrichment.title
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
-
-                // Auto-apply tags
-                let allTags = fetchTags(in: context)
-                for tagName in enrichment.tags {
-                    let normalized = tagName.lowercased()
-                    let match = allTags.first(where: { $0.name.lowercased() == normalized })
-                    if let match, !capture.tags.contains(where: { $0.id == match.id }) {
-                        capture.tags.append(match)
-                    }
-                }
-
                 try context.save()
                 logger.info("Processed OCR for capture")
 
@@ -107,11 +96,7 @@ final class OCRQueueService {
     }
 
     private func fetchTagNames(in context: ModelContext) -> [String] {
-        fetchTags(in: context).map(\.name)
-    }
-
-    private func fetchTags(in context: ModelContext) -> [Tag] {
         let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.name)])
-        return (try? context.fetch(descriptor)) ?? []
+        return ((try? context.fetch(descriptor)) ?? []).map(\.name)
     }
 }

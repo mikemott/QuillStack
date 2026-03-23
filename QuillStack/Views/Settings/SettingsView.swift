@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
     @State private var macMiniHost = UserDefaults.standard.string(forKey: "macMiniHost") ?? ""
+    @State private var ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel") ?? "qwen3-vl:8b"
     @State private var isConnected = false
     @State private var isCheckingConnection = false
     @State private var pendingCount = 0
@@ -218,6 +219,7 @@ struct SettingsView: View {
 
             VStack(spacing: 0) {
                 settingsInput("Mac Mini IP", text: $macMiniHost, key: "macMiniHost")
+                settingsInput("Model", text: $ollamaModel, key: "ollamaModel")
 
                 settingsRow("Status") {
                     HStack(spacing: 6) {
@@ -331,6 +333,11 @@ struct SettingsView: View {
                             try? await Task.sleep(for: .milliseconds(500))
                             guard !Task.isCancelled else { return }
                             await RemoteOCRService.shared.setMacMiniHost(newValue)
+                            await checkConnection()
+                        }
+                    } else if key == "ollamaModel" {
+                        Task {
+                            await RemoteOCRService.shared.setModelName(newValue)
                             await checkConnection()
                         }
                     }
