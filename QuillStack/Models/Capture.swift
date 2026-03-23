@@ -39,8 +39,8 @@ final class Capture {
 
     var primaryTag: Tag? { tags.first }
 
-    var enrichment: Enrichment? {
+    var enrichment: EnrichedCapture? {
         guard let data = enrichmentJSON else { return nil }
-        return try? JSONDecoder().decode(Enrichment.self, from: data)
+        return try? JSONDecoder().decode(EnrichedCapture.self, from: data)
     }
 }

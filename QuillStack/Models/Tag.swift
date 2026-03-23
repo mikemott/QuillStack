@@ -38,13 +38,14 @@ extension Tag {
     static let defaults: [(name: String, hex: String)] = [
         ("Receipt", "#D4FF00"),
         ("Event", "#007AFF"),
-        ("Note", "#FFB6C1"),
         ("Work", "#FFC107"),
-        ("Document", "#008080"),
         ("Contact", "#E0E0E0"),
-        ("Travel", "#FF7F50"),
-        ("Inspiration", "#90EE90"),
         ("Food", "#FFFF00"),
+        ("Inspiration", "#90EE90"),
+        ("Project", "#FFB6C1"),
+        ("Ticket", "#FF7F50"),
+        ("Reference", "#008080"),
+        ("Quote", "#BB86FC"),
     ]
 
     // Dark text on light backgrounds, white text on dark backgrounds

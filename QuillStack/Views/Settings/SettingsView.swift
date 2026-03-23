@@ -9,7 +9,12 @@ struct SettingsView: View {
     @State private var newTagName = ""
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
-    private var vlmStatus = VLMStatus.shared
+    @State private var macMiniHost = UserDefaults.standard.string(forKey: "macMiniHost") ?? ""
+    @State private var ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel") ?? "qwen3-vl:8b"
+    @State private var isConnected = false
+    @State private var isCheckingConnection = false
+    @State private var pendingCount = 0
+    @State private var connectionCheckTask: Task<Void, Never>?
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
@@ -28,7 +33,7 @@ struct SettingsView: View {
                 locationSection
                 obsidianSection
                 storageSection
-                vlmSection
+                ocrSection
                 aboutSection
             }
             .padding(.horizontal, 20)
@@ -37,6 +42,10 @@ struct SettingsView: View {
         .background(QSSurface.base)
         .navigationTitle("Settings")
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .task {
+            await checkConnection()
+            pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
+        }
         .alert("New Tag", isPresented: $showNewTag) {
             TextField("Tag name", text: $newTagName)
             Button("Cancel", role: .cancel) { newTagName = "" }
@@ -195,76 +204,74 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Text("Reset deletes all captures but keeps the VLM model cache.")
+            Text("Reset deletes all captures and clears the OCR queue.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
         }
     }
 
-    // MARK: - VLM
+    // MARK: - Remote OCR
 
-    private var vlmSection: some View {
+    private var ocrSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            sectionHeader("AI MODEL")
+            sectionHeader("REMOTE OCR")
 
             VStack(spacing: 0) {
-                settingsRow("Model") {
-                    Text("Qwen2-VL 2B + Apple FM")
-                        .font(QSFont.mono(size: 13))
-                        .foregroundStyle(QSColor.onSurfaceMuted)
-                }
+                settingsInput("Mac Mini IP", text: $macMiniHost, key: "macMiniHost")
+                settingsInput("Model", text: $ollamaModel, key: "ollamaModel")
 
                 settingsRow("Status") {
-                    HStack(spacing: 8) {
-                        switch vlmStatus.state {
-                        case .idle:
-                            Text("Not started")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(QSColor.onSurfaceMuted)
-                        case .downloading(let progress):
-                            Text("Downloading \(Int(progress * 100))%")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(QSColor.onSurfaceMuted)
+                    HStack(spacing: 6) {
+                        if isCheckingConnection {
                             ProgressView()
-                                .controlSize(.small)
-                                .tint(QSColor.onSurfaceMuted)
-                        case .loading:
-                            Text("Loading")
+                                .controlSize(.mini)
+                        } else {
+                            Circle()
+                                .fill(QSColor.onSurfaceMuted)
+                                .frame(width: 8, height: 8)
+                                .opacity(isConnected ? 1.0 : 0.3)
+                            Text(isConnected ? "Connected" : "Offline")
                                 .font(QSFont.mono(size: 13))
                                 .foregroundStyle(QSColor.onSurfaceMuted)
-                            ProgressView()
-                                .controlSize(.small)
-                                .tint(QSColor.onSurfaceMuted)
-                        case .ready:
-                            Text("Ready")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(.green)
-                        case .failed(let error):
-                            Text("Failed")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(.red)
-                                .help(error)
                         }
+                    }
+                }
+
+                if pendingCount > 0 {
+                    settingsRow("Pending") {
+                        Text("\(pendingCount) captures")
+                            .font(QSFont.mono(size: 13))
+                            .foregroundStyle(QSColor.onSurfaceMuted)
                     }
                 }
             }
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Button {
-                clearModelCache()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 12, weight: .medium))
-                    Text("CLEAR MODEL CACHE")
-                        .font(QSFont.sectionHeader)
-                        .tracking(1.5)
+            if pendingCount > 0 {
+                Button {
+                    Task {
+                        await OCRQueueService.shared.processQueue(in: modelContext)
+                        pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("PROCESS QUEUE NOW")
+                            .font(QSFont.sectionHeader)
+                            .tracking(1.5)
+                    }
+                    .foregroundStyle(QSColor.tertiary)
                 }
-                .foregroundStyle(.red)
+                .padding(.leading, 4)
             }
-            .padding(.leading, 4)
+
+            Text("Enter your Mac Mini's Tailscale IP address. Captures queue when offline.")
+                .font(QSFont.monoLight(size: 11))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .padding(.leading, 4)
         }
     }
 
@@ -320,6 +327,20 @@ struct SettingsView: View {
                 .autocorrectionDisabled()
                 .onChange(of: text.wrappedValue) { _, newValue in
                     UserDefaults.standard.set(newValue, forKey: key)
+                    if key == "macMiniHost" {
+                        connectionCheckTask?.cancel()
+                        connectionCheckTask = Task {
+                            try? await Task.sleep(for: .milliseconds(500))
+                            guard !Task.isCancelled else { return }
+                            await RemoteOCRService.shared.setMacMiniHost(newValue)
+                            await checkConnection()
+                        }
+                    } else if key == "ollamaModel" {
+                        Task {
+                            await RemoteOCRService.shared.setModelName(newValue)
+                            await checkConnection()
+                        }
+                    }
                 }
         }
         .padding(.horizontal, 16)
@@ -328,18 +349,10 @@ struct SettingsView: View {
 
     // MARK: - Actions
 
-    private func clearModelCache() {
-        let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
-        let possiblePaths = ["huggingface", "models"]
-        for name in possiblePaths {
-            if let dir = cacheDir?.appendingPathComponent(name) {
-                try? FileManager.default.removeItem(at: dir)
-            }
-        }
-        Task {
-            await VLMService.shared.clearModel()
-        }
-        VLMStatus.shared.state = .idle
+    private func checkConnection() async {
+        isCheckingConnection = true
+        isConnected = await RemoteOCRService.shared.checkAvailability()
+        isCheckingConnection = false
     }
 
     private func resetData() {
@@ -350,10 +363,17 @@ struct SettingsView: View {
         }
         try? modelContext.save()
 
-        // Now delete captures
+        // Delete captures
         let captureDescriptor = FetchDescriptor<Capture>()
         if let captures = try? modelContext.fetch(captureDescriptor) {
             for capture in captures { modelContext.delete(capture) }
+        }
+        try? modelContext.save()
+
+        // Clear OCR queue
+        let queueDescriptor = FetchDescriptor<PendingOCRRequest>()
+        if let pendingRequests = try? modelContext.fetch(queueDescriptor) {
+            for request in pendingRequests { modelContext.delete(request) }
         }
         try? modelContext.save()
 
@@ -367,6 +387,7 @@ struct SettingsView: View {
         }
 
         try? modelContext.save()
+        pendingCount = 0
     }
 
     private func createTag() {

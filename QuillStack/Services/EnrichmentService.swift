@@ -40,6 +40,9 @@ actor EnrichmentService {
             You analyze descriptions of captured images and extract structured data.
             When picking tags, you MUST choose from exactly this list: \(tagList).
             Never invent new tags. If none fit well, pick the closest match.
+            For aiTags, suggest up to 4 descriptive topic tags about the subject matter.
+            These should be lowercase, 1-2 words each, describing WHAT the content is about,
+            not the physical format. Do not use words like "handwritten", "notebook", "notes", or "page".
             """
         })
 
@@ -114,6 +117,7 @@ actor EnrichmentService {
             summary: imageDescription.prefix(200).description,
             text: imageDescription,
             tags: matchedTags,
+            aiTags: [],
             actions: actions
         )
     }

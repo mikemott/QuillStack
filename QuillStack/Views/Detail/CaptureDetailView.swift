@@ -10,13 +10,24 @@ struct CaptureDetailView: View {
     @State private var showDeleteConfirm = false
     @State private var showExportResult: ExportResult?
     @State private var selectedTags: [Tag] = []
+    @State private var showContactAction = false
+    @State private var showEventAction = false
+    @State private var showReceiptAction = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             QSSurface.base.ignoresSafeArea()
 
-            imageViewer
-                .ignoresSafeArea()
+            ZStack(alignment: .bottomLeading) {
+                imageViewer
+                    .ignoresSafeArea()
+
+                ActionIconStack(capture: capture) { tag in
+                    handleAction(tag)
+                }
+                .padding(20)
+                .padding(.bottom, 200)
+            }
 
             metadataOverlay
         }
@@ -70,6 +81,30 @@ struct CaptureDetailView: View {
             Button("OK") { showExportResult = nil }
         } message: {
             Text(showExportResult?.message ?? "")
+        }
+        .sheet(isPresented: $showContactAction) {
+            if let contact = capture.enrichment?.contact {
+                ContactActionView(extraction: contact) {
+                    showContactAction = false
+                }
+            }
+        }
+        .sheet(isPresented: $showEventAction) {
+            if let event = capture.enrichment?.event {
+                EventActionView(extraction: event, eventStore: .init()) {
+                    showEventAction = false
+                }
+            }
+        }
+        .sheet(isPresented: $showReceiptAction) {
+            if let receipt = capture.enrichment?.receipt {
+                ReceiptPreviewSheet(receipt: receipt, capture: capture, onExport: {
+                    exportToObsidian()
+                    showReceiptAction = false
+                }, onDismiss: {
+                    showReceiptAction = false
+                })
+            }
         }
         .onAppear {
             selectedTags = capture.tags
@@ -139,6 +174,17 @@ struct CaptureDetailView: View {
                 }
             }
 
+            // AI topic tags
+            if let aiTags = capture.enrichment?.aiTags, !aiTags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(aiTags, id: \.self) { tag in
+                            AITagChip(label: tag)
+                        }
+                    }
+                }
+            }
+
             // Location & timestamp — use spacing, not dividers
             HStack(spacing: 12) {
                 if let location = capture.locationName {
@@ -201,6 +247,17 @@ struct CaptureDetailView: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    // MARK: - Quick Actions
+
+    private func handleAction(_ tag: String) {
+        switch tag {
+        case "Contact": showContactAction = true
+        case "Event": showEventAction = true
+        case "Receipt": showReceiptAction = true
+        default: break
+        }
     }
 
     // MARK: - Share

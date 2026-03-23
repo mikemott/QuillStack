@@ -83,4 +83,9 @@ extension UIImage {
         }
         return image.jpegData(compressionQuality: 0.7)
     }
+
+    func toBase64JPEG(quality: CGFloat = 0.8) -> String? {
+        guard let data = jpegData(compressionQuality: quality) else { return nil }
+        return data.base64EncodedString()
+    }
 }

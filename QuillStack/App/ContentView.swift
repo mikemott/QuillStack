@@ -13,7 +13,6 @@ struct ContentView: View {
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
     @FocusState private var searchFocused: Bool
-    private var vlmStatus = VLMStatus.shared
 
     private var filteredCaptures: [Capture] {
         var result = captures
@@ -90,8 +89,6 @@ struct ContentView: View {
                     .padding(.bottom, 12)
                     .background(QSSurface.base)
 
-                    vlmStatusBar
-
                     // Search field (expandable)
                     if showSearch {
                         HStack(spacing: 10) {
@@ -154,48 +151,6 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
-    }
-
-    // MARK: - VLM Status Bar
-
-    @ViewBuilder
-    private var vlmStatusBar: some View {
-        switch vlmStatus.state {
-        case .idle:
-            EmptyView()
-        case .downloading(let progress):
-            VStack(spacing: 4) {
-                HStack {
-                    Text("Downloading model")
-                        .font(QSFont.mono(size: 11))
-                        .foregroundStyle(QSColor.onSurfaceMuted)
-                    Spacer()
-                    Text("\(Int(progress * 100))%")
-                        .font(QSFont.mono(size: 11))
-                        .foregroundStyle(QSColor.onSurfaceMuted)
-                }
-                ProgressView(value: progress)
-                    .tint(QSColor.primary)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
-            .background(QSSurface.containerLow)
-        case .loading:
-            HStack {
-                Text("Loading model")
-                    .font(QSFont.mono(size: 11))
-                    .foregroundStyle(QSColor.onSurfaceMuted)
-                Spacer()
-                ProgressView()
-                    .controlSize(.small)
-                    .tint(QSColor.onSurfaceMuted)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
-            .background(QSSurface.containerLow)
-        case .ready, .failed:
-            EmptyView()
-        }
     }
 
     // MARK: - Tag Filter Bar

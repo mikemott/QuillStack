@@ -4,32 +4,49 @@ import SwiftData
 struct CaptureCard: View {
     let capture: Capture
     var onShare: (() -> Void)? = nil
+    var onAction: ((String) -> Void)? = nil
 
     var body: some View {
         GeometryReader { geo in
             let imageHeight = geo.size.height * 0.58
             VStack(spacing: 0) {
                 // Image section
-                ZStack(alignment: .topTrailing) {
+                ZStack {
                     thumbnailImage(width: geo.size.width, height: imageHeight)
 
-                    // Utility action overlay — glass style
+                    // Utility action overlay — glass style (top-right)
                     if onShare != nil {
-                        VStack(spacing: 10) {
-                            Button {
-                                onShare?()
-                            } label: {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(QSColor.onSurfaceVariant)
-                                    .frame(width: 36, height: 36)
-                                    .background(QSSurface.base.opacity(0.70))
-                                    .background(.ultraThinMaterial.opacity(0.4))
-                                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        VStack {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    onShare?()
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(QSColor.onSurfaceVariant)
+                                        .frame(width: 36, height: 36)
+                                        .background(QSSurface.base.opacity(0.70))
+                                        .background(.ultraThinMaterial.opacity(0.4))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                                }
                             }
+                            Spacer()
                         }
                         .padding(14)
                     }
+
+                    // Quick action icons (bottom-left)
+                    VStack {
+                        Spacer()
+                        HStack {
+                            ActionIconStack(capture: capture) { tag in
+                                onAction?(tag)
+                            }
+                            Spacer()
+                        }
+                    }
+                    .padding(14)
                 }
 
                 // Metadata — glass & gradient recipe from the design doc
@@ -84,6 +101,16 @@ struct CaptureCard: View {
                 FlowLayout(spacing: 8) {
                     ForEach(capture.tags) { tag in
                         TagChip(tag: tag, isSelected: true)
+                    }
+                }
+                .padding(.bottom, capture.enrichment?.aiTags.isEmpty == false ? 8 : 16)
+            }
+
+            // AI topic tags
+            if let aiTags = capture.enrichment?.aiTags, !aiTags.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(aiTags, id: \.self) { tag in
+                        AITagChip(label: tag)
                     }
                 }
                 .padding(.bottom, 16)
