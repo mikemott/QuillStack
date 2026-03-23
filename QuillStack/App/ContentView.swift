@@ -12,7 +12,6 @@ struct ContentView: View {
     @State private var currentIndex = 0
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
-    @State private var captureToTag: Capture?
     @FocusState private var searchFocused: Bool
 
     private var filteredCaptures: [Capture] {
@@ -130,18 +129,6 @@ struct ContentView: View {
                     // Tag filter
                     tagFilterBar
 
-                    // Post-capture tag toast
-                    if let capture = captureToTag {
-                        TagToast(capture: capture) {
-                            withAnimation(.easeOut(duration: 0.3)) {
-                                try? modelContext.save()
-                                captureToTag = nil
-                            }
-                        }
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .padding(.top, 8)
-                    }
-
                     if isDrawerMode {
                         drawerView
                             .transition(.opacity)
@@ -157,11 +144,7 @@ struct ContentView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .fullScreenCover(isPresented: $showCamera) {
-                CaptureFlowView { capture in
-                    withAnimation(.easeIn(duration: 0.3)) {
-                        captureToTag = capture
-                    }
-                }
+                CaptureFlowView()
             }
             .sheet(item: $shareItem) { item in
                 ActivityView(activityItems: item.activityItems)

@@ -21,7 +21,7 @@ struct Enrichment: Codable, Sendable {
     @Guide(description: "Actionable items extracted from the image, if any")
     var actions: [Action]
 
-    init(title: String, summary: String, text: String, tags: [String], aiTags: [String], actions: [Action]) {
+    init(title: String, summary: String, text: String, tags: [String], aiTags: [String], actions: [Action] = []) {
         self.title = title
         self.summary = summary
         self.text = text
@@ -71,5 +71,28 @@ struct Enrichment: Codable, Sendable {
 
         @Guide(description: "URL, if found")
         var url: String?
+    }
+}
+
+struct EnrichedCapture: Codable, Sendable {
+    var title: String
+    var summary: String
+    var text: String
+    var tags: [String]
+    var aiTags: [String]
+    var contact: ContactExtraction?
+    var event: EventExtraction?
+    var receipt: ReceiptExtraction?
+
+    init(title: String, summary: String, text: String, tags: [String], aiTags: [String],
+         contact: ContactExtraction? = nil, event: EventExtraction? = nil, receipt: ReceiptExtraction? = nil) {
+        self.title = title
+        self.summary = summary
+        self.text = text
+        self.tags = tags
+        self.aiTags = aiTags
+        self.contact = contact
+        self.event = event
+        self.receipt = receipt
     }
 }

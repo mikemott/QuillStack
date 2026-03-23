@@ -22,6 +22,10 @@
 	<string>QuillStack uses the camera to capture notes and documents.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>QuillStack can tag captures with your location for easier organization.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>QuillStack can create contacts from captured business cards and documents.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>QuillStack can create calendar events from captured event details.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

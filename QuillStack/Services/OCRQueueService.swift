@@ -57,19 +57,22 @@ final class OCRQueueService {
             }
 
             do {
-                let result = try await remoteOCR.recognizeText(from: request.imageData)
+                let tagNames = Set(capture.tags.map(\.name))
+                let result = try await remoteOCR.recognizeText(from: request.imageData, tagNames: tagNames)
 
                 capture.ocrText = result.text
                 capture.extractedTitle = result.title
                 capture.isProcessingOCR = false
 
-                let enrichment = Enrichment(
+                let enrichment = EnrichedCapture(
                     title: result.title ?? "",
                     summary: String(result.text.prefix(200)),
                     text: result.text,
                     tags: [],
                     aiTags: Array(result.aiTags.prefix(4)),
-                    actions: []
+                    contact: result.contact,
+                    event: result.event,
+                    receipt: result.receipt
                 )
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
 

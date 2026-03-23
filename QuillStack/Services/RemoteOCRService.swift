@@ -61,9 +61,12 @@ actor RemoteOCRService {
         let text: String
         let title: String?
         let aiTags: [String]
+        let contact: ContactExtraction?
+        let event: EventExtraction?
+        let receipt: ReceiptExtraction?
     }
 
-    func recognizeText(from imageData: Data) async throws -> OCRResult {
+    func recognizeText(from imageData: Data, tagNames: Set<String> = []) async throws -> OCRResult {
         guard !macMiniHost.isEmpty else {
             throw RemoteOCRError.notConfigured
         }
@@ -98,18 +101,7 @@ actor RemoteOCRService {
 
         let body: [String: Any] = [
             "model": modelName,
-            "prompt": """
-                /no_think
-                Read this image carefully and respond with a JSON object containing:
-
-                1. "text": Transcribe ALL visible text exactly as written (handwritten, printed, numbers, dates, phone numbers, emails, URLs). Preserve formatting and structure.
-
-                2. "tags": Up to 4 short tags describing the SUBJECT MATTER and TOPICS (not the physical format). Lowercase, 1-2 words each. Do not use tags like "handwritten", "notebook", "notes", or "page".
-
-                3. "title": A short descriptive title, under 10 words.
-
-                Respond ONLY with the JSON object.
-                """,
+            "prompt": buildPrompt(tagNames: tagNames),
             "images": [base64],
             "format": "json",
             "stream": false
@@ -161,8 +153,85 @@ actor RemoteOCRService {
             throw RemoteOCRError.emptyResponse
         }
 
-        logger.info("OCR completed: \(text.count) chars, \(tags.count) tags, title=\(title ?? "none")")
-        return OCRResult(text: text, title: title, aiTags: tags)
+        // Parse tag-specific extractions
+        var contact: ContactExtraction?
+        if let c = parsed["contact"] as? [String: Any] {
+            contact = ContactExtraction(
+                name: c["name"] as? String, phone: c["phone"] as? String,
+                email: c["email"] as? String, company: c["company"] as? String,
+                address: c["address"] as? String, jobTitle: c["jobTitle"] as? String,
+                url: c["url"] as? String
+            )
+        }
+
+        var event: EventExtraction?
+        if let e = parsed["event"] as? [String: Any] {
+            event = EventExtraction(
+                title: e["title"] as? String, date: e["date"] as? String,
+                time: e["time"] as? String, endTime: e["endTime"] as? String,
+                location: e["location"] as? String, description: e["description"] as? String
+            )
+        }
+
+        var receipt: ReceiptExtraction?
+        if let r = parsed["receipt"] as? [String: Any] {
+            let items = (r["items"] as? [[String: Any]])?.map { item in
+                ReceiptItem(
+                    name: item["name"] as? String,
+                    quantity: item["quantity"] as? Int,
+                    price: item["price"] as? String
+                )
+            }
+            receipt = ReceiptExtraction(
+                vendor: r["vendor"] as? String, total: r["total"] as? String,
+                date: r["date"] as? String, currency: r["currency"] as? String,
+                items: items
+            )
+        }
+
+        logger.info("OCR completed: \(text.count) chars, \(tags.count) tags, title=\(title ?? "none"), contact=\(contact != nil), event=\(event != nil), receipt=\(receipt != nil)")
+        return OCRResult(text: text, title: title, aiTags: tags, contact: contact, event: event, receipt: receipt)
+    }
+
+    private func buildPrompt(tagNames: Set<String>) -> String {
+        var sections: [String] = [
+            """
+            /no_think
+            Read this image carefully and respond with a JSON object containing:
+
+            1. "text": Transcribe ALL visible text exactly as written (handwritten, printed, numbers, dates, phone numbers, emails, URLs). Preserve formatting and structure.
+
+            2. "tags": Up to 4 short tags describing the SUBJECT MATTER and TOPICS (not the physical format). Lowercase, 1-2 words each. Do not use tags like "handwritten", "notebook", "notes", or "page".
+
+            3. "title": A short descriptive title, under 10 words.
+            """
+        ]
+
+        var fieldNum = 4
+
+        if tagNames.contains("Contact") {
+            sections.append("""
+            \(fieldNum). "contact": Extract contact information as a JSON object with fields: name, phone, email, company, address, jobTitle, url. Only include fields that are clearly visible.
+            """)
+            fieldNum += 1
+        }
+
+        if tagNames.contains("Event") {
+            sections.append("""
+            \(fieldNum). "event": Extract event information as a JSON object with fields: title, date (ISO 8601), time, endTime, location, description. Only include fields that are clearly visible.
+            """)
+            fieldNum += 1
+        }
+
+        if tagNames.contains("Receipt") {
+            sections.append("""
+            \(fieldNum). "receipt": Extract receipt information as a JSON object with fields: vendor, total, date (ISO 8601), currency, items (array of objects with name, quantity, price). Only include fields that are clearly visible.
+            """)
+            fieldNum += 1
+        }
+
+        sections.append("Respond ONLY with the JSON object.")
+        return sections.joined(separator: "\n\n")
     }
 
     private func preloadModel() async {

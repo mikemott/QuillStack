@@ -10,6 +10,7 @@ final class CaptureProcessor {
 
     func process(_ capture: Capture, in context: ModelContext) {
         capture.isProcessingOCR = true
+        let tagNames = Set(capture.tags.map(\.name))
 
         guard let primaryImage = capture.sortedImages.first else {
             capture.isProcessingOCR = false
@@ -21,7 +22,6 @@ final class CaptureProcessor {
 
         Task { @MainActor in
             do {
-                // Check if Mac Mini is available
                 guard await remoteOCRService.checkAvailability() else {
                     logger.info("Mac Mini unavailable, queueing OCR request")
                     capture.isProcessingOCR = false
@@ -29,37 +29,44 @@ final class CaptureProcessor {
                     return
                 }
 
-                // Process each page with remote OCR + tags
+                // Process each page with tag-aware OCR
                 var allText: [String] = []
                 var allAITags: [String] = []
                 var firstTitle: String?
+                var firstContact: ContactExtraction?
+                var firstEvent: EventExtraction?
+                var firstReceipt: ReceiptExtraction?
+
                 for image in capture.sortedImages {
-                    let result = try await remoteOCRService.recognizeText(from: image.imageData)
+                    let result = try await remoteOCRService.recognizeText(from: image.imageData, tagNames: tagNames)
                     image.ocrText = result.text
                     allText.append(result.text)
                     allAITags.append(contentsOf: result.aiTags)
                     if firstTitle == nil { firstTitle = result.title }
+                    if firstContact == nil { firstContact = result.contact }
+                    if firstEvent == nil { firstEvent = result.event }
+                    if firstReceipt == nil { firstReceipt = result.receipt }
                 }
+
                 let description = allText.joined(separator: "\n\n---\n\n")
-                // Deduplicate AI tags, keep max 4
                 var seen = Set<String>()
                 let uniqueAITags = allAITags.filter { seen.insert($0.lowercased()).inserted }.prefix(4)
 
                 logger.info("OCR complete: \(allText.count) pages, \(description.count) chars, \(uniqueAITags.count) tags")
 
-                // Persist OCR + Ollama-generated metadata
                 capture.ocrText = description
                 capture.extractedTitle = firstTitle
                 capture.isProcessingOCR = false
 
-                // Build enrichment with Ollama tags
-                let enrichment = Enrichment(
+                let enrichment = EnrichedCapture(
                     title: firstTitle ?? "",
                     summary: String(description.prefix(200)),
                     text: description,
                     tags: [],
                     aiTags: Array(uniqueAITags),
-                    actions: []
+                    contact: firstContact,
+                    event: firstEvent,
+                    receipt: firstReceipt
                 )
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
                 try context.save()
