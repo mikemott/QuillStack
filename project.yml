@@ -37,3 +37,14 @@ targets:
       - path: QuillStack/Assets.xcassets
       - path: QuillStack/Resources/Fonts
         buildPhase: resources
+  QuillStackTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: QuillStackTests
+    dependencies:
+      - target: QuillStack
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quillstack.tests
+        GENERATE_INFOPLIST_FILE: YES

@@ -66,7 +66,7 @@ struct ObsidianExporter {
         }
     }
 
-    private func buildMarkdown(capture: Capture, imageFilenames: [String]) -> String {
+    func buildMarkdown(capture: Capture, imageFilenames: [String]) -> String {
         var lines: [String] = []
 
         // Heading
@@ -98,7 +98,7 @@ struct ObsidianExporter {
         return lines.joined(separator: "\n")
     }
 
-    private func dailyNoteURL(for date: Date, vaultURL: URL) -> URL {
+    func dailyNoteURL(for date: Date, vaultURL: URL) -> URL {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let filename = formatter.string(from: date) + ".md"
