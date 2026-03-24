@@ -43,7 +43,7 @@ final class OCRQueueService {
         let descriptor = FetchDescriptor<PendingOCRRequest>(
             sortBy: [SortDescriptor(\.createdAt)]
         )
-        guard let requests = try? context.fetch(descriptor) else { return }
+        guard let requests = try? context.fetch(descriptor), !requests.isEmpty else { return }
 
         logger.info("Processing \(requests.count) pending OCR requests")
 

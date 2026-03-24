@@ -26,7 +26,6 @@ struct DocumentScannerView: UIViewControllerRepresentable {
         ) {
             let images = (0..<scan.pageCount).map { scan.imageOfPage(at: $0) }
             parent.onScan(images)
-            parent.dismiss()
         }
 
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {

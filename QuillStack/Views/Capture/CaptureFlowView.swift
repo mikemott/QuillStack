@@ -12,12 +12,12 @@ struct CaptureFlowView: View {
 
     var body: some View {
         ZStack {
-            DocumentScannerView { images in
-                pendingCapture = createCapture(images: images)
-                showTagPicker = true
-            }
-
-            if showTagPicker, let capture = pendingCapture {
+            if !showTagPicker {
+                DocumentScannerView { images in
+                    pendingCapture = createCapture(images: images)
+                    showTagPicker = true
+                }
+            } else if let capture = pendingCapture {
                 tagPickerOverlay(capture: capture)
             }
         }
@@ -31,7 +31,9 @@ struct CaptureFlowView: View {
             if let data = capture.thumbnail, let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(QSSurface.base)
                     .ignoresSafeArea()
             } else {
                 QSSurface.base.ignoresSafeArea()

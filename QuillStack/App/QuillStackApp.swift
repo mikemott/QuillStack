@@ -62,6 +62,9 @@ struct QuillStackApp: App {
         while !Task.isCancelled {
             try? await Task.sleep(for: .seconds(30))
 
+            let pendingCount = OCRQueueService.shared.getPendingCount(in: container.mainContext)
+            guard pendingCount > 0 else { continue }
+
             if await RemoteOCRService.shared.checkAvailability() {
                 await OCRQueueService.shared.processQueue(in: container.mainContext)
             }
