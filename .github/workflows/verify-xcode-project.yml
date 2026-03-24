@@ -48,6 +48,12 @@ jobs:
 
           echo "✅ All Swift files are properly added to Xcode project"
 
+      - name: Create secrets config placeholder
+        run: |
+          if [ ! -f Secrets.xcconfig ] && [ -f Secrets.xcconfig.example ]; then
+            cp Secrets.xcconfig.example Secrets.xcconfig
+          fi
+
       - name: Verify project builds
         run: |
           echo "🔨 Verifying project builds..."
