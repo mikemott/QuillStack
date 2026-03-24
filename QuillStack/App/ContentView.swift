@@ -354,10 +354,14 @@ struct ContentView: View {
 
     private func handleCardAction(_ tag: String) {
         CrashReporting.actionTapped(tag)
+        guard let capture = actionCapture else { return }
         switch tag {
-        case "Contact": showContactAction = true
-        case "Event": showEventAction = true
-        case "Receipt": showReceiptAction = true
+        case "Contact" where capture.enrichment?.contact != nil:
+            showContactAction = true
+        case "Event" where capture.enrichment?.event != nil:
+            showEventAction = true
+        case "Receipt" where capture.enrichment?.receipt != nil:
+            showReceiptAction = true
         default: break
         }
     }
