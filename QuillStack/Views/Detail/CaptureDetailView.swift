@@ -13,6 +13,7 @@ struct CaptureDetailView: View {
     @State private var showContactAction = false
     @State private var showEventAction = false
     @State private var showReceiptAction = false
+    @State private var todoForAction: TodoExtraction?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -104,6 +105,11 @@ struct CaptureDetailView: View {
                 }, onDismiss: {
                     showReceiptAction = false
                 })
+            }
+        }
+        .sheet(item: $todoForAction) { todo in
+            TodoActionView(extraction: todo, eventStore: .init()) {
+                todoForAction = nil
             }
         }
         .onAppear {
@@ -257,6 +263,7 @@ struct CaptureDetailView: View {
         case "Contact": showContactAction = true
         case "Event": showEventAction = true
         case "Receipt": showReceiptAction = true
+        case "To-Do": todoForAction = capture.enrichment?.todo
         default: break
         }
     }

@@ -72,7 +72,8 @@ final class OCRQueueService {
                     aiTags: Array(result.aiTags.prefix(4)),
                     contact: result.contact,
                     event: result.event,
-                    receipt: result.receipt
+                    receipt: result.receipt,
+                    todo: result.todo
                 )
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
 

@@ -128,7 +128,7 @@ struct QuillStackApp: App {
             }
         } else {
             // Rename old tags — captures follow automatically via the relationship
-            let renames = ["Note": "Project", "Document": "Reference", "Travel": "Ticket"]
+            let renames = ["Note": "Project", "Document": "Reference", "Travel": "Ticket", "Inspiration": "To-Do"]
             for tag in existing {
                 if let newName = renames[tag.name] {
                     tag.name = newName

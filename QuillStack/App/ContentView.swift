@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var showContactAction = false
     @State private var showEventAction = false
     @State private var showReceiptAction = false
+    @State private var todoForAction: TodoExtraction?
     @FocusState private var searchFocused: Bool
 
     private var filteredCaptures: [Capture] {
@@ -174,6 +175,11 @@ struct ContentView: View {
                     }, onDismiss: {
                         showReceiptAction = false
                     })
+                }
+            }
+            .sheet(item: $todoForAction) { todo in
+                TodoActionView(extraction: todo, eventStore: .init()) {
+                    todoForAction = nil
                 }
             }
         }
@@ -362,6 +368,8 @@ struct ContentView: View {
             showEventAction = true
         case "Receipt" where capture.enrichment?.receipt != nil:
             showReceiptAction = true
+        case "To-Do":
+            todoForAction = capture.enrichment?.todo
         default: break
         }
     }
