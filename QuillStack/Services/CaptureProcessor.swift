@@ -29,7 +29,8 @@ final class CaptureProcessor {
                     return
                 }
 
-                // Process each page with tag-aware OCR
+                CrashReporting.ocrRequested(engine: "remote", tagCount: tagNames.count)
+
                 var allText: [String] = []
                 var allAITags: [String] = []
                 var firstTitle: String?

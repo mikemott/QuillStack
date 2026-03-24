@@ -5,7 +5,8 @@ enum CrashReporting {
 
     static func start() {
         guard let dsn = Bundle.main.object(forInfoDictionaryKey: "SENTRY_DSN") as? String,
-              !dsn.isEmpty else {
+              !dsn.isEmpty,
+              dsn.hasPrefix("https://") else {
             return
         }
 
