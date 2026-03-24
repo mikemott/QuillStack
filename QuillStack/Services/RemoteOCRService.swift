@@ -8,6 +8,7 @@ actor RemoteOCRService {
     private let logger = Logger(subsystem: "com.quillstack", category: "RemoteOCR")
     private var macMiniHost: String
     private var modelName: String
+    private var modelPreloaded = false
 
     init(macMiniHost: String = "", modelName: String = "qwen3-vl:8b") {
         self.macMiniHost = macMiniHost
@@ -48,8 +49,10 @@ actor RemoteOCRService {
                 return false
             }
 
-            // Preload the model so it's warm for OCR requests
-            Task { await preloadModel() }
+            if !modelPreloaded {
+                modelPreloaded = true
+                Task { await preloadModel() }
+            }
             return true
         } catch {
             logger.debug("Mac Mini unreachable: \(error.localizedDescription)")
@@ -143,6 +146,11 @@ actor RemoteOCRService {
         guard let parsed else {
             logger.error("Empty or unparseable response from Ollama")
             throw RemoteOCRError.emptyResponse
+        }
+
+        logger.info("Ollama response keys: \(Array(parsed.keys).sorted())")
+        if !tagNames.isEmpty {
+            logger.info("Requested extractions for tags: \(tagNames.sorted())")
         }
 
         let text = parsed["text"] as? String ?? responseText ?? ""

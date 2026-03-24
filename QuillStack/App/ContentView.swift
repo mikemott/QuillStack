@@ -12,6 +12,10 @@ struct ContentView: View {
     @State private var currentIndex = 0
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
+    @State private var actionCapture: Capture?
+    @State private var showContactAction = false
+    @State private var showEventAction = false
+    @State private var showReceiptAction = false
     @FocusState private var searchFocused: Bool
 
     private var filteredCaptures: [Capture] {
@@ -149,6 +153,29 @@ struct ContentView: View {
             .sheet(item: $shareItem) { item in
                 ActivityView(activityItems: item.activityItems)
             }
+            .sheet(isPresented: $showContactAction) {
+                if let contact = actionCapture?.enrichment?.contact {
+                    ContactActionView(extraction: contact) {
+                        showContactAction = false
+                    }
+                }
+            }
+            .sheet(isPresented: $showEventAction) {
+                if let event = actionCapture?.enrichment?.event {
+                    EventActionView(extraction: event, eventStore: .init()) {
+                        showEventAction = false
+                    }
+                }
+            }
+            .sheet(isPresented: $showReceiptAction) {
+                if let receipt = actionCapture?.enrichment?.receipt, let capture = actionCapture {
+                    ReceiptPreviewSheet(receipt: receipt, capture: capture, onExport: {
+                        showReceiptAction = false
+                    }, onDismiss: {
+                        showReceiptAction = false
+                    })
+                }
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -191,9 +218,12 @@ struct ContentView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(Array(filteredCaptures.enumerated()), id: \.element.id) { index, capture in
                         NavigationLink(destination: CaptureDetailView(capture: capture)) {
-                            CaptureCard(capture: capture) {
+                            CaptureCard(capture: capture, onShare: {
                                 shareCapture(capture)
-                            }
+                            }, onAction: { tag in
+                                actionCapture = capture
+                                handleCardAction(tag)
+                            })
                             .padding(.horizontal, 16)
                             .padding(.top, 12)
                             .padding(.bottom, 8)
@@ -318,6 +348,17 @@ struct ContentView: View {
         guard let data = capture.sortedImages.first?.imageData,
               let image = UIImage(data: data) else { return }
         shareItem = ShareableCapture(image: image, title: capture.extractedTitle)
+    }
+
+    // MARK: - Quick Actions
+
+    private func handleCardAction(_ tag: String) {
+        switch tag {
+        case "Contact": showContactAction = true
+        case "Event": showEventAction = true
+        case "Receipt": showReceiptAction = true
+        default: break
+        }
     }
 
     // MARK: - Capture Button
