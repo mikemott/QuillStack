@@ -17,10 +17,12 @@ actor RemoteOCRService {
 
     func setMacMiniHost(_ host: String) {
         macMiniHost = host
+        modelPreloaded = false
     }
 
     func setModelName(_ name: String) {
         modelName = name
+        modelPreloaded = false
     }
 
     func checkAvailability() async -> Bool {
