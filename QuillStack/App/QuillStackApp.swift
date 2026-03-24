@@ -11,6 +11,7 @@ struct QuillStackApp: App {
     private static let bgTaskID = "com.quillstack.ocr-queue-processing"
 
     init() {
+        CrashReporting.start()
         let schema = Schema([Capture.self, CaptureImage.self, Tag.self, PendingOCRRequest.self])
         let config = ModelConfiguration("QuillStack", isStoredInMemoryOnly: false)
         do {

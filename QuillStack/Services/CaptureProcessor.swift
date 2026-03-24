@@ -71,9 +71,16 @@ final class CaptureProcessor {
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
                 try context.save()
                 logger.info("Capture processed successfully")
+                CrashReporting.ocrCompleted(
+                    charCount: description.count,
+                    hasContact: firstContact != nil,
+                    hasEvent: firstEvent != nil,
+                    hasReceipt: firstReceipt != nil
+                )
 
             } catch {
                 logger.error("OCR failed, queueing for retry: \(error.localizedDescription)")
+                CrashReporting.ocrFailed(error: error.localizedDescription)
                 capture.isProcessingOCR = false
                 try? queueService.enqueue(capture: capture, imageData: imageData, in: context)
             }

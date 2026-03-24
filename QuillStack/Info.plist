@@ -54,6 +54,8 @@
 	<array>
 		<string>com.quillstack.ocr-queue-processing</string>
 	</array>
+	<key>SENTRY_DSN</key>
+	<string>$(SENTRY_DSN)</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

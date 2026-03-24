@@ -353,6 +353,7 @@ struct ContentView: View {
     // MARK: - Quick Actions
 
     private func handleCardAction(_ tag: String) {
+        CrashReporting.actionTapped(tag)
         switch tag {
         case "Contact": showContactAction = true
         case "Event": showEventAction = true

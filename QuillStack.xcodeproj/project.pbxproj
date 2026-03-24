@@ -16,6 +16,7 @@
 		2C35FD888C2D154153877D2B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C21F408FCDD056482FDC727 /* LocationService.swift */; };
 		30850D9D9ECE398BAE5BE713 /* EventExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316694A14067DD5476FC5F8B /* EventExtraction.swift */; };
 		335D0D41E36D88BE5E5FB07C /* EventActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */; };
+		33AE9DD46B3DBF42B691E303 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8DA5851B4883923523C9D303 /* SentrySwiftUI */; };
 		467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */; };
 		4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84704540B805D88979BF52CD /* Typography.swift */; };
 		50C2AF91CE131807998DEE51 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF1A4950689E86FEDAA8FF4 /* Capture.swift */; };
@@ -44,6 +45,7 @@
 		E24B9BFBABD48CE54562CBFC /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */; };
 		E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */; };
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
+		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
 		F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD8C80E9AA138C4F0460C /* Tag.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +60,7 @@
 		316694A14067DD5476FC5F8B /* EventExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventExtraction.swift; sourceTree = "<group>"; };
 		3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptPreviewSheet.swift; sourceTree = "<group>"; };
 		3D41AB88F26A245C79AAC7FC /* TagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
+		3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
 		3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRQueueService.swift; sourceTree = "<group>"; };
 		3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingOCRRequest.swift; sourceTree = "<group>"; };
 		3FB76058408D13419B7BE321 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -83,11 +86,23 @@
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOCRService.swift; sourceTree = "<group>"; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
 		FD81AE056AC7E1A2498C619A /* Enrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrichment.swift; sourceTree = "<group>"; };
 		FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Light.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3DCF1E145DC6854477FE9B23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33AE9DD46B3DBF42B691E303 /* SentrySwiftUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0C37BF2F7D4D252B9E612A73 /* Products */ = {
@@ -116,6 +131,15 @@
 				3D41AB88F26A245C79AAC7FC /* TagChip.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		39C6F980E0E534A1AD0570F1 /* QuillStack */ = {
+			isa = PBXGroup;
+			children = (
+				DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */,
+			);
+			name = QuillStack;
+			path = .;
 			sourceTree = "<group>";
 		};
 		3EECED0CADFB246418452A4C /* Resources */ = {
@@ -214,6 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				95969AF08CEC6F0DD5723B72 /* QuillStack */,
+				39C6F980E0E534A1AD0570F1 /* QuillStack */,
 				0C37BF2F7D4D252B9E612A73 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -237,6 +262,7 @@
 			isa = PBXGroup;
 			children = (
 				537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */,
+				3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */,
 				1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
@@ -256,6 +282,7 @@
 			buildPhases = (
 				1D891DEED3465CFB17A6D95A /* Sources */,
 				A19D3ABF7F6B458337656FA3 /* Resources */,
+				3DCF1E145DC6854477FE9B23 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -263,6 +290,7 @@
 			);
 			name = QuillStack;
 			packageProductDependencies = (
+				8DA5851B4883923523C9D303 /* SentrySwiftUI */,
 			);
 			productName = QuillStack;
 			productReference = 817E6AAE6434F0F869ED3954 /* QuillStack.app */;
@@ -288,6 +316,9 @@
 			);
 			mainGroup = DFE5CD96A4FC166CA560C928;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				457C1836BC8CD79198298FEC /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0C37BF2F7D4D252B9E612A73 /* Products */;
 			projectDirPath = "";
@@ -330,6 +361,7 @@
 				74CFA93B5B14CAA49F511DC7 /* ContactActionView.swift in Sources */,
 				C3AA5AB93657990DA5182634 /* ContactExtraction.swift in Sources */,
 				55932922712289AB36418C79 /* ContentView.swift in Sources */,
+				F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */,
 				9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */,
 				83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */,
 				7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */,
@@ -359,6 +391,7 @@
 /* Begin XCBuildConfiguration section */
 		0A5DE0C3D348FEF7CEF2801D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -499,6 +532,7 @@
 		};
 		A3D1BFB4F33C2134870C1924 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -538,6 +572,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		457C1836BC8CD79198298FEC /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8DA5851B4883923523C9D303 /* SentrySwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 457C1836BC8CD79198298FEC /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = SentrySwiftUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A37481913C0479A999F1272F /* Project object */;
 }
