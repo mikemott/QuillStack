@@ -7,6 +7,10 @@ options:
 settings:
   SWIFT_VERSION: "6.0"
   SWIFT_STRICT_CONCURRENCY: complete
+packages:
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa.git
+    from: 8.0.0
 targets:
   QuillStack:
     type: application
@@ -15,6 +19,9 @@ targets:
       - path: QuillStack
         excludes:
           - Info.plist
+    configFiles:
+      Debug: Secrets.xcconfig
+      Release: Secrets.xcconfig
     settings:
       base:
         INFOPLIST_FILE: QuillStack/Info.plist
@@ -23,7 +30,21 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
+    dependencies:
+      - package: Sentry
+        product: SentrySwiftUI
     resources:
       - path: QuillStack/Assets.xcassets
       - path: QuillStack/Resources/Fonts
         buildPhase: resources
+  QuillStackTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: QuillStackTests
+    dependencies:
+      - target: QuillStack
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quillstack.tests
+        GENERATE_INFOPLIST_FILE: YES

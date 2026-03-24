@@ -252,6 +252,7 @@ struct CaptureDetailView: View {
     // MARK: - Quick Actions
 
     private func handleAction(_ tag: String) {
+        CrashReporting.actionTapped(tag)
         switch tag {
         case "Contact": showContactAction = true
         case "Event": showEventAction = true

@@ -353,6 +353,7 @@ struct ContentView: View {
     // MARK: - Quick Actions
 
     private func handleCardAction(_ tag: String) {
+        CrashReporting.actionTapped(tag)
         guard let capture = actionCapture else { return }
         switch tag {
         case "Contact" where capture.enrichment?.contact != nil:

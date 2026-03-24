@@ -203,7 +203,7 @@ actor RemoteOCRService {
         return OCRResult(text: text, title: title, aiTags: tags, contact: contact, event: event, receipt: receipt)
     }
 
-    private func buildPrompt(tagNames: Set<String>) -> String {
+    func buildPrompt(tagNames: Set<String>) -> String {
         var sections: [String] = [
             """
             /no_think
