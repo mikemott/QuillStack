@@ -25,7 +25,8 @@ struct CaptureCard: View {
                                     .foregroundStyle(QSColor.onPrimaryDark)
                                     .frame(width: 44, height: 44)
                                     .background(QSColor.primary)
-                                    .clipShape(Circle())
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                             }
                         }
 
