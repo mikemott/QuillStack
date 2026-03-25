@@ -13,9 +13,9 @@ struct ContentView: View {
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
     @State private var actionCapture: Capture?
-    @State private var showContactAction = false
-    @State private var showEventAction = false
-    @State private var showReceiptAction = false
+    @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
+    @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
+    @State private var receiptForAction: IdentifiableWrapper<(ReceiptExtraction, Capture)>?
     @State private var todoForAction: TodoExtraction?
     @FocusState private var searchFocused: Bool
 
@@ -154,28 +154,23 @@ struct ContentView: View {
             .sheet(item: $shareItem) { item in
                 ActivityView(activityItems: item.activityItems)
             }
-            .sheet(isPresented: $showContactAction) {
-                if let contact = actionCapture?.enrichment?.contact {
-                    ContactActionView(extraction: contact) {
-                        showContactAction = false
-                    }
+            .sheet(item: $contactForAction) { wrapper in
+                ContactActionView(extraction: wrapper.value) {
+                    contactForAction = nil
                 }
             }
-            .sheet(isPresented: $showEventAction) {
-                if let event = actionCapture?.enrichment?.event {
-                    EventActionView(extraction: event, eventStore: .init()) {
-                        showEventAction = false
-                    }
+            .sheet(item: $eventForAction) { wrapper in
+                EventActionView(extraction: wrapper.value, eventStore: .init()) {
+                    eventForAction = nil
                 }
             }
-            .sheet(isPresented: $showReceiptAction) {
-                if let receipt = actionCapture?.enrichment?.receipt, let capture = actionCapture {
-                    ReceiptPreviewSheet(receipt: receipt, capture: capture, onExport: {
-                        showReceiptAction = false
-                    }, onDismiss: {
-                        showReceiptAction = false
-                    })
-                }
+            .sheet(item: $receiptForAction) { wrapper in
+                let (receipt, capture) = wrapper.value
+                ReceiptPreviewSheet(receipt: receipt, capture: capture, onExport: {
+                    receiptForAction = nil
+                }, onDismiss: {
+                    receiptForAction = nil
+                })
             }
             .sheet(item: $todoForAction) { todo in
                 TodoActionView(extraction: todo, eventStore: .init()) {
@@ -231,8 +226,7 @@ struct ContentView: View {
                                 handleCardAction(tag)
                             })
                             .padding(.horizontal, 16)
-                            .padding(.top, 12)
-                            .padding(.bottom, 8)
+                            .padding(.vertical, 10)
                             .frame(height: geo.size.height * 0.90)
                         }
                         .buttonStyle(.plain)
@@ -240,7 +234,7 @@ struct ContentView: View {
                 }
                 .scrollTargetLayout()
             }
-            .scrollTargetBehavior(.paging)
+            .scrollTargetBehavior(.viewAligned)
         }
     }
 
@@ -362,12 +356,18 @@ struct ContentView: View {
         CrashReporting.actionTapped(tag)
         guard let capture = actionCapture else { return }
         switch tag {
-        case "Contact" where capture.enrichment?.contact != nil:
-            showContactAction = true
-        case "Event" where capture.enrichment?.event != nil:
-            showEventAction = true
-        case "Receipt" where capture.enrichment?.receipt != nil:
-            showReceiptAction = true
+        case "Contact":
+            if let contact = capture.enrichment?.contact {
+                contactForAction = IdentifiableWrapper(contact)
+            }
+        case "Event":
+            if let event = capture.enrichment?.event {
+                eventForAction = IdentifiableWrapper(event)
+            }
+        case "Receipt":
+            if let receipt = capture.enrichment?.receipt {
+                receiptForAction = IdentifiableWrapper((receipt, capture))
+            }
         case "To-Do":
             todoForAction = capture.enrichment?.todo
         default: break
@@ -416,4 +416,11 @@ struct ActivityView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+struct IdentifiableWrapper<T>: Identifiable {
+    let id = UUID()
+    let value: T
+
+    init(_ value: T) { self.value = value }
 }

@@ -2,23 +2,25 @@ import SwiftUI
 
 struct ActionIcon: View {
     let systemName: String
-    let tint: Color
+    let backgroundColor: Color
+    let foregroundColor: Color
     let action: () -> Void
+
+    @State private var glowing = false
 
     var body: some View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(tint)
+                .foregroundStyle(foregroundColor)
                 .frame(width: 44, height: 44)
-                .background(QSSurface.base.opacity(0.80))
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .strokeBorder(tint.opacity(0.35), lineWidth: 1)
-                )
-                .shadow(color: tint.opacity(0.25), radius: 8, x: 0, y: 2)
+                .background(backgroundColor)
+                .shadow(color: backgroundColor.opacity(glowing ? 0.5 : 0.2), radius: glowing ? 10 : 4, x: 0, y: 2)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                glowing = true
+            }
         }
     }
 }
@@ -26,22 +28,22 @@ struct ActionIcon: View {
 struct ActionIconStack: View {
     let capture: Capture
 
-    var availableActions: [(icon: String, tag: String, color: Color)] {
-        var actions: [(String, String, Color)] = []
+    var availableActions: [(icon: String, tagName: String, bgColor: Color, fgColor: Color)] {
+        var actions: [(String, String, Color, Color)] = []
         let tagsByName = Dictionary(uniqueKeysWithValues: capture.tags.map { ($0.name, $0) })
         let enrichment = capture.enrichment
 
         if let tag = tagsByName["Contact"], enrichment?.contact != nil {
-            actions.append(("person.crop.circle.badge.plus", "Contact", Color(hex: tag.colorHex)))
+            actions.append(("person.crop.circle.badge.plus", "Contact", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
         }
         if let tag = tagsByName["Event"], enrichment?.event != nil {
-            actions.append(("calendar.badge.plus", "Event", Color(hex: tag.colorHex)))
+            actions.append(("calendar.badge.plus", "Event", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
         }
         if let tag = tagsByName["Receipt"], enrichment?.receipt != nil {
-            actions.append(("doc.text", "Receipt", Color(hex: tag.colorHex)))
+            actions.append(("doc.text", "Receipt", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
         }
         if let tag = tagsByName["To-Do"], enrichment?.todo != nil {
-            actions.append(("checklist", "To-Do", Color(hex: tag.colorHex)))
+            actions.append(("checklist", "To-Do", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
         }
         return actions
     }
@@ -55,9 +57,9 @@ struct ActionIconStack: View {
     var body: some View {
         if showIcons {
             VStack(spacing: 8) {
-                ForEach(availableActions, id: \.tag) { action in
-                    ActionIcon(systemName: action.icon, tint: action.color) {
-                        onAction?(action.tag)
+                ForEach(availableActions, id: \.tagName) { action in
+                    ActionIcon(systemName: action.icon, backgroundColor: action.bgColor, foregroundColor: action.fgColor) {
+                        onAction?(action.tagName)
                     }
                 }
             }
