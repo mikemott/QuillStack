@@ -26,6 +26,8 @@
 	<string>QuillStack can create contacts from captured business cards and documents.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>QuillStack can create calendar events from captured event details.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>QuillStack can create reminders from captured to-do lists and tasks.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

@@ -37,6 +37,7 @@ final class CaptureProcessor {
                 var firstContact: ContactExtraction?
                 var firstEvent: EventExtraction?
                 var firstReceipt: ReceiptExtraction?
+                var firstTodo: TodoExtraction?
 
                 for image in capture.sortedImages {
                     let result = try await remoteOCRService.recognizeText(from: image.imageData, tagNames: tagNames)
@@ -47,6 +48,7 @@ final class CaptureProcessor {
                     if firstContact == nil { firstContact = result.contact }
                     if firstEvent == nil { firstEvent = result.event }
                     if firstReceipt == nil { firstReceipt = result.receipt }
+                    if firstTodo == nil { firstTodo = result.todo }
                 }
 
                 let description = allText.joined(separator: "\n\n---\n\n")
@@ -67,7 +69,8 @@ final class CaptureProcessor {
                     aiTags: Array(uniqueAITags),
                     contact: firstContact,
                     event: firstEvent,
-                    receipt: firstReceipt
+                    receipt: firstReceipt,
+                    todo: firstTodo
                 )
                 capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
                 try context.save()

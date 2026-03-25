@@ -69,6 +69,7 @@ actor RemoteOCRService {
         let contact: ContactExtraction?
         let event: EventExtraction?
         let receipt: ReceiptExtraction?
+        let todo: TodoExtraction?
     }
 
     func recognizeText(from imageData: Data, tagNames: Set<String> = []) async throws -> OCRResult {
@@ -199,8 +200,32 @@ actor RemoteOCRService {
             )
         }
 
-        logger.info("OCR completed: \(text.count) chars, \(tags.count) tags, title=\(title ?? "none"), contact=\(contact != nil), event=\(event != nil), receipt=\(receipt != nil)")
-        return OCRResult(text: text, title: title, aiTags: tags, contact: contact, event: event, receipt: receipt)
+        var todo: TodoExtraction?
+        if let t = parsed["todo"] {
+            var todoItems: [[String: Any]]?
+
+            // Model may return {"items": [...]} or just [...]
+            if let obj = t as? [String: Any] {
+                todoItems = obj["items"] as? [[String: Any]]
+            } else if let arr = t as? [[String: Any]] {
+                todoItems = arr
+            }
+
+            if let todoItems {
+                let items = todoItems.map { item in
+                    TodoItem(
+                        title: item["title"] as? String,
+                        dueDate: item["dueDate"] as? String,
+                        priority: item["priority"] as? String,
+                        notes: item["notes"] as? String
+                    )
+                }
+                todo = TodoExtraction(items: items)
+            }
+        }
+
+        logger.info("OCR completed: \(text.count) chars, \(tags.count) tags, title=\(title ?? "none"), contact=\(contact != nil), event=\(event != nil), receipt=\(receipt != nil), todo=\(todo != nil)")
+        return OCRResult(text: text, title: title, aiTags: tags, contact: contact, event: event, receipt: receipt, todo: todo)
     }
 
     func buildPrompt(tagNames: Set<String>) -> String {
@@ -236,6 +261,13 @@ actor RemoteOCRService {
         if tagNames.contains("Receipt") {
             sections.append("""
             \(fieldNum). "receipt": Extract receipt information as a JSON object with fields: vendor, total, date (ISO 8601), currency, items (array of objects with name, quantity, price). Only include fields that are clearly visible.
+            """)
+            fieldNum += 1
+        }
+
+        if tagNames.contains("To-Do") {
+            sections.append("""
+            \(fieldNum). "todo": Extract to-do items as a JSON object with fields: items (array of objects with title, dueDate (ISO 8601 if visible), priority (high/medium/low if indicated), notes). Extract each task or action item as a separate entry.
             """)
             fieldNum += 1
         }

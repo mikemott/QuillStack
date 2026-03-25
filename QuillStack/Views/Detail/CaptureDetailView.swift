@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import EventKit
 
 struct CaptureDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -10,15 +11,17 @@ struct CaptureDetailView: View {
     @State private var showDeleteConfirm = false
     @State private var showExportResult: ExportResult?
     @State private var selectedTags: [Tag] = []
-    @State private var showContactAction = false
-    @State private var showEventAction = false
-    @State private var showReceiptAction = false
+    @State private var eventStore = EKEventStore()
+    @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
+    @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
+    @State private var receiptForAction: IdentifiableWrapper<ReceiptExtraction>?
+    @State private var todoForAction: TodoExtraction?
 
     var body: some View {
         ZStack(alignment: .bottom) {
             QSSurface.base.ignoresSafeArea()
 
-            ZStack(alignment: .bottomLeading) {
+            ZStack(alignment: .bottomTrailing) {
                 imageViewer
                     .ignoresSafeArea()
 
@@ -82,28 +85,27 @@ struct CaptureDetailView: View {
         } message: {
             Text(showExportResult?.message ?? "")
         }
-        .sheet(isPresented: $showContactAction) {
-            if let contact = capture.enrichment?.contact {
-                ContactActionView(extraction: contact) {
-                    showContactAction = false
-                }
+        .sheet(item: $contactForAction) { wrapper in
+            ContactActionView(extraction: wrapper.value) {
+                contactForAction = nil
             }
         }
-        .sheet(isPresented: $showEventAction) {
-            if let event = capture.enrichment?.event {
-                EventActionView(extraction: event, eventStore: .init()) {
-                    showEventAction = false
-                }
+        .sheet(item: $eventForAction) { wrapper in
+            EventActionView(extraction: wrapper.value, eventStore: eventStore) {
+                eventForAction = nil
             }
         }
-        .sheet(isPresented: $showReceiptAction) {
-            if let receipt = capture.enrichment?.receipt {
-                ReceiptPreviewSheet(receipt: receipt, capture: capture, onExport: {
-                    exportToObsidian()
-                    showReceiptAction = false
-                }, onDismiss: {
-                    showReceiptAction = false
-                })
+        .sheet(item: $receiptForAction) { wrapper in
+            ReceiptPreviewSheet(receipt: wrapper.value, capture: capture, onExport: {
+                exportToObsidian()
+                receiptForAction = nil
+            }, onDismiss: {
+                receiptForAction = nil
+            })
+        }
+        .sheet(item: $todoForAction) { todo in
+            TodoActionView(extraction: todo, eventStore: eventStore) {
+                todoForAction = nil
             }
         }
         .onAppear {
@@ -254,9 +256,20 @@ struct CaptureDetailView: View {
     private func handleAction(_ tag: String) {
         CrashReporting.actionTapped(tag)
         switch tag {
-        case "Contact": showContactAction = true
-        case "Event": showEventAction = true
-        case "Receipt": showReceiptAction = true
+        case "Contact":
+            if let contact = capture.enrichment?.contact {
+                contactForAction = IdentifiableWrapper(contact)
+            }
+        case "Event":
+            if let event = capture.enrichment?.event {
+                eventForAction = IdentifiableWrapper(event)
+            }
+        case "Receipt":
+            if let receipt = capture.enrichment?.receipt {
+                receiptForAction = IdentifiableWrapper(receipt)
+            }
+        case "To-Do":
+            todoForAction = capture.enrichment?.todo
         default: break
         }
     }

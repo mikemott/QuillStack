@@ -14,38 +14,26 @@ struct CaptureCard: View {
                 ZStack {
                     thumbnailImage(width: geo.size.width, height: imageHeight)
 
-                    // Utility action overlay — glass style (top-right)
-                    if onShare != nil {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Button {
-                                    onShare?()
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundStyle(QSColor.onSurfaceVariant)
-                                        .frame(width: 36, height: 36)
-                                        .background(QSSurface.base.opacity(0.70))
-                                        .background(.ultraThinMaterial.opacity(0.4))
-                                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-                                }
+                    // Share + quick actions (top-right, vertical)
+                    VStack(spacing: 8) {
+                        if onShare != nil {
+                            Button {
+                                onShare?()
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(QSColor.onPrimaryDark)
+                                    .frame(width: 44, height: 44)
+                                    .background(QSColor.primary)
+                                    .clipShape(Circle())
                             }
-                            Spacer()
                         }
-                        .padding(14)
-                    }
 
-                    // Quick action icons (bottom-left)
-                    VStack {
-                        Spacer()
-                        HStack {
-                            ActionIconStack(capture: capture) { tag in
-                                onAction?(tag)
-                            }
-                            Spacer()
+                        ActionIconStack(capture: capture) { tag in
+                            onAction?(tag)
                         }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                     .padding(14)
                 }
 
@@ -75,15 +63,6 @@ struct CaptureCard: View {
                     .foregroundStyle(QSColor.onSurface)
                     .lineLimit(2)
                     .padding(.bottom, 4)
-            }
-
-            // Summary
-            if let summary = capture.enrichment?.summary {
-                Text(summary)
-                    .font(QSFont.cardBody)
-                    .foregroundStyle(QSColor.onSurfaceVariant)
-                    .lineLimit(2)
-                    .padding(.bottom, 6)
             }
 
             // Timestamp — Plex Mono for data

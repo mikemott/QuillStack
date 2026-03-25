@@ -27,7 +27,7 @@ final class Tag {
         case "Document": return "ph-file-text-duotone"
         case "Contact": return "ph-address-book-duotone"
         case "Travel": return "ph-airplane-tilt-duotone"
-        case "Inspiration": return "ph-sparkle-duotone"
+        case "To-Do": return "ph-checks-duotone"
         case "Food": return "ph-fork-knife-duotone"
         default: return "ph-tag-duotone"
         }
@@ -41,7 +41,7 @@ extension Tag {
         ("Work", "#FFC107"),
         ("Contact", "#64D2FF"),
         ("Food", "#E85D75"),
-        ("Inspiration", "#90EE90"),
+        ("To-Do", "#90EE90"),
         ("Project", "#FFB6C1"),
         ("Ticket", "#FF7F50"),
         ("Reference", "#008080"),
