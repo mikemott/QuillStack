@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuillStack — Transform Handwriting Into Action</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* QuillStack Color Palette */
+            --forest-dark: #1e4d2f;
+            --forest-medium: #143d23;
+            --forest-light: #e8f0e8;
+            --cream-light: #f4f8f4;
+            --cream-medium: #eef5ee;
+            --paper-beige: #faf5f0;
+            --paper-tan: #f8f0e4;
+            --text-dark: #2d4a2f;
+            --text-medium: #4a6b4f;
+            --text-light: #d4e0d4;
+
+            /* Badge colors - all 12 note types */
+            --badge-general: #1e4d2f;
+            --badge-todo: #b8860b;
+            --badge-meeting: #146464;
+            --badge-email: #8b4577;
+            --badge-prompt: #5b4d99;
+            --badge-reminder: #dc5858;
+            --badge-contact: #3478b4;
+            --badge-expense: #2e8b57;
+            --badge-shopping: #ff8c00;
+            --badge-recipe: #cd5c5c;
+            --badge-event: #4682b4;
+            --badge-idea: #ffd700;
+
+            /* Typography */
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Crimson Pro', Georgia, serif;
+            --font-handwritten: 'Caveat', cursive;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 2rem;
+            --space-xl: 4rem;
+            --space-2xl: 8rem;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--cream-light);
+            overflow-x: hidden;
+        }
+
+        /* Paper Texture Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            z-index: 9999;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--forest-dark);
+        }
+
+        h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); }
+        h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+
+        p {
+            color: var(--text-medium);
+        }
+
+        .handwritten {
+            font-family: var(--font-handwritten);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        section {
+            padding: var(--space-2xl) 0;
+        }
+
+        /* Decorative Elements */
+        .flourish {
+            display: block;
+            width: 120px;
+            height: 30px;
+            margin: var(--space-lg) auto;
+            background: var(--forest-dark);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30'%3E%3Cpath d='M0 15 Q30 0 60 15 Q90 30 120 15' stroke='black' stroke-width='2' fill='none'/%3E%3Ccircle cx='60' cy='15' r='4'/%3E%3C/svg%3E");
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--space-md) 0;
+            background: linear-gradient(to bottom, var(--cream-light) 60%, transparent);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: var(--paper-beige);
+            box-shadow: 0 2px 20px rgba(30, 77, 47, 0.08);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(30, 77, 47, 0.2);
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            letter-spacing: -0.02em;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        nav a {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--forest-dark);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--forest-dark);
+            color: var(--cream-light);
+        }
+
+        .btn-primary:hover {
+            background: var(--forest-medium);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(30, 77, 47, 0.25);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--forest-dark);
+            border: 2px solid var(--forest-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--forest-dark);
+            color: var(--cream-light);
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--forest-light) 0%, transparent 70%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .hero-text {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 0.5rem 1rem;
+            background: var(--paper-tan);
+            border-radius: 100px;
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--forest-dark);
+            margin-bottom: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+        }
+
+        .hero-badge::before {
+            content: '\2726';
+            color: var(--badge-todo);
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--forest-medium);
+            position: relative;
+        }
+
+        .hero h1 em::after {
+            content: '';
+            position: absolute;
+            bottom: 0.1em;
+            left: 0;
+            right: 0;
+            height: 0.15em;
+            background: var(--badge-todo);
+            opacity: 0.4;
+            transform: skewX(-5deg);
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xl);
+            max-width: 500px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        /* Phone Mockup */
+        .phone-mockup {
+            position: relative;
+            width: 320px;
+            height: 650px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .phone-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 45px;
+            padding: 12px;
+            box-shadow:
+                0 50px 100px rgba(30, 77, 47, 0.2),
+                0 20px 40px rgba(30, 77, 47, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: rotateY(-5deg) rotateX(2deg);
+            transition: transform 0.5s ease;
+        }
+
+        .phone-frame:hover {
+            transform: rotateY(0deg) rotateX(0deg);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--cream-light);
+            border-radius: 35px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 34px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen-content {
+            padding: 50px 20px 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+        }
+
+        .app-icon-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--forest-dark);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cream-light);
+            font-size: 1.25rem;
+        }
+
+        .note-card {
+            background: var(--paper-beige);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(30, 77, 47, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-card:hover {
+            transform: translateX(4px);
+            box-shadow: -4px 4px 0 var(--forest-light);
+        }
+
+        .note-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .note-type-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-general { background: var(--badge-general); color: white; }
+        .badge-todo { background: var(--badge-todo); color: white; }
+        .badge-meeting { background: var(--badge-meeting); color: white; }
+        .badge-email { background: var(--badge-email); color: white; }
+        .badge-prompt { background: var(--badge-prompt); color: white; }
+        .badge-reminder { background: var(--badge-reminder); color: white; }
+        .badge-contact { background: var(--badge-contact); color: white; }
+        .badge-expense { background: var(--badge-expense); color: white; }
+        .badge-shopping { background: var(--badge-shopping); color: white; }
+        .badge-recipe { background: var(--badge-recipe); color: white; }
+        .badge-event { background: var(--badge-event); color: white; }
+        .badge-idea { background: var(--badge-idea); color: #2d4a2f; }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+        }
+
+        .note-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            margin-bottom: 4px;
+        }
+
+        .note-preview {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+        }
+
+        .confidence-word {
+            border-bottom: 2px dotted #e6a23c;
+            cursor: help;
+        }
+
+        /* Floating annotations */
+        .annotation {
+            position: absolute;
+            font-family: var(--font-handwritten);
+            font-size: 1.1rem;
+            color: var(--forest-dark);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .annotation-1 {
+            top: 10%;
+            right: -20%;
+            transform: rotate(8deg);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .annotation-2 {
+            bottom: 20%;
+            left: -25%;
+            transform: rotate(-5deg);
+            animation: float 4s ease-in-out infinite 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(8deg); }
+            50% { transform: translateY(-10px) rotate(8deg); }
+        }
+
+        .annotation-arrow {
+            display: block;
+            width: 60px;
+            height: 30px;
+            margin-top: 5px;
+        }
+
+        /* ===== TOUR SECTION ===== */
+        .tour-section {
+            background: var(--paper-beige);
+            position: relative;
+        }
+
+        .tour-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--cream-light), var(--paper-beige));
+        }
+
+        .tour-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+
+        .tour-header h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .tour-subtitle {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Interactive Tour */
+        .tour-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tour-manuscript {
+            background: var(--paper-tan);
+            border-radius: 8px;
+            padding: var(--space-xl);
+            box-shadow:
+                0 20px 60px rgba(30, 77, 47, 0.1),
+                inset 0 0 100px rgba(30, 77, 47, 0.03);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+            position: relative;
+            min-height: 650px;
+        }
+
+        .manuscript-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 35px,
+                rgba(30, 77, 47, 0.05) 35px,
+                rgba(30, 77, 47, 0.05) 36px
+            );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        .tour-progress {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-light);
+            border: 2px solid var(--forest-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--forest-dark);
+            transform: scale(1.3);
+        }
+
+        .progress-dot:hover {
+            background: var(--forest-medium);
+        }
+
+        /* Tour Slides */
+        .tour-slides {
+            position: relative;
+            min-height: 500px;
+        }
+
+        .tour-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .tour-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .slide-text {
+            padding-right: var(--space-lg);
+        }
+
+        .slide-chapter {
+            font-family: var(--font-handwritten);
+            font-size: 1.5rem;
+            color: var(--badge-todo);
+            margin-bottom: var(--space-sm);
+        }
+
+        .slide-title {
+            font-size: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .slide-description {
+            font-size: 1.1rem;
+            margin-bottom: var(--space-lg);
+        }
+
+        .slide-features {
+            list-style: none;
+        }
+
+        .slide-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            font-size: 1rem;
+        }
+
+        .slide-features li::before {
+            content: '\2713';
+            color: var(--forest-dark);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .slide-visual {
+            position: relative;
+        }
+
+        .feature-illustration {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 4/3;
+            background: var(--cream-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(30, 77, 47, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Feature-specific illustrations */
+        .illustration-camera {
+            background: linear-gradient(135deg, var(--forest-light) 0%, var(--cream-light) 100%);
+        }
+
+        .camera-icon {
+            width: 120px;
+            height: 100px;
+            background: var(--forest-dark);
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-lens {
+            width: 50px;
+            height: 50px;
+            background: var(--cream-light);
+            border-radius: 50%;
+            border: 4px solid var(--forest-medium);
+        }
+
+        .flash-indicator {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background: var(--badge-todo);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .illustration-ocr {
+            background: var(--paper-beige);
+            padding: 30px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ocr-line {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ocr-word {
+            font-family: var(--font-handwritten);
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+        }
+
+        .ocr-word.low-confidence {
+            border-bottom: 3px dotted #e6a23c;
+            position: relative;
+        }
+
+        .ocr-word.low-confidence::after {
+            content: '?';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            font-size: 0.75rem;
+            background: #e6a23c;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+        }
+
+        .illustration-classify {
+            background: var(--cream-light);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 24px;
+            align-content: center;
+        }
+
+        .classify-badge {
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .classify-badge svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .classify-badge:hover {
+            transform: scale(1.08);
+        }
+
+        @media (max-width: 600px) {
+            .illustration-classify {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 16px;
+            }
+            .classify-badge {
+                padding: 8px;
+                font-size: 0.65rem;
+            }
+            .classify-badge svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .illustration-enhance {
+            background: linear-gradient(135deg, var(--badge-prompt) 0%, var(--forest-dark) 100%);
+            color: white;
+            flex-direction: column;
+            padding: 24px;
+            aspect-ratio: auto;
+            height: auto;
+            min-height: 380px;
+        }
+
+        .enhance-before, .enhance-after {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .enhance-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .enhance-text {
+            font-family: var(--font-handwritten);
+            font-size: 1.1rem;
+        }
+
+        .enhance-arrow {
+            font-size: 2rem;
+            margin: 10px 0;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        .parsed-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .parsed-field {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .parsed-field-label {
+            font-weight: 600;
+            opacity: 0.8;
+            min-width: 70px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .parsed-field-value {
+            flex: 1;
+        }
+
+        .attendee-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .attendee-chip {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        .illustration-github {
+            background: var(--forest-dark);
+            color: white;
+            flex-direction: column;
+            padding: 20px;
+            gap: 10px;
+            aspect-ratio: auto;
+            height: auto;
+            min-height: 400px;
+        }
+
+        .github-before {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .github-before-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .github-before-text {
+            font-family: var(--font-handwritten);
+            font-size: 1.05rem;
+        }
+
+        .github-arrow {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .github-issue {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 14px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 320px;
+            text-align: left;
+        }
+
+        .github-issue-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .github-issue-header svg {
+            width: 18px;
+            height: 18px;
+            opacity: 0.8;
+        }
+
+        .github-issue-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+        }
+
+        .github-issue-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .github-issue-body {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .github-issue-section {
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+        }
+
+        .github-issue-section strong {
+            opacity: 0.7;
+        }
+
+        .github-issue-checklist {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin-left: 4px;
+        }
+
+        .issue-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .issue-labels {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .issue-label {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tour Navigation */
+        .tour-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px dashed rgba(30, 77, 47, 0.2);
+        }
+
+        .tour-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 12px 24px;
+            background: transparent;
+            border: 2px solid var(--forest-dark);
+            border-radius: 100px;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tour-nav-btn:hover {
+            background: var(--forest-dark);
+            color: white;
+        }
+
+        .tour-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .tour-nav-btn:disabled:hover {
+            background: transparent;
+            color: var(--forest-dark);
+        }
+
+        /* ===== NOTE TYPES SECTION ===== */
+        .note-types-section {
+            background: linear-gradient(180deg, var(--paper-beige) 0%, var(--cream-light) 100%);
+            padding: var(--space-2xl) 0;
+        }
+
+        .note-types-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .note-types-header h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .note-types-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .note-types-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .note-types-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .note-types-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .note-type-card {
+            background: white;
+            border-radius: 16px;
+            padding: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-type-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-accent-color, var(--forest-dark));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: top;
+        }
+
+        .note-type-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(30, 77, 47, 0.15);
+        }
+
+        .note-type-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .note-type-card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .note-type-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .note-type-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .note-type-name {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--forest-dark);
+        }
+
+        .note-type-trigger {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            background: var(--cream-medium);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .note-type-description {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .note-type-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .note-type-feature {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: var(--cream-light);
+            color: var(--text-dark);
+            border: 1px solid rgba(30, 77, 47, 0.1);
+        }
+
+        /* ===== FEATURES GRID ===== */
+        .features-section {
+            background: var(--cream-light);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .feature-card {
+            background: var(--paper-beige);
+            border-radius: 20px;
+            padding: var(--space-lg);
+            border: 1px solid rgba(30, 77, 47, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--forest-dark);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(30, 77, 47, 0.12);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--forest-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: var(--forest-dark);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            color: white;
+            margin-bottom: var(--space-md);
+        }
+
+        .cta-section p {
+            color: var(--text-light);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .btn-cta-primary {
+            background: white;
+            color: var(--forest-dark);
+        }
+
+        .btn-cta-primary:hover {
+            background: var(--paper-beige);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-cta-secondary:hover {
+            background: white;
+            color: var(--forest-dark);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--forest-medium);
+            color: var(--text-light);
+            padding: var(--space-xl) 0 var(--space-lg);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .footer-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .footer-logo .logo-text {
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
+        }
+
+        /* ===== HOTSPOT MARKERS ===== */
+        .hotspot {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .hotspot-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--badge-todo);
+            border-radius: 50%;
+            animation: hotspot-pulse 2s ease-in-out infinite;
+        }
+
+        .hotspot-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: var(--badge-todo);
+            border-radius: 50%;
+        }
+
+        @keyframes hotspot-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0.5;
+            }
+        }
+
+        .hotspot-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--forest-dark);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(30, 77, 47, 0.3);
+        }
+
+        .hotspot-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--forest-dark);
+        }
+
+        .hotspot:hover .hotspot-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-15px);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text {
+                order: 1;
+            }
+
+            .hero-visual {
+                order: 0;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                width: 280px;
+                height: 570px;
+            }
+
+            .annotation {
+                display: none;
+            }
+
+            .slide-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .slide-text {
+                padding-right: 0;
+                order: 1;
+            }
+
+            .slide-visual {
+                order: 0;
+                margin-bottom: var(--space-lg);
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .phone-mockup {
+                width: 250px;
+                height: 510px;
+            }
+
+            .tour-manuscript {
+                padding: var(--space-lg);
+            }
+
+            .feature-illustration {
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <div class="header-inner">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <img src="logo.png" alt="QuillStack Logo">
+                    </div>
+                    <span class="logo-text">QuillStack</span>
+                </a>
+                <nav>
+                    <a href="#tour">Tour</a>
+                    <a href="#note-types">Note Types</a>
+                    <a href="#features">Features</a>
+                    <a href="#download">Download</a>
+                </nav>
+                <a href="https://beta.quillstack.io" class="btn btn-primary">Try QuillStack</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">Learns Your Handwriting Over Time</div>
+                    <h1>Transform <em>Handwriting</em> Into Action</h1>
+                    <p class="hero-description">
+                        Coordinate all your handwritten notes—from whiteboards, post-its, journals, and notebooks—into one organized digital workspace. Smart classification and powerful on-device OCR turn scattered notes into actionable insights.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#download" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            Download for iOS
+                        </a>
+                        <a href="#tour" class="btn btn-secondary">Take the Tour</a>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="phone-mockup">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <div class="phone-notch"></div>
+                                <div class="screen-content">
+                                    <div class="app-header">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="logo.png" alt="QuillStack" style="width: 28px; height: 28px; border-radius: 6px;">
+                                            <span class="app-title">QuillStack</span>
+                                        </div>
+                                        <div class="app-icon-btn">+</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-expense">Expense</span>
+                                            <span class="note-date">Today</span>
+                                        </div>
+                                        <div class="note-title">Coffee Meeting</div>
+                                        <div class="note-preview">$24.50 • Business • <span class="confidence-word">Starbucks</span></div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-contact">Contact</span>
+                                            <span class="note-date">Today</span>
+                                        </div>
+                                        <div class="note-title">Sarah Chen</div>
+                                        <div class="note-preview">Senior Designer • Acme Corp • (555) 123-4567</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-reminder">Reminder</span>
+                                            <span class="note-date">Yesterday</span>
+                                        </div>
+                                        <div class="note-title">Call dentist</div>
+                                        <div class="note-preview">Tomorrow at 9am</div>
+                                    </div>
+
+                                    <div class="note-card">
+                                        <div class="note-card-header">
+                                            <span class="note-type-badge badge-idea">Idea</span>
+                                            <span class="note-date">Dec 29</span>
+                                        </div>
+                                        <div class="note-title">App feature idea</div>
+                                        <div class="note-preview">Voice memos to text...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotspots on phone -->
+                        <div class="hotspot" style="top: 15%; right: 5%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">Tap to capture new note</div>
+                        </div>
+
+                        <div class="hotspot" style="top: 38%; left: 15%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">12 auto-classified note types</div>
+                        </div>
+
+                        <div class="hotspot" style="top: 58%; left: 18%;">
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-dot"></div>
+                            <div class="hotspot-tooltip">Export to iOS Reminders</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Tour Section -->
+    <section class="tour-section" id="tour">
+        <div class="container">
+            <div class="tour-header">
+                <span class="flourish"></span>
+                <h2>Discover QuillStack</h2>
+                <p class="tour-subtitle">
+                    Take a guided tour through the features that make capturing and organizing handwritten notes effortless.
+                </p>
+            </div>
+
+            <div class="tour-container">
+                <div class="tour-manuscript">
+                    <div class="manuscript-lines"></div>
+
+                    <div class="tour-progress">
+                        <button class="progress-dot active" data-slide="0" aria-label="Slide 1"></button>
+                        <button class="progress-dot" data-slide="1" aria-label="Slide 2"></button>
+                        <button class="progress-dot" data-slide="2" aria-label="Slide 3"></button>
+                        <button class="progress-dot" data-slide="3" aria-label="Slide 4"></button>
+                        <button class="progress-dot" data-slide="4" aria-label="Slide 5"></button>
+                    </div>
+
+                    <div class="tour-slides">
+                        <!-- Slide 1: Camera Capture -->
+                        <div class="tour-slide active" data-index="0">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter I</div>
+                                    <h3 class="slide-title">Capture with Precision</h3>
+                                    <p class="slide-description">
+                                        Point your camera at any handwritten note. QuillStack automatically corrects document perspective and optimizes the image for exceptional OCR accuracy.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Simple framing guide for optimal capture</li>
+                                        <li>Import from your photo library</li>
+                                        <li>Automatic document perspective correction</li>
+                                        <li>Add additional pages to notes anytime</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-camera">
+                                        <div class="camera-icon">
+                                            <div class="camera-lens"></div>
+                                            <div class="flash-indicator">&#9889;</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Smart Document Understanding -->
+                        <div class="tour-slide" data-index="1">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter II</div>
+                                    <h3 class="slide-title">Smart Document Understanding</h3>
+                                    <p class="slide-description">
+                                        QuillStack intelligently understands what you're capturing. Extract contacts from business cards, parse receipts for expense tracking, and benefit from advanced multi-variant OCR that gets smarter over time.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Smart document type detection (contacts, receipts)</li>
+                                        <li>Multi-variant OCR tries 6 approaches for best accuracy</li>
+                                        <li>Automatic perspective correction for skewed photos</li>
+                                        <li>Learns from your corrections over time</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-smart-capture">
+                                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 15px; gap: 16px; height: 100%;">
+                                            <!-- Business Card (Landscape) -->
+                                            <div style="width: 100%; max-width: 280px; background: linear-gradient(135deg, #2c5f4a 0%, #1e4d2f 100%); padding: 18px 22px; border-radius: 10px; box-shadow: 0 4px 12px rgba(30, 77, 47, 0.25);">
+                                                <div style="text-align: left; color: #f4f8f4;">
+                                                    <div style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em;">Sarah Chen</div>
+                                                    <div style="font-size: 0.72rem; opacity: 0.85; margin-bottom: 10px;">Senior Designer</div>
+                                                    <div style="border-top: 1px solid rgba(244, 248, 244, 0.25); padding-top: 9px; font-size: 0.68rem; line-height: 1.5; opacity: 0.9;">
+                                                        <div style="margin-bottom: 3px;">Acme Corp</div>
+                                                        <div style="margin-bottom: 3px;">sarah.chen@acme.com</div>
+                                                        <div>(555) 123-4567</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Arrow -->
+                                            <div style="font-size: 1.5rem; color: var(--forest-dark); opacity: 0.5; line-height: 1;">↓</div>
+
+                                            <!-- Extracted Contact -->
+                                            <div style="width: 100%; max-width: 280px; background: var(--forest-light); padding: 14px 18px; border-radius: 8px; border: 2px solid var(--forest-dark);">
+                                                <div style="font-family: var(--font-display); font-size: 0.7rem; font-weight: 600; color: var(--forest-dark); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8;">Saved to Contacts</div>
+                                                <div style="font-size: 0.72rem; color: var(--text-dark); line-height: 1.6;">
+                                                    <div style="margin-bottom: 4px;"><strong style="color: var(--forest-dark);">Name:</strong> Sarah Chen</div>
+                                                    <div style="margin-bottom: 4px;"><strong style="color: var(--forest-dark);">Company:</strong> Acme Corp</div>
+                                                    <div style="margin-bottom: 4px;"><strong style="color: var(--forest-dark);">Email:</strong> sarah.chen@acme.com</div>
+                                                    <div><strong style="color: var(--forest-dark);">Phone:</strong> (555) 123-4567</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Smart Classification -->
+                        <div class="tour-slide" data-index="2">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter III</div>
+                                    <h3 class="slide-title">Smart Classification</h3>
+                                    <p class="slide-description">
+                                        QuillStack intelligently detects your note type—write a hashtag trigger like #todo#, let AI classify automatically, or simply write naturally and pick the type yourself.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>12 specialized note types with unique features</li>
+                                        <li>AI-powered detection (optional Claude API)</li>
+                                        <li>Fuzzy hashtag matching handles OCR errors</li>
+                                        <li>Export to Calendar, Reminders, GitHub, Mail</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-classify">
+                                        <div class="classify-badge" style="background: var(--badge-todo);">
+                                            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                            Todo
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-meeting);">
+                                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                            Meeting
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-email);">
+                                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                            Email
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-prompt);">
+                                            <svg viewBox="0 0 24 24"><path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z"/></svg>
+                                            Feature
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-reminder);">
+                                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                            Reminder
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-contact);">
+                                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Contact
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-expense);">
+                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15.5 9.5a3 3 0 0 0-3-2.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-2.5a3 3 0 0 1-3-2.5"/></svg>
+                                            Expense
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-shopping);">
+                                            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                            Shopping
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-recipe);">
+                                            <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+                                            Recipe
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-event);">
+                                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2 4-4"/></svg>
+                                            Event
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-idea);">
+                                            <svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                                            Idea
+                                        </div>
+                                        <div class="classify-badge" style="background: var(--badge-general);">
+                                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                            Note
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: LLM Enhancement -->
+                        <div class="tour-slide" data-index="3">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter IV</div>
+                                    <h3 class="slide-title">AI Enhancement</h3>
+                                    <p class="slide-description">
+                                        Tap "Enhance" to have Claude clean up your OCR text, fix remaining errors, and improve formatting—all while preserving your original intent.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>Powered by Claude API</li>
+                                        <li>Summarize notes and enhance formatting</li>
+                                        <li>Token usage tracking and cost monitoring</li>
+                                        <li>Your API key, your control</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-enhance">
+                                        <div class="enhance-before">
+                                            <div class="enhance-label">Handwritten Note</div>
+                                            <div class="enhance-text">#meeting# sprint planning w/ sarah mike alex jan 15 2pm - review Q1 goals, assign tasks</div>
+                                        </div>
+                                        <div class="enhance-arrow">&#8595;</div>
+                                        <div class="enhance-after">
+                                            <div class="enhance-label">Parsed &amp; Structured</div>
+                                            <div class="parsed-fields">
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Title</span>
+                                                    <span class="parsed-field-value">Sprint Planning</span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Date</span>
+                                                    <span class="parsed-field-value">Jan 15, 2025 at 2:00 PM</span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Attendees</span>
+                                                    <span class="parsed-field-value">
+                                                        <span class="attendee-chips">
+                                                            <span class="attendee-chip">Sarah</span>
+                                                            <span class="attendee-chip">Mike</span>
+                                                            <span class="attendee-chip">Alex</span>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                                <div class="parsed-field">
+                                                    <span class="parsed-field-label">Agenda</span>
+                                                    <span class="parsed-field-value">Review Q1 goals, assign tasks</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: GitHub Integration -->
+                        <div class="tour-slide" data-index="4">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <div class="slide-chapter">Chapter V</div>
+                                    <h3 class="slide-title">Integration & Export</h3>
+                                    <p class="slide-description">
+                                        QuillStack connects seamlessly with your workflow. Create GitHub Issues from feature ideas, export expenses to CSV, save contacts directly to iOS Contacts, and share notes via any app.
+                                    </p>
+                                    <ul class="slide-features">
+                                        <li>GitHub Issues with AI-refined prompts</li>
+                                        <li>Export expenses to CSV for reports</li>
+                                        <li>iOS Contacts integration for contact notes</li>
+                                        <li>Share via Mail, Messages, or clipboard</li>
+                                    </ul>
+                                </div>
+                                <div class="slide-visual">
+                                    <div class="feature-illustration illustration-github">
+                                        <div class="github-before">
+                                            <div class="github-before-label">Your Note</div>
+                                            <div class="github-before-text">#feature# add dark mode - save eye strain at night</div>
+                                        </div>
+                                        <div class="github-arrow">&#8595;</div>
+                                        <div class="github-issue">
+                                            <div class="github-issue-header">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                                </svg>
+                                                <span class="github-issue-label">Generated Issue</span>
+                                            </div>
+                                            <div class="github-issue-title">Add dark mode toggle to settings</div>
+                                            <div class="github-issue-body">Implement a dark mode option to reduce eye strain during nighttime usage and improve accessibility.</div>
+                                            <div class="github-issue-section"><strong>Acceptance Criteria:</strong></div>
+                                            <div class="github-issue-checklist">
+                                                &#9744; Toggle in Settings view<br>
+                                                &#9744; Persists across sessions<br>
+                                                &#9744; Respects system preference
+                                            </div>
+                                            <div class="issue-labels" style="margin-top: 10px;">
+                                                <span class="issue-label">enhancement</span>
+                                                <span class="issue-label">ui</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tour-nav">
+                        <button class="tour-nav-btn" id="prevBtn" disabled>
+                            <span class="btn-icon-left">&#8592;</span> Previous
+                        </button>
+                        <button class="tour-nav-btn" id="nextBtn">
+                            Next <span class="btn-icon-right">&#8594;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Note Types Section -->
+    <section class="note-types-section" id="note-types">
+        <div class="container">
+            <div class="note-types-header">
+                <span class="flourish"></span>
+                <h2>12 Specialized Note Types</h2>
+                <p class="tour-subtitle">
+                    Each note type unlocks purpose-built features. Just write a hashtag trigger and let QuillStack do the rest.
+                </p>
+            </div>
+
+            <div class="note-types-grid">
+                <!-- Todo -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-todo);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-todo);">
+                            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">To-Do</div>
+                            <div class="note-type-trigger">#todo#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Checkable task lists with progress tracking. Never lose a handwritten to-do again.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Checkboxes</span>
+                        <span class="note-type-feature">Progress bar</span>
+                        <span class="note-type-feature">Reminders</span>
+                    </div>
+                </div>
+
+                <!-- Meeting -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-meeting);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-meeting);">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Meeting</div>
+                            <div class="note-type-trigger">#meeting#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Parse attendees, agenda items, and action items automatically from your notes.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Attendees</span>
+                        <span class="note-type-feature">Agenda</span>
+                        <span class="note-type-feature">Action items</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-email);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-email);">
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Email</div>
+                            <div class="note-type-trigger">#email#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Draft emails with parsed To, Subject, and Body fields. Open directly in Mail.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">To/Subject</span>
+                        <span class="note-type-feature">Open in Mail</span>
+                    </div>
+                </div>
+
+                <!-- Feature/GitHub -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-prompt);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-prompt);">
+                            <svg viewBox="0 0 24 24"><path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Feature</div>
+                            <div class="note-type-trigger">#feature#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Transform rough ideas into structured GitHub Issues with AI refinement.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">GitHub export</span>
+                        <span class="note-type-feature">AI refine</span>
+                        <span class="note-type-feature">Labels</span>
+                    </div>
+                </div>
+
+                <!-- Reminder -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-reminder);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-reminder);">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Reminder</div>
+                            <div class="note-type-trigger">#reminder#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Quick reminders that export directly to Apple Reminders with due dates.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Due dates</span>
+                        <span class="note-type-feature">Reminders app</span>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-contact);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-contact);">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Contact</div>
+                            <div class="note-type-trigger">#contact#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture contact info from business cards or notes. Add to Contacts with one tap.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Phone/Email</span>
+                        <span class="note-type-feature">Add to Contacts</span>
+                    </div>
+                </div>
+
+                <!-- Expense -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-expense);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-expense);">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15.5 9.5a3 3 0 0 0-3-2.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-2.5a3 3 0 0 1-3-2.5"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Expense</div>
+                            <div class="note-type-trigger">#expense#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Track expenses and receipts. Parse amounts, dates, and categories automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Amount</span>
+                        <span class="note-type-feature">Category</span>
+                        <span class="note-type-feature">Receipt scan</span>
+                    </div>
+                </div>
+
+                <!-- Shopping -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-shopping);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-shopping);">
+                            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Shopping</div>
+                            <div class="note-type-trigger">#shopping#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Shopping lists that sync to Reminders. Check items off as you shop.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Checklist</span>
+                        <span class="note-type-feature">Reminders sync</span>
+                    </div>
+                </div>
+
+                <!-- Recipe -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-recipe);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-recipe);">
+                            <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Recipe</div>
+                            <div class="note-type-trigger">#recipe#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture handwritten recipes with ingredients and steps parsed automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Ingredients</span>
+                        <span class="note-type-feature">Steps</span>
+                        <span class="note-type-feature">Servings</span>
+                    </div>
+                </div>
+
+                <!-- Event -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-event);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-event);">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2 4-4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Event</div>
+                            <div class="note-type-trigger">#event#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Create calendar events from notes. Parse date, time, and location automatically.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Date/Time</span>
+                        <span class="note-type-feature">Location</span>
+                        <span class="note-type-feature">Calendar</span>
+                    </div>
+                </div>
+
+                <!-- Idea -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-idea);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-idea);">
+                            <svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">Idea</div>
+                            <div class="note-type-trigger">#idea#</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">Capture fleeting thoughts and brainstorms. Tag and organize for later review.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">Quick capture</span>
+                        <span class="note-type-feature">Tags</span>
+                    </div>
+                </div>
+
+                <!-- General Note -->
+                <div class="note-type-card" style="--card-accent-color: var(--badge-general);">
+                    <div class="note-type-card-header">
+                        <div class="note-type-icon" style="background: var(--badge-general);">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <div>
+                            <div class="note-type-name">General Note</div>
+                            <div class="note-type-trigger">default</div>
+                        </div>
+                    </div>
+                    <p class="note-type-description">For everything else. Full OCR with confidence highlighting and AI enhancement.</p>
+                    <div class="note-type-features">
+                        <span class="note-type-feature">OCR</span>
+                        <span class="note-type-feature">AI enhance</span>
+                        <span class="note-type-feature">Search</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="features-header">
+                <span class="flourish"></span>
+                <h2>Everything You Need</h2>
+                <p class="tour-subtitle">
+                    Built for people who love writing by hand but need digital organization.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/>
+                            <circle cx="12" cy="13" r="3"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Capture</h3>
+                    <p>Automatic document perspective correction and multi-variant OCR preprocessing optimize every capture for exceptional accuracy.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="7" height="7" x="3" y="3" rx="1"/>
+                            <rect width="7" height="7" x="14" y="3" rx="1"/>
+                            <rect width="7" height="7" x="14" y="14" rx="1"/>
+                            <rect width="7" height="7" x="3" y="14" rx="1"/>
+                        </svg>
+                    </div>
+                    <h3>12 Specialized Note Types</h3>
+                    <p>From todo lists to meeting notes, recipes to expenses—each note type gets purpose-built features and smart organization.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13 21h8"/>
+                            <path d="m15 5 4 4"/>
+                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+                        </svg>
+                    </div>
+                    <h3>Handwriting Learning</h3>
+                    <p>QuillStack learns from your corrections and gets better at reading your unique handwriting over time.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>OCR and document parsing happen entirely on-device. AI features are optional and use your own Claude API key for full control.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/>
+                            <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h3>Your Keys, Your Data</h3>
+                    <p>Bring your own Claude API key. Your data stays on your device with optional iCloud sync.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6" x2="6" y1="3" y2="15"/>
+                            <circle cx="18" cy="6" r="3"/>
+                            <circle cx="6" cy="18" r="3"/>
+                            <path d="M18 9a9 9 0 0 1-9 9"/>
+                        </svg>
+                    </div>
+                    <h3>Developer Workflow</h3>
+                    <p>Write feature ideas on paper, export them as structured GitHub Issues for Claude Code.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="download">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Notes?</h2>
+                <p>
+                    Join the QuillStack beta and get instant access with 500 free AI credits. Be part of shaping the future of handwritten notes.
+                </p>
+                <div class="cta-buttons">
+                    <a href="https://beta.quillstack.io" class="btn btn-cta-primary">
+                        Get Beta Access →
+                    </a>
+                </div>
+                <p style="margin-top: 1.5rem; opacity: 0.8; font-size: 0.95rem;">
+                    Download QuillStack via TestFlight • Instant beta code delivery • 500 free credits
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-icon">
+                        <img src="logo.png" alt="QuillStack Logo">
+                    </div>
+                    <span class="logo-text">QuillStack</span>
+                </div>
+                <div class="footer-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="mailto:support@quillstack.io">Support</a>
+                    <a href="https://github.com/mikemott/QuillStack">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 QuillStack. Crafted with care for handwriting lovers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Tour functionality
+        const slides = document.querySelectorAll('.tour-slide');
+        const dots = document.querySelectorAll('.progress-dot');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentSlide = 0;
+
+        function updateButtonText(btn, text, arrowLeft, arrowRight) {
+            // Clear existing content safely
+            while (btn.firstChild) {
+                btn.removeChild(btn.firstChild);
+            }
+
+            if (arrowLeft) {
+                const leftSpan = document.createElement('span');
+                leftSpan.className = 'btn-icon-left';
+                leftSpan.textContent = arrowLeft;
+                btn.appendChild(leftSpan);
+                btn.appendChild(document.createTextNode(' '));
+            }
+
+            btn.appendChild(document.createTextNode(text));
+
+            if (arrowRight) {
+                btn.appendChild(document.createTextNode(' '));
+                const rightSpan = document.createElement('span');
+                rightSpan.className = 'btn-icon-right';
+                rightSpan.textContent = arrowRight;
+                btn.appendChild(rightSpan);
+            }
+        }
+
+        function showSlide(index) {
+            // Clamp index
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+
+            currentSlide = index;
+
+            // Update slides
+            slides.forEach(function(slide, i) {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update dots
+            dots.forEach(function(dot, i) {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Update buttons
+            prevBtn.disabled = index === 0;
+
+            // Update button text on last slide
+            if (index === slides.length - 1) {
+                updateButtonText(nextBtn, 'Start Using', null, '\u2192');
+                nextBtn.disabled = false;
+                nextBtn.onclick = function() {
+                    document.getElementById('download').scrollIntoView({ behavior: 'smooth' });
+                };
+            } else {
+                updateButtonText(nextBtn, 'Next', null, '\u2192');
+                nextBtn.disabled = false;
+                nextBtn.onclick = function() {
+                    showSlide(currentSlide + 1);
+                };
+            }
+        }
+
+        // Event listeners
+        prevBtn.addEventListener('click', function() {
+            showSlide(currentSlide - 1);
+        });
+
+        // Note: nextBtn.onclick is set dynamically in showSlide()
+
+        dots.forEach(function(dot, index) {
+            dot.addEventListener('click', function() {
+                showSlide(index);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // Only when tour is in viewport
+            const tourSection = document.getElementById('tour');
+            const rect = tourSection.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+            if (isVisible) {
+                if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+                if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add entrance animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach(function(card, index) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease ' + (index * 0.1) + 's';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

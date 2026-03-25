@@ -1,0 +1,118 @@
+import SwiftData
+import Foundation
+import UIKit
+import os
+
+@MainActor
+final class OCRQueueService {
+    static let shared = OCRQueueService()
+
+    private let logger = Logger(subsystem: "com.quillstack", category: "OCRQueue")
+    private var isProcessing = false
+
+    private init() {}
+
+    func enqueue(captureID: UUID, imageData: Data, in context: ModelContext) throws {
+        let request = PendingOCRRequest(captureID: captureID, imageData: imageData)
+        context.insert(request)
+        try context.save()
+        logger.info("Enqueued OCR request for capture \(captureID)")
+    }
+
+    func getPendingCount(in context: ModelContext) -> Int {
+        let descriptor = FetchDescriptor<PendingOCRRequest>()
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+
+    func processQueue(in context: ModelContext) async {
+        guard !isProcessing else {
+            logger.debug("Queue processing already in progress")
+            return
+        }
+
+        isProcessing = true
+        defer { isProcessing = false }
+
+        let remoteOCR = RemoteOCRService.shared
+        let enrichmentService = EnrichmentService.shared
+
+        guard await remoteOCR.checkAvailability() else {
+            logger.debug("Remote server not available, skipping queue processing")
+            return
+        }
+
+        let descriptor = FetchDescriptor<PendingOCRRequest>(
+            sortBy: [SortDescriptor(\.createdAt)]
+        )
+        guard let requests = try? context.fetch(descriptor) else { return }
+
+        logger.info("Processing \(requests.count) pending OCR requests")
+
+        for request in requests {
+            do {
+                let description = try await remoteOCR.recognizeText(from: request.imageData)
+
+                // Find the capture
+                let captureDescriptor = FetchDescriptor<Capture>(
+                    predicate: #Predicate { $0.id == request.captureID }
+                )
+                guard let capture = try? context.fetch(captureDescriptor).first else {
+                    logger.warning("Capture not found for pending request, removing from queue")
+                    context.delete(request)
+                    continue
+                }
+
+                // Run enrichment
+                let tagNames = fetchTagNames(in: context)
+                let enrichment = try await enrichmentService.enrich(
+                    imageDescription: description,
+                    tagNames: tagNames
+                )
+
+                // Update capture
+                capture.extractedTitle = enrichment.title
+                capture.ocrText = enrichment.text
+                capture.enrichmentJSON = try? JSONEncoder().encode(enrichment)
+                capture.isProcessingOCR = false
+
+                // Auto-apply tags
+                let allTags = fetchTags(in: context)
+                for tagName in enrichment.tags {
+                    let normalized = tagName.lowercased()
+                    let match = allTags.first(where: { $0.name.lowercased() == normalized })
+                    if let match, !capture.tags.contains(where: { $0.id == match.id }) {
+                        capture.tags.append(match)
+                    }
+                }
+
+                // Remove from queue
+                context.delete(request)
+                try context.save()
+
+                logger.info("Processed OCR for capture \(request.captureID)")
+
+            } catch {
+                logger.error("Failed to process OCR request: \(error.localizedDescription)")
+                request.retryCount += 1
+
+                if request.retryCount > 5 {
+                    logger.warning("Max retries exceeded, removing request")
+                    context.delete(request)
+                }
+
+                try? context.save()
+            }
+        }
+
+        logger.info("Queue processing complete")
+    }
+
+    private func fetchTagNames(in context: ModelContext) -> [String] {
+        fetchTags(in: context).map(\.name)
+    }
+
+    private func fetchTags(in context: ModelContext) -> [Tag] {
+        let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.name)])
+        return (try? context.fetch(descriptor)) ?? []
+    }
+}
