@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import EventKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -12,6 +13,7 @@ struct ContentView: View {
     @State private var currentIndex = 0
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
+    @State private var eventStore = EKEventStore()
     @State private var actionCapture: Capture?
     @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
     @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
@@ -160,7 +162,7 @@ struct ContentView: View {
                 }
             }
             .sheet(item: $eventForAction) { wrapper in
-                EventActionView(extraction: wrapper.value, eventStore: .init()) {
+                EventActionView(extraction: wrapper.value, eventStore: eventStore) {
                     eventForAction = nil
                 }
             }
@@ -173,7 +175,7 @@ struct ContentView: View {
                 })
             }
             .sheet(item: $todoForAction) { todo in
-                TodoActionView(extraction: todo, eventStore: .init()) {
+                TodoActionView(extraction: todo, eventStore: eventStore) {
                     todoForAction = nil
                 }
             }

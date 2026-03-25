@@ -6,6 +6,7 @@ struct ActionIcon: View {
     let foregroundColor: Color
     let action: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var glowing = false
 
     var body: some View {
@@ -18,6 +19,7 @@ struct ActionIcon: View {
                 .shadow(color: backgroundColor.opacity(glowing ? 0.5 : 0.2), radius: glowing ? 10 : 4, x: 0, y: 2)
         }
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
                 glowing = true
             }

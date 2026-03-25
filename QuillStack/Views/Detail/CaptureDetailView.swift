@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import EventKit
 
 struct CaptureDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -10,6 +11,7 @@ struct CaptureDetailView: View {
     @State private var showDeleteConfirm = false
     @State private var showExportResult: ExportResult?
     @State private var selectedTags: [Tag] = []
+    @State private var eventStore = EKEventStore()
     @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
     @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
     @State private var receiptForAction: IdentifiableWrapper<ReceiptExtraction>?
@@ -89,7 +91,7 @@ struct CaptureDetailView: View {
             }
         }
         .sheet(item: $eventForAction) { wrapper in
-            EventActionView(extraction: wrapper.value, eventStore: .init()) {
+            EventActionView(extraction: wrapper.value, eventStore: eventStore) {
                 eventForAction = nil
             }
         }
@@ -102,7 +104,7 @@ struct CaptureDetailView: View {
             })
         }
         .sheet(item: $todoForAction) { todo in
-            TodoActionView(extraction: todo, eventStore: .init()) {
+            TodoActionView(extraction: todo, eventStore: eventStore) {
                 todoForAction = nil
             }
         }

@@ -123,7 +123,10 @@ struct TodoActionView: View {
                 }
 
                 guard let items = extraction.items else { return }
-                let defaultList = eventStore.defaultCalendarForNewReminders()
+                guard let defaultList = eventStore.defaultCalendarForNewReminders() else {
+                    showResult = "No default reminders list found. Check your Reminders settings."
+                    return
+                }
                 var addedCount = 0
 
                 for index in selectedItems.sorted() {
