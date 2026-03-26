@@ -267,7 +267,9 @@ actor RemoteOCRService {
 
         if tagNames.contains("To-Do") {
             sections.append("""
-            \(fieldNum). "todo": Extract to-do items as a JSON object with fields: items (array of objects with title, dueDate (ISO 8601 if visible), priority (high/medium/low if indicated), notes). Extract each task or action item as a separate entry.
+            \(fieldNum). "todo": Extract to-do items as a JSON object with fields: \
+            items (array of objects with title, dueDate (ISO 8601 if visible), \
+            priority (high/medium/low if indicated), notes). Extract each task as a separate entry.
             """)
             fieldNum += 1
         }

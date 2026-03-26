@@ -106,11 +106,11 @@ private func parseTime(_ string: String?) -> DateComponents? {
     }
 
     // 12-hour: "2:00 PM", "2:00PM", "2PM"
-    let s_upper = s.uppercased()
-    let isPM = s_upper.contains("PM")
-    let isAM = s_upper.contains("AM")
+    let uppered = s.uppercased()
+    let isPM = uppered.contains("PM")
+    let isAM = uppered.contains("AM")
     if isPM || isAM {
-        let cleaned = s_upper
+        let cleaned = uppered
             .replacingOccurrences(of: "PM", with: "")
             .replacingOccurrences(of: "AM", with: "")
             .trimmingCharacters(in: .whitespaces)

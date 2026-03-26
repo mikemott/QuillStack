@@ -39,7 +39,7 @@ struct CaptureCard: View {
                 }
 
                 // Metadata — glass & gradient recipe from the design doc
-                metadataArea(width: geo.size.width)
+                metadataArea
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     .qsGlass(
                         glow: QSColor.tertiaryDim,
@@ -55,7 +55,7 @@ struct CaptureCard: View {
 
     // MARK: - Metadata
 
-    private func metadataArea(width: CGFloat) -> some View {
+    private var metadataArea: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Title
             if let title = capture.extractedTitle {

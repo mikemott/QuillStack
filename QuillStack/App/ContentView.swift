@@ -3,14 +3,12 @@ import SwiftData
 import EventKit
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Capture.createdAt, order: .reverse) private var captures: [Capture]
     @Query(sort: \Tag.name) private var tags: [Tag]
     @State private var selectedTag: Tag?
     @State private var showCamera = false
     @State private var searchText = ""
     @State private var isDrawerMode = false
-    @State private var currentIndex = 0
     @State private var shareItem: ShareableCapture?
     @State private var showSearch = false
     @State private var eventStore = EKEventStore()
