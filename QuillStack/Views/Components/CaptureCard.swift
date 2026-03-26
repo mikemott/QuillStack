@@ -50,6 +50,7 @@ struct CaptureCard: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .qsAmbientShadow(radius: 50, opacity: 0.10)
+            .accessibilityIdentifier("capture-card")
         }
     }
 
