@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D51927EF2182B3554AB682C /* EnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */; };
 		0F2CD5E9D07C7A0F4308D05F /* ReceiptPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */; };
 		101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */; };
 		1171088212D4885CEBC52F2F /* IBMPlexMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */; };
@@ -42,7 +41,6 @@
 		93B5D3BA7FBC716CDA95890B /* CaptureDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */; };
 		9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CCF501CFC82F4F42461A30 /* DesignSystem.swift */; };
 		963B0E3B153A52158C33A350 /* ReceiptExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC672610E74311F8BA9D7D1 /* ReceiptExtraction.swift */; };
-		9FAF19B6E64542E895FB2FA5 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F0C9F7F2944D13A9B17A0 /* OCRService.swift */; };
 		A3631677B710AF4253F20B16 /* TagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD9B3DEBE8DF814E0E8BEC0 /* TagTests.swift */; };
 		A8D75CAD90CCC45017B9402B /* CaptureCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */; };
 		A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6280494C3FF19CC00F604 /* TagPickerView.swift */; };
@@ -69,7 +67,6 @@
 
 /* Begin PBXFileReference section */
 		023FCC5789353D9A25A446B3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentService.swift; sourceTree = "<group>"; };
 		17CCF501CFC82F4F42461A30 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		1A30FB6B084F1B94BEE0D6D6 /* IBMPlexSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Regular.ttf"; sourceTree = "<group>"; };
 		1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCard.swift; sourceTree = "<group>"; };
@@ -97,8 +94,7 @@
 		78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventActionView.swift; sourceTree = "<group>"; };
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
 		7DED94D89E0E9CD89DA0CDB8 /* PromptBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilderTests.swift; sourceTree = "<group>"; };
-		804F0C9F7F2944D13A9B17A0 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
-		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
 		84704540B805D88979BF52CD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureDetailView.swift; sourceTree = "<group>"; };
@@ -307,11 +303,9 @@
 			children = (
 				537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */,
 				3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */,
-				1582AF8120076ACAEF96FF09 /* EnrichmentService.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
 				3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */,
-				804F0C9F7F2944D13A9B17A0 /* OCRService.swift */,
 				BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */,
 			);
 			path = Services;
@@ -324,6 +318,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA7C63D86734813964FC403D /* Build configuration list for PBXNativeTarget "QuillStack" */;
 			buildPhases = (
+				954BD65E9787FEEBF8145EF9 /* SwiftLint */,
 				1D891DEED3465CFB17A6D95A /* Sources */,
 				A19D3ABF7F6B458337656FA3 /* Resources */,
 				3DCF1E145DC6854477FE9B23 /* Frameworks */,
@@ -366,6 +361,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = F6AFC3A57067B7E8467C388E /* Build configuration list for PBXProject "QuillStack" */;
 			developmentRegion = en;
@@ -406,6 +403,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		954BD65E9787FEEBF8145EF9 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if command -v swiftlint >/dev/null 2>&1; then\n  swiftlint lint --quiet --lenient\nelse\n  echo \"warning: SwiftLint not installed — brew install swiftlint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1D891DEED3465CFB17A6D95A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -426,13 +445,11 @@
 				9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */,
 				83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */,
 				7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */,
-				0D51927EF2182B3554AB682C /* EnrichmentService.swift in Sources */,
 				335D0D41E36D88BE5E5FB07C /* EventActionView.swift in Sources */,
 				30850D9D9ECE398BAE5BE713 /* EventExtraction.swift in Sources */,
 				93150BFD7F960AF463D425F7 /* Extensions.swift in Sources */,
 				2C35FD888C2D154153877D2B /* LocationService.swift in Sources */,
 				142552AD97F78CA2DE45C13D /* OCRQueueService.swift in Sources */,
-				9FAF19B6E64542E895FB2FA5 /* OCRService.swift in Sources */,
 				F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */,
 				101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */,
 				672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */,
@@ -481,7 +498,6 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
 				INFOPLIST_FILE = QuillStack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -624,7 +640,6 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
 				INFOPLIST_FILE = QuillStack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

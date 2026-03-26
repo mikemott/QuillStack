@@ -75,21 +75,4 @@ enum CrashReporting {
         SentrySDK.addBreadcrumb(crumb)
     }
 
-    static func queueProcessed(count: Int, failed: Int) {
-        let crumb = Breadcrumb(level: .info, category: "queue")
-        crumb.message = "Queue processed"
-        crumb.data = ["count": count, "failed": failed]
-        SentrySDK.addBreadcrumb(crumb)
-    }
-
-    // MARK: - Context
-
-    static func setContext(macMiniConnected: Bool, queueDepth: Int) {
-        SentrySDK.configureScope { scope in
-            scope.setContext(value: [
-                "macMiniConnected": macMiniConnected,
-                "ocrQueueDepth": queueDepth
-            ], key: "quillstack")
-        }
-    }
 }
