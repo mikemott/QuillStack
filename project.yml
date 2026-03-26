@@ -58,3 +58,14 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.quillstack.tests
         GENERATE_INFOPLIST_FILE: YES
+  QuillStackUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: QuillStackUITests
+    dependencies:
+      - target: QuillStack
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quillstack.uitests
+        GENERATE_INFOPLIST_FILE: YES

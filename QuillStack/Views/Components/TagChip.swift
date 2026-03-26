@@ -51,5 +51,6 @@ struct TagChip: View {
             .contentShape(.rect)
             .onTapGesture { action?() }
             .allowsHitTesting(action != nil)
+            .accessibilityIdentifier("tag-\(tag.name)")
     }
 }

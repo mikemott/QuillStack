@@ -10,18 +10,25 @@ struct QuillStackApp: App {
 
     private static let bgTaskID = "com.quillstack.ocr-queue-processing"
 
+    static let isUITesting = CommandLine.arguments.contains("--uitesting")
+
     init() {
-        CrashReporting.start()
+        if !Self.isUITesting {
+            CrashReporting.start()
+        }
         let schema = Schema([Capture.self, CaptureImage.self, Tag.self, PendingOCRRequest.self])
-        let config = ModelConfiguration("QuillStack", isStoredInMemoryOnly: false)
+        let inMemory = Self.isUITesting
+        let config = ModelConfiguration("QuillStack", isStoredInMemoryOnly: inMemory)
         do {
             container = try ModelContainer(for: schema, configurations: [config])
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         seedDefaultTags(in: container)
-        configureMacMini()
-        registerBackgroundTask()
+        if !Self.isUITesting {
+            configureMacMini()
+            registerBackgroundTask()
+        }
     }
 
     private func configureMacMini() {

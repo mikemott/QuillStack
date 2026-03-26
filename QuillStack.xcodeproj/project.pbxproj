@@ -51,11 +51,19 @@
 		E24B9BFBABD48CE54562CBFC /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */; };
 		E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */; };
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
+		F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */; };
 		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
 		F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD8C80E9AA138C4F0460C /* Tag.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4148EF805ED9E2209F3AF938 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A37481913C0479A999F1272F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 02B2FAA4FE826727BB4A1349;
+			remoteInfo = QuillStack;
+		};
 		5CF56AABC028CA59712B3330 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A37481913C0479A999F1272F /* Project object */;
@@ -102,6 +110,7 @@
 		A184EA2BA7186D5A1DD844E9 /* OCRResponseParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRResponseParsingTests.swift; sourceTree = "<group>"; };
 		A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporter.swift; sourceTree = "<group>"; };
 		B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B4823E20FD700284A0FA6844 /* QuillStackUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoExtraction.swift; sourceTree = "<group>"; };
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +120,7 @@
 		DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporterTests.swift; sourceTree = "<group>"; };
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentTests.swift; sourceTree = "<group>"; };
+		F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackUITests.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
 		FD81AE056AC7E1A2498C619A /* Enrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrichment.swift; sourceTree = "<group>"; };
 		FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Light.ttf"; sourceTree = "<group>"; };
@@ -133,6 +143,7 @@
 			children = (
 				817E6AAE6434F0F869ED3954 /* QuillStack.app */,
 				BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */,
+				B4823E20FD700284A0FA6844 /* QuillStackUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,12 +283,21 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		D2B2DA6E5EFCEB56E889818E /* QuillStackUITests */ = {
+			isa = PBXGroup;
+			children = (
+				F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */,
+			);
+			path = QuillStackUITests;
+			sourceTree = "<group>";
+		};
 		DFE5CD96A4FC166CA560C928 = {
 			isa = PBXGroup;
 			children = (
 				95969AF08CEC6F0DD5723B72 /* QuillStack */,
 				39C6F980E0E534A1AD0570F1 /* QuillStack */,
 				2ADC8D8AE46861C381CC6F87 /* QuillStackTests */,
+				D2B2DA6E5EFCEB56E889818E /* QuillStackUITests */,
 				0C37BF2F7D4D252B9E612A73 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -353,6 +373,24 @@
 			productReference = BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E42AB247E38CBD58E3C8FB84 /* QuillStackUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9874A4AE0F262EAD18799599 /* Build configuration list for PBXNativeTarget "QuillStackUITests" */;
+			buildPhases = (
+				D72E1D7C4AB603C82C95A5AB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1C5FA3CDF12E0D52D61F2491 /* PBXTargetDependency */,
+			);
+			name = QuillStackUITests;
+			packageProductDependencies = (
+			);
+			productName = QuillStackUITests;
+			productReference = B4823E20FD700284A0FA6844 /* QuillStackUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -362,6 +400,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					E42AB247E38CBD58E3C8FB84 = {
+						TestTargetID = 02B2FAA4FE826727BB4A1349;
+					};
 				};
 			};
 			buildConfigurationList = F6AFC3A57067B7E8467C388E /* Build configuration list for PBXProject "QuillStack" */;
@@ -383,6 +424,7 @@
 			targets = (
 				02B2FAA4FE826727BB4A1349 /* QuillStack */,
 				538F8570D1E027322DE80B8A /* QuillStackTests */,
+				E42AB247E38CBD58E3C8FB84 /* QuillStackUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -479,9 +521,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D72E1D7C4AB603C82C95A5AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1C5FA3CDF12E0D52D61F2491 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 02B2FAA4FE826727BB4A1349 /* QuillStack */;
+			targetProxy = 4148EF805ED9E2209F3AF938 /* PBXContainerItemProxy */;
+		};
 		7AB0C9D600705BD62DDD7258 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 02B2FAA4FE826727BB4A1349 /* QuillStack */;
@@ -508,6 +563,23 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.quillstack.app;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0C22A38B412FED5371DCF148 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.quillstack.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = QuillStack;
 			};
 			name = Debug;
 		};
@@ -670,6 +742,23 @@
 			};
 			name = Debug;
 		};
+		B4F18F8ED9DC9FC43E277D41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.quillstack.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = QuillStack;
+			};
+			name = Release;
+		};
 		F687FBA07D817A35C2B9C22E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -690,6 +779,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9874A4AE0F262EAD18799599 /* Build configuration list for PBXNativeTarget "QuillStackUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C22A38B412FED5371DCF148 /* Debug */,
+				B4F18F8ED9DC9FC43E277D41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		9A05B16866F16C3C3FB306B3 /* Build configuration list for PBXNativeTarget "QuillStackTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

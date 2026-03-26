@@ -59,6 +59,7 @@ struct ContentView: View {
                             .foregroundStyle(QSColor.primary)
                             .shadow(color: QSColor.primary.opacity(0.20), radius: 20, x: 0, y: 0)
                             .shadow(color: QSColor.primary.opacity(0.08), radius: 50, x: 0, y: 0)
+                            .accessibilityIdentifier("header-title")
 
                         Spacer()
 
@@ -72,6 +73,7 @@ struct ContentView: View {
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(QSColor.onSurfaceMuted)
                             }
+                            .accessibilityIdentifier("toggle-layout")
                             Button {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     showSearch.toggle()
@@ -82,11 +84,13 @@ struct ContentView: View {
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(QSColor.onSurfaceMuted)
                             }
+                            .accessibilityIdentifier("search-button")
                             NavigationLink(destination: SettingsView()) {
                                 Image(systemName: "gearshape")
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(QSColor.onSurfaceMuted)
                             }
+                            .accessibilityIdentifier("settings-button")
                         }
                     }
                     .padding(.horizontal, 20)
@@ -104,6 +108,7 @@ struct ContentView: View {
                                 .font(QSFont.sans(size: 15))
                                 .foregroundStyle(QSColor.onSurface)
                                 .focused($searchFocused)
+                                .accessibilityIdentifier("search-field")
                             if !searchText.isEmpty {
                                 Button {
                                     searchText = ""
@@ -209,6 +214,7 @@ struct ContentView: View {
             .padding(.vertical, 12)
         }
         .background(QSSurface.containerLow)
+        .accessibilityIdentifier("tag-filter-bar")
     }
 
     // MARK: - Card Pager
@@ -388,6 +394,7 @@ struct ContentView: View {
                 .clipShape(Circle())
                 .shadow(color: QSColor.primary.opacity(0.25), radius: 12, x: 0, y: 4)
                 .shadow(color: QSColor.primary.opacity(0.08), radius: 30, x: 0, y: 6)
+                .accessibilityIdentifier("capture-button")
         }
         .padding(.trailing, 20)
         .padding(.bottom, 28)
