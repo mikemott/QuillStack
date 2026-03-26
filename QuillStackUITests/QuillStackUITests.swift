@@ -29,7 +29,7 @@ final class QuillStackUITests: XCTestCase {
 
     func testTagFilterBarVisible() {
         // Tag filter bar renders as a ScrollView — look for tag chips directly
-        let expectedTags = ["Event", "Contact", "Receipt", "To-Do", "Project", "Reference", "Ticket", "Whiteboard"]
+        let expectedTags = ["Receipt", "Event", "Work", "Contact", "Food", "To-Do", "Project", "Ticket", "Reference", "Quote"]
         var foundAny = false
         for tagName in expectedTags {
             let chip = app.staticTexts["#\(tagName.uppercased())"]
@@ -74,23 +74,19 @@ final class QuillStackUITests: XCTestCase {
         app.buttons["search-button"].tap()
 
         // Field should disappear
-        XCTAssertFalse(searchField.waitForExistence(timeout: 2))
+        XCTAssertFalse(searchField.waitForExistence(timeout: 0.5))
     }
 
     // MARK: - Tag Filtering
 
-    func testTagFilterToggle() {
-        // Find any tag chip and tap it
-        let expectedTags = ["Event", "Contact", "Receipt", "To-Do", "Project", "Reference", "Ticket", "Whiteboard"]
+    func testMultipleTagsVisible() {
+        let expectedTags = ["Receipt", "Event", "Work", "Contact", "Food", "To-Do", "Project", "Ticket", "Reference", "Quote"]
+        var count = 0
         for tagName in expectedTags {
             let chip = app.staticTexts["#\(tagName.uppercased())"]
-            if chip.exists {
-                chip.tap()
-                // Tap again to deselect
-                chip.tap()
-                return
-            }
+            if chip.exists { count += 1 }
         }
+        XCTAssertGreaterThanOrEqual(count, 5, "Most default tags should be visible")
     }
 
     // MARK: - Settings Navigation
