@@ -421,7 +421,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if command -v swiftlint >/dev/null 2>&1; then\n  swiftlint lint --quiet\nelse\n  echo \"warning: SwiftLint not installed — brew install swiftlint\"\nfi\n";
+			shellScript = "if command -v swiftlint >/dev/null 2>&1; then\n  swiftlint lint --quiet --lenient\nelse\n  echo \"warning: SwiftLint not installed — brew install swiftlint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

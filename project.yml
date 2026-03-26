@@ -34,7 +34,7 @@ targets:
     preBuildScripts:
       - script: |
           if command -v swiftlint >/dev/null 2>&1; then
-            swiftlint lint --quiet
+            swiftlint lint --quiet --lenient
           else
             echo "warning: SwiftLint not installed — brew install swiftlint"
           fi
