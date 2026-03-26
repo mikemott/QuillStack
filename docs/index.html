@@ -3,104 +3,827 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuillStack — Fast capture for real life</title>
-  <meta name="description" content="A fast image-capture app for the paper trail of real life — receipts, tickets, posters, notes. Snap it now, sort it later. Tag, search, and export to Obsidian.">
+  <title>QuillStack — Point your phone at something. Something happens.</title>
+  <meta name="description" content="QuillStack reads what you photograph — receipts, flyers, notes, business cards — and does something with it.">
+  <link rel="icon" type="image/png" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="qs-logo.png">
-  <link rel="apple-touch-icon" href="qs-logo.png">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --base: #0E0E0E;
+      --container-low: #131313;
+      --container: #1A1919;
+      --container-high: #222222;
+      --container-highest: #262626;
+      --bright: #393939;
+      --primary: #E0E0E0;
+      --on-primary-dark: #0E0E0E;
+      --on-surface: #E5E2E1;
+      --on-surface-variant: #ADAAAA;
+      --on-surface-muted: #737070;
+      --border: #222222;
+
+      --tag-receipt: #D4FF00;
+      --tag-event: #007AFF;
+      --tag-contact: #E0E0E0;
+      --tag-work: #FFC107;
+      --tag-todo: #90EE90;
+      --tag-meeting: #008080;
+      --tag-idea: #FFB6C1;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--base);
+      color: var(--on-surface);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: var(--container-low);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wordmark {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 8px;
+      color: var(--primary);
+      text-shadow: 0 0 20px rgba(224, 224, 224, 0.2), 0 0 50px rgba(224, 224, 224, 0.08);
+      text-decoration: none;
+    }
+
+    .nav-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 160px 40px 100px;
+      min-height: 100vh;
+    }
+
+    .hero-text h1 {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 900;
+      font-size: 56px;
+      line-height: 1.1;
+      color: var(--on-surface);
+      margin-bottom: 28px;
+    }
+
+    .hero-text h1 span {
+      display: block;
+    }
+
+    .hero-text h1 span:last-child {
+      color: var(--on-surface-variant);
+    }
+
+    .hero-body {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--on-surface-variant);
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--primary);
+      color: var(--on-primary-dark);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--on-surface-variant);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--on-surface-muted);
+      color: var(--on-surface);
+    }
+
+    /* Phone mockup */
+    .hero-phone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone-frame {
+      width: 300px;
+      height: 620px;
+      background: var(--container);
+      border-radius: 40px;
+      border: 2px solid var(--container-high);
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--base);
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-header {
+      padding: 20px 16px 12px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 6px;
+      color: var(--primary);
+      text-shadow: 0 0 12px rgba(224, 224, 224, 0.15);
+    }
+
+    .phone-tags {
+      display: flex;
+      gap: 6px;
+      padding: 0 16px 12px;
+      overflow: hidden;
+    }
+
+    .phone-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .phone-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 12px 12px;
+      flex: 1;
+    }
+
+    .phone-card {
+      background: var(--container);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-card-img {
+      height: 80px;
+      position: relative;
+    }
+
+    .phone-card-img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--container-high);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .phone-card-img-placeholder svg {
+      width: 24px;
+      height: 24px;
+      opacity: 0.3;
+    }
+
+    .phone-card-meta {
+      padding: 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .phone-card-title {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--on-surface);
+      line-height: 1.3;
+    }
+
+    .phone-card-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px;
+      color: var(--on-surface-muted);
+    }
+
+    .phone-card-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 5px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .phone-capture-btn {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(224, 224, 224, 0.25), 0 0 30px rgba(224, 224, 224, 0.08);
+    }
+
+    .phone-capture-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--on-primary-dark);
+    }
+
+    /* ── CAROUSEL ── */
+    .carousel-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px 100px;
+    }
+
+    .carousel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .carousel-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--on-surface-muted);
+      text-transform: uppercase;
+    }
+
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .carousel-counter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--on-surface-muted);
+    }
+
+    .carousel-arrow {
+      width: 40px;
+      height: 40px;
+      background: var(--container);
+      border: 1px solid var(--border);
+      color: var(--on-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .carousel-arrow:hover {
+      background: var(--container-high);
+      color: var(--on-surface);
+    }
+
+    .carousel-arrow:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .carousel-track-wrapper {
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      gap: 20px;
+      transition: transform 0.4s ease;
+    }
+
+    .action-card {
+      flex: 0 0 calc((100% - 40px) / 3);
+      background: var(--container);
+      border: 1px solid var(--border);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 280px;
+    }
+
+    .action-card-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 6px 12px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .action-card-body {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--on-surface-variant);
+      flex: 1;
+    }
+
+    .action-card-footer {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--on-surface-muted);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-card-footer svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--on-surface-muted);
+    }
+
+    /* ── KEEPS SECTION ── */
+    .keeps-section {
+      background: var(--container-low);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .keeps-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .keeps-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--on-surface-muted);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    .keeps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+
+    .keeps-item h3 {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--on-surface);
+      margin-bottom: 8px;
+    }
+
+    .keeps-item p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--on-surface-variant);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--container-low);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--on-surface-muted);
+    }
+
+    footer a {
+      color: var(--on-surface-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--on-surface-variant);
+    }
+
+    .footer-dot {
+      color: var(--on-surface-muted);
+      opacity: 0.4;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        padding: 120px 24px 60px;
+        min-height: auto;
+      }
+
+      .hero-text h1 {
+        font-size: 40px;
+      }
+
+      .hero-phone {
+        order: -1;
+      }
+
+      .phone-frame {
+        width: 240px;
+        height: 500px;
+      }
+
+      .action-card {
+        flex: 0 0 calc((100% - 20px) / 2);
+      }
+
+      .keeps-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .carousel-section,
+      .keeps-inner {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      nav {
+        padding: 16px 24px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero-text h1 {
+        font-size: 32px;
+      }
+
+      .action-card {
+        flex: 0 0 100%;
+      }
+
+      .keeps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+      }
+
+      footer {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="inner">
-      <a class="brand" href="/">
-        <img class="brand-icon" src="qs-logo.png" alt="" width="38" height="38">
-        <span class="wordmark">QUILLSTACK</span>
-      </a>
-      <nav class="site-nav">
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="https://github.com/mikemott/QuillStack/issues">Support</a>
-      </nav>
-    </div>
-  </header>
 
-  <main>
-    <section class="hero wrap">
-      <div class="capture-dot" aria-hidden="true">
-        <!-- camera glyph -->
-        <svg viewBox="0 0 24 24"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
-      </div>
-      <h1>Fast capture for<br><strong>real life</strong>.</h1>
-      <p class="lede">The receipts, tickets, and notes piling up in your camera roll finally have a home. Snap it now, sort it later.</p>
-      <div class="chips">
-        <span class="chip" style="background:#D4FF00;color:#1A1C1C">#RECEIPT</span>
-        <span class="chip" style="background:#007AFF;color:#FFFFFF">#EVENT</span>
-        <span class="chip" style="background:#FFC107;color:#1A1C1C">#WORK</span>
-        <span class="chip" style="background:#64D2FF;color:#1A1C1C">#CONTACT</span>
-        <span class="chip" style="background:#E85D75;color:#FFFFFF">#FOOD</span>
-        <span class="chip" style="background:#90EE90;color:#1A1C1C">#TO-DO</span>
-        <span class="chip" style="background:#FFB6C1;color:#1A1C1C">#PROJECT</span>
-        <span class="chip" style="background:#FF7F50;color:#FFFFFF">#TICKET</span>
-        <span class="chip" style="background:#008080;color:#FFFFFF">#REFERENCE</span>
-        <span class="chip" style="background:#BB86FC;color:#1A1C1C">#QUOTE</span>
-      </div>
-    </section>
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="wordmark">QUILLSTACK</a>
+    <img src="icon.png" alt="QuillStack" class="nav-icon">
+  </nav>
 
-    <section class="features wrap">
-      <p class="section-label">What it does</p>
-      <div class="feature-grid">
-        <div class="feature">
-          <h3>One-tap capture</h3>
-          <p>Open, hit the shutter, done. The document scanner auto-crops and corrects perspective; multi-page captures stack into one item.</p>
-        </div>
-        <div class="feature">
-          <h3>Search by content</h3>
-          <p>On-device text recognition reads every capture, so you can find “that Delta ticket from March” by what it says — not just by date. Images never leave your phone.</p>
-        </div>
-        <div class="feature">
-          <h3>On-device enrichment</h3>
-          <p>A model on your device reads each capture and pulls out a title, suggested tags, and quick actions. None of it leaves your phone.</p>
-        </div>
-        <div class="feature">
-          <h3>Tags, not folders</h3>
-          <p>Ten curated tags cover the shape of everyday paper. Add your own sparingly. No nested folders to reorganize every six months.</p>
-        </div>
-        <div class="feature">
-          <h3>Quick actions</h3>
-          <p>Turn a business card into a contact, an event flyer into a calendar entry, a to-do list into Reminders — only when the capture actually contains it.</p>
-        </div>
-        <div class="feature">
-          <h3>Obsidian export</h3>
-          <p>Point QuillStack at your vault. Captures export as markdown with images attached — plain files, plain folders, yours to keep.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="wrap" style="padding:0 24px 88px;text-align:center">
-      <p class="section-label">On-device by default</p>
-      <p style="max-width:36em;margin:0 auto;color:var(--on-surface-variant)">
-        Everything you capture is processed and stored on your device — text recognition and
-        enrichment run entirely on-device. Your content never leaves unless you choose iCloud
-        sync or Obsidian export. The only thing sent off-device is pseudonymous crash diagnostics,
-        never your images or notes. Full detail in the
-        <a href="privacy.html" style="color:var(--on-surface);text-decoration:underline;text-underline-offset:2px">privacy policy</a>.
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>
+        <span>Point your phone</span>
+        <span>at something.</span>
+        <span>Something happens.</span>
+      </h1>
+      <p class="hero-body">
+        You wrote it on paper. You tore it from a flyer. QuillStack reads it, understands it, and does something with it.
       </p>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="inner">
-      <span class="copy">© 2026 QuillStack</span>
-      <div class="foot-links">
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="https://github.com/mikemott/QuillStack/issues">Support</a>
-        <a href="mailto:mike@mottvt.com">Contact</a>
+      <div class="hero-ctas">
+        <a href="#" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download
+        </a>
+        <a href="#smart-actions" class="btn-secondary">How it works</a>
       </div>
     </div>
+
+    <div class="hero-phone">
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="phone-header">QUILLSTACK</div>
+          <div class="phone-tags">
+            <span class="phone-tag" style="background: var(--tag-receipt); color: #1A1C1C;">#receipt</span>
+            <span class="phone-tag" style="background: var(--tag-event); color: #fff;">#event</span>
+            <span class="phone-tag" style="background: var(--tag-contact); color: #1A1C1C;">#contact</span>
+            <span class="phone-tag" style="background: var(--tag-work); color: #1A1C1C;">#work</span>
+            <span class="phone-tag" style="background: var(--tag-todo); color: #1A1C1C;">#todo</span>
+          </div>
+          <div class="phone-cards">
+            <div class="phone-card">
+              <div class="phone-card-img">
+                <div class="phone-card-img-placeholder">
+                  <svg viewBox="0 0 24 24" fill="var(--on-surface-muted)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                </div>
+              </div>
+              <div class="phone-card-meta">
+                <div class="phone-card-title">Coffee receipt</div>
+                <div class="phone-card-time">10:32 AM</div>
+                <span class="phone-card-tag" style="background: var(--tag-receipt); color: #1A1C1C;">#receipt</span>
+              </div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-img">
+                <div class="phone-card-img-placeholder">
+                  <svg viewBox="0 0 24 24" fill="var(--on-surface-muted)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                </div>
+              </div>
+              <div class="phone-card-meta">
+                <div class="phone-card-title">Concert poster</div>
+                <div class="phone-card-time">9:15 AM</div>
+                <span class="phone-card-tag" style="background: var(--tag-event); color: #fff;">#event</span>
+              </div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-img">
+                <div class="phone-card-img-placeholder">
+                  <svg viewBox="0 0 24 24" fill="var(--on-surface-muted)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                </div>
+              </div>
+              <div class="phone-card-meta">
+                <div class="phone-card-title">Morning tasks</div>
+                <div class="phone-card-time">8:45 AM</div>
+                <span class="phone-card-tag" style="background: var(--tag-todo); color: #1A1C1C;">#todo</span>
+              </div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-img">
+                <div class="phone-card-img-placeholder">
+                  <svg viewBox="0 0 24 24" fill="var(--on-surface-muted)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                </div>
+              </div>
+              <div class="phone-card-meta">
+                <div class="phone-card-title">Business card</div>
+                <div class="phone-card-time">Yesterday</div>
+                <span class="phone-card-tag" style="background: var(--tag-contact); color: #1A1C1C;">#contact</span>
+              </div>
+            </div>
+          </div>
+          <div class="phone-capture-btn">
+            <svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SMART ACTIONS CAROUSEL -->
+  <section class="carousel-section" id="smart-actions">
+    <div class="carousel-header">
+      <span class="carousel-title">Smart Actions</span>
+      <div class="carousel-nav">
+        <span class="carousel-counter"><span id="carousel-current">1</span>&ndash;<span id="carousel-end">3</span> / 6</span>
+        <button class="carousel-arrow" id="carousel-prev" disabled aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="carousel-arrow" id="carousel-next" aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="carousel-track-wrapper">
+      <div class="carousel-track" id="carousel-track">
+
+        <!-- Contact -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-contact); color: #1A1C1C;">#contact</span>
+          <p class="action-card-body">A business card or a phone number on a napkin. Photograph it. QuillStack fills in the name, number, email, and opens your Contacts app with fields pre-filled.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg>
+            opens iOS Contacts
+          </div>
+        </div>
+
+        <!-- Event -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-event); color: #fff;">#event</span>
+          <p class="action-card-body">A flyer on a telephone pole. A date, a time, a place. Photograph it. QuillStack finds what matters and opens your calendar. The event is already there.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            opens Calendar
+          </div>
+        </div>
+
+        <!-- Todo -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-todo); color: #1A1C1C;">#todo</span>
+          <p class="action-card-body">A list you wrote this morning. Photograph it. QuillStack pulls each task and sends them to Apple Reminders.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            opens Reminders
+          </div>
+        </div>
+
+        <!-- Receipt -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-receipt); color: #1A1C1C;">#receipt</span>
+          <p class="action-card-body">A paper receipt. Photograph it. QuillStack reads the vendor, the total, the line items and exports a clean summary to your notes.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+            exports to Obsidian
+          </div>
+        </div>
+
+        <!-- Meeting -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-meeting); color: #fff;">#meeting</span>
+          <p class="action-card-body">Your meeting notes. Photograph them. QuillStack organizes what you wrote — attendees, agenda, action items — into something you can use.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            structured note
+          </div>
+        </div>
+
+        <!-- Idea -->
+        <div class="action-card">
+          <span class="action-card-tag" style="background: var(--tag-idea); color: #1A1C1C;">#idea</span>
+          <p class="action-card-body">A thought you caught on paper before it disappeared. Photograph it. QuillStack stores it, searchable, dated, waiting for when you need it again.</p>
+          <div class="action-card-footer">
+            <svg viewBox="0 0 24 24"><path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/></svg>
+            stored and searchable
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT QUILLSTACK KEEPS -->
+  <section class="keeps-section">
+    <div class="keeps-inner">
+      <div class="keeps-label">What QuillStack keeps</div>
+      <div class="keeps-grid">
+        <div class="keeps-item">
+          <h3>Structure</h3>
+          <p>The shape of what you wrote, not just the words.</p>
+        </div>
+        <div class="keeps-item">
+          <h3>Bullets</h3>
+          <p>Lists come through as lists.</p>
+        </div>
+        <div class="keeps-item">
+          <h3>Numbers</h3>
+          <p>Ordered items stay ordered.</p>
+        </div>
+        <div class="keeps-item">
+          <h3>Headers</h3>
+          <p>Sections land where you put them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="privacy.html">Privacy Policy</a>
+    <span class="footer-dot">&middot;</span>
+    <a href="terms.html">Terms</a>
+    <span class="footer-dot">&middot;</span>
+    <a href="https://github.com/mikemott/QuillStack/issues">Support</a>
+    <span class="footer-dot">&middot;</span>
+    <a href="mailto:mike@mottvt.com">Contact</a>
+    <span class="footer-dot">&middot;</span>
+    <span>&copy; 2026 QuillStack</span>
   </footer>
+
+  <script>
+    const track = document.getElementById('carousel-track');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const currentEl = document.getElementById('carousel-current');
+    const endEl = document.getElementById('carousel-end');
+    const cards = track.children;
+    const totalCards = cards.length;
+
+    let position = 0;
+
+    function getVisibleCount() {
+      if (window.innerWidth <= 560) return 1;
+      if (window.innerWidth <= 900) return 2;
+      return 3;
+    }
+
+    function getMaxPosition() {
+      return Math.max(0, totalCards - getVisibleCount());
+    }
+
+    function update() {
+      const visible = getVisibleCount();
+      const cardWidth = cards[0].offsetWidth;
+      const gap = 20;
+      track.style.transform = `translateX(-${position * (cardWidth + gap)}px)`;
+
+      currentEl.textContent = position + 1;
+      endEl.textContent = Math.min(position + visible, totalCards);
+
+      prevBtn.disabled = position === 0;
+      nextBtn.disabled = position >= getMaxPosition();
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (position > 0) { position--; update(); }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (position < getMaxPosition()) { position++; update(); }
+    });
+
+    window.addEventListener('resize', () => {
+      if (position > getMaxPosition()) position = getMaxPosition();
+      update();
+    });
+
+    update();
+  </script>
+
 </body>
 </html>
