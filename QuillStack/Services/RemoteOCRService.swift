@@ -10,7 +10,7 @@ actor RemoteOCRService {
     private var modelName: String
     private var modelPreloaded = false
 
-    init(macMiniHost: String = "", modelName: String = "qwen3-vl:8b") {
+    init(macMiniHost: String = "", modelName: String = "chandra-ocr-2") {
         self.macMiniHost = macMiniHost
         self.modelName = modelName
     }
