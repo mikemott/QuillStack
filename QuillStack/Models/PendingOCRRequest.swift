@@ -3,10 +3,10 @@ import SwiftData
 
 @Model
 final class PendingOCRRequest {
-    @Attribute(.unique) var id: UUID
-    var imageData: Data
-    var createdAt: Date
-    var retryCount: Int
+    var id: UUID = UUID()
+    var imageData: Data = Data()
+    var createdAt: Date = Date.now
+    var retryCount: Int = 0
 
     @Relationship var capture: Capture?
 

@@ -10,7 +10,7 @@ actor RemoteOCRService {
     private var modelName: String
     private var modelPreloaded = false
 
-    init(macMiniHost: String = "", modelName: String = "qwen3-vl:8b") {
+    init(macMiniHost: String = "", modelName: String = "chandra-ocr-2") {
         self.macMiniHost = macMiniHost
         self.modelName = modelName
     }
@@ -134,11 +134,25 @@ actor RemoteOCRService {
         let responseText = json?["response"] as? String
         let thinkingText = json?["thinking"] as? String
 
-        // Parse structured JSON from response or thinking field (Qwen3 thinking mode)
+        // Parse structured JSON from response
         var parsed: [String: Any]?
         for candidate in [responseText, thinkingText] {
-            guard let candidate, !candidate.isEmpty,
-                  let candidateData = candidate.data(using: .utf8),
+            guard let candidate, !candidate.isEmpty else { continue }
+            // Strip outer markdown code fences if present
+            let trimmed = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            let cleaned: String
+            if trimmed.hasPrefix("```") && trimmed.hasSuffix("```") {
+                cleaned = trimmed
+                    .replacingOccurrences(
+                        of: #"^```(?:json)?\s*|\s*```$"#,
+                        with: "",
+                        options: .regularExpression
+                    )
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                cleaned = trimmed
+            }
+            guard let candidateData = cleaned.data(using: .utf8),
                   let obj = try? JSONSerialization.jsonObject(with: candidateData) as? [String: Any] else {
                 continue
             }

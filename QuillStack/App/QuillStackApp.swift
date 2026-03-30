@@ -18,13 +18,31 @@ struct QuillStackApp: App {
         }
         let schema = Schema([Capture.self, CaptureImage.self, Tag.self, PendingOCRRequest.self])
         let inMemory = Self.isUITesting
-        let config = ModelConfiguration("QuillStack", isStoredInMemoryOnly: inMemory)
+        let useCloud = !inMemory
+
+        let config = ModelConfiguration(
+            "QuillStack",
+            isStoredInMemoryOnly: inMemory,
+            cloudKitDatabase: useCloud ? .automatic : .none
+        )
         do {
             container = try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
+            // CloudKit setup can fail even with an iCloud account (e.g. container
+            // not yet provisioned). Fall back to local-only storage.
+            let fallback = ModelConfiguration(
+                "QuillStack",
+                isStoredInMemoryOnly: inMemory,
+                cloudKitDatabase: .none
+            )
+            do {
+                container = try ModelContainer(for: schema, configurations: [fallback])
+            } catch {
+                fatalError("Failed to create ModelContainer: \(error)")
+            }
         }
         seedDefaultTags(in: container)
+        deduplicateTags(in: container.mainContext)
         if !Self.isUITesting {
             configureMacMini()
             registerBackgroundTask()
@@ -32,6 +50,11 @@ struct QuillStackApp: App {
     }
 
     private func configureMacMini() {
+        // Migrate stale Qwen model name to Chandra 2
+        if UserDefaults.standard.string(forKey: "ollamaModel") == "qwen3-vl:8b" {
+            UserDefaults.standard.set("chandra-ocr-2", forKey: "ollamaModel")
+        }
+
         Task {
             if let savedHost = UserDefaults.standard.string(forKey: "macMiniHost") {
                 await RemoteOCRService.shared.setMacMiniHost(savedHost)
@@ -53,6 +76,7 @@ struct QuillStackApp: App {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
+                deduplicateTags(in: container.mainContext)
                 Task {
                     await OCRQueueService.shared.processQueue(in: container.mainContext)
                 }
@@ -120,6 +144,31 @@ struct QuillStackApp: App {
             task.setTaskCompleted(success: true)
             scheduleBackgroundProcessing()
         }
+    }
+
+    // MARK: - Tag Deduplication
+
+    private func deduplicateTags(in context: ModelContext) {
+        let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.createdAt)])
+        guard let tags = try? context.fetch(descriptor) else { return }
+
+        var seen: [String: Tag] = [:]
+        for tag in tags {
+            let key = tag.name.lowercased()
+            if let existing = seen[key] {
+                // Move captures from duplicate to the original
+                let capturesToMove = tag.captures.filter { capture in
+                    !existing.captures.contains(where: { $0.id == capture.id })
+                }
+                for capture in capturesToMove {
+                    existing.captures.append(capture)
+                }
+                context.delete(tag)
+            } else {
+                seen[key] = tag
+            }
+        }
+        try? context.save()
     }
 
     // MARK: - Seed Tags
