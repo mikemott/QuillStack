@@ -139,7 +139,9 @@ struct ContentView: View {
                     // Tag filter
                     tagFilterBar
 
-                    if isDrawerMode {
+                    if captures.isEmpty {
+                        emptyStateView
+                    } else if isDrawerMode {
                         drawerView
                             .transition(.opacity)
                     } else {
@@ -215,6 +217,57 @@ struct ContentView: View {
         }
         .background(QSSurface.containerLow)
         .accessibilityIdentifier("tag-filter-bar")
+    }
+
+    // MARK: - Empty State
+
+    private var emptyStateView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            VStack(spacing: 16) {
+                Text("Point your phone\nat something.")
+                    .font(.system(size: 28, weight: .black))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(QSColor.onSurface)
+
+                Text("Something happens.")
+                    .font(.system(size: 28, weight: .black))
+                    .foregroundStyle(QSColor.onSurfaceVariant)
+            }
+
+            Text("Receipts, flyers, notes, business cards —\nQuillStack reads it, tags it, does something with it.")
+                .font(QSFont.sans(size: 15))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .lineSpacing(4)
+                .padding(.horizontal, 32)
+
+            VStack(alignment: .leading, spacing: 12) {
+                guideStep("1", "Tap the camera button below")
+                guideStep("2", "Scan a receipt, note, or card")
+                guideStep("3", "Tag it — OCR and actions happen automatically")
+            }
+            .padding(.top, 8)
+
+            Spacer()
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func guideStep(_ number: String, _ text: String) -> some View {
+        HStack(spacing: 12) {
+            Text(number)
+                .font(QSFont.mono(size: 12))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .frame(width: 24, height: 24)
+                .background(QSSurface.container)
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+            Text(text)
+                .font(QSFont.sans(size: 14))
+                .foregroundStyle(QSColor.onSurfaceVariant)
+        }
     }
 
     // MARK: - Card Pager
