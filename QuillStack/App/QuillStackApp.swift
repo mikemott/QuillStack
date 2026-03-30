@@ -157,10 +157,8 @@ struct QuillStackApp: App {
             let key = tag.name.lowercased()
             if let existing = seen[key] {
                 // Move captures from duplicate to the original
-                for capture in tag.captures {
-                    if !existing.captures.contains(where: { $0.id == capture.id }) {
-                        existing.captures.append(capture)
-                    }
+                for capture in tag.captures where !existing.captures.contains(where: { $0.id == capture.id }) {
+                    existing.captures.append(capture)
                 }
                 context.delete(tag)
             } else {

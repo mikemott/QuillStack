@@ -288,7 +288,7 @@ struct SettingsView: View {
                 settingsRow("Status") {
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(icloudAvailable ? Color.green : QSColor.onSurfaceMuted)
+                            .fill(QSColor.onSurfaceMuted)
                             .frame(width: 8, height: 8)
                             .opacity(icloudAvailable ? 1.0 : 0.3)
                         Text(icloudAvailable ? "Active" : "Unavailable")

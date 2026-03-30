@@ -138,11 +138,20 @@ actor RemoteOCRService {
         var parsed: [String: Any]?
         for candidate in [responseText, thinkingText] {
             guard let candidate, !candidate.isEmpty else { continue }
-            // Strip markdown code fences if present
-            let cleaned = candidate
-                .replacingOccurrences(of: "```json", with: "")
-                .replacingOccurrences(of: "```", with: "")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+            // Strip outer markdown code fences if present
+            let trimmed = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            let cleaned: String
+            if trimmed.hasPrefix("```") && trimmed.hasSuffix("```") {
+                cleaned = trimmed
+                    .replacingOccurrences(
+                        of: #"^```(?:json)?\s*|\s*```$"#,
+                        with: "",
+                        options: .regularExpression
+                    )
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                cleaned = trimmed
+            }
             guard let candidateData = cleaned.data(using: .utf8),
                   let obj = try? JSONSerialization.jsonObject(with: candidateData) as? [String: Any] else {
                 continue

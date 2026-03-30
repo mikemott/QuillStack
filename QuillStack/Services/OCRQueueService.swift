@@ -13,6 +13,12 @@ final class OCRQueueService {
     private init() {}
 
     func enqueue(capture: Capture, imageData: Data, in context: ModelContext) throws {
+        let allPending = (try? context.fetch(FetchDescriptor<PendingOCRRequest>())) ?? []
+        if allPending.contains(where: { $0.capture?.persistentModelID == capture.persistentModelID }) {
+            logger.debug("OCR request already queued for this capture, skipping")
+            return
+        }
+
         let request = PendingOCRRequest(capture: capture, imageData: imageData)
         context.insert(request)
         try context.save()
@@ -59,9 +65,7 @@ final class OCRQueueService {
                 let tagNames = Set(capture.tags.map(\.name))
                 let imageData = request.imageData
 
-                let result = try await Task.detached {
-                    try await remoteOCR.recognizeText(from: imageData, tagNames: tagNames)
-                }.value
+                let result = try await remoteOCR.recognizeText(from: imageData, tagNames: tagNames)
 
                 capture.ocrText = result.text
                 capture.extractedTitle = result.title
