@@ -48,7 +48,6 @@ final class OCRQueueService {
         logger.info("Processing \(requests.count) pending OCR requests")
 
         for request in requests {
-            // Check for orphaned requests before doing network work
             guard let capture = request.capture else {
                 logger.warning("Capture not found for pending request, removing from queue")
                 context.delete(request)
@@ -58,7 +57,11 @@ final class OCRQueueService {
 
             do {
                 let tagNames = Set(capture.tags.map(\.name))
-                let result = try await remoteOCR.recognizeText(from: request.imageData, tagNames: tagNames)
+                let imageData = request.imageData
+
+                let result = try await Task.detached {
+                    try await remoteOCR.recognizeText(from: imageData, tagNames: tagNames)
+                }.value
 
                 capture.ocrText = result.text
                 capture.extractedTitle = result.title

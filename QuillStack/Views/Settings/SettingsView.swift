@@ -10,11 +10,12 @@ struct SettingsView: View {
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
     @State private var macMiniHost = UserDefaults.standard.string(forKey: "macMiniHost") ?? ""
-    @State private var ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel") ?? "qwen3-vl:8b"
+    @State private var ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel") ?? "chandra-ocr-2"
     @State private var isConnected = false
     @State private var isCheckingConnection = false
     @State private var pendingCount = 0
     @State private var connectionCheckTask: Task<Void, Never>?
+    @State private var icloudAvailable = FileManager.default.ubiquityIdentityToken != nil
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
@@ -34,6 +35,7 @@ struct SettingsView: View {
                 obsidianSection
                 storageSection
                 ocrSection
+                icloudSection
                 aboutSection
             }
             .padding(.horizontal, 20)
@@ -45,6 +47,7 @@ struct SettingsView: View {
         .task {
             await checkConnection()
             pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
+            icloudAvailable = FileManager.default.ubiquityIdentityToken != nil
         }
         .alert("New Tag", isPresented: $showNewTag) {
             TextField("Tag name", text: $newTagName)
@@ -269,6 +272,41 @@ struct SettingsView: View {
             }
 
             Text("Enter your Mac Mini's Tailscale IP address. Captures queue when offline.")
+                .font(QSFont.monoLight(size: 11))
+                .foregroundStyle(QSColor.onSurfaceMuted)
+                .padding(.leading, 4)
+        }
+    }
+
+    // MARK: - iCloud
+
+    private var icloudSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            sectionHeader("ICLOUD BACKUP")
+
+            VStack(spacing: 0) {
+                settingsRow("Status") {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(icloudAvailable ? Color.green : QSColor.onSurfaceMuted)
+                            .frame(width: 8, height: 8)
+                            .opacity(icloudAvailable ? 1.0 : 0.3)
+                        Text(icloudAvailable ? "Active" : "Unavailable")
+                            .font(QSFont.mono(size: 13))
+                            .foregroundStyle(QSColor.onSurfaceMuted)
+                    }
+                }
+
+                settingsRow("Account") {
+                    Text(icloudAvailable ? "Signed In" : "Not Signed In")
+                        .font(QSFont.mono(size: 13))
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+                }
+            }
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            Text("Captures and tags sync to iCloud automatically. Data restores when you reinstall.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)

@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class CaptureImage {
-    @Attribute(.externalStorage) var imageData: Data
+    @Attribute(.externalStorage) var imageData: Data = Data()
     @Attribute(.externalStorage) var thumbnailData: Data?
-    var pageIndex: Int
+    var pageIndex: Int = 0
     var ocrText: String?
     var ocrConfidence: Double?
     var capture: Capture?

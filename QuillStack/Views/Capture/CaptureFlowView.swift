@@ -130,14 +130,13 @@ struct CaptureFlowView: View {
         let processor = CaptureProcessor()
         processor.process(capture, in: modelContext)
 
-        // Location in background
-        let ctx = modelContext
-        Task {
+        // Location in background — stay on MainActor for SwiftData access
+        Task { @MainActor in
             if let location = await locationService.currentLocation() {
                 capture.latitude = location.coordinate.latitude
                 capture.longitude = location.coordinate.longitude
                 capture.locationName = await locationService.reverseGeocode(location)
-                try? ctx.save()
+                try? modelContext.save()
             }
         }
 
