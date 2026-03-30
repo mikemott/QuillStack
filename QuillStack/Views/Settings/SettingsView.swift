@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CloudKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -15,7 +16,7 @@ struct SettingsView: View {
     @State private var isCheckingConnection = false
     @State private var pendingCount = 0
     @State private var connectionCheckTask: Task<Void, Never>?
-    @State private var icloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+    @State private var icloudAvailable = false
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
@@ -47,7 +48,8 @@ struct SettingsView: View {
         .task {
             await checkConnection()
             pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
-            icloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+            let status = try? await CKContainer.default().accountStatus()
+            icloudAvailable = status == .available
         }
         .alert("New Tag", isPresented: $showNewTag) {
             TextField("Tag name", text: $newTagName)

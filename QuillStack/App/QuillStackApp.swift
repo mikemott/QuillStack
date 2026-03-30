@@ -18,7 +18,7 @@ struct QuillStackApp: App {
         }
         let schema = Schema([Capture.self, CaptureImage.self, Tag.self, PendingOCRRequest.self])
         let inMemory = Self.isUITesting
-        let useCloud = !inMemory && FileManager.default.ubiquityIdentityToken != nil
+        let useCloud = !inMemory
 
         let config = ModelConfiguration(
             "QuillStack",
