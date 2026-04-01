@@ -4,10 +4,10 @@ import SwiftUI
 
 @Model
 final class Tag {
-    @Attribute(.unique) var name: String
-    var colorHex: String
-    var createdAt: Date
-    var captures: [Capture]
+    var name: String = ""
+    var colorHex: String = "#6B7280"
+    var createdAt: Date = Date.now
+    var captures: [Capture] = []
 
     init(name: String, colorHex: String) {
         self.name = name

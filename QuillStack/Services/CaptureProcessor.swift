@@ -20,7 +20,10 @@ final class CaptureProcessor {
 
         let imageData = primaryImage.imageData
 
-        Task { @MainActor in
+        // Task inherits @MainActor; await calls to RemoteOCRService (an actor)
+        // naturally hop off main thread for network work, then resume here
+        // for SwiftData mutations.
+        Task {
             do {
                 guard await remoteOCRService.checkAvailability() else {
                     logger.info("Mac Mini unavailable, queueing OCR request")

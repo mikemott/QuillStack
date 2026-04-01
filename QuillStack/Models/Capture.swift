@@ -4,13 +4,13 @@ import CoreLocation
 
 @Model
 final class Capture {
-    var createdAt: Date
+    var createdAt: Date = Date.now
     var extractedTitle: String?
     var ocrText: String?
     var latitude: Double?
     var longitude: Double?
     var locationName: String?
-    var isProcessingOCR: Bool
+    var isProcessingOCR: Bool = false
     var enrichmentJSON: Data?
 
     @Relationship(deleteRule: .cascade, inverse: \CaptureImage.capture)
