@@ -61,15 +61,20 @@ struct CaptureFlowView: View {
                 // Selected tags confirmation
                 if !selectedTags.isEmpty {
                     HStack(spacing: 8) {
-                        ForEach(selectedTags) { tag in
-                            TagChip(tag: tag, size: .compact) {
-                                toggleTag(tag)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(selectedTags) { tag in
+                                    TagChip(tag: tag, size: .compact) {
+                                        toggleTag(tag)
+                                    }
+                                    .accessibilityIdentifier("selected-tag-\(tag.name)")
+                                }
                             }
                         }
-                        Spacer()
                         Text("\(selectedTags.count) tagged")
                             .font(QSFont.mono(size: 11))
                             .foregroundStyle(QSColor.onSurfaceMuted)
+                            .fixedSize()
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
