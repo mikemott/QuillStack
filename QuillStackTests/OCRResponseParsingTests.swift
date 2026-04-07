@@ -5,8 +5,7 @@ import Foundation
 @Suite("OCR Response Parsing")
 struct OCRResponseParsingTests {
 
-    /// Simulates the same parsing logic used in RemoteOCRService.recognizeText
-    /// to validate that various Ollama response shapes are handled correctly.
+    /// Validates that various OCR response JSON shapes are parsed correctly.
     private func parseOllamaResponse(_ json: String) -> (
         text: String, title: String?, aiTags: [String],
         contact: ContactExtraction?, event: EventExtraction?, receipt: ReceiptExtraction?

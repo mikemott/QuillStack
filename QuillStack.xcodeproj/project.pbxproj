@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0F2CD5E9D07C7A0F4308D05F /* ReceiptPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */; };
-		101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */; };
 		1171088212D4885CEBC52F2F /* IBMPlexMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */; };
-		142552AD97F78CA2DE45C13D /* OCRQueueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */; };
 		18B99221501B9088B896EB31 /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D41AB88F26A245C79AAC7FC /* TagChip.swift */; };
 		2490979D71F3CAB3BA764743 /* OCRResponseParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A184EA2BA7186D5A1DD844E9 /* OCRResponseParsingTests.swift */; };
 		2C35FD888C2D154153877D2B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C21F408FCDD056482FDC727 /* LocationService.swift */; };
@@ -18,6 +16,7 @@
 		335D0D41E36D88BE5E5FB07C /* EventActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */; };
 		33AE9DD46B3DBF42B691E303 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8DA5851B4883923523C9D303 /* SentrySwiftUI */; };
 		3E51D99B0372958EE56301A1 /* DateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FFF4FC8F004219B04DCBC6 /* DateFormattingTests.swift */; };
+		44DF0CF22A37593B493BBACF /* DatalabOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */; };
 		467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */; };
 		48DAD0B56F467A9C5B7DEC6A /* ObsidianExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */; };
 		4A3C84EC9820B8ADD1E62E5A /* TodoActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */; };
@@ -31,7 +30,6 @@
 		6D7C5DF56898D0641C871CB7 /* EnrichmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */; };
 		74CFA93B5B14CAA49F511DC7 /* ContactActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4326D65CD0927EFFD223CB42 /* ContactActionView.swift */; };
 		78B6D218E8A7A47B2CE2B0E0 /* TodoExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */; };
-		796B6BE3A307BF5FB2D7412F /* RemoteOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */; };
 		7D712EB29B747417C5122CC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FB76058408D13419B7BE321 /* Assets.xcassets */; };
 		7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD81AE056AC7E1A2498C619A /* Enrichment.swift */; };
 		83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */; };
@@ -54,6 +52,7 @@
 		F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */; };
 		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
 		F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD8C80E9AA138C4F0460C /* Tag.swift */; };
+		FAFDD368D3B7526C246ED8F4 /* OnDeviceEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,8 +84,6 @@
 		3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptPreviewSheet.swift; sourceTree = "<group>"; };
 		3D41AB88F26A245C79AAC7FC /* TagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
 		3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
-		3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRQueueService.swift; sourceTree = "<group>"; };
-		3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingOCRRequest.swift; sourceTree = "<group>"; };
 		3FB76058408D13419B7BE321 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4326D65CD0927EFFD223CB42 /* ContactActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactActionView.swift; sourceTree = "<group>"; };
 		48FFF4FC8F004219B04DCBC6 /* DateFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormattingTests.swift; sourceTree = "<group>"; };
@@ -105,6 +102,7 @@
 		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuillStack.entitlements; sourceTree = "<group>"; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
+		83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceEnrichmentService.swift; sourceTree = "<group>"; };
 		84704540B805D88979BF52CD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureDetailView.swift; sourceTree = "<group>"; };
 		9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentScannerView.swift; sourceTree = "<group>"; };
@@ -115,9 +113,9 @@
 		B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoExtraction.swift; sourceTree = "<group>"; };
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOCRService.swift; sourceTree = "<group>"; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatalabOCRService.swift; sourceTree = "<group>"; };
 		DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporterTests.swift; sourceTree = "<group>"; };
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentTests.swift; sourceTree = "<group>"; };
@@ -312,7 +310,6 @@
 				24F4D271DC1243947BE92062 /* ContactExtraction.swift */,
 				FD81AE056AC7E1A2498C619A /* Enrichment.swift */,
 				316694A14067DD5476FC5F8B /* EventExtraction.swift */,
-				3E7C5994F01441D2A17F50C4 /* PendingOCRRequest.swift */,
 				5BC672610E74311F8BA9D7D1 /* ReceiptExtraction.swift */,
 				BE6DD8C80E9AA138C4F0460C /* Tag.swift */,
 				B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */,
@@ -325,10 +322,10 @@
 			children = (
 				537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */,
 				3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */,
+				DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
-				3E640E87487BCBCAFBE00B4E /* OCRQueueService.swift */,
-				BDFBE2D58FDCF082AB8F1438 /* RemoteOCRService.swift */,
+				83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -486,6 +483,7 @@
 				C3AA5AB93657990DA5182634 /* ContactExtraction.swift in Sources */,
 				55932922712289AB36418C79 /* ContentView.swift in Sources */,
 				F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */,
+				44DF0CF22A37593B493BBACF /* DatalabOCRService.swift in Sources */,
 				9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */,
 				83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */,
 				7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */,
@@ -493,13 +491,11 @@
 				30850D9D9ECE398BAE5BE713 /* EventExtraction.swift in Sources */,
 				93150BFD7F960AF463D425F7 /* Extensions.swift in Sources */,
 				2C35FD888C2D154153877D2B /* LocationService.swift in Sources */,
-				142552AD97F78CA2DE45C13D /* OCRQueueService.swift in Sources */,
 				F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */,
-				101E63C826AF5061A17155AF /* PendingOCRRequest.swift in Sources */,
+				FAFDD368D3B7526C246ED8F4 /* OnDeviceEnrichmentService.swift in Sources */,
 				672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */,
 				963B0E3B153A52158C33A350 /* ReceiptExtraction.swift in Sources */,
 				0F2CD5E9D07C7A0F4308D05F /* ReceiptPreviewSheet.swift in Sources */,
-				796B6BE3A307BF5FB2D7412F /* RemoteOCRService.swift in Sources */,
 				C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */,
 				F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */,
 				18B99221501B9088B896EB31 /* TagChip.swift in Sources */,

@@ -10,12 +10,7 @@ struct SettingsView: View {
     @State private var newTagName = ""
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
-    @State private var macMiniHost = UserDefaults.standard.string(forKey: "macMiniHost") ?? ""
-    @State private var ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel") ?? "chandra-ocr-2"
-    @State private var isConnected = false
-    @State private var isCheckingConnection = false
-    @State private var pendingCount = 0
-    @State private var connectionCheckTask: Task<Void, Never>?
+    @State private var isAPIConfigured = false
     @State private var icloudAvailable = false
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
@@ -46,8 +41,7 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            await checkConnection()
-            pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
+            isAPIConfigured = await DatalabOCRService.shared.isConfigured
             let status = try? await CKContainer.default().accountStatus()
             icloudAvailable = status == .available
         }
@@ -209,43 +203,33 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Text("Reset deletes all captures and clears the OCR queue.")
+            Text("Reset deletes all captures and restores default tags.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
         }
     }
 
-    // MARK: - Remote OCR
+    // MARK: - OCR
 
     private var ocrSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            sectionHeader("REMOTE OCR")
+            sectionHeader("OCR")
 
             VStack(spacing: 0) {
-                settingsInput("Mac Mini IP", text: $macMiniHost, key: "macMiniHost")
-                settingsInput("Model", text: $ollamaModel, key: "ollamaModel")
-
-                settingsRow("Status") {
-                    HStack(spacing: 6) {
-                        if isCheckingConnection {
-                            ProgressView()
-                                .controlSize(.mini)
-                        } else {
-                            Circle()
-                                .fill(QSColor.onSurfaceMuted)
-                                .frame(width: 8, height: 8)
-                                .opacity(isConnected ? 1.0 : 0.3)
-                            Text(isConnected ? "Connected" : "Offline")
-                                .font(QSFont.mono(size: 13))
-                                .foregroundStyle(QSColor.onSurfaceMuted)
-                        }
-                    }
+                settingsRow("Engine") {
+                    Text("Datalab Chandra")
+                        .font(QSFont.mono(size: 13))
+                        .foregroundStyle(QSColor.onSurfaceMuted)
                 }
 
-                if pendingCount > 0 {
-                    settingsRow("Pending") {
-                        Text("\(pendingCount) captures")
+                settingsRow("API Key") {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(QSColor.onSurfaceMuted)
+                            .frame(width: 8, height: 8)
+                            .opacity(isAPIConfigured ? 1.0 : 0.3)
+                        Text(isAPIConfigured ? "Configured" : "Missing")
                             .font(QSFont.mono(size: 13))
                             .foregroundStyle(QSColor.onSurfaceMuted)
                     }
@@ -254,26 +238,7 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            if pendingCount > 0 {
-                Button {
-                    Task {
-                        await OCRQueueService.shared.processQueue(in: modelContext)
-                        pendingCount = OCRQueueService.shared.getPendingCount(in: modelContext)
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 12, weight: .medium))
-                        Text("PROCESS QUEUE NOW")
-                            .font(QSFont.sectionHeader)
-                            .tracking(1.5)
-                    }
-                    .foregroundStyle(QSColor.tertiary)
-                }
-                .padding(.leading, 4)
-            }
-
-            Text("Enter your Mac Mini's Tailscale IP address. Captures queue when offline.")
+            Text("API key is set in Secrets.xcconfig. Get one at datalab.to/app/keys.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
@@ -367,20 +332,6 @@ struct SettingsView: View {
                 .autocorrectionDisabled()
                 .onChange(of: text.wrappedValue) { _, newValue in
                     UserDefaults.standard.set(newValue, forKey: key)
-                    if key == "macMiniHost" {
-                        connectionCheckTask?.cancel()
-                        connectionCheckTask = Task {
-                            try? await Task.sleep(for: .milliseconds(500))
-                            guard !Task.isCancelled else { return }
-                            await RemoteOCRService.shared.setMacMiniHost(newValue)
-                            await checkConnection()
-                        }
-                    } else if key == "ollamaModel" {
-                        Task {
-                            await RemoteOCRService.shared.setModelName(newValue)
-                            await checkConnection()
-                        }
-                    }
                 }
         }
         .padding(.horizontal, 16)
@@ -388,12 +339,6 @@ struct SettingsView: View {
     }
 
     // MARK: - Actions
-
-    private func checkConnection() async {
-        isCheckingConnection = true
-        isConnected = await RemoteOCRService.shared.checkAvailability()
-        isCheckingConnection = false
-    }
 
     private func resetData() {
         // Delete images first to avoid external storage fault on cascade
@@ -410,13 +355,6 @@ struct SettingsView: View {
         }
         try? modelContext.save()
 
-        // Clear OCR queue
-        let queueDescriptor = FetchDescriptor<PendingOCRRequest>()
-        if let pendingRequests = try? modelContext.fetch(queueDescriptor) {
-            for request in pendingRequests { modelContext.delete(request) }
-        }
-        try? modelContext.save()
-
         // Delete all tags and re-seed defaults
         let tagDescriptor = FetchDescriptor<Tag>()
         if let existingTags = try? modelContext.fetch(tagDescriptor) {
@@ -427,7 +365,6 @@ struct SettingsView: View {
         }
 
         try? modelContext.save()
-        pendingCount = 0
     }
 
     private func createTag() {
