@@ -13,6 +13,7 @@ actor DatalabOCRService {
     private let maxPollAttempts = 90
 
     func setAPIKey(_ key: String) {
+        guard !key.isEmpty, !key.hasPrefix("$(") else { return }
         apiKey = key
     }
 
@@ -103,7 +104,7 @@ actor DatalabOCRService {
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-            return status < 500
+            return (200..<300).contains(status)
         } catch {
             logger.debug("Datalab API unreachable: \(error.localizedDescription)")
             return false
@@ -202,10 +203,14 @@ actor DatalabOCRService {
 
             let (data, response) = try await URLSession.shared.data(for: request)
 
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200 else {
-                continue
+            guard let httpResponse = response as? HTTPURLResponse else { continue }
+
+            // Fail fast on terminal client errors (bad key, not found, etc.)
+            if (400..<500).contains(httpResponse.statusCode) {
+                throw DatalabOCRError.serverError(httpResponse.statusCode)
             }
+
+            guard httpResponse.statusCode == 200 else { continue }
 
             guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 continue

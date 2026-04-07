@@ -23,6 +23,7 @@ final class CaptureProcessor {
 
         Task {
             var lastError: Error?
+            CrashReporting.ocrRequested(engine: "datalab", tagCount: tagNames.count)
 
             for attempt in 0..<maxRetries {
                 if attempt > 0 {
@@ -32,7 +33,6 @@ final class CaptureProcessor {
                 }
 
                 do {
-                    CrashReporting.ocrRequested(engine: "datalab", tagCount: tagNames.count)
 
                     var allText: [String] = []
                     var firstContact: ContactExtraction?
