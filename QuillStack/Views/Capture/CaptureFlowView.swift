@@ -148,8 +148,21 @@ struct CaptureFlowView: View {
         try? modelContext.save()
 
         // OCR fires now with tag context
+        let imageData = capture.sortedImages.map { $0.imageData }
+        let tagNames = Set(selectedTags.map(\.name))
         let processor = CaptureProcessor()
-        processor.process(capture, in: modelContext)
+        capture.isProcessingOCR = true
+        try? modelContext.save()
+        Task {
+            let result = await processor.process(imageData: imageData, tagNames: tagNames)
+            capture.isProcessingOCR = result.isProcessingOCR
+            if result.success {
+                capture.ocrText = result.ocrText
+                capture.extractedTitle = result.extractedTitle
+                capture.enrichmentJSON = result.enrichmentJSON
+            }
+            try? modelContext.save()
+        }
 
         // Location in background — stay on MainActor for SwiftData access
         Task { @MainActor in

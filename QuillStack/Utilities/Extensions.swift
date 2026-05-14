@@ -22,15 +22,44 @@ extension Color {
 // MARK: - Date Formatting
 
 extension Date {
+    private static let sameYearFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMMM d"
+        return f
+    }()
+
+    private static let fullYearFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMMM d, yyyy"
+        return f
+    }()
+
+    private static let cardTimestampFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        return f
+    }()
+
+    private static let detailFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d, h:mm a"
+        return f
+    }()
+
+    private static let cardDetailFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d, yyyy • h:mm a"
+        return f
+    }()
+
     var timelineHeader: String {
         let calendar = Calendar.current
         if calendar.isDateInToday(self) { return "Today" }
         if calendar.isDateInYesterday(self) { return "Yesterday" }
-        let formatter = DateFormatter()
-        formatter.dateFormat = calendar.isDate(self, equalTo: .now, toGranularity: .year)
-            ? "MMMM d"
-            : "MMMM d, yyyy"
-        return formatter.string(from: self)
+        if calendar.isDate(self, equalTo: .now, toGranularity: .year) {
+            return Date.sameYearFormatter.string(from: self)
+        }
+        return Date.fullYearFormatter.string(from: self)
     }
 
     var startOfDay: Date {
@@ -38,21 +67,15 @@ extension Date {
     }
 
     var cardTimestamp: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: self)
+        Date.cardTimestampFormatter.string(from: self)
     }
 
     var detailTimestamp: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, h:mm a"
-        return formatter.string(from: self)
+        Date.detailFormatter.string(from: self)
     }
 
     var cardDetailTimestamp: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy • h:mm a"
-        return formatter.string(from: self).uppercased()
+        Date.cardDetailFormatter.string(from: self).uppercased()
     }
 }
 
@@ -84,8 +107,4 @@ extension UIImage {
         return image.jpegData(compressionQuality: 0.7)
     }
 
-    func toBase64JPEG(quality: CGFloat = 0.8) -> String? {
-        guard let data = jpegData(compressionQuality: quality) else { return nil }
-        return data.base64EncodedString()
-    }
 }

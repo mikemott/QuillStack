@@ -19,25 +19,25 @@ enum QSFont {
     // Using abbreviated PostScript names per IBM Plex v6.0.0+ convention
 
     static func sans(size: CGFloat) -> Font {
-        .custom("IBMPlexSans-Regular", size: size)
+        .custom("IBMPlexSans", size: size)
     }
 
     static func sansLight(size: CGFloat) -> Font {
-        .custom("IBMPlexSans-Lt", size: size)  // v6+ abbrev: Light → Lt
+        .custom("IBMPlexSans-Light", size: size)
     }
 
     static func sansMedium(size: CGFloat) -> Font {
-        .custom("IBMPlexSans-Medm", size: size)  // v6+ abbrev: Medium → Medm
+        .custom("IBMPlexSans-Medm", size: size)
     }
 
     // MARK: - IBM Plex Mono
 
     static func mono(size: CGFloat) -> Font {
-        .custom("IBMPlexMono-Regular", size: size)
+        .custom("IBMPlexMono", size: size)
     }
 
     static func monoLight(size: CGFloat) -> Font {
-        .custom("IBMPlexMono-Lt", size: size)  // v6+ abbrev: Light → Lt
+        .custom("IBMPlexMono-Light", size: size)
     }
 
     // MARK: - Display (large, editorial — tight tracking)

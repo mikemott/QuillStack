@@ -15,7 +15,6 @@ enum CrashReporting {
             options.enableAutoSessionTracking = true
             options.enableAppHangTracking = true
             options.enableCaptureFailedRequests = true
-            options.attachScreenshot = true
             options.enableUserInteractionTracing = true
             options.tracesSampleRate = 0.2
             #if DEBUG
