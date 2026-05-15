@@ -27,7 +27,7 @@ final class Tag {
         case "Document": return "ph-file-text-duotone"
         case "Contact": return "ph-address-book-duotone"
         case "Travel": return "ph-airplane-tilt-duotone"
-        case "To-Do": return "ph-checks-duotone"
+        case "To-Do": return "ph-sparkle-duotone"
         case "Food": return "ph-fork-knife-duotone"
         default: return "ph-tag-duotone"
         }

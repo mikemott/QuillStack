@@ -206,6 +206,7 @@ actor DatalabOCRService {
             guard let httpResponse = response as? HTTPURLResponse else { continue }
 
             // Fail fast on terminal client errors (bad key, not found, etc.)
+            // 5xx are transient and should be retried per Datalab docs
             if (400..<500).contains(httpResponse.statusCode) {
                 throw DatalabOCRError.serverError(httpResponse.statusCode)
             }

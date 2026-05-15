@@ -74,11 +74,13 @@ struct QuillStackApp: App {
         for tag in tags {
             let key = tag.name.lowercased()
             if let existing = seen[key] {
-                let capturesToMove = tag.captures.filter { capture in
-                    !existing.captures.contains(where: { $0.id == capture.id })
-                }
-                for capture in capturesToMove {
-                    existing.captures.append(capture)
+                // Reassign captures from the owning side to avoid corrupting SwiftData's inverse tracking
+                let capturesToReassign = tag.captures
+                for capture in capturesToReassign {
+                    if !existing.captures.contains(where: { $0.id == capture.id }) {
+                        capture.tags.removeAll { $0.id == tag.id }
+                        capture.tags.append(existing)
+                    }
                 }
                 context.delete(tag)
             } else {

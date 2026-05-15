@@ -37,8 +37,10 @@ final class Capture {
         sortedImages.first?.thumbnailData ?? sortedImages.first?.imageData
     }
 
+    private static let enrichmentDecoder = JSONDecoder()
+
     var enrichment: EnrichedCapture? {
         guard let data = enrichmentJSON else { return nil }
-        return try? JSONDecoder().decode(EnrichedCapture.self, from: data)
+        return try? Capture.enrichmentDecoder.decode(EnrichedCapture.self, from: data)
     }
 }
