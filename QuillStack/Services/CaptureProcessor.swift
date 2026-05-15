@@ -9,12 +9,12 @@ actor CaptureProcessor {
 
     private let maxRetries = 3
     private let baseRetryDelay: TimeInterval = 2.0
+    private static let enrichmentEncoder = JSONEncoder()
 
     struct ProcessingResult: Sendable {
         let ocrText: String
         let extractedTitle: String?
         let enrichmentJSON: Data?
-        let isProcessingOCR: Bool
         let charCount: Int
         let hasContact: Bool
         let hasEvent: Bool
@@ -27,7 +27,7 @@ actor CaptureProcessor {
         guard !imageData.isEmpty else {
             return ProcessingResult(
                 ocrText: "", extractedTitle: nil, enrichmentJSON: nil,
-                isProcessingOCR: false, charCount: 0,
+                charCount: 0,
                 hasContact: false, hasEvent: false, hasReceipt: false,
                 success: false, errorDescription: "No images"
             )
@@ -79,7 +79,7 @@ actor CaptureProcessor {
                     receipt: firstReceipt,
                     todo: firstTodo
                 )
-                let enrichmentData = try? JSONEncoder().encode(enrichment)
+                let enrichmentData = try? Self.enrichmentEncoder.encode(enrichment)
 
                 CrashReporting.ocrCompleted(
                     charCount: description.count,
@@ -92,7 +92,6 @@ actor CaptureProcessor {
                     ocrText: description,
                     extractedTitle: title,
                     enrichmentJSON: enrichmentData,
-                    isProcessingOCR: false,
                     charCount: description.count,
                     hasContact: firstContact != nil,
                     hasEvent: firstEvent != nil,
@@ -101,6 +100,13 @@ actor CaptureProcessor {
                     errorDescription: nil
                 )
 
+            } catch let error as DatalabOCRError {
+                lastError = error
+                logger.error("OCR attempt \(attempt + 1) failed: \(error.localizedDescription)")
+                // Terminal client errors (4xx) should not be retried
+                if case .serverError(let code) = error, (400..<500).contains(code) {
+                    break
+                }
             } catch {
                 lastError = error
                 logger.error("OCR attempt \(attempt + 1) failed: \(error.localizedDescription)")
@@ -112,7 +118,7 @@ actor CaptureProcessor {
 
         return ProcessingResult(
             ocrText: "", extractedTitle: nil, enrichmentJSON: nil,
-            isProcessingOCR: false, charCount: 0,
+            charCount: 0,
             hasContact: false, hasEvent: false, hasReceipt: false,
             success: false, errorDescription: lastError?.localizedDescription
         )

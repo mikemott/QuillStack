@@ -153,9 +153,9 @@ struct CaptureFlowView: View {
         let processor = CaptureProcessor()
         capture.isProcessingOCR = true
         try? modelContext.save()
-        Task {
+        Task { @MainActor in
             let result = await processor.process(imageData: imageData, tagNames: tagNames)
-            capture.isProcessingOCR = result.isProcessingOCR
+            capture.isProcessingOCR = false
             if result.success {
                 capture.ocrText = result.ocrText
                 capture.extractedTitle = result.extractedTitle
