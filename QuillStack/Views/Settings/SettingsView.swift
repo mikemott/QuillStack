@@ -10,7 +10,6 @@ struct SettingsView: View {
     @State private var newTagName = ""
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
-    @State private var isAPIConfigured = false
     @State private var icloudAvailable = false
     @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
@@ -41,7 +40,6 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            isAPIConfigured = await DatalabOCRService.shared.isConfigured
             let status = try? await CKContainer.default().accountStatus()
             icloudAvailable = status == .available
         }
@@ -218,18 +216,17 @@ struct SettingsView: View {
 
             VStack(spacing: 0) {
                 settingsRow("Engine") {
-                    Text("Datalab Chandra")
+                    Text("On-Device (Vision)")
                         .font(QSFont.mono(size: 13))
                         .foregroundStyle(QSColor.onSurfaceMuted)
                 }
 
-                settingsRow("API Key") {
+                settingsRow("Status") {
                     HStack(spacing: 6) {
                         Circle()
                             .fill(QSColor.onSurfaceMuted)
                             .frame(width: 8, height: 8)
-                            .opacity(isAPIConfigured ? 1.0 : 0.3)
-                        Text(isAPIConfigured ? "Configured" : "Missing")
+                        Text("Active")
                             .font(QSFont.mono(size: 13))
                             .foregroundStyle(QSColor.onSurfaceMuted)
                     }
@@ -238,7 +235,7 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Text("API key is set in Secrets.xcconfig. Get one at datalab.to/app/keys.")
+            Text("Text recognition runs on-device using Apple Vision framework.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
