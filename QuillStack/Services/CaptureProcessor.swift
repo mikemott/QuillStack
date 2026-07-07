@@ -3,7 +3,7 @@ import Foundation
 import os
 
 actor CaptureProcessor {
-    private let datalabService = DatalabOCRService.shared
+    private let visionService = VisionOCRService.shared
     private let enrichmentService = OnDeviceEnrichmentService.shared
     private let logger = Logger(subsystem: "com.quillstack", category: "CaptureProcessor")
 
@@ -34,7 +34,7 @@ actor CaptureProcessor {
         }
 
         var lastError: Error?
-        CrashReporting.ocrRequested(engine: "datalab", tagCount: tagNames.count)
+        CrashReporting.ocrRequested(engine: "vision", tagCount: tagNames.count)
 
         for attempt in 0..<maxRetries {
             if attempt > 0 {
@@ -51,7 +51,7 @@ actor CaptureProcessor {
                 var firstTodo: TodoExtraction?
 
                 for data in imageData {
-                    let result = try await datalabService.recognizeText(from: data, tagNames: tagNames)
+                    let result = try await visionService.recognizeText(from: data, tagNames: tagNames)
                     allText.append(result.text)
                     if firstContact == nil { firstContact = result.contact }
                     if firstEvent == nil { firstEvent = result.event }
@@ -100,13 +100,10 @@ actor CaptureProcessor {
                     errorDescription: nil
                 )
 
-            } catch let error as DatalabOCRError {
+            } catch let error as VisionOCRError {
                 lastError = error
                 logger.error("OCR attempt \(attempt + 1) failed: \(error.localizedDescription)")
-                // Terminal client errors (4xx) should not be retried
-                if case .serverError(let code) = error, (400..<500).contains(code) {
-                    break
-                }
+                break
             } catch {
                 lastError = error
                 logger.error("OCR attempt \(attempt + 1) failed: \(error.localizedDescription)")

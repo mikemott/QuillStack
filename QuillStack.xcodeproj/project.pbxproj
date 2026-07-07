@@ -16,7 +16,6 @@
 		335D0D41E36D88BE5E5FB07C /* EventActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */; };
 		33AE9DD46B3DBF42B691E303 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8DA5851B4883923523C9D303 /* SentrySwiftUI */; };
 		3E51D99B0372958EE56301A1 /* DateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FFF4FC8F004219B04DCBC6 /* DateFormattingTests.swift */; };
-		44DF0CF22A37593B493BBACF /* DatalabOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */; };
 		467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */; };
 		48DAD0B56F467A9C5B7DEC6A /* ObsidianExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */; };
 		4A3C84EC9820B8ADD1E62E5A /* TodoActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */; };
@@ -26,7 +25,6 @@
 		5A5854F13DF491FCE3606CC7 /* ActionIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830DBB50D82C00865610C70E /* ActionIcon.swift */; };
 		6031DF40116E06AB7F5BF168 /* IBMPlexSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1A30FB6B084F1B94BEE0D6D6 /* IBMPlexSans-Regular.ttf */; };
 		672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6499B4EDA579471C027B8B /* QuillStackApp.swift */; };
-		6B10712250EAF7434F485955 /* PromptBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DED94D89E0E9CD89DA0CDB8 /* PromptBuilderTests.swift */; };
 		6D7C5DF56898D0641C871CB7 /* EnrichmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */; };
 		74CFA93B5B14CAA49F511DC7 /* ContactActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4326D65CD0927EFFD223CB42 /* ContactActionView.swift */; };
 		78B6D218E8A7A47B2CE2B0E0 /* TodoExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */; };
@@ -42,6 +40,7 @@
 		A3631677B710AF4253F20B16 /* TagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD9B3DEBE8DF814E0E8BEC0 /* TagTests.swift */; };
 		A8D75CAD90CCC45017B9402B /* CaptureCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */; };
 		A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6280494C3FF19CC00F604 /* TagPickerView.swift */; };
+		C389A75F1281C857033AF94D /* VisionOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFD2EA26A4D4D042D6507A3 /* VisionOCRService.swift */; };
 		C3AA5AB93657990DA5182634 /* ContactExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F4D271DC1243947BE92062 /* ContactExtraction.swift */; };
 		C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */; };
 		D92F60E053C90FF44A37AF57 /* IBMPlexMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */; };
@@ -98,8 +97,7 @@
 		786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Medium.ttf"; sourceTree = "<group>"; };
 		78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventActionView.swift; sourceTree = "<group>"; };
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
-		7DED94D89E0E9CD89DA0CDB8 /* PromptBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilderTests.swift; sourceTree = "<group>"; };
-		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuillStack.entitlements; sourceTree = "<group>"; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
 		83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceEnrichmentService.swift; sourceTree = "<group>"; };
@@ -114,8 +112,7 @@
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
-		DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
-		DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatalabOCRService.swift; sourceTree = "<group>"; };
+		CDFD2EA26A4D4D042D6507A3 /* VisionOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionOCRService.swift; sourceTree = "<group>"; };
 		DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporterTests.swift; sourceTree = "<group>"; };
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentTests.swift; sourceTree = "<group>"; };
@@ -174,19 +171,9 @@
 				F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */,
 				DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */,
 				A184EA2BA7186D5A1DD844E9 /* OCRResponseParsingTests.swift */,
-				7DED94D89E0E9CD89DA0CDB8 /* PromptBuilderTests.swift */,
 				4CD9B3DEBE8DF814E0E8BEC0 /* TagTests.swift */,
 			);
 			path = QuillStackTests;
-			sourceTree = "<group>";
-		};
-		39C6F980E0E534A1AD0570F1 /* QuillStack */ = {
-			isa = PBXGroup;
-			children = (
-				DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */,
-			);
-			name = QuillStack;
-			path = .;
 			sourceTree = "<group>";
 		};
 		3EECED0CADFB246418452A4C /* Resources */ = {
@@ -295,7 +282,6 @@
 			isa = PBXGroup;
 			children = (
 				95969AF08CEC6F0DD5723B72 /* QuillStack */,
-				39C6F980E0E534A1AD0570F1 /* QuillStack */,
 				2ADC8D8AE46861C381CC6F87 /* QuillStackTests */,
 				D2B2DA6E5EFCEB56E889818E /* QuillStackUITests */,
 				0C37BF2F7D4D252B9E612A73 /* Products */,
@@ -322,12 +308,26 @@
 			children = (
 				537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */,
 				3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */,
-				DBB6F0F3F9C60CA1C080F496 /* DatalabOCRService.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
 				83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */,
+				CDFD2EA26A4D4D042D6507A3 /* VisionOCRService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		"TEMP_452E2FFA-09B4-4C10-B081-39B425572B58" /* Features */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		"TEMP_B6D2CE8C-D5E0-406C-999D-DC4F20A45109" /* Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Whiteboard;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -483,7 +483,6 @@
 				C3AA5AB93657990DA5182634 /* ContactExtraction.swift in Sources */,
 				55932922712289AB36418C79 /* ContentView.swift in Sources */,
 				F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */,
-				44DF0CF22A37593B493BBACF /* DatalabOCRService.swift in Sources */,
 				9538CC60B95314CFBF1A9E08 /* DesignSystem.swift in Sources */,
 				83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */,
 				7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */,
@@ -503,6 +502,7 @@
 				4A3C84EC9820B8ADD1E62E5A /* TodoActionView.swift in Sources */,
 				78B6D218E8A7A47B2CE2B0E0 /* TodoExtraction.swift in Sources */,
 				4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */,
+				C389A75F1281C857033AF94D /* VisionOCRService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,7 +514,6 @@
 				6D7C5DF56898D0641C871CB7 /* EnrichmentTests.swift in Sources */,
 				2490979D71F3CAB3BA764743 /* OCRResponseParsingTests.swift in Sources */,
 				48DAD0B56F467A9C5B7DEC6A /* ObsidianExporterTests.swift in Sources */,
-				6B10712250EAF7434F485955 /* PromptBuilderTests.swift in Sources */,
 				A3631677B710AF4253F20B16 /* TagTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -545,14 +544,12 @@
 /* Begin XCBuildConfiguration section */
 		0A5DE0C3D348FEF7CEF2801D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
 				INFOPLIST_FILE = QuillStack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -706,14 +703,12 @@
 		};
 		A3D1BFB4F33C2134870C1924 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAC20EC36AF5E27F573C0987 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HZQB6JS358;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
 				INFOPLIST_FILE = QuillStack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -19,9 +19,6 @@ targets:
       - path: QuillStack
         excludes:
           - Info.plist
-    configFiles:
-      Debug: Secrets.xcconfig
-      Release: Secrets.xcconfig
     settings:
       base:
         INFOPLIST_FILE: QuillStack/Info.plist

@@ -36,18 +36,6 @@ struct QuillStackApp: App {
         }
         seedDefaultTags(in: container)
         deduplicateTags(in: container.mainContext)
-        if !Self.isUITesting {
-            configureDatalabAPI()
-        }
-    }
-
-    private func configureDatalabAPI() {
-        if let apiKey = Bundle.main.infoDictionary?["DATALAB_API_KEY"] as? String,
-           !apiKey.isEmpty {
-            Task {
-                await DatalabOCRService.shared.setAPIKey(apiKey)
-            }
-        }
     }
 
     var body: some Scene {
