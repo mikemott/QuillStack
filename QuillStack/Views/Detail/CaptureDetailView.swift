@@ -1,0 +1,310 @@
+import SwiftUI
+import SwiftData
+import EventKit
+
+struct CaptureDetailView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @Bindable var capture: Capture
+    @State private var currentPage = 0
+    @State private var showTagEditor = false
+    @State private var showDeleteConfirm = false
+    @State private var showExportResult: ExportResult?
+    @State private var selectedTags: [Tag] = []
+    @State private var eventStore = EKEventStore()
+    @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
+    @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
+    @State private var receiptForAction: IdentifiableWrapper<ReceiptExtraction>?
+    @State private var todoForAction: TodoExtraction?
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            QSSurface.base.ignoresSafeArea()
+
+            ZStack(alignment: .bottomTrailing) {
+                imageViewer
+                    .ignoresSafeArea()
+
+                ActionIconStack(capture: capture) { tag in
+                    handleAction(tag)
+                }
+                .padding(20)
+                .padding(.bottom, 200)
+            }
+
+            metadataOverlay
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        exportToObsidian()
+                    } label: {
+                        Label("Export to Obsidian", systemImage: "square.and.arrow.up")
+                    }
+
+                    ShareLink(item: shareImage, preview: SharePreview(
+                        capture.extractedTitle ?? "Capture",
+                        image: shareImage
+                    ))
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundStyle(QSColor.onSurfaceVariant)
+                }
+            }
+        }
+        .alert("Delete Capture?", isPresented: $showDeleteConfirm) {
+            Button("Delete", role: .destructive) {
+                modelContext.delete(capture)
+                try? modelContext.save()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showTagEditor) {
+            tagEditorSheet
+        }
+        .alert(
+            showExportResult?.title ?? "",
+            isPresented: Binding(
+                get: { showExportResult != nil },
+                set: { if !$0 { showExportResult = nil } }
+            )
+        ) {
+            Button("OK") { showExportResult = nil }
+        } message: {
+            Text(showExportResult?.message ?? "")
+        }
+        .sheet(item: $contactForAction) { wrapper in
+            ContactActionView(extraction: wrapper.value) {
+                contactForAction = nil
+            }
+        }
+        .sheet(item: $eventForAction) { wrapper in
+            EventActionView(extraction: wrapper.value, eventStore: eventStore) {
+                eventForAction = nil
+            }
+        }
+        .sheet(item: $receiptForAction) { wrapper in
+            ReceiptPreviewSheet(receipt: wrapper.value, capture: capture, onExport: {
+                exportToObsidian()
+                receiptForAction = nil
+            }, onDismiss: {
+                receiptForAction = nil
+            })
+        }
+        .sheet(item: $todoForAction) { todo in
+            TodoActionView(extraction: todo, eventStore: eventStore) {
+                todoForAction = nil
+            }
+        }
+        .onAppear {
+            selectedTags = capture.tags
+        }
+    }
+
+    // MARK: - Image Viewer
+
+    @ViewBuilder
+    private var imageViewer: some View {
+        let images = capture.sortedImages
+        if images.count > 1 {
+            TabView(selection: $currentPage) {
+                ForEach(Array(images.enumerated()), id: \.offset) { index, captureImage in
+                    zoomableImage(data: captureImage.imageData)
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+        } else if let first = images.first {
+            zoomableImage(data: first.imageData)
+        }
+    }
+
+    private func zoomableImage(data: Data) -> some View {
+        GeometryReader { geo in
+            if let uiImage = UIImage(data: data) {
+                ScrollView([.horizontal, .vertical], showsIndicators: false) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width)
+                }
+            }
+        }
+    }
+
+    // MARK: - Metadata Overlay
+    // Glass recipe: primary glow bleeding from bottom-left
+
+    private var metadataOverlay: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Title — onSurface, not pure white
+            if let title = capture.extractedTitle {
+                Text(title)
+                    .font(QSFont.detailTitle)
+                    .foregroundStyle(QSColor.onSurface)
+            }
+
+            // Tags row
+            HStack {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(capture.tags) { tag in
+                            TagChip(tag: tag, isSelected: true)
+                        }
+                    }
+                }
+
+                Button {
+                    selectedTags = capture.tags
+                    showTagEditor = true
+                } label: {
+                    Image(systemName: "pencil.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(QSColor.secondary)
+                }
+            }
+
+            // AI topic tags
+            if let aiTags = capture.enrichment?.aiTags, !aiTags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(aiTags, id: \.self) { tag in
+                            AITagChip(label: tag)
+                        }
+                    }
+                }
+            }
+
+            // Location & timestamp — use spacing, not dividers
+            HStack(spacing: 12) {
+                if let location = capture.locationName {
+                    Label {
+                        Text(location)
+                            .font(QSFont.detailLocation)
+                    } icon: {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 11))
+                    }
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+                }
+
+                Spacer()
+
+                Text(capture.createdAt.detailTimestamp)
+                    .font(QSFont.detailTimestamp)
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+            }
+
+            if capture.isStack {
+                Text("Page \(currentPage + 1) of \(capture.pageCount)")
+                    .font(QSFont.detailPageIndicator)
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 20)
+        .qsGlass(
+            glow: QSColor.tertiaryDim,
+            center: .bottomLeading,
+            intensity: 0.15,
+            surfaceOpacity: 0.65
+        )
+    }
+
+    // MARK: - Tag Editor Sheet
+
+    private var tagEditorSheet: some View {
+        NavigationStack {
+            ScrollView {
+                TagPickerView(selectedTags: $selectedTags)
+                    .padding(.top)
+            }
+            .background(QSSurface.base)
+            .navigationTitle("Edit Tags")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showTagEditor = false }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        capture.tags = selectedTags
+                        try? modelContext.save()
+                        showTagEditor = false
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    // MARK: - Quick Actions
+
+    private func handleAction(_ tag: String) {
+        CrashReporting.actionTapped(tag)
+        switch tag {
+        case "Contact":
+            if let contact = capture.enrichment?.contact {
+                contactForAction = IdentifiableWrapper(contact)
+            }
+        case "Event":
+            if let event = capture.enrichment?.event {
+                eventForAction = IdentifiableWrapper(event)
+            }
+        case "Receipt":
+            if let receipt = capture.enrichment?.receipt {
+                receiptForAction = IdentifiableWrapper(receipt)
+            }
+        case "To-Do":
+            todoForAction = capture.enrichment?.todo
+        default: break
+        }
+    }
+
+    // MARK: - Share
+
+    private var shareImage: Image {
+        if let data = capture.sortedImages.first?.imageData,
+           let uiImage = UIImage(data: data) {
+            return Image(uiImage: uiImage)
+        }
+        return Image(systemName: "photo")
+    }
+
+    // MARK: - Export
+
+    private func exportToObsidian() {
+        let exporter = ObsidianExporter()
+        do {
+            try exporter.export(capture)
+            showExportResult = ExportResult(
+                title: "Exported",
+                message: "Capture added to your Obsidian daily note."
+            )
+        } catch {
+            showExportResult = ExportResult(
+                title: "Export Failed",
+                message: error.localizedDescription
+            )
+        }
+    }
+}
+
+struct ExportResult: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+}

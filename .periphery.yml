@@ -1,0 +1,4 @@
+project: QuillStack.xcodeproj
+schemes:
+  - QuillStack
+retain_public: true
