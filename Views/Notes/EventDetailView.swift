@@ -317,8 +317,6 @@ struct EventDetailView: View, NoteDetailViewProtocol {
                 .cornerRadius(10)
             }
             .accessibilityLabel("Actions menu")
-            .disabled(eventTitle.isEmpty)
-            .opacity(eventTitle.isEmpty ? 0.5 : 1)
             
             Spacer()
         }

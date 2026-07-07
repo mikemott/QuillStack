@@ -303,10 +303,10 @@ struct IdeaDetailView: View, NoteDetailViewProtocol {
                     Button(action: { showingExpandSheet = true }) {
                         Label("Expand with AI", systemImage: "sparkles")
                     }
+
+                    Divider()
                 }
-                
-                Divider()
-                
+
                 // Share
                 Button(action: shareIdea) {
                     Label("Share", systemImage: "square.and.arrow.up")
