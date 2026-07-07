@@ -123,16 +123,20 @@ https://quillstack.io/privacy.html
 
 ## App Privacy (Data Collection)
 
-### Data Not Collected
-QuillStack does not collect any data. All note content stays on-device or in user's iCloud.
+### Data Collected
+QuillStack may collect limited diagnostics through Sentry, including crash reports, performance traces, app hang diagnostics, app version, device/OS information, and non-content breadcrumbs used to debug stability issues.
+
+Captured notes, images, OCR text, contacts, events, receipts, reminders, and location names are not intentionally sent as app content.
 
 ### Data Linked to You
-None
+Diagnostics may be associated with Sentry-generated installation/session identifiers for crash grouping and troubleshooting.
 
 ### Data Used to Track You
 None
 
 **Privacy Nutrition Label:**
-- Data Not Collected ✓
+- Diagnostics: Crash Data and Performance Data
+- Not used for tracking
+- User content not collected by QuillStack
 
-Note: If users configure third-party APIs (Claude, GitHub, Notion), data is sent directly to those services under their respective privacy policies.
+Note: If users configure optional third-party integrations, data is sent directly to those services under their respective privacy policies.

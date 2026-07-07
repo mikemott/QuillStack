@@ -6,7 +6,7 @@
 
 QuillStack ("the App") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our iOS application.
 
-**The short version:** QuillStack does not collect, store, or transmit your personal data to our servers. All your notes and data remain on your device or in your personal iCloud account.
+**The short version:** QuillStack does not collect, store, or transmit your captured notes, images, OCR text, tags, contacts, events, receipts, or reminders to QuillStack servers. Your capture content remains on your device or in your personal iCloud account. If crash reporting is enabled in the App Store build, limited diagnostic telemetry may be sent to Sentry to help identify crashes and performance problems.
 
 ---
 
@@ -14,11 +14,17 @@ QuillStack ("the App") is committed to protecting your privacy. This Privacy Pol
 
 QuillStack does not collect:
 - Personal identification information
-- Usage analytics or telemetry
-- Location data
-- Device identifiers
-- Crash reports sent to us
+- Advertising identifiers
+- Location data for advertising or tracking
 - Any content from your notes
+
+QuillStack may collect limited diagnostic information:
+- Crash reports
+- Performance and app hang diagnostics
+- Basic device and operating system information needed to diagnose crashes
+- Non-content app breadcrumbs such as capture count, OCR status, selected tag names, and action type
+
+Diagnostic telemetry is used only to improve app stability and performance. It is not used for advertising or cross-app tracking.
 
 ---
 
@@ -26,9 +32,9 @@ QuillStack does not collect:
 
 ### Local Storage
 All notes, images, and settings are stored locally on your device using:
-- Core Data for structured note content
+- SwiftData for structured note content
 - Local file storage for captured images
-- UserDefaults and Keychain for settings and API keys
+- UserDefaults for settings
 
 ### iCloud Sync (Optional)
 If you enable iCloud sync on your device, your QuillStack data may sync across your Apple devices through your personal iCloud account. This sync is handled entirely by Apple's CloudKit framework, and we have no access to your iCloud data.
@@ -37,7 +43,15 @@ If you enable iCloud sync on your device, your QuillStack data may sync across y
 
 ## Third-Party Services
 
-QuillStack allows you to optionally connect to third-party services. When you choose to use these integrations, your data is sent directly from your device to these services:
+QuillStack uses the following third-party services:
+
+### Sentry
+- **Purpose:** Crash reporting, performance monitoring, failed-request diagnostics, and app hang diagnostics
+- **Data sent:** Technical diagnostics such as crash stack traces, app version, device/OS information, performance traces, and non-content breadcrumbs
+- **Data not intentionally sent:** Captured images, OCR text, contact details, receipt contents, and note content
+- **Their privacy policy:** https://sentry.io/privacy/
+
+QuillStack also allows you to optionally connect to third-party services. When you choose to use these integrations, your data is sent directly from your device to these services:
 
 ### Claude API (Anthropic)
 - **Purpose:** AI-powered text enhancement and prompt refinement
@@ -60,7 +74,7 @@ QuillStack allows you to optionally connect to third-party services. When you ch
 ### Obsidian
 - **Purpose:** Exporting notes to Obsidian vault
 - **Data sent:** None transmitted over network; files saved locally
-- **Your control:** You specify the local vault path
+- **Your control:** You choose the vault folder through the iOS document picker
 
 ---
 
@@ -71,7 +85,6 @@ QuillStack requests the following permissions:
 | Permission | Purpose | When Asked |
 |------------|---------|------------|
 | Camera | Capture photos of handwritten notes | First camera use |
-| Photo Library | Import existing photos of notes | First import attempt |
 | Calendar | Create events from meeting notes | First calendar export |
 | Reminders | Export todo items to Reminders app | First reminder export |
 
@@ -81,10 +94,10 @@ You can revoke any permission at any time through iOS Settings.
 
 ## Data Security
 
-- API keys are stored in the iOS Keychain with hardware encryption
-- Core Data store uses iOS file protection (complete protection when locked)
+- QuillStack does not currently store third-party API keys
+- SwiftData and local app storage are protected by iOS app sandboxing and device security
 - No data is transmitted to our servers
-- All third-party API calls use HTTPS encryption
+- Diagnostic telemetry and third-party service requests use HTTPS encryption
 
 ---
 

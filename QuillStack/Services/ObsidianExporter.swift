@@ -2,32 +2,70 @@ import Foundation
 import UIKit
 
 struct ObsidianExporter {
-    var vaultPath: String {
-        get { UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: "obsidianVaultPath") }
+    private static let vaultBookmarkKey = "obsidianVaultBookmark"
+    private static let vaultDisplayNameKey = "obsidianVaultDisplayName"
+    private let userDefaults: UserDefaults
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
     }
 
     var attachmentFolder: String {
-        get { UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments" }
-        set { UserDefaults.standard.set(newValue, forKey: "obsidianAttachmentFolder") }
+        get { userDefaults.string(forKey: "obsidianAttachmentFolder") ?? "attachments" }
+        set { userDefaults.set(newValue, forKey: "obsidianAttachmentFolder") }
     }
 
     var dailyNoteFolder: String {
-        get { UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: "obsidianDailyNoteFolder") }
+        get { userDefaults.string(forKey: "obsidianDailyNoteFolder") ?? "" }
+        set { userDefaults.set(newValue, forKey: "obsidianDailyNoteFolder") }
     }
 
     var includeOCRText: Bool {
-        get { UserDefaults.standard.bool(forKey: "obsidianIncludeOCR") }
-        set { UserDefaults.standard.set(newValue, forKey: "obsidianIncludeOCR") }
+        get { userDefaults.bool(forKey: "obsidianIncludeOCR") }
+        set { userDefaults.set(newValue, forKey: "obsidianIncludeOCR") }
     }
 
-    var isConfigured: Bool { !vaultPath.isEmpty }
+    var vaultDisplayName: String {
+        userDefaults.string(forKey: Self.vaultDisplayNameKey) ?? ""
+    }
+
+    var isConfigured: Bool {
+        userDefaults.data(forKey: Self.vaultBookmarkKey) != nil
+    }
+
+    func configureVault(url: URL) throws {
+        let didStartAccess = url.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let bookmark = try url.bookmarkData(options: [.minimalBookmark], includingResourceValuesForKeys: nil)
+        userDefaults.set(bookmark, forKey: Self.vaultBookmarkKey)
+        userDefaults.set(url.lastPathComponent, forKey: Self.vaultDisplayNameKey)
+    }
+
+    func clearVault() {
+        userDefaults.removeObject(forKey: Self.vaultBookmarkKey)
+        userDefaults.removeObject(forKey: Self.vaultDisplayNameKey)
+    }
 
     func export(_ capture: Capture) throws {
         guard isConfigured else { throw ExportError.notConfigured }
 
-        let vaultURL = URL(fileURLWithPath: vaultPath)
+        let vaultURL = try resolvedVaultURL()
+        let didStartAccess = vaultURL.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess {
+                vaultURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        try export(capture, to: vaultURL)
+    }
+
+    func export(_ capture: Capture, to vaultURL: URL) throws {
         let attachmentURL = vaultURL.appendingPathComponent(attachmentFolder)
         let fm = FileManager.default
 
@@ -117,12 +155,32 @@ struct ObsidianExporter {
         return formatter.string(from: date)
     }
 
+    private func resolvedVaultURL() throws -> URL {
+        guard let bookmark = userDefaults.data(forKey: Self.vaultBookmarkKey) else {
+            throw ExportError.notConfigured
+        }
+
+        var isStale = false
+        let url = try URL(
+            resolvingBookmarkData: bookmark,
+            options: [],
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        )
+
+        if isStale {
+            try configureVault(url: url)
+        }
+
+        return url
+    }
+
     enum ExportError: LocalizedError {
         case notConfigured
 
         var errorDescription: String? {
             switch self {
-            case .notConfigured: "Obsidian vault path not configured. Set it in Settings."
+            case .notConfigured: "Obsidian vault folder not selected. Choose it in Settings."
             }
         }
     }

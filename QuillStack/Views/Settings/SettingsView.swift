@@ -1,6 +1,8 @@
 import SwiftUI
 import SwiftData
 import CloudKit
+import UIKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -11,7 +13,8 @@ struct SettingsView: View {
     @State private var newTagColor = "#6B7280"
     @State private var showResetConfirm = false
     @State private var icloudAvailable = false
-    @State private var vaultPath = UserDefaults.standard.string(forKey: "obsidianVaultPath") ?? ""
+    @State private var showVaultPicker = false
+    @State private var vaultName = ObsidianExporter().vaultDisplayName
     @State private var attachmentFolder = UserDefaults.standard.string(forKey: "obsidianAttachmentFolder") ?? "attachments"
     @State private var dailyNoteFolder = UserDefaults.standard.string(forKey: "obsidianDailyNoteFolder") ?? ""
     @State private var includeOCR = UserDefaults.standard.bool(forKey: "obsidianIncludeOCR")
@@ -49,6 +52,19 @@ struct SettingsView: View {
             Button("Create") { createTag() }
         } message: {
             Text("Choose a short, reusable name.")
+        }
+        .sheet(isPresented: $showVaultPicker) {
+            VaultFolderPicker { url in
+                do {
+                    try ObsidianExporter().configureVault(url: url)
+                    vaultName = ObsidianExporter().vaultDisplayName
+                } catch {
+                    vaultName = ""
+                }
+                showVaultPicker = false
+            } onCancel: {
+                showVaultPicker = false
+            }
         }
     }
 
@@ -144,7 +160,20 @@ struct SettingsView: View {
             sectionHeader("OBSIDIAN")
 
             VStack(spacing: 0) {
-                settingsInput("Vault Path", text: $vaultPath, key: "obsidianVaultPath")
+                settingsRow("Vault") {
+                    HStack(spacing: 10) {
+                        Text(vaultName.isEmpty ? "Not Selected" : vaultName)
+                            .font(QSFont.mono(size: 13))
+                            .foregroundStyle(QSColor.onSurfaceMuted)
+                            .lineLimit(1)
+
+                        Button(vaultName.isEmpty ? "Choose" : "Change") {
+                            showVaultPicker = true
+                        }
+                        .font(QSFont.sansMedium(size: 13))
+                        .foregroundStyle(QSColor.tertiary)
+                    }
+                }
                 settingsInput("Attachment Folder", text: $attachmentFolder, key: "obsidianAttachmentFolder")
                 settingsInput("Daily Note Folder", text: $dailyNoteFolder, key: "obsidianDailyNoteFolder")
 
@@ -160,11 +189,28 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Text("Set the full path to your Obsidian vault folder.")
+            obsidianHelpText
+
+            if !vaultName.isEmpty {
+                Button {
+                    ObsidianExporter().clearVault()
+                    vaultName = ""
+                } label: {
+                    Text("FORGET VAULT")
+                        .font(QSFont.sectionHeader)
+                        .tracking(1.5)
+                        .foregroundStyle(.red)
+                }
+                .padding(.leading, 4)
+            }
+        }
+    }
+
+    private var obsidianHelpText: some View {
+        Text("Choose your vault folder once. iOS grants QuillStack access for exports.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
-        }
     }
 
     // MARK: - Storage
@@ -375,5 +421,45 @@ struct SettingsView: View {
         modelContext.insert(tag)
         try? modelContext.save()
         newTagName = ""
+    }
+}
+
+struct VaultFolderPicker: UIViewControllerRepresentable {
+    var onSelect: (URL) -> Void
+    var onCancel: () -> Void
+
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
+        picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = false
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onSelect: onSelect, onCancel: onCancel)
+    }
+
+    final class Coordinator: NSObject, UIDocumentPickerDelegate {
+        private let onSelect: (URL) -> Void
+        private let onCancel: () -> Void
+
+        init(onSelect: @escaping (URL) -> Void, onCancel: @escaping () -> Void) {
+            self.onSelect = onSelect
+            self.onCancel = onCancel
+        }
+
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            guard let url = urls.first else {
+                onCancel()
+                return
+            }
+            onSelect(url)
+        }
+
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+            onCancel()
+        }
     }
 }

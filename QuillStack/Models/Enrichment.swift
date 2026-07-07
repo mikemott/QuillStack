@@ -98,4 +98,17 @@ struct EnrichedCapture: Codable, Sendable {
         self.receipt = receipt
         self.todo = todo
     }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decode(String.self, forKey: .title)
+        summary = try container.decode(String.self, forKey: .summary)
+        text = try container.decode(String.self, forKey: .text)
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+        aiTags = try container.decodeIfPresent([String].self, forKey: .aiTags) ?? []
+        contact = try container.decodeIfPresent(ContactExtraction.self, forKey: .contact)
+        event = try container.decodeIfPresent(EventExtraction.self, forKey: .event)
+        receipt = try container.decodeIfPresent(ReceiptExtraction.self, forKey: .receipt)
+        todo = try container.decodeIfPresent(TodoExtraction.self, forKey: .todo)
+    }
 }

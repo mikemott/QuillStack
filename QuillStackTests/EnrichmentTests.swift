@@ -84,13 +84,9 @@ struct EnrichedCaptureTests {
             "tags": ["Receipt"]
         }
         """
-        // EnrichedCapture requires aiTags in its Codable — this should fail
-        // but we need to verify the app handles it gracefully
-        let result = try? JSONDecoder().decode(EnrichedCapture.self, from: Data(json.utf8))
-        // If this fails, we need a custom decoder with decodeIfPresent
-        if let result {
-            #expect(result.aiTags.isEmpty)
-        }
+        let result = try JSONDecoder().decode(EnrichedCapture.self, from: Data(json.utf8))
+        #expect(result.aiTags.isEmpty)
+        #expect(result.tags == ["Receipt"])
     }
 
     // MARK: - Contact extraction edge cases
