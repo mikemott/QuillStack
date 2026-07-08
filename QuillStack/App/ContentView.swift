@@ -226,17 +226,17 @@ struct ContentView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Text("Point your phone\nat something.")
+                Text("Your captures\nlive here.")
                     .font(.system(size: 28, weight: .black))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(QSColor.onSurface)
 
-                Text("Something happens.")
+                Text("Snap your first one.")
                     .font(.system(size: 28, weight: .black))
                     .foregroundStyle(QSColor.onSurfaceVariant)
             }
 
-            Text("Receipts, flyers, notes, business cards —\nQuillStack reads it, tags it, does something with it.")
+            Text("Receipts, flyers, notes, business cards —\nQuillStack reads them, suggests tags, and surfaces quick actions.")
                 .font(QSFont.sans(size: 15))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(QSColor.onSurfaceMuted)
