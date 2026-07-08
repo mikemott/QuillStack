@@ -1,0 +1,300 @@
+/* QuillStack — site styles. Mirrors the app's STYLE_GUIDE.md:
+   dark, utilitarian, monochrome chrome, color reserved for tags. */
+
+:root {
+  /* Surfaces (tonal stepping) */
+  --base: #0E0E0E;
+  --container-low: #131313;
+  --container: #1A1919;
+  --container-high: #222222;
+  --container-highest: #262626;
+  --bright: #393939;
+
+  /* Primary */
+  --primary: #E0E0E0;
+  --on-primary-dark: #0E0E0E;
+
+  /* Text hierarchy — never pure #FFF for body (OLED haloing) */
+  --on-surface: #E5E2E1;
+  --on-surface-variant: #ADAAAA;
+  --on-surface-muted: #737070;
+
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --maxw: 860px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--on-surface-variant);
+  background: var(--base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--on-surface); text-decoration: none; }
+a:hover { color: var(--primary); }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--container-low);
+  border-bottom: 1px solid var(--container);
+}
+.site-header .inner {
+  max-width: none;          /* full-width bar: logo hugs the top-left corner */
+  margin: 0;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 24%;
+  /* brighter edge ring + soft glow so the mark stands out against the dark bar */
+  box-shadow:
+    0 0 0 1px rgba(229, 226, 225, 0.22),
+    0 0 24px rgba(224, 224, 224, 0.12);
+  flex-shrink: 0;
+}
+.wordmark {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.42em;
+  color: var(--primary);
+  text-shadow: 0 0 20px rgba(224, 224, 224, 0.20), 0 0 50px rgba(224, 224, 224, 0.08);
+  white-space: nowrap;
+}
+.site-nav {
+  display: flex;
+  gap: 22px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.site-nav a { color: var(--on-surface-muted); }
+.site-nav a:hover { color: var(--primary); }
+
+/* ---------- Layout ---------- */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--on-surface-muted);
+  margin-bottom: 14px;
+}
+
+/* ---------- Hero ---------- */
+.hero { padding: 96px 0 72px; text-align: center; }
+.hero h1 {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin-bottom: 20px;
+}
+.hero h1 strong { font-weight: 600; color: var(--primary); }
+.hero p.lede {
+  font-size: 1.15rem;
+  max-width: 30em;
+  margin: 0 auto 32px;
+  color: var(--on-surface-variant);
+}
+
+/* ---------- Tag chips (the only color) ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 0;               /* sharp rectangles */
+  line-height: 1;
+}
+
+/* ---------- App-icon tile ---------- */
+.app-icon {
+  display: block;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 28px;
+  border-radius: 22%;              /* iOS squircle-ish */
+  /* faint ring separates the near-black icon bg from the page; soft glow to lift it */
+  box-shadow:
+    0 0 0 1px rgba(229, 226, 225, 0.08),
+    0 10px 34px rgba(0, 0, 0, 0.6),
+    0 0 44px rgba(224, 224, 224, 0.05);
+}
+
+/* ---------- Capture-button motif ---------- */
+.capture-dot {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(224,224,224,0.25), 0 0 30px rgba(224,224,224,0.08);
+}
+.capture-dot svg { width: 24px; height: 24px; fill: var(--on-primary-dark); }
+
+/* ---------- Features ---------- */
+.features { padding: 40px 0 72px; }
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--container);        /* hairline gutters via gap */
+  border: 1px solid var(--container);
+}
+.feature {
+  background: var(--base);
+  padding: 24px 22px;
+}
+.feature h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--on-surface);
+  margin-bottom: 8px;
+}
+.feature p { font-size: 0.92rem; color: var(--on-surface-variant); }
+
+/* ---------- Content pages (privacy / terms) ---------- */
+.doc { padding: 56px 0 80px; }
+.doc h1 {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin-bottom: 6px;
+}
+.doc .updated {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-muted);
+  margin-bottom: 40px;
+}
+.doc h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--on-surface);
+  margin: 40px 0 14px;
+}
+.doc h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--on-surface);
+  margin: 26px 0 10px;
+}
+.doc p, .doc li { color: var(--on-surface-variant); }
+.doc p { margin-bottom: 14px; }
+.doc ul { margin: 0 0 16px 22px; }
+.doc li { margin-bottom: 7px; }
+.doc strong { color: var(--on-surface); font-weight: 600; }
+.doc a { text-decoration: underline; text-underline-offset: 2px; }
+.doc hr { border: none; border-top: 1px solid var(--container-high); margin: 36px 0; }
+
+.doc .callout {
+  background: var(--container);
+  border-left: 2px solid var(--bright);
+  padding: 16px 18px;
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+}
+
+/* Tables */
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 24px;
+  font-size: 0.86rem;
+  display: block;
+  overflow-x: auto;
+}
+.doc th, .doc td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--container-high);
+  vertical-align: top;
+}
+.doc th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-surface-muted);
+  font-weight: 400;
+  white-space: nowrap;
+}
+.doc td { color: var(--on-surface-variant); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--container);
+  background: var(--container-low);
+  padding: 32px 0;
+}
+.site-footer .inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.site-footer .foot-links {
+  display: flex;
+  gap: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.site-footer .foot-links a { color: var(--on-surface-muted); }
+.site-footer .foot-links a:hover { color: var(--primary); }
+.site-footer .copy {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--on-surface-muted);
+}
+
+@media (max-width: 560px) {
+  .site-header .inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .hero { padding: 64px 0 48px; }
+}

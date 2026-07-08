@@ -1,86 +1,87 @@
-# QuillStack - App Store Metadata
+# QuillStack — App Store Metadata
 
 ## App Name
-**QuillStack** (10 characters - max 30)
+**QuillStack** (10 characters — max 30)
 
 ## Subtitle
-**Handwriting to Digital Notes** (27 characters - max 30)
+**Fast capture for real life** (26 characters — max 30)
 
 ---
 
 ## Description (4000 character limit)
 
-Transform your handwritten notes into organized, searchable digital content with QuillStack.
+The receipts, tickets, and business cards piling up in your camera roll finally have a home. QuillStack is a fast image-capture app for the paper trail of real life — snap it now, sort it later.
 
-**CAPTURE WITH PRECISION**
-Point your camera at any handwritten note and QuillStack instantly converts it to editable text using advanced OCR technology. Our three-pronged accuracy system combines Apple's latest Vision framework with intelligent spell correction and word-level confidence tracking.
+**ONE-TAP CAPTURE**
+Open the app, hit the shutter, done. The document scanner auto-crops and corrects perspective. Multi-page captures stack into a single item. No form to fill in before you can put your phone away.
 
-**SMART CLASSIFICATION**
-Simply write a hashtag trigger like #todo# or #email# on your note, and QuillStack automatically organizes it:
+**ON-DEVICE TEXT RECOGNITION**
+Every capture is read with Apple's on-device Vision framework, so you can search your entire timeline by content — not just by date. Find "that Delta ticket from March" in one query. Your images are never uploaded for text recognition.
 
-• Todo lists with checkable tasks and progress tracking
-• Email drafts with parsed To/Subject fields and one-tap sending
-• Meeting notes with attendees, agendas, and action items
-• Claude prompts ready to export as GitHub Issues
+**ON-DEVICE ENRICHMENT**
+A model running on your device reads each capture and pulls out the parts you actually need: a title, suggested tags, and quick actions like "add to reminders," "save contact," or "add to calendar." Nothing about enrichment leaves your device.
 
-**CONFIDENCE HIGHLIGHTING**
-Not sure if a word was recognized correctly? Low-confidence words are underlined so you can tap to see alternatives or make corrections. QuillStack learns from your corrections and improves over time.
+**TAG-BASED, NOT FOLDER-BASED**
+Ten curated tags — Receipt, Event, Work, Contact, Food, To-Do, Project, Ticket, Reference, Quote — cover the shape of everyday paper. Add your own sparingly. No nested folders to reorganize every six months.
 
-**AI-POWERED ENHANCEMENT**
-Connect your Claude API key to clean up OCR text, fix remaining errors, and improve formatting—all while preserving your original intent. Works offline too; requests queue up and sync when you're back online.
+**QUICK ACTIONS**
+Turn a business card into a saved contact, an event flyer into a calendar entry, a to-do list into Reminders items. The actions surface only when the capture actually contains the right information.
 
-**DEVELOPER WORKFLOW**
-Write feature ideas on paper, then export them as structured GitHub Issues. Perfect for Claude Code workflows and capturing ideas when you're away from your keyboard.
+**OBSIDIAN EXPORT**
+Point QuillStack at your Obsidian vault path. Captures export as markdown with images attached and optional recognized text, ready to link from your daily note. Your archive stays portable — plain files, plain folders.
 
-**SEAMLESS INTEGRATION**
-• Export to Apple Notes, Obsidian, or Notion
-• Create calendar events from meeting notes
-• Send todos to the Reminders app
-• Share via PDF or plain text
+**ICLOUD SYNC**
+Sign in to iCloud and your captures and tags sync across your iPhone and iPad automatically via CloudKit. Reinstall the app, sign in, and your timeline comes back.
 
-**YOUR DATA, YOUR CONTROL**
-QuillStack stores everything locally on your device with optional iCloud sync. Bring your own API keys—we never see your data.
+**YOUR DATA STAYS ON YOUR DEVICE**
+Captured images, recognized text, enrichment output, and tags are processed and stored on your device (and, optionally, in your own iCloud). Your content never leaves your device unless you choose to sync via iCloud or export to Obsidian. The only data the app sends off-device is anonymous crash diagnostics via Sentry — never your images, text, or notes. Full detail: quillstack.io/privacy.html.
+
+**BUILT FOR IOS 26**
+Native SwiftUI, SwiftData persistence, minimum iOS 26.
 
 **FEATURES**
-✓ Advanced OCR with confidence scoring
-✓ Automatic note classification
-✓ AI text enhancement (Claude API)
-✓ GitHub Issues integration
-✓ Export to Notes, Obsidian, Notion
-✓ Calendar and Reminders sync
-✓ Handwriting learning system
-✓ Offline support with queue
-✓ Multi-page document capture
-✓ Full-text search across all notes
+✓ Document-scanner capture with auto-crop
+✓ Multi-page stacks
+✓ On-device text recognition (Apple Vision) for full-text search
+✓ On-device enrichment: titles, tags, quick actions
+✓ 10 curated default tags plus your own
+✓ Location tagging (optional, on-device only)
+✓ Save Contact, Add to Calendar, Add to Reminders quick actions
+✓ Obsidian markdown export with attachments
+✓ iCloud sync via CloudKit
+✓ Dark, minimal UI
 
-Download QuillStack and bridge the gap between analog writing and digital productivity.
+Fast capture for real life. Download QuillStack.
 
 ---
 
-## Promotional Text (170 character limit - can be updated without review)
+## Promotional Text (170 character limit — can be updated without review)
 
-Capture handwritten notes with your camera. Smart OCR converts them to searchable text, auto-classifies by type, and exports anywhere. Your handwriting, digitized.
+Snap the receipts, tickets, and notes piling up in real life. QuillStack captures, tags, and searches them on-device — then exports to Obsidian when you want them for keeps.
 
 ---
 
 ## Keywords (100 character limit, comma-separated)
 
-handwriting,ocr,notes,scan,text recognition,todo,meeting notes,handwritten,camera,productivity
+receipt scanner,notes,capture,tag,obsidian,ocr,document,camera,archive,paper
 
 ---
 
-## What's New (Version 1.0)
+## What's New (Version 2.0.0)
 
-Initial release of QuillStack!
+QuillStack is a fast image-capture app for the paper trail of real life.
 
-• Capture handwritten notes with your camera
-• Advanced OCR with word-level confidence tracking
-• Smart note classification (Todo, Email, Meeting, Prompt)
-• AI-powered text enhancement with Claude
-• Export to GitHub Issues, Obsidian, Notion, Apple Notes
-• Calendar and Reminders integration
-• Handwriting learning that improves over time
-• Full offline support
+• One-tap document scanner with auto-crop and multi-page stacks
+• On-device text recognition (Apple Vision) for full-text search across your timeline
+• On-device enrichment suggests titles, tags, and quick actions
+• Ten curated default tags — no folders to reorganize
+• Save Contact, Add to Calendar, Add to Reminders quick actions
+• Obsidian markdown export with attachments
+• iCloud sync via CloudKit
+• Optional location tagging (on-device only)
+• Dark, minimal UI — monochrome chrome, colorful tags
+
+Note: the app's marketing version is 2.0.0 to reflect a full rewrite from an earlier codebase; this is the first release on this App Store record.
 
 ---
 
@@ -114,29 +115,53 @@ https://quillstack.io/privacy.html
 - Simulated Gambling: None
 - Horror/Fear Themes: None
 - Medical/Treatment Information: None
-- Unrestricted Web Access: No (only API calls to user-configured endpoints)
+- Unrestricted Web Access: No
 - Gambling and Contests: None
 
 **Expected Rating:** 4+ (All Ages)
 
 ---
 
-## App Privacy (Data Collection)
+## App Privacy — App Store Connect Nutrition Label
 
-### Data Collected
-QuillStack may collect limited diagnostics through Sentry, including crash reports, performance traces, app hang diagnostics, app version, device/OS information, and non-content breadcrumbs used to debug stability issues.
+Declare the following in App Store Connect. These MUST match `AppStore/privacy-policy.md`.
 
-Captured notes, images, OCR text, contacts, events, receipts, reminders, and location names are not intentionally sent as app content.
+### Data Collected — Linked to User: NO — Used for Tracking: NO
 
-### Data Linked to You
-Diagnostics may be associated with Sentry-generated installation/session identifiers for crash grouping and troubleshooting.
+The only data transmitted off the device is anonymous diagnostics.
 
-### Data Used to Track You
-None
+| Data Type | Purpose | Source |
+|-----------|---------|--------|
+| Crash Data | App Functionality | Sent to Sentry |
+| Performance Data | App Functionality | Sent to Sentry |
 
-**Privacy Nutrition Label:**
-- Diagnostics: Crash Data and Performance Data
-- Not used for tracking
-- User content not collected by QuillStack
+### Data NOT Collected
 
-Note: If users configure optional third-party integrations, data is sent directly to those services under their respective privacy policies.
+Photos or Videos (captured images), User Content (recognized text, tags, notes), Coarse Location (on-device only, never transmitted), Contact Info, Health & Fitness, Financial Info, Contacts, Search History, Browsing History, Identifiers, Purchase History, Usage Data, Sensitive Info, Other Data.
+
+> Text recognition and enrichment run entirely on-device, so captured images and recognized text are never transmitted and are not "collected" under Apple's definition.
+
+### Third-Party SDKs Disclosed
+
+- **Sentry** — https://sentry.io/privacy/
+
+---
+
+## Reviewer Notes (for App Review submission)
+
+Use App Store Connect → App Information → Review Notes.
+
+> QuillStack captures images (receipts, tickets, notes). Text recognition runs entirely on-device using Apple's Vision framework, and an on-device model suggests tags and quick actions — no image or recognized text is uploaded to any server. No account is required; sign-in is optional via iCloud. There are no in-app purchases. Sentry is used only for anonymous crash and performance reporting — no screenshots or capture content is attached.
+>
+> Test flow: Launch → tap capture → scan any document (a receipt is a good test) → hold to save → view the timeline → tap a capture → see enrichment (title, tags, quick actions). Obsidian export requires a vault path in Settings; iCloud sync requires the reviewer's iCloud account to be signed in on the test device.
+
+---
+
+## Version + Build Checklist Before Upload
+
+- [ ] `project.yml` → `MARKETING_VERSION` is `2.0.0` (matches "What's New")
+- [ ] `project.yml` → `CURRENT_PROJECT_VERSION` bumped from the last uploaded build
+- [ ] `Secrets.xcconfig` populated on the archiving machine (`SENTRY_DSN`) — no OCR API key is needed; text recognition is on-device
+- [ ] `xcodegen generate` run after any `project.yml` change
+- [ ] Archive built with Release config, tested on a real device once (not just simulator)
+- [ ] Screenshots regenerated per `AppStore/screenshots.md`

@@ -1,136 +1,115 @@
 # Privacy Policy for QuillStack
 
-**Last Updated:** December 31, 2024
+**Last Updated:** July 8, 2026
 
 ## Overview
 
-QuillStack ("the App") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our iOS application.
+QuillStack ("the App") is a fast image-capture tool for receipts, tickets, posters, and notes. This Privacy Policy explains what data the app handles, where it goes, and what stays on your device.
 
-**The short version:** QuillStack does not collect, store, or transmit your captured notes, images, OCR text, tags, contacts, events, receipts, or reminders to QuillStack servers. Your capture content remains on your device or in your personal iCloud account. If crash reporting is enabled in the App Store build, limited diagnostic telemetry may be sent to Sentry to help identify crashes and performance problems.
-
----
-
-## Information We Do NOT Collect
-
-QuillStack does not collect:
-- Personal identification information
-- Advertising identifiers
-- Location data for advertising or tracking
-- Any content from your notes
-
-QuillStack may collect limited diagnostic information:
-- Crash reports
-- Performance and app hang diagnostics
-- Basic device and operating system information needed to diagnose crashes
-- Non-content app breadcrumbs such as capture count, OCR status, selected tag names, and action type
-
-Diagnostic telemetry is used only to improve app stability and performance. It is not used for advertising or cross-app tracking.
+**Short version:** Everything you capture — images, recognized text, tags, and enrichment — is processed and stored entirely on your device. Your content never leaves your device unless you choose to sync it to your personal iCloud or export it to Obsidian. The only data the app sends off-device is anonymous crash diagnostics, which never include your images, text, or notes.
 
 ---
 
-## Data Storage
+## What Stays on Your Device
 
-### Local Storage
-All notes, images, and settings are stored locally on your device using:
-- SwiftData for structured note content
-- Local file storage for captured images
-- UserDefaults for settings
+Your captures and everything derived from them are created, processed, and stored locally:
 
-### iCloud Sync (Optional)
-If you enable iCloud sync on your device, your QuillStack data may sync across your Apple devices through your personal iCloud account. This sync is handled entirely by Apple's CloudKit framework, and we have no access to your iCloud data.
+- **Text recognition (OCR)** runs on-device using Apple's Vision framework. Captured images are **never uploaded** for text extraction.
+- **Enrichment** — titles, suggested tags, and quick actions — is produced by a model running on your device. Nothing about enrichment leaves your phone.
+- **SwiftData** (Apple's on-device database) stores captures, tags, and relationships.
+- **Local file storage** holds original images and thumbnails.
+- **UserDefaults** holds non-sensitive preferences (Obsidian vault path, toggles); the **iOS Keychain** holds any API keys you enter.
+
+We do not operate any server that stores — or ever receives — your notes or images.
 
 ---
 
-## Third-Party Services
+## What Can Leave Your Device — and Only If You Choose
 
-QuillStack uses the following third-party services:
+There are exactly three ways any data leaves your device. The first two are entirely your choice and move only the data you direct; the third is limited, anonymous diagnostics that never contain your content.
 
-### Sentry
-- **Purpose:** Crash reporting, performance monitoring, failed-request diagnostics, and app hang diagnostics
-- **Data sent:** Technical diagnostics such as crash stack traces, app version, device/OS information, performance traces, and non-content breadcrumbs
-- **Data not intentionally sent:** Captured images, OCR text, contact details, receipt contents, and note content
+- **iCloud sync (optional, off unless you enable it):** your captures and tags sync across your Apple devices through **your own** iCloud account via CloudKit. Apple manages this end-to-end; we have no access to your iCloud data. Turn it off in iOS Settings → Apple ID → iCloud → QuillStack.
+- **Obsidian export (optional, only when you configure a vault):** selected captures are written as local markdown files (with images attached, and optional recognized text) to a folder path you specify. Nothing is sent over the network.
+- **Anonymous crash diagnostics (Sentry):** if the app crashes or errors, a diagnostic report is sent so we can fix the bug. It contains no images, no recognized text, and no notes — see below.
+
+---
+
+## Crash Diagnostics (Sentry)
+
+- **What it does:** reports crashes, errors, and performance samples so we can fix bugs.
+- **Data sent:** stack traces, device model, OS version, app version, breadcrumbs (in-app navigation events such as capture count, tag names, and action type), and non-sensitive diagnostic context. **Your captured images, recognized text, tags, and notes are never sent. Screenshots are not attached.**
+- **Identifier:** a random Sentry-generated installation ID that we cannot link to your Apple ID or name.
 - **Their privacy policy:** https://sentry.io/privacy/
+- **How to turn it off:** see "Your Rights" below.
 
-QuillStack also allows you to optionally connect to third-party services. When you choose to use these integrations, your data is sent directly from your device to these services:
+---
 
-### Claude API (Anthropic)
-- **Purpose:** AI-powered text enhancement and prompt refinement
-- **Data sent:** Note text content you choose to enhance
-- **Your control:** You provide your own API key; we never see it
-- **Their privacy policy:** https://www.anthropic.com/privacy
+## App Store Privacy Nutrition Label
 
-### GitHub API
-- **Purpose:** Creating issues from Claude prompt notes
-- **Data sent:** Note content when you export to GitHub
-- **Your control:** You authenticate with your own GitHub account
-- **Their privacy policy:** https://docs.github.com/en/site-policy/privacy-policies
+The only data collected (i.e., transmitted off your device) is anonymous diagnostics. We declare it in App Store Connect as:
 
-### Notion API
-- **Purpose:** Exporting notes to Notion
-- **Data sent:** Note content when you choose to export
-- **Your control:** You provide your own integration token
-- **Their privacy policy:** https://www.notion.so/privacy
+| Data Type | Collected? | Purpose | Linked to You? | Used to Track? |
+|-----------|------------|---------|----------------|----------------|
+| Crash Data | Yes, via Sentry | App Functionality (diagnostics) | No | No |
+| Performance Data | Yes, via Sentry | App Functionality (diagnostics) | No | No |
 
-### Obsidian
-- **Purpose:** Exporting notes to Obsidian vault
-- **Data sent:** None transmitted over network; files saved locally
-- **Your control:** You choose the vault folder through the iOS document picker
+**Not collected** — stays on your device (and, if you enable it, your iCloud): captured images and videos, recognized text (OCR), tags and notes (User Content), coarse location, contacts, identifiers, search and browsing history, purchase history, financial info, health & fitness, and sensitive info.
 
 ---
 
 ## Device Permissions
 
-QuillStack requests the following permissions:
+These permissions are used entirely on your device; granting them does not send data to us.
 
 | Permission | Purpose | When Asked |
 |------------|---------|------------|
-| Camera | Capture photos of handwritten notes | First camera use |
-| Calendar | Create events from meeting notes | First calendar export |
-| Reminders | Export todo items to Reminders app | First reminder export |
+| Camera | Capture photos of documents, receipts, and notes | First camera use |
+| Location (While Using) | Optionally tag captures with location — stored on-device, never transmitted | When you enable location tagging in Settings |
+| Contacts (Full Access) | Save contacts extracted from business cards | First "Save Contact" action |
+| Calendars (Full Access) | Create calendar events from captured event details | First "Add to Calendar" action |
+| Reminders (Full Access) | Create reminders from captured to-do lists | First "Add to Reminders" action |
 
-You can revoke any permission at any time through iOS Settings.
+You can revoke any permission at any time in iOS Settings → QuillStack.
 
 ---
 
 ## Data Security
 
-- QuillStack does not currently store third-party API keys
-- SwiftData and local app storage are protected by iOS app sandboxing and device security
-- No data is transmitted to our servers
-- Diagnostic telemetry and third-party service requests use HTTPS encryption
+- API keys entered in the app are stored in the iOS Keychain with hardware-backed encryption.
+- The SwiftData store uses iOS file protection.
+- Crash diagnostics are sent to Sentry over HTTPS. Arbitrary loads are disabled (`NSAllowsArbitraryLoads = false`).
+- We do not operate a server that ingests your notes or images.
 
 ---
 
 ## Children's Privacy
 
-QuillStack does not knowingly collect information from children under 13. The app does not contain ads, in-app purchases, or social features that would require age-gated content.
-
----
-
-## Changes to This Policy
-
-We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the "Last Updated" date.
-
----
-
-## Contact Us
-
-If you have questions about this Privacy Policy, please contact us at:
-
-**Email:** [your-email@example.com]
-**GitHub:** https://github.com/[your-username]/quillstack/issues
+QuillStack is rated 4+ and does not knowingly collect information from children. The app contains no ads, no in-app purchases, no social features, and no age-gated content.
 
 ---
 
 ## Your Rights
 
-Depending on your jurisdiction, you may have rights regarding your personal data. Since QuillStack does not collect personal data, these rights are automatically satisfied:
+Because QuillStack processes your data on your device and does not operate a server that stores it:
 
-- **Right to Access:** All your data is already on your device
-- **Right to Deletion:** Delete the app to remove all local data
-- **Right to Portability:** Export your notes using the built-in export features
-- **Right to Opt-Out:** No data collection means nothing to opt out of
+- **Access:** your data is on your device (and, optionally, your iCloud).
+- **Deletion:** deleting the app removes local data. iCloud data can be removed via iOS Settings → Apple ID → iCloud → Manage Storage → QuillStack. To request deletion of any Sentry-side crash reports tied to your installation ID, email us.
+- **Portability:** use the Obsidian export to write your notes to markdown files you own.
+- **Opt-out of diagnostics:** Sentry honors your iOS system-level setting at *Settings → Privacy & Security → Analytics & Improvements → Share with App Developers*. Turning it off stops non-crash telemetry from being sent. To also block crash reports, revoke network access to the app via iOS Screen Time or a network profile.
 
 ---
 
-*This privacy policy is provided for informational purposes. QuillStack is designed with privacy as a core principle—your notes are yours alone.*
+## Changes to This Policy
+
+Material changes will be reflected in this document and dated in the "Last Updated" line. If you continue to use the app after a change, you accept the updated policy.
+
+---
+
+## Contact
+
+**Email:** mike@mottvt.com
+**Issues:** https://github.com/mikemott/QuillStack/issues
+
+---
+
+*QuillStack is designed to keep your paper trail yours. If something in this policy is unclear, email us.*
