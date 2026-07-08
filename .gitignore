@@ -68,6 +68,18 @@ secrets.json
 *.key
 Secrets.xcconfig
 
+# Local scratch — test images at repo root and legacy docs
+/IMG_*.jpeg
+/IMG_*.jpg
+/IMG_*.PNG
+/IMG_*.png
+/*.md.old
+
+# Tool-generated caches
+.codegraph/
+.cursor/
+.wrangler/
+
 # Archives
 *.ipa
 *.dSYM.zip

@@ -1,160 +1,142 @@
-# QuillStack - Screenshot Requirements
+# QuillStack — Screenshot Guide (v2)
 
-## Required Screenshot Sizes
+## Required Sizes
 
-You need screenshots for these device sizes:
+App Store Connect will render your submission on every device, but you must upload for at least the largest supported iPhone size. Everything else can be auto-scaled.
 
-### iPhone (Required)
-| Device | Resolution | Display Size |
-|--------|------------|--------------|
-| iPhone 16 Pro Max | 1320 x 2868 | 6.9" |
-| iPhone 16 Pro Max (or 15 Pro Max, 14 Pro Max) | 1290 x 2796 | 6.7" |
-| iPhone 8 Plus | 1242 x 2208 | 5.5" |
+### iPhone (required)
+| Device | Points | Pixels @ 3x |
+|--------|--------|-------------|
+| iPhone 17 Pro Max (6.9") | 440 × 956 | 1320 × 2868 |
+| iPhone 16 Pro Max (6.7") | 430 × 932 | 1290 × 2796 |
+| iPhone 8 Plus / older (5.5") | 414 × 736 | 1242 × 2208 (only if you support the size) |
 
-### iPad (Required if app supports iPad)
-| Device | Resolution |
-|--------|------------|
-| iPad Pro 13" | 2064 x 2752 |
-| iPad Pro 12.9" | 2048 x 2732 |
+### iPad (required only if you list iPad support)
+QuillStack is iPhone-first with portrait-only orientation on iPhone (Info.plist:62). If you don't ship iPad support, remove iPad from App Store Connect — don't submit stretched iPhone shots.
 
-**Tip:** Take 6.7" iPhone screenshots, then scale for other sizes. App Store Connect can auto-generate some sizes.
+Recommendation: **submit 6.9" only** and let Apple scale. Fewer shots to keep in sync when the UI shifts.
 
 ---
 
-## Recommended Screenshots (6-10 per device)
+## Shot List (target: 6 shots)
 
-### Screenshot 1: Hero/Note List
-**Caption:** "Your handwritten notes, digitized"
-- Show the main NoteListView with the QuillStack logo header
-- Display 3-4 sample notes with different types (Todo, Meeting, Email, Prompt)
-- Show the confidence bar on note cards
+Each shot has an on-device screen to capture, plus an optional caption overlay you add in Figma/Canva. Captions are your primary sales copy — a user scans them before reading anything.
 
-### Screenshot 2: Camera Capture
-**Caption:** "Point, capture, convert"
-- Show the camera view with a handwritten note in frame
-- Flash toggle and capture button visible
-- Perhaps show template overlay options
+### 1. Timeline — Card Pager
+**Screen:** `ContentView` (default state, cards visible)
+**Caption:** *Fast capture for real life*
+**Setup:**
+- 4–6 captures in the timeline
+- Mixed tags: at least one Receipt, one Event, one Contact
+- Search bar hidden, layout toggle set to card pager (not drawer)
+- Show the header "QUILLSTACK" glow prominently
 
-### Screenshot 3: OCR Confidence
-**Caption:** "Smart confidence highlighting"
-- Show a note detail view with some words underlined (low confidence)
-- Maybe show the word alternatives popup
-- Emphasize the accuracy feedback
+### 2. Capture Flow — Tag Picker
+**Screen:** `CaptureFlowView` in `showTagPicker = true` state
+**Caption:** *Snap it. Tag it. Done.*
+**Setup:**
+- A crisp document scan visible behind the sheet (a receipt reads best)
+- 2–3 tags pre-selected so the "N tagged" affordance is visible
+- Focus a colorful tag (Receipt, Event) so the color story pops against the monochrome UI
 
-### Screenshot 4: Todo List
-**Caption:** "Checkable tasks from handwriting"
-- Show TodoDetailView with several tasks
-- Mix of completed and pending items
-- Show progress indicator
+### 3. Detail View — Enrichment
+**Screen:** `CaptureDetailView` with enrichment populated
+**Caption:** *Titles, tags, and actions — automatic*
+**Setup:**
+- A receipt capture with `extractedTitle`, tags, and a Receipt quick-action visible
+- OCR text expanded or hinted at
+- Location line if it fits
 
-### Screenshot 5: AI Enhancement
-**Caption:** "AI-powered text cleanup"
-- Show before/after of enhanced text
-- Or show the Enhance button in action
-- Claude integration visible
+### 4. Timeline — Drawer Mode
+**Screen:** `ContentView` with `isDrawerMode = true`
+**Caption:** *A grid when you want it, cards when you don't*
+**Setup:**
+- Same captures as shot #1 but grouped by date (headers visible)
+- 2+ date sections so the date header shows real content
+- Long-press one card if you want to highlight actions
 
-### Screenshot 6: Export Options
-**Caption:** "Export anywhere"
-- Show the export sheet with destinations
-- GitHub, Obsidian, Notion, Apple Notes icons
-- Emphasize flexibility
+### 5. Quick Action — Contact / Calendar / Receipt / Reminder
+**Screen:** Pick one action sheet — `ContactActionView`, `EventActionView`, `ReceiptPreviewSheet`, or `TodoActionView`
+**Caption:** *Turn a business card into a contact. Instantly.*
+**Setup:**
+- Capture visible behind the sheet
+- Sheet expanded with parsed fields (name, phone, org for Contact)
+- The primary action button ("Save Contact") in the highlight color
 
-### Screenshot 7: Meeting Notes (Optional)
-**Caption:** "Meeting notes with structure"
-- Show MeetingDetailView
-- Attendees, agenda, action items
-- Calendar integration button
-
-### Screenshot 8: Search (Optional)
-**Caption:** "Find any note instantly"
-- Show search view with results
-- Filter options visible
-- Full-text search in action
-
----
-
-## Screenshot Tips
-
-1. **Use real content** - Create sample notes that look authentic but don't contain personal info
-
-2. **Clean status bar** - Take screenshots at 9:41 AM with full battery (Apple's preferred time)
-
-3. **Consistent style** - Same background color, similar content density across all shots
-
-4. **Show key features** - Each screenshot should highlight a different capability
-
-5. **Captions** - Add text overlays that explain the feature (use a tool like Figma or Canva)
+### 6. Settings — Obsidian Export
+**Screen:** `SettingsView` scrolled to the Obsidian section
+**Caption:** *Export to Obsidian when you want it for keeps*
+**Setup:**
+- Vault path field filled with a plausible path (e.g. `/Vaults/Personal`)
+- "Include OCR Text" toggle on
+- iCloud Backup section visible below (bonus: shows the sync story)
 
 ---
 
-## Taking Screenshots
+## Empty State (optional 7th shot, only for App Store 6.9" if you have room)
 
-### On Simulator:
+**Screen:** `ContentView` with no captures — the "Point your phone at something. Something happens." state
+**Caption:** *Start with the very first snap*
+
+This shot is a strong opener if you have space. Users unfamiliar with the app understand what to do immediately.
+
+---
+
+## Content Guidance
+
+**Realism beats polish.** Screenshot fakery gets flagged in review — every screen must be reachable in the actual app. Use real receipts you'd be comfortable showing (redact totals if you like, but don't fabricate).
+
+**Match the dark editorial UI.** The app is dark by design (`preferredColorScheme(.dark)` in `ContentView`). Don't try to shoot in a light appearance — it doesn't exist in the app.
+
+**Use color from tags, nothing else.** The single most on-brand thing you can show is a monochrome timeline with 3 or 4 saturated tag chips. That's the whole design story of v2 in one image.
+
+**Time on the status bar.** Apple's guidance is 9:41 AM, full signal, full battery. Use `xcrun simctl status_bar` to fake it on the Simulator:
+
 ```bash
-# Run in simulator, then:
-# Cmd + S to save screenshot
-xcrun simctl io booted screenshot screenshot.png
+xcrun simctl status_bar booted override \
+  --time "9:41" --dataNetwork wifi \
+  --wifiMode active --wifiBars 3 \
+  --cellularMode active --cellularBars 4 \
+  --batteryState charged --batteryLevel 100
 ```
 
-### On Device:
-- Side button + Volume up (Face ID devices)
-- Side button + Home button (Touch ID devices)
-
-### From Xcode:
-1. Run app on device/simulator
-2. Debug → View Debugging → Take Screenshot
+Reset with `xcrun simctl status_bar booted clear`.
 
 ---
 
-## App Preview Video (Optional but Recommended)
+## Capturing Screens
 
-- 15-30 seconds
-- Show the capture → OCR → organize flow
-- Same resolutions as screenshots
-- No audio required, but can add music/captions
+### Simulator (fastest)
+```bash
+xcrun simctl io booted screenshot ~/Desktop/quillstack-01-timeline.png
+```
+Simulator screenshots come out at the correct pixel density for the device you booted — no post-processing needed.
+
+### On device (real content)
+- Side button + Volume up (Face ID)
+- AirDrop to your Mac, do not iCloud-share (metadata leak)
+
+### From Xcode (for design mocks)
+Debug → View Debugging → Take Screenshot renders at the current window size.
 
 ---
 
-## Sample Note Content for Screenshots
+## App Preview Video (optional, strongly recommended)
 
-### Todo Note:
-```
-#todo#
-Project Tasks
-- Review design mockups
-- Update documentation
-- Fix login bug
-- Send weekly report
-```
+15–30 seconds, no audio required. Suggested flow:
 
-### Meeting Note:
-```
-#meeting#
-Sprint Planning
-Attendees: Sarah, Mike, Alex
-Date: Monday 2pm
+1. Timeline scrolls (2s)
+2. Tap capture button, doc scanner appears (3s)
+3. Snap → tag picker → confirm (5s)
+4. Return to timeline, new card animates in (3s)
+5. Tap card → detail view with enrichment (4s)
+6. Quick action sheet slides up (3s)
+7. Hold on the finished detail view with caption "Fast capture for real life." (5s)
 
-Agenda:
-- Review backlog
-- Assign stories
-- Set sprint goals
-```
+Record on-device via QuickTime → New Movie Recording → source = iPhone. Trim in QuickTime, export at native resolution.
 
-### Email Note:
-```
-#email#
-To: team@company.com
-Subject: Project Update
+---
 
-Hi team,
-Quick update on the project status...
-```
+## Localization
 
-### Claude Prompt Note:
-```
-#claude#
-Add dark mode toggle to settings
-- Should persist preference
-- Use system default option
-- Animate transition
-```
+If you localize the App Store listing in the future, you must re-upload screenshots per locale — captions overlaid in Figma need the translated string baked in. On first submission, English only is fine.
