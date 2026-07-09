@@ -133,7 +133,7 @@ struct CaptureFlowView: View {
                 pageIndex: index,
                 thumbnailData: thumbnailData
             )
-            capture.images.append(captureImage)
+            capture.images = (capture.images ?? []) + [captureImage]
         }
 
         modelContext.insert(capture)
@@ -143,8 +143,8 @@ struct CaptureFlowView: View {
 
     private func finishCapture(_ capture: Capture) {
         capture.tags = selectedTags
-        CrashReporting.captureStarted(pageCount: capture.images.count)
-        CrashReporting.tagsSelected(selectedTags.map(\.name))
+        CrashReporting.captureStarted(pageCount: capture.pageCount)
+        CrashReporting.tagsSelected(count: selectedTags.count)
         try? modelContext.save()
 
         // OCR fires now with tag context
@@ -152,16 +152,11 @@ struct CaptureFlowView: View {
         let tagNames = Set(selectedTags.map(\.name))
         let processor = CaptureProcessor()
         capture.isProcessingOCR = true
-        try? modelContext.save()
+        CaptureReprocessor.save(modelContext)
         Task { @MainActor in
             let result = await processor.process(imageData: imageData, tagNames: tagNames)
-            capture.isProcessingOCR = false
-            if result.success {
-                capture.ocrText = result.ocrText
-                capture.extractedTitle = result.extractedTitle
-                capture.enrichmentJSON = result.enrichmentJSON
-            }
-            try? modelContext.save()
+            CaptureReprocessor.apply(result, to: capture)
+            CaptureReprocessor.save(modelContext)
         }
 
         // Location in background — stay on MainActor for SwiftData access

@@ -3,6 +3,13 @@ import Sentry
 
 enum CrashReporting {
 
+    /// Breadcrumb `data` keys this app is allowed to transmit. Everything else —
+    /// including SDK-generated keys carrying view names or paths — is stripped
+    /// before leaving the device. No key here may hold user content.
+    private static let allowedBreadcrumbKeys: Set<String> = [
+        "pageCount", "tagCount", "engine", "charCount", "code", "type", "stage"
+    ]
+
     static func start() {
         guard let dsn = Bundle.main.object(forInfoDictionaryKey: "SENTRY_DSN") as? String,
               !dsn.isEmpty,
@@ -14,18 +21,39 @@ enum CrashReporting {
             options.dsn = dsn
             options.enableAutoSessionTracking = true
             options.enableAppHangTracking = true
-            options.enableCaptureFailedRequests = true
-            options.enableUserInteractionTracing = true
+            // No URLSession in this app, and interaction traces name views —
+            // both are off to keep transmitted data to crashes and performance.
+            options.enableCaptureFailedRequests = false
+            options.enableUserInteractionTracing = false
             options.tracesSampleRate = 0.2
             #if DEBUG
             options.environment = "development"
             #else
             options.environment = "production"
             #endif
+
+            // Client-side IP scrubbing. Sentry's ingest also infers IP server-side;
+            // "Prevent Storing of IP Addresses" must be enabled in the project too.
+            options.beforeSend = { event in
+                event.user?.ipAddress = nil
+                return event
+            }
+
+            // Defense in depth: even if a caller regresses, only allowlisted
+            // scalar keys survive.
+            options.beforeBreadcrumb = { crumb in
+                if let data = crumb.data {
+                    crumb.data = data.filter { allowedBreadcrumbKeys.contains($0.key) }
+                }
+                return crumb
+            }
         }
     }
 
     // MARK: - Breadcrumbs
+    //
+    // These carry counts and stable codes only — never tag names, OCR text,
+    // extracted fields, or raw error strings.
 
     static func captureStarted(pageCount: Int) {
         let crumb = Breadcrumb(level: .info, category: "capture")
@@ -34,10 +62,10 @@ enum CrashReporting {
         SentrySDK.addBreadcrumb(crumb)
     }
 
-    static func tagsSelected(_ tagNames: [String]) {
+    static func tagsSelected(count: Int) {
         let crumb = Breadcrumb(level: .info, category: "capture")
         crumb.message = "Tags selected"
-        crumb.data = ["tags": tagNames]
+        crumb.data = ["tagCount": count]
         SentrySDK.addBreadcrumb(crumb)
     }
 
@@ -48,22 +76,17 @@ enum CrashReporting {
         SentrySDK.addBreadcrumb(crumb)
     }
 
-    static func ocrCompleted(charCount: Int, hasContact: Bool, hasEvent: Bool, hasReceipt: Bool) {
+    static func ocrCompleted(charCount: Int) {
         let crumb = Breadcrumb(level: .info, category: "ocr")
         crumb.message = "OCR completed"
-        crumb.data = [
-            "charCount": charCount,
-            "hasContact": hasContact,
-            "hasEvent": hasEvent,
-            "hasReceipt": hasReceipt
-        ]
+        crumb.data = ["charCount": charCount]
         SentrySDK.addBreadcrumb(crumb)
     }
 
-    static func ocrFailed(error: String) {
+    static func ocrFailed(code: OCRFailureCode) {
         let crumb = Breadcrumb(level: .error, category: "ocr")
         crumb.message = "OCR failed"
-        crumb.data = ["error": error]
+        crumb.data = ["code": code.rawValue]
         SentrySDK.addBreadcrumb(crumb)
     }
 
@@ -72,6 +95,22 @@ enum CrashReporting {
         crumb.message = "Quick action tapped"
         crumb.data = ["type": actionType]
         SentrySDK.addBreadcrumb(crumb)
+    }
+
+    // MARK: - Storage
+
+    /// One container attempt failed but another may still succeed.
+    static func storeLoadFailed(stage: String) {
+        let crumb = Breadcrumb(level: .warning, category: "storage")
+        crumb.message = "ModelContainer attempt failed"
+        crumb.data = ["stage": stage]
+        SentrySDK.addBreadcrumb(crumb)
+    }
+
+    /// Every attempt failed — the app cannot persist. Captured as an event so it
+    /// is reported without waiting for a crash. Carries no user content.
+    static func storeUnavailable() {
+        SentrySDK.capture(message: "Persistent store unavailable")
     }
 
 }

@@ -117,8 +117,8 @@ struct ObsidianExporter {
         }
 
         // Tags
-        if !capture.tags.isEmpty {
-            let tags = capture.tags.map { "#\($0.name.lowercased().replacingOccurrences(of: " ", with: "-"))" }
+        if !(capture.tags ?? []).isEmpty {
+            let tags = (capture.tags ?? []).map { "#\($0.name.lowercased().replacingOccurrences(of: " ", with: "-"))" }
             lines.append(tags.joined(separator: " "))
         }
 

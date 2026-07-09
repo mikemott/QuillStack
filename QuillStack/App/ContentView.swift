@@ -22,7 +22,7 @@ struct ContentView: View {
     private var filteredCaptures: [Capture] {
         var result = captures
         if let tag = selectedTag {
-            result = result.filter { $0.tags.contains(where: { $0.id == tag.id }) }
+            result = result.filter { ($0.tags ?? []).contains(where: { $0.id == tag.id }) }
         }
         if !searchText.isEmpty {
             let query = searchText.lowercased()
@@ -31,7 +31,7 @@ struct ContentView: View {
                 || (capture.ocrText?.lowercased().contains(query) ?? false)
                 || (capture.enrichment?.summary.lowercased().contains(query) ?? false)
                 || (capture.locationName?.lowercased().contains(query) ?? false)
-                || capture.tags.contains(where: { $0.name.lowercased().contains(query) })
+                || (capture.tags ?? []).contains(where: { $0.name.lowercased().contains(query) })
             }
         }
         return result
@@ -226,17 +226,17 @@ struct ContentView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Text("Point your phone\nat something.")
+                Text("Your captures\nlive here.")
                     .font(.system(size: 28, weight: .black))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(QSColor.onSurface)
 
-                Text("Something happens.")
+                Text("Snap your first one.")
                     .font(.system(size: 28, weight: .black))
                     .foregroundStyle(QSColor.onSurfaceVariant)
             }
 
-            Text("Receipts, flyers, notes, business cards —\nQuillStack reads it, tags it, does something with it.")
+            Text("Receipts, flyers, notes, business cards —\nQuillStack reads them, suggests tags, and surfaces quick actions.")
                 .font(QSFont.sans(size: 15))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(QSColor.onSurfaceMuted)
@@ -285,6 +285,8 @@ struct ContentView: View {
                                 handleCardAction(tag)
                             })
                             .padding(.horizontal, 16)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityIdentifier("capture-card")
                             .padding(.vertical, 10)
                             .frame(height: geo.size.height * 0.90)
                         }
@@ -385,9 +387,9 @@ struct ContentView: View {
                     .foregroundStyle(QSColor.onSurfaceMuted)
                 }
 
-                if !capture.tags.isEmpty {
+                if !(capture.tags ?? []).isEmpty {
                     HStack(spacing: 6) {
-                        ForEach(capture.tags.prefix(3)) { tag in
+                        ForEach((capture.tags ?? []).prefix(3)) { tag in
                             TagChip(tag: tag, size: .compact)
                         }
                     }

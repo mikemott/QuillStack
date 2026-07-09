@@ -33,7 +33,7 @@ struct ActionIconStack: View {
 
     var availableActions: [(icon: String, tagName: String, bgColor: Color, fgColor: Color)] {
         var actions: [(String, String, Color, Color)] = []
-        let tagsByName = Dictionary(uniqueKeysWithValues: capture.tags.map { ($0.name, $0) })
+        let tagsByName = Dictionary(uniqueKeysWithValues: (capture.tags ?? []).map { ($0.name, $0) })
         let enrichment = capture.enrichment
 
         if let tag = tagsByName["Contact"], enrichment?.contact != nil {

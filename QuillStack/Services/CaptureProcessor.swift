@@ -2,6 +2,55 @@ import SwiftData
 import Foundation
 import os
 
+/// Stable, content-free identifiers for OCR failure. Safe to transmit and to
+/// persist; never derived from `Error.localizedDescription`, which can embed
+/// file paths or fragments of recognized text.
+enum OCRFailureCode: String, Sendable {
+    case noImages
+    case imageUnreadable
+    case noTextFound
+    case extractionFailed
+    case unexpected
+
+    init(_ error: Error) {
+        guard let visionError = error as? VisionOCRError else {
+            self = .unexpected
+            return
+        }
+        switch visionError {
+        case .imageEncodingFailed: self = .imageUnreadable
+        case .emptyResponse: self = .noTextFound
+        case .extractionFailed: self = .extractionFailed
+        }
+    }
+
+    /// Vision is deterministic for a given image: re-running `.noTextFound` or
+    /// `.imageUnreadable` on the same bytes produces the same result. Offering a
+    /// retry there would be a button that cannot work. Only transient failures —
+    /// an unexpected Vision error, or FoundationModels being briefly unavailable —
+    /// are worth re-running.
+    var isRetryable: Bool {
+        switch self {
+        case .unexpected, .extractionFailed: true
+        case .noImages, .imageUnreadable, .noTextFound: false
+        }
+    }
+
+    /// `.noTextFound` is an outcome, not an error: a photo of something with no
+    /// readable text is a perfectly valid capture.
+    var isError: Bool { self != .noTextFound }
+
+    var userMessage: String {
+        switch self {
+        case .noTextFound: "No text recognized in this image."
+        case .imageUnreadable: "This image couldn't be read. Try capturing it again."
+        case .noImages: "This capture has no image."
+        case .extractionFailed: "On-device processing was unavailable."
+        case .unexpected: "Text recognition didn't finish."
+        }
+    }
+}
+
 actor CaptureProcessor {
     private let visionService = VisionOCRService.shared
     private let enrichmentService = OnDeviceEnrichmentService.shared
@@ -15,21 +64,15 @@ actor CaptureProcessor {
         let ocrText: String
         let extractedTitle: String?
         let enrichmentJSON: Data?
-        let charCount: Int
-        let hasContact: Bool
-        let hasEvent: Bool
-        let hasReceipt: Bool
         let success: Bool
-        let errorDescription: String?
+        let failure: OCRFailureCode?
     }
 
     func process(imageData: [Data], tagNames: Set<String>) async -> ProcessingResult {
         guard !imageData.isEmpty else {
             return ProcessingResult(
                 ocrText: "", extractedTitle: nil, enrichmentJSON: nil,
-                charCount: 0,
-                hasContact: false, hasEvent: false, hasReceipt: false,
-                success: false, errorDescription: "No images"
+                success: false, failure: .noImages
             )
         }
 
@@ -81,23 +124,14 @@ actor CaptureProcessor {
                 )
                 let enrichmentData = try? Self.enrichmentEncoder.encode(enrichment)
 
-                CrashReporting.ocrCompleted(
-                    charCount: description.count,
-                    hasContact: firstContact != nil,
-                    hasEvent: firstEvent != nil,
-                    hasReceipt: firstReceipt != nil
-                )
+                CrashReporting.ocrCompleted(charCount: description.count)
 
                 return ProcessingResult(
                     ocrText: description,
                     extractedTitle: title,
                     enrichmentJSON: enrichmentData,
-                    charCount: description.count,
-                    hasContact: firstContact != nil,
-                    hasEvent: firstEvent != nil,
-                    hasReceipt: firstReceipt != nil,
                     success: true,
-                    errorDescription: nil
+                    failure: nil
                 )
 
             } catch let error as VisionOCRError {
@@ -110,14 +144,14 @@ actor CaptureProcessor {
             }
         }
 
+        // localizedDescription stays in the on-device log; only a stable code leaves.
         logger.error("OCR failed after \(self.maxRetries) attempts: \(lastError?.localizedDescription ?? "unknown")")
-        CrashReporting.ocrFailed(error: lastError?.localizedDescription ?? "unknown")
+        let code = lastError.map(OCRFailureCode.init) ?? .unexpected
+        CrashReporting.ocrFailed(code: code)
 
         return ProcessingResult(
             ocrText: "", extractedTitle: nil, enrichmentJSON: nil,
-            charCount: 0,
-            hasContact: false, hasEvent: false, hasReceipt: false,
-            success: false, errorDescription: lastError?.localizedDescription
+            success: false, failure: code
         )
     }
 }

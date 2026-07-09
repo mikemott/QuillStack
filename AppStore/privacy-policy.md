@@ -6,7 +6,7 @@
 
 QuillStack ("the App") is a fast image-capture tool for receipts, tickets, posters, and notes. This Privacy Policy explains what data the app handles, where it goes, and what stays on your device.
 
-**Short version:** Everything you capture — images, recognized text, tags, and enrichment — is processed and stored entirely on your device. Your content never leaves your device unless you choose to sync it to your personal iCloud or export it to Obsidian. The only data the app sends off-device is anonymous crash diagnostics, which never include your images, text, or notes.
+**Short version:** Everything you capture — images, recognized text, tags, and enrichment — is processed and stored entirely on your device. Your content never leaves your device unless you choose to sync it to your personal iCloud or export it to Obsidian. The only data the app sends off-device is pseudonymous crash diagnostics — tied to a random installation ID, never to you — which never include your images, text, or notes.
 
 ---
 
@@ -18,7 +18,7 @@ Your captures and everything derived from them are created, processed, and store
 - **Enrichment** — titles, suggested tags, and quick actions — is produced by a model running on your device. Nothing about enrichment leaves your phone.
 - **SwiftData** (Apple's on-device database) stores captures, tags, and relationships.
 - **Local file storage** holds original images and thumbnails.
-- **UserDefaults** holds non-sensitive preferences (Obsidian vault path, toggles); the **iOS Keychain** holds any API keys you enter.
+- **UserDefaults** holds non-sensitive preferences (Obsidian vault bookmark, toggles). The app has no API keys to store — OCR and enrichment run entirely on-device.
 
 We do not operate any server that stores — or ever receives — your notes or images.
 
@@ -26,19 +26,19 @@ We do not operate any server that stores — or ever receives — your notes or 
 
 ## What Can Leave Your Device — and Only If You Choose
 
-There are exactly three ways any data leaves your device. The first two are entirely your choice and move only the data you direct; the third is limited, anonymous diagnostics that never contain your content.
+There are exactly three ways any data leaves your device. The first two are entirely your choice and move only the data you direct; the third is limited, pseudonymous diagnostics that never contain your content.
 
 - **iCloud sync (optional, off unless you enable it):** your captures and tags sync across your Apple devices through **your own** iCloud account via CloudKit. Apple manages this end-to-end; we have no access to your iCloud data. Turn it off in iOS Settings → Apple ID → iCloud → QuillStack.
 - **Obsidian export (optional, only when you configure a vault):** selected captures are written as local markdown files (with images attached, and optional recognized text) to a folder path you specify. Nothing is sent over the network.
-- **Anonymous crash diagnostics (Sentry):** if the app crashes or errors, a diagnostic report is sent so we can fix the bug. It contains no images, no recognized text, and no notes — see below.
+- **Pseudonymous crash diagnostics (Sentry):** if the app crashes or errors, a diagnostic report is sent so we can fix the bug. It contains no images, no recognized text, and no notes — see below.
 
 ---
 
 ## Crash Diagnostics (Sentry)
 
 - **What it does:** reports crashes, errors, and performance samples so we can fix bugs.
-- **Data sent:** stack traces, device model, OS version, app version, breadcrumbs (in-app navigation events such as capture count, tag names, and action type), and non-sensitive diagnostic context. **Your captured images, recognized text, tags, and notes are never sent. Screenshots are not attached.**
-- **Identifier:** a random Sentry-generated installation ID that we cannot link to your Apple ID or name.
+- **Data sent:** stack traces, device model, OS version, app version, breadcrumbs (in-app navigation events carrying only counts and fixed codes — page count, number of tags selected, recognized-character count, action type, and an OCR failure code), and non-sensitive diagnostic context. **Your captured images, recognized text, tag names, and notes are never sent. Screenshots are not attached.**
+- **Identifier:** a random Sentry-generated installation ID that we cannot link to your Apple ID or name. Because reports carry this stable ID — and because you can ask us to delete reports tied to it — they are pseudonymous rather than strictly anonymous.
 - **Their privacy policy:** https://sentry.io/privacy/
 - **How to turn it off:** see "Your Rights" below.
 
@@ -46,7 +46,7 @@ There are exactly three ways any data leaves your device. The first two are enti
 
 ## App Store Privacy Nutrition Label
 
-The only data collected (i.e., transmitted off your device) is anonymous diagnostics. We declare it in App Store Connect as:
+The only data collected (i.e., transmitted off your device) is pseudonymous diagnostics. We declare it in App Store Connect as:
 
 | Data Type | Collected? | Purpose | Linked to You? | Used to Track? |
 |-----------|------------|---------|----------------|----------------|
@@ -75,8 +75,7 @@ You can revoke any permission at any time in iOS Settings → QuillStack.
 
 ## Data Security
 
-- API keys entered in the app are stored in the iOS Keychain with hardware-backed encryption.
-- The SwiftData store uses iOS file protection.
+- The SwiftData store uses iOS file protection (`NSFileProtectionCompleteUntilFirstUserAuthentication`, the system default).
 - Crash diagnostics are sent to Sentry over HTTPS. Arbitrary loads are disabled (`NSAllowsArbitraryLoads = false`).
 - We do not operate a server that ingests your notes or images.
 

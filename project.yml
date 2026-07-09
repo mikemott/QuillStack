@@ -10,7 +10,8 @@ settings:
 packages:
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa.git
-    from: 8.0.0
+    # 8.58.0 is the first floor guaranteed to ship Sentry's own PrivacyInfo.xcprivacy.
+    from: 8.58.0
 targets:
   QuillStack:
     type: application

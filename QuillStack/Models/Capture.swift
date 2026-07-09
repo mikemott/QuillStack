@@ -13,11 +13,19 @@ final class Capture {
     var isProcessingOCR: Bool = false
     var enrichmentJSON: Data?
 
+    /// Raw value of `OCRFailureCode` from the last processing attempt.
+    /// nil means OCR succeeded, or has not run. Stable and content-free,
+    /// so it is safe to persist and to sync.
+    var ocrFailureCode: String?
+
+    // CloudKit requires every relationship to be optional: a synced record may
+    // arrive before its inverse exists. nil means "not yet materialized",
+    // [] means "materialized and empty".
     @Relationship(deleteRule: .cascade, inverse: \CaptureImage.capture)
-    var images: [CaptureImage]
+    var images: [CaptureImage]?
 
     @Relationship(inverse: \Tag.captures)
-    var tags: [Tag]
+    var tags: [Tag]?
 
     init() {
         self.createdAt = .now
@@ -27,11 +35,11 @@ final class Capture {
     }
 
     var sortedImages: [CaptureImage] {
-        images.sorted { $0.pageIndex < $1.pageIndex }
+        (images ?? []).sorted { $0.pageIndex < $1.pageIndex }
     }
 
-    var isStack: Bool { images.count > 1 }
-    var pageCount: Int { images.count }
+    var isStack: Bool { pageCount > 1 }
+    var pageCount: Int { images?.count ?? 0 }
 
     var thumbnail: Data? {
         sortedImages.first?.thumbnailData ?? sortedImages.first?.imageData
@@ -42,5 +50,9 @@ final class Capture {
     var enrichment: EnrichedCapture? {
         guard let data = enrichmentJSON else { return nil }
         return try? Capture.enrichmentDecoder.decode(EnrichedCapture.self, from: data)
+    }
+
+    var ocrFailure: OCRFailureCode? {
+        ocrFailureCode.flatMap(OCRFailureCode.init(rawValue:))
     }
 }

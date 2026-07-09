@@ -58,6 +58,15 @@ Thumbs.db
 *.swo
 *~
 
+# Local agent/tooling state
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.codegraph/
+.cursor/
+
+# Cloudflare Wrangler (caches account id)
+.wrangler/
+
 # Sensitive files
 *.env
 .env.*

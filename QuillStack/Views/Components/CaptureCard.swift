@@ -28,6 +28,8 @@ struct CaptureCard: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                                     .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                             }
+                            .accessibilityIdentifier("capture-share")
+                            .accessibilityLabel("Share capture")
                         }
 
                         ActionIconStack(capture: capture) { tag in
@@ -50,7 +52,6 @@ struct CaptureCard: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .qsAmbientShadow(radius: 50, opacity: 0.10)
-            .accessibilityIdentifier("capture-card")
         }
     }
 
@@ -73,14 +74,22 @@ struct CaptureCard: View {
                     .font(.system(size: 9))
                 Text(capture.createdAt.cardDetailTimestamp)
                     .font(QSFont.cardTimestamp)
+
+                // Only genuine errors get a badge. `.noTextFound` is a valid
+                // outcome for a photo with no readable text, not a fault.
+                if capture.ocrFailure?.isError == true {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 9))
+                        .accessibilityLabel("Text recognition failed")
+                }
             }
             .foregroundStyle(QSColor.onSurfaceMuted)
             .padding(.bottom, 16)
 
             // Tags — generous spacing between them
-            if !capture.tags.isEmpty {
+            if !(capture.tags ?? []).isEmpty {
                 FlowLayout(spacing: 8) {
-                    ForEach(capture.tags) { tag in
+                    ForEach(capture.tags ?? []) { tag in
                         TagChip(tag: tag, isSelected: true)
                     }
                 }
