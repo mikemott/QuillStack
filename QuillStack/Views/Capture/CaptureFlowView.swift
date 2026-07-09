@@ -133,7 +133,7 @@ struct CaptureFlowView: View {
                 pageIndex: index,
                 thumbnailData: thumbnailData
             )
-            capture.images.append(captureImage)
+            capture.images = (capture.images ?? []) + [captureImage]
         }
 
         modelContext.insert(capture)
@@ -143,7 +143,7 @@ struct CaptureFlowView: View {
 
     private func finishCapture(_ capture: Capture) {
         capture.tags = selectedTags
-        CrashReporting.captureStarted(pageCount: capture.images.count)
+        CrashReporting.captureStarted(pageCount: capture.pageCount)
         CrashReporting.tagsSelected(selectedTags.map(\.name))
         try? modelContext.save()
 

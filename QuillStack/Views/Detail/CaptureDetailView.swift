@@ -8,6 +8,7 @@ struct CaptureDetailView: View {
     @Bindable var capture: Capture
     @State private var currentPage = 0
     @State private var showTagEditor = false
+    @State private var showOCRText = false
     @State private var showDeleteConfirm = false
     @State private var showExportResult: ExportResult?
     @State private var selectedTags: [Tag] = []
@@ -109,7 +110,7 @@ struct CaptureDetailView: View {
             }
         }
         .onAppear {
-            selectedTags = capture.tags
+            selectedTags = capture.tags ?? []
         }
     }
 
@@ -147,6 +148,57 @@ struct CaptureDetailView: View {
     // MARK: - Metadata Overlay
     // Glass recipe: primary glow bleeding from bottom-left
 
+    /// Recognized text is otherwise invisible in the app — it only reaches
+    /// search and Obsidian export. Surfacing it here makes an unenriched
+    /// capture (OCR ran, titling failed) distinguishable from a failed one.
+    @ViewBuilder
+    private var ocrTextSection: some View {
+        if let text = capture.ocrText, !text.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.18)) { showOCRText.toggle() }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text("RECOGNIZED TEXT")
+                            .font(QSFont.mono(size: 9))
+                            .fontWeight(.bold)
+                            .tracking(1.5)
+
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 9, weight: .bold))
+                            .rotationEffect(.degrees(showOCRText ? 0 : -90))
+
+                        Spacer()
+
+                        Text("\(text.count) CHARS")
+                            .font(QSFont.monoLight(size: 10))
+                    }
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("ocr-text-toggle")
+                .accessibilityLabel(showOCRText ? "Hide recognized text" : "Show recognized text")
+                .accessibilityHint("\(text.count) characters were recognized in this capture")
+
+                if showOCRText {
+                    ScrollView {
+                        Text(text)
+                            .font(QSFont.detailBody)
+                            .foregroundStyle(QSColor.onSurfaceVariant)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxHeight: 180)
+                    .padding(12)
+                    .background(QSSurface.container)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityIdentifier("ocr-text-body")
+                }
+            }
+        }
+    }
+
     private var metadataOverlay: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Title — onSurface, not pure white
@@ -160,14 +212,14 @@ struct CaptureDetailView: View {
             HStack {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(capture.tags) { tag in
+                        ForEach(capture.tags ?? []) { tag in
                             TagChip(tag: tag, isSelected: true)
                         }
                     }
                 }
 
                 Button {
-                    selectedTags = capture.tags
+                    selectedTags = capture.tags ?? []
                     showTagEditor = true
                 } label: {
                     Image(systemName: "pencil.circle.fill")
@@ -186,6 +238,8 @@ struct CaptureDetailView: View {
                     }
                 }
             }
+
+            ocrTextSection
 
             // Location & timestamp — use spacing, not dividers
             HStack(spacing: 12) {

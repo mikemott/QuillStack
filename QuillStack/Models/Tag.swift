@@ -7,7 +7,8 @@ final class Tag {
     var name: String = ""
     var colorHex: String = "#6B7280"
     var createdAt: Date = Date.now
-    var captures: [Capture] = []
+    // Optional for CloudKit — see Capture.images.
+    var captures: [Capture]?
 
     init(name: String, colorHex: String) {
         self.name = name
@@ -16,7 +17,7 @@ final class Tag {
         self.captures = []
     }
 
-    var captureCount: Int { captures.count }
+    var captureCount: Int { captures?.count ?? 0 }
 
     var iconName: String {
         switch name {

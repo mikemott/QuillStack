@@ -107,8 +107,9 @@ final class QuillStackUITests: XCTestCase {
     // MARK: - Empty State
 
     func testEmptyStateShowsNoCards() {
-        // In UI testing mode with in-memory store, there should be no captures
-        let card = app.otherElements["capture-card"]
+        // In UI testing mode with in-memory store, there should be no captures.
+        // Cards surface as buttons (NavigationLink + .accessibilityElement(children: .combine)).
+        let card = app.buttons["capture-card"]
         XCTAssertFalse(card.exists)
     }
 }

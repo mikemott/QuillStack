@@ -13,11 +13,14 @@ final class Capture {
     var isProcessingOCR: Bool = false
     var enrichmentJSON: Data?
 
+    // CloudKit requires every relationship to be optional: a synced record may
+    // arrive before its inverse exists. nil means "not yet materialized",
+    // [] means "materialized and empty".
     @Relationship(deleteRule: .cascade, inverse: \CaptureImage.capture)
-    var images: [CaptureImage]
+    var images: [CaptureImage]?
 
     @Relationship(inverse: \Tag.captures)
-    var tags: [Tag]
+    var tags: [Tag]?
 
     init() {
         self.createdAt = .now
@@ -27,11 +30,11 @@ final class Capture {
     }
 
     var sortedImages: [CaptureImage] {
-        images.sorted { $0.pageIndex < $1.pageIndex }
+        (images ?? []).sorted { $0.pageIndex < $1.pageIndex }
     }
 
-    var isStack: Bool { images.count > 1 }
-    var pageCount: Int { images.count }
+    var isStack: Bool { pageCount > 1 }
+    var pageCount: Int { images?.count ?? 0 }
 
     var thumbnail: Data? {
         sortedImages.first?.thumbnailData ?? sortedImages.first?.imageData

@@ -1,11 +1,19 @@
 import SwiftUI
 import SwiftData
+#if DEBUG
+import UIKit
+#endif
 
 @main
 struct QuillStackApp: App {
     let container: ModelContainer
 
     static let isUITesting = CommandLine.arguments.contains("--uitesting")
+
+    #if DEBUG
+    /// Only honoured under --uitesting, where the store is in-memory.
+    static let shouldSeedSampleCapture = CommandLine.arguments.contains("--seed-ocr-capture")
+    #endif
 
     init() {
         if !Self.isUITesting {
@@ -36,7 +44,32 @@ struct QuillStackApp: App {
         }
         seedDefaultTags(in: container)
         deduplicateTags(in: container.mainContext)
+        #if DEBUG
+        if Self.isUITesting && Self.shouldSeedSampleCapture {
+            Self.seedSampleCapture(in: container.mainContext)
+        }
+        #endif
     }
+
+    #if DEBUG
+    /// Test-only fixture: an already-processed capture, so UI tests can drive
+    /// surfaces that would otherwise require the camera.
+    private static func seedSampleCapture(in context: ModelContext) {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 600))
+        let image = renderer.image { ctx in
+            UIColor.darkGray.setFill()
+            ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 600))
+        }
+        let data = image.jpegData(compressionQuality: 0.8) ?? Data()
+
+        let capture = Capture()
+        capture.extractedTitle = "Meeting notes"
+        capture.ocrText = "Meeting notes Thursday\nbuy milk and coffee\ncall Sarah about the lease"
+        capture.images = [CaptureImage(imageData: data, pageIndex: 0, thumbnailData: data)]
+        context.insert(capture)
+        try? context.save()
+    }
+    #endif
 
     var body: some Scene {
         WindowGroup {
@@ -63,11 +96,12 @@ struct QuillStackApp: App {
             let key = tag.name.lowercased()
             if let existing = seen[key] {
                 // Reassign captures from the owning side to avoid corrupting SwiftData's inverse tracking
-                let capturesToReassign = tag.captures
+                let capturesToReassign = tag.captures ?? []
                 for capture in capturesToReassign {
-                    if !existing.captures.contains(where: { $0.id == capture.id }) {
-                        capture.tags.removeAll { $0.id == tag.id }
-                        capture.tags.append(existing)
+                    if !(existing.captures ?? []).contains(where: { $0.id == capture.id }) {
+                        var updated = (capture.tags ?? []).filter { $0.id != tag.id }
+                        updated.append(existing)
+                        capture.tags = updated
                     }
                 }
                 context.delete(tag)

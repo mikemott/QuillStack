@@ -47,6 +47,7 @@
 		DC09856D39B244902C7F8D6F /* AITagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB6CBB1585D65A2820B654D /* AITagChip.swift */; };
 		E24B9BFBABD48CE54562CBFC /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */; };
 		E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */; };
+		EC6A6244A74C8C00DA961B46 /* OCRTextSectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */; };
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
 		F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */; };
 		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
@@ -115,6 +116,7 @@
 		CDFD2EA26A4D4D042D6507A3 /* VisionOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionOCRService.swift; sourceTree = "<group>"; };
 		DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporterTests.swift; sourceTree = "<group>"; };
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
+		EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRTextSectionUITests.swift; sourceTree = "<group>"; };
 		F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentTests.swift; sourceTree = "<group>"; };
 		F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackUITests.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 		D2B2DA6E5EFCEB56E889818E /* QuillStackUITests */ = {
 			isa = PBXGroup;
 			children = (
+				EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */,
 				F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */,
 			);
 			path = QuillStackUITests;
@@ -314,20 +317,6 @@
 				CDFD2EA26A4D4D042D6507A3 /* VisionOCRService.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		"TEMP_452E2FFA-09B4-4C10-B081-39B425572B58" /* Features */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		"TEMP_B6D2CE8C-D5E0-406C-999D-DC4F20A45109" /* Whiteboard */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Whiteboard;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -522,6 +511,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC6A6244A74C8C00DA961B46 /* OCRTextSectionUITests.swift in Sources */,
 				F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
