@@ -23,6 +23,32 @@ enum OCRFailureCode: String, Sendable {
         case .extractionFailed: self = .extractionFailed
         }
     }
+
+    /// Vision is deterministic for a given image: re-running `.noTextFound` or
+    /// `.imageUnreadable` on the same bytes produces the same result. Offering a
+    /// retry there would be a button that cannot work. Only transient failures —
+    /// an unexpected Vision error, or FoundationModels being briefly unavailable —
+    /// are worth re-running.
+    var isRetryable: Bool {
+        switch self {
+        case .unexpected, .extractionFailed: true
+        case .noImages, .imageUnreadable, .noTextFound: false
+        }
+    }
+
+    /// `.noTextFound` is an outcome, not an error: a photo of something with no
+    /// readable text is a perfectly valid capture.
+    var isError: Bool { self != .noTextFound }
+
+    var userMessage: String {
+        switch self {
+        case .noTextFound: "No text recognized in this image."
+        case .imageUnreadable: "This image couldn't be read. Try capturing it again."
+        case .noImages: "This capture has no image."
+        case .extractionFailed: "On-device processing was unavailable."
+        case .unexpected: "Text recognition didn't finish."
+        }
+    }
 }
 
 actor CaptureProcessor {

@@ -21,6 +21,10 @@ struct QuillStackApp: App {
     static let shouldSeedSampleCapture = CommandLine.arguments.contains("--seed-ocr-capture")
     /// Forces the store to fail to load, so the recovery path is testable.
     static let shouldFailStore = CommandLine.arguments.contains("--fail-store")
+    /// Seeds a capture whose OCR failed with a retryable code.
+    static let shouldSeedOCRFailure = CommandLine.arguments.contains("--seed-ocr-failure")
+    /// Seeds a capture where Vision found no text — an outcome, not an error.
+    static let shouldSeedNoText = CommandLine.arguments.contains("--seed-no-text")
     #endif
 
     init() {
@@ -69,28 +73,67 @@ struct QuillStackApp: App {
     private static func prepared(_ container: ModelContainer) -> ModelContainer {
         seedDefaultTags(in: container)
         deduplicateTags(in: container.mainContext)
+        resetStaleProcessingFlags(in: container.mainContext)
         #if DEBUG
         if isUITesting && shouldSeedSampleCapture {
             seedSampleCapture(in: container.mainContext)
+        }
+        if isUITesting && shouldSeedOCRFailure {
+            seedFailedCapture(in: container.mainContext, code: .unexpected)
+        }
+        if isUITesting && shouldSeedNoText {
+            seedFailedCapture(in: container.mainContext, code: .noTextFound)
         }
         #endif
         return container
     }
 
+    // MARK: - Stale Processing Flags
+
+    /// `isProcessingOCR` is persisted before the OCR task runs. If the app is
+    /// killed mid-OCR the flag survives forever, permanently suppressing that
+    /// capture's action icons. Nothing else ever clears it.
+    private static func resetStaleProcessingFlags(in context: ModelContext) {
+        let descriptor = FetchDescriptor<Capture>(predicate: #Predicate { $0.isProcessingOCR })
+        guard let stuck = try? context.fetch(descriptor), !stuck.isEmpty else { return }
+        for capture in stuck {
+            capture.isProcessingOCR = false
+            // OCR never completed, and nothing recorded why. Mark it retryable
+            // so the user gets a Retry affordance instead of a dead capture.
+            if capture.ocrText == nil && capture.ocrFailureCode == nil {
+                capture.ocrFailureCode = OCRFailureCode.unexpected.rawValue
+            }
+        }
+        try? context.save()
+    }
+
     #if DEBUG
-    /// Test-only fixture: an already-processed capture, so UI tests can drive
-    /// surfaces that would otherwise require the camera.
-    private static func seedSampleCapture(in context: ModelContext) {
+    private static func placeholderImageData() -> Data {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 600))
         let image = renderer.image { ctx in
             UIColor.darkGray.setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 600))
         }
-        let data = image.jpegData(compressionQuality: 0.8) ?? Data()
+        return image.jpegData(compressionQuality: 0.8) ?? Data()
+    }
 
+    /// Test-only fixture: an already-processed capture, so UI tests can drive
+    /// surfaces that would otherwise require the camera.
+    private static func seedSampleCapture(in context: ModelContext) {
+        let data = placeholderImageData()
         let capture = Capture()
         capture.extractedTitle = "Meeting notes"
         capture.ocrText = "Meeting notes Thursday\nbuy milk and coffee\ncall Sarah about the lease"
+        capture.images = [CaptureImage(imageData: data, pageIndex: 0, thumbnailData: data)]
+        context.insert(capture)
+        try? context.save()
+    }
+
+    /// Test-only fixture: a capture whose OCR failed, for driving the status UI.
+    private static func seedFailedCapture(in context: ModelContext, code: OCRFailureCode) {
+        let data = placeholderImageData()
+        let capture = Capture()
+        capture.ocrFailureCode = code.rawValue
         capture.images = [CaptureImage(imageData: data, pageIndex: 0, thumbnailData: data)]
         context.insert(capture)
         try? context.save()

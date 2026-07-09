@@ -74,6 +74,14 @@ struct CaptureCard: View {
                     .font(.system(size: 9))
                 Text(capture.createdAt.cardDetailTimestamp)
                     .font(QSFont.cardTimestamp)
+
+                // Only genuine errors get a badge. `.noTextFound` is a valid
+                // outcome for a photo with no readable text, not a fault.
+                if capture.ocrFailure?.isError == true {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 9))
+                        .accessibilityLabel("Text recognition failed")
+                }
             }
             .foregroundStyle(QSColor.onSurfaceMuted)
             .padding(.bottom, 16)

@@ -148,6 +148,67 @@ struct CaptureDetailView: View {
     // MARK: - Metadata Overlay
     // Glass recipe: primary glow bleeding from bottom-left
 
+    /// Before this, a failed OCR was completely silent: the capture saved with no
+    /// text, no title, no action icons, and no way to re-run. Retry appears only
+    /// for codes where re-running can actually change the outcome — Vision is
+    /// deterministic for a given image.
+    @ViewBuilder
+    private var ocrStatusSection: some View {
+        if capture.isProcessingOCR {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Recognizing text…")
+                    .font(QSFont.detailBody)
+                    .foregroundStyle(QSColor.onSurfaceMuted)
+                    .accessibilityIdentifier("ocr-processing")
+                Spacer()
+            }
+        } else if let failure = capture.ocrFailure {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: failure.isError ? "exclamationmark.triangle.fill" : "text.viewfinder")
+                        .font(.system(size: 12))
+                        .accessibilityHidden(true)
+
+                    Text(failure.userMessage)
+                        .font(QSFont.detailBody)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("ocr-status-message")
+
+                    Spacer()
+                }
+                .foregroundStyle(failure.isError ? QSColor.onSurface : QSColor.onSurfaceMuted)
+
+                if failure.isRetryable {
+                    Button(action: retryOCR) {
+                        Text("RETRY")
+                            .font(QSFont.mono(size: 10))
+                            .fontWeight(.bold)
+                            .tracking(1.5)
+                            .foregroundStyle(QSColor.onPrimaryDark)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(QSColor.primary)
+                            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("ocr-retry")
+                    .accessibilityLabel("Retry text recognition")
+                }
+            }
+            .padding(12)
+            .background(QSSurface.container)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+    }
+
+    private func retryOCR() {
+        Task { @MainActor in
+            await CaptureReprocessor.rerun(for: capture, in: modelContext)
+        }
+    }
+
     /// Recognized text is otherwise invisible in the app — it only reaches
     /// search and Obsidian export. Surfacing it here makes an unenriched
     /// capture (OCR ran, titling failed) distinguishable from a failed one.
@@ -238,6 +299,8 @@ struct CaptureDetailView: View {
                     }
                 }
             }
+
+            ocrStatusSection
 
             ocrTextSection
 
