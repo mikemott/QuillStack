@@ -7,7 +7,7 @@ enum CrashReporting {
     /// including SDK-generated keys carrying view names or paths — is stripped
     /// before leaving the device. No key here may hold user content.
     private static let allowedBreadcrumbKeys: Set<String> = [
-        "pageCount", "tagCount", "engine", "charCount", "code", "type"
+        "pageCount", "tagCount", "engine", "charCount", "code", "type", "stage"
     ]
 
     static func start() {
@@ -95,6 +95,22 @@ enum CrashReporting {
         crumb.message = "Quick action tapped"
         crumb.data = ["type": actionType]
         SentrySDK.addBreadcrumb(crumb)
+    }
+
+    // MARK: - Storage
+
+    /// One container attempt failed but another may still succeed.
+    static func storeLoadFailed(stage: String) {
+        let crumb = Breadcrumb(level: .warning, category: "storage")
+        crumb.message = "ModelContainer attempt failed"
+        crumb.data = ["stage": stage]
+        SentrySDK.addBreadcrumb(crumb)
+    }
+
+    /// Every attempt failed — the app cannot persist. Captured as an event so it
+    /// is reported without waiting for a crash. Carries no user content.
+    static func storeUnavailable() {
+        SentrySDK.capture(message: "Persistent store unavailable")
     }
 
 }

@@ -4,51 +4,77 @@ import SwiftData
 import UIKit
 #endif
 
+enum StoreState {
+    case ready(ModelContainer)
+    /// Diagnostic text for on-device display only — never transmitted.
+    case unavailable(String)
+}
+
 @main
 struct QuillStackApp: App {
-    let container: ModelContainer
+    @State private var store: StoreState
 
     static let isUITesting = CommandLine.arguments.contains("--uitesting")
 
     #if DEBUG
     /// Only honoured under --uitesting, where the store is in-memory.
     static let shouldSeedSampleCapture = CommandLine.arguments.contains("--seed-ocr-capture")
+    /// Forces the store to fail to load, so the recovery path is testable.
+    static let shouldFailStore = CommandLine.arguments.contains("--fail-store")
     #endif
 
     init() {
         if !Self.isUITesting {
             CrashReporting.start()
         }
-        let schema = Schema([Capture.self, CaptureImage.self, Tag.self])
-        let inMemory = Self.isUITesting
-        let useCloud = !inMemory
+        _store = State(initialValue: Self.loadStore())
+    }
 
-        let config = ModelConfiguration(
-            "QuillStack",
-            isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: useCloud ? .automatic : .none
-        )
-        do {
-            container = try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            let fallback = ModelConfiguration(
-                "QuillStack",
-                isStoredInMemoryOnly: inMemory,
-                cloudKitDatabase: .none
+    /// Never falls back to an in-memory container on failure: the app would look
+    /// healthy while every new capture vanished on quit. Never deletes the store
+    /// either — an unopenable store may still be recoverable.
+    private static func loadStore() -> StoreState {
+        #if DEBUG
+        if shouldFailStore {
+            return .unavailable("Simulated store failure (--fail-store)")
+        }
+        #endif
+
+        let schema = Schema([Capture.self, CaptureImage.self, Tag.self])
+        let inMemory = isUITesting
+
+        if !inMemory {
+            let cloudConfig = ModelConfiguration(
+                "QuillStack", isStoredInMemoryOnly: false, cloudKitDatabase: .automatic
             )
             do {
-                container = try ModelContainer(for: schema, configurations: [fallback])
+                return .ready(prepared(try ModelContainer(for: schema, configurations: [cloudConfig])))
             } catch {
-                fatalError("Failed to create ModelContainer: \(error)")
+                // CloudKit unhappy; local-only still serves the user's data.
+                CrashReporting.storeLoadFailed(stage: "cloudkit")
             }
         }
+
+        let localConfig = ModelConfiguration(
+            "QuillStack", isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none
+        )
+        do {
+            return .ready(prepared(try ModelContainer(for: schema, configurations: [localConfig])))
+        } catch {
+            CrashReporting.storeUnavailable()
+            return .unavailable(String(describing: error))
+        }
+    }
+
+    private static func prepared(_ container: ModelContainer) -> ModelContainer {
         seedDefaultTags(in: container)
         deduplicateTags(in: container.mainContext)
         #if DEBUG
-        if Self.isUITesting && Self.shouldSeedSampleCapture {
-            Self.seedSampleCapture(in: container.mainContext)
+        if isUITesting && shouldSeedSampleCapture {
+            seedSampleCapture(in: container.mainContext)
         }
         #endif
+        return container
     }
 
     #if DEBUG
@@ -73,12 +99,19 @@ struct QuillStackApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            switch store {
+            case .ready(let container):
+                ContentView()
+                    .modelContainer(container)
+            case .unavailable(let detail):
+                StorageUnavailableView(detail: detail) {
+                    store = Self.loadStore()
+                }
+            }
         }
-        .modelContainer(container)
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                deduplicateTags(in: container.mainContext)
+            if newPhase == .active, case .ready(let container) = store {
+                Self.deduplicateTags(in: container.mainContext)
             }
         }
     }
@@ -87,7 +120,7 @@ struct QuillStackApp: App {
 
     // MARK: - Tag Deduplication
 
-    private func deduplicateTags(in context: ModelContext) {
+    private static func deduplicateTags(in context: ModelContext) {
         let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.createdAt)])
         guard let tags = try? context.fetch(descriptor) else { return }
 
@@ -97,12 +130,11 @@ struct QuillStackApp: App {
             if let existing = seen[key] {
                 // Reassign captures from the owning side to avoid corrupting SwiftData's inverse tracking
                 let capturesToReassign = tag.captures ?? []
-                for capture in capturesToReassign {
-                    if !(existing.captures ?? []).contains(where: { $0.id == capture.id }) {
-                        var updated = (capture.tags ?? []).filter { $0.id != tag.id }
-                        updated.append(existing)
-                        capture.tags = updated
-                    }
+                for capture in capturesToReassign
+                where !(existing.captures ?? []).contains(where: { $0.id == capture.id }) {
+                    var updated = (capture.tags ?? []).filter { $0.id != tag.id }
+                    updated.append(existing)
+                    capture.tags = updated
                 }
                 context.delete(tag)
             } else {
@@ -114,7 +146,7 @@ struct QuillStackApp: App {
 
     // MARK: - Seed Tags
 
-    private func seedDefaultTags(in container: ModelContainer) {
+    private static func seedDefaultTags(in container: ModelContainer) {
         let context = container.mainContext
         let descriptor = FetchDescriptor<Tag>()
         let existing = (try? context.fetch(descriptor)) ?? []

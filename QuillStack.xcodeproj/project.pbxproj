@@ -10,6 +10,7 @@
 		0F2CD5E9D07C7A0F4308D05F /* ReceiptPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */; };
 		1171088212D4885CEBC52F2F /* IBMPlexMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFC7508D56530B28304F8B0A /* IBMPlexMono-Light.ttf */; };
 		18B99221501B9088B896EB31 /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D41AB88F26A245C79AAC7FC /* TagChip.swift */; };
+		2353F05EE8A14760B75C4687 /* StorageRecoveryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E04295D9BFF151B35D4EDF0 /* StorageRecoveryUITests.swift */; };
 		2490979D71F3CAB3BA764743 /* OCRResponseParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A184EA2BA7186D5A1DD844E9 /* OCRResponseParsingTests.swift */; };
 		2C35FD888C2D154153877D2B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C21F408FCDD056482FDC727 /* LocationService.swift */; };
 		30850D9D9ECE398BAE5BE713 /* EventExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316694A14067DD5476FC5F8B /* EventExtraction.swift */; };
@@ -52,6 +53,7 @@
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
 		F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */; };
 		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
+		F84F3E76BE7F7ABC56DA086B /* StorageUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C58417BCD34A8A64E1FCF0 /* StorageUnavailableView.swift */; };
 		F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD8C80E9AA138C4F0460C /* Tag.swift */; };
 		FAFDD368D3B7526C246ED8F4 /* OnDeviceEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */; };
 /* End PBXBuildFile section */
@@ -75,6 +77,7 @@
 
 /* Begin PBXFileReference section */
 		023FCC5789353D9A25A446B3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		15C58417BCD34A8A64E1FCF0 /* StorageUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUnavailableView.swift; sourceTree = "<group>"; };
 		17CCF501CFC82F4F42461A30 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		1A30FB6B084F1B94BEE0D6D6 /* IBMPlexSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Regular.ttf"; sourceTree = "<group>"; };
 		1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCard.swift; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 		786E6E28646D6BD247920801 /* IBMPlexSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Medium.ttf"; sourceTree = "<group>"; };
 		78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventActionView.swift; sourceTree = "<group>"; };
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
+		7E04295D9BFF151B35D4EDF0 /* StorageRecoveryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageRecoveryUITests.swift; sourceTree = "<group>"; };
 		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuillStack.entitlements; sourceTree = "<group>"; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
@@ -266,6 +270,7 @@
 		D04A692D91FA3EA4CD42030B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				15C58417BCD34A8A64E1FCF0 /* StorageUnavailableView.swift */,
 				B9F18337BE182E26BB564CDB /* Actions */,
 				60BD23A06611D8643FFF4F4E /* Capture */,
 				171E24937E05D50289ADE08B /* Components */,
@@ -280,6 +285,7 @@
 			children = (
 				EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */,
 				F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */,
+				7E04295D9BFF151B35D4EDF0 /* StorageRecoveryUITests.swift */,
 			);
 			path = QuillStackUITests;
 			sourceTree = "<group>";
@@ -489,6 +495,7 @@
 				963B0E3B153A52158C33A350 /* ReceiptExtraction.swift in Sources */,
 				0F2CD5E9D07C7A0F4308D05F /* ReceiptPreviewSheet.swift in Sources */,
 				C659170F0AB69678AB385D86 /* SettingsView.swift in Sources */,
+				F84F3E76BE7F7ABC56DA086B /* StorageUnavailableView.swift in Sources */,
 				F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */,
 				18B99221501B9088B896EB31 /* TagChip.swift in Sources */,
 				A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */,
@@ -517,6 +524,7 @@
 			files = (
 				EC6A6244A74C8C00DA961B46 /* OCRTextSectionUITests.swift in Sources */,
 				F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */,
+				2353F05EE8A14760B75C4687 /* StorageRecoveryUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
