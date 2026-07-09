@@ -28,11 +28,11 @@ Fast image capture app for real-world information — receipts, posters, tickets
 
 ## Design Principles
 
-- **Minimal, utilitarian UI** — system fonts, system colors, no decorative chrome
+- **Minimal, utilitarian UI** — no decorative chrome. Dark editorial styling; IBM Plex Sans/Mono via `QSFont`, tokens in `DesignSystem.swift`. See `STYLE_GUIDE.md`
 - **Monochrome UI, colorful data** — only tags bring color (via colored chips and thumbnail borders)
 - **One-handed capture** — camera → tag → done in under 3 seconds
 - **Tag-only organization** — no folders, no note types. Tags are the sole organizing concept
-- **Discourage tag sprawl** — ship with 8 curated defaults, make creating new tags deliberate
+- **Discourage tag sprawl** — ship with 10 curated defaults, make creating new tags deliberate
 
 ## Build & Project Generation
 
@@ -60,4 +60,6 @@ Branch naming: `quillstack-{issue#}-short-description`
 
 ## Default Tags
 
-Receipt (amber), Event (blue), Note (green), Work (slate), Personal (gray), Ticket (purple), Document (teal), Reference (orange)
+Seeded on first launch from `Tag.defaults` in `QuillStack/Models/Tag.swift` — that array is the source of truth.
+
+Receipt (`#D4FF00`), Event (`#007AFF`), Work (`#FFC107`), Contact (`#64D2FF`), Food (`#E85D75`), To-Do (`#90EE90`), Project (`#FFB6C1`), Ticket (`#FF7F50`), Reference (`#008080`), Quote (`#BB86FC`)

@@ -2,3 +2,9 @@ project: QuillStack.xcodeproj
 schemes:
   - QuillStack
 retain_public: true
+
+# Design tokens are declared ahead of use by contract (STYLE_GUIDE.md).
+# Still analyzed as reference sources; just not reported as unused.
+report_exclude:
+  - "**/Utilities/DesignSystem.swift"
+  - "**/Utilities/Typography.swift"
