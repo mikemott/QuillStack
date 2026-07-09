@@ -10,5 +10,13 @@
 	<array>
 		<string>CloudKit</string>
 	</array>
+	<!--
+	  NSPersistentCloudKitContainer drives sync with silent pushes, so the Push
+	  Notifications capability is required alongside the remote-notification
+	  background mode in Info.plist. Must be "development" for Xcode builds.
+	  No icloud-container-environment here: dev builds default to Development.
+	-->
+	<key>aps-environment</key>
+	<string>development</string>
 </dict>
 </plist>

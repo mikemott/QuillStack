@@ -54,6 +54,7 @@
 		E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */; };
 		EC6A6244A74C8C00DA961B46 /* OCRTextSectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */; };
 		F1201C13E23112CB33A6A34A /* ObsidianExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */; };
+		F5F66EFB29731C6D79EF2C00 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486CFFAF2AB54660DEC760A /* CloudKitSyncMonitor.swift */; };
 		F82CA7DE8A8CBAFEA3514940 /* QuillStackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */; };
 		F8446781AF15E4615A2631CA /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */; };
 		F84F3E76BE7F7ABC56DA086B /* StorageUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C58417BCD34A8A64E1FCF0 /* StorageUnavailableView.swift */; };
@@ -109,7 +110,6 @@
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
 		7E04295D9BFF151B35D4EDF0 /* StorageRecoveryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageRecoveryUITests.swift; sourceTree = "<group>"; };
 		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuillStack.entitlements; sourceTree = "<group>"; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
 		83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceEnrichmentService.swift; sourceTree = "<group>"; };
 		84704540B805D88979BF52CD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
@@ -130,6 +130,7 @@
 		DFB6CBB1585D65A2820B654D /* AITagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITagChip.swift; sourceTree = "<group>"; };
 		EF9861103633A47D3918999A /* OCRTextSectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRTextSectionUITests.swift; sourceTree = "<group>"; };
 		F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrichmentTests.swift; sourceTree = "<group>"; };
+		F486CFFAF2AB54660DEC760A /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		F49090AA5E910A9D4502F4BD /* QuillStackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackUITests.swift; sourceTree = "<group>"; };
 		FD6499B4EDA579471C027B8B /* QuillStackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuillStackApp.swift; sourceTree = "<group>"; };
 		FD81AE056AC7E1A2498C619A /* Enrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrichment.swift; sourceTree = "<group>"; };
@@ -242,7 +243,6 @@
 			children = (
 				3FB76058408D13419B7BE321 /* Assets.xcassets */,
 				2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */,
-				82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */,
 				1259D777AD7D35451FCEDC2A /* App */,
 				E846F93AD9E4D1ECB67861D1 /* Models */,
 				3EECED0CADFB246418452A4C /* Resources */,
@@ -328,6 +328,7 @@
 			children = (
 				537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */,
 				D7FE444B2A567385036B273D /* CaptureReprocessor.swift */,
+				F486CFFAF2AB54660DEC760A /* CloudKitSyncMonitor.swift */,
 				3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */,
 				5C21F408FCDD056482FDC727 /* LocationService.swift */,
 				A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */,
@@ -406,7 +407,14 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					02B2FAA4FE826727BB4A1349 = {
+						DevelopmentTeam = HZQB6JS358;
+					};
+					538F8570D1E027322DE80B8A = {
+						DevelopmentTeam = HZQB6JS358;
+					};
 					E42AB247E38CBD58E3C8FB84 = {
+						DevelopmentTeam = HZQB6JS358;
 						TestTargetID = 02B2FAA4FE826727BB4A1349;
 					};
 				};
@@ -488,6 +496,7 @@
 				E9ACD9D237539FE98A517F0C /* CaptureImage.swift in Sources */,
 				467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */,
 				8E83ED6F75D0B9E55D8B582E /* CaptureReprocessor.swift in Sources */,
+				F5F66EFB29731C6D79EF2C00 /* CloudKitSyncMonitor.swift in Sources */,
 				74CFA93B5B14CAA49F511DC7 /* ContactActionView.swift in Sources */,
 				C3AA5AB93657990DA5182634 /* ContactExtraction.swift in Sources */,
 				55932922712289AB36418C79 /* ContentView.swift in Sources */,
@@ -561,7 +570,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
+				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
@@ -629,6 +638,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -693,6 +703,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -720,7 +731,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
+				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;

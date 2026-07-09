@@ -7,6 +7,10 @@ options:
 settings:
   SWIFT_VERSION: "6.0"
   SWIFT_STRICT_CONCURRENCY: complete
+  # Pinned here, not left to Xcode. Xcode writes DEVELOPMENT_TEAM back into
+  # project.pbxproj, which `xcodegen generate` then discards — signing silently
+  # drifts, and CloudKit rejects a container owned by a different team.
+  DEVELOPMENT_TEAM: HZQB6JS358
 packages:
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa.git
@@ -20,6 +24,7 @@ targets:
       - path: QuillStack
         excludes:
           - Info.plist
+          - "*.entitlements"
     settings:
       base:
         INFOPLIST_FILE: QuillStack/Info.plist
@@ -29,7 +34,14 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT: NO
-        CODE_SIGN_ENTITLEMENTS: QuillStack/QuillStack.entitlements
+      configs:
+        # aps-environment and icloud-container-environment must differ between
+        # a local Xcode build (Development CloudKit) and an archive bound for
+        # TestFlight (Production CloudKit). One entitlements file cannot do both.
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: QuillStack/QuillStack.Debug.entitlements
+        Release:
+          CODE_SIGN_ENTITLEMENTS: QuillStack/QuillStack.Release.entitlements
     preBuildScripts:
       - script: |
           if command -v swiftlint >/dev/null 2>&1; then

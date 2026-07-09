@@ -30,6 +30,9 @@ struct QuillStackApp: App {
     init() {
         if !Self.isUITesting {
             CrashReporting.start()
+            // Registered before the container is built, or the `setup` event —
+            // the one that carries container/entitlement failures — is missed.
+            MainActor.assumeIsolated { CloudKitSyncMonitor.shared.start() }
         }
         _store = State(initialValue: Self.loadStore())
     }

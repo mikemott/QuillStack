@@ -8,6 +8,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Tag.name) private var tags: [Tag]
     @State private var locationService = LocationService()
+    private var syncMonitor: CloudKitSyncMonitor { .shared }
     @State private var showNewTag = false
     @State private var newTagName = ""
     @State private var newTagColor = "#6B7280"
@@ -295,15 +296,18 @@ struct SettingsView: View {
             sectionHeader("ICLOUD BACKUP")
 
             VStack(spacing: 0) {
-                settingsRow("Status") {
+                // An iCloud account existing says nothing about whether mirroring
+                // works. Report the last real CloudKit event instead.
+                settingsRow("Sync") {
                     HStack(spacing: 6) {
                         Circle()
                             .fill(QSColor.onSurfaceMuted)
                             .frame(width: 8, height: 8)
-                            .opacity(icloudAvailable ? 1.0 : 0.3)
-                        Text(icloudAvailable ? "Active" : "Unavailable")
+                            .opacity(syncMonitor.lastStatus?.succeeded == true ? 1.0 : 0.3)
+                        Text(syncStatusLabel)
                             .font(QSFont.mono(size: 13))
                             .foregroundStyle(QSColor.onSurfaceMuted)
+                            .accessibilityIdentifier("icloud-sync-status")
                     }
                 }
 
@@ -316,11 +320,38 @@ struct SettingsView: View {
             .background(QSSurface.container)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
+            if let failure = syncMonitor.lastFailure {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("LAST SYNC ERROR — \(failure.eventType.uppercased())")
+                        .font(QSFont.mono(size: 9))
+                        .fontWeight(.bold)
+                        .tracking(1.5)
+                        .foregroundStyle(QSColor.onSurfaceMuted)
+
+                    Text(failure.errorDescription ?? "Unknown error")
+                        .font(QSFont.monoLight(size: 11))
+                        .foregroundStyle(QSColor.onSurfaceVariant)
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("icloud-sync-error")
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(QSSurface.container)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+
             Text("Captures and tags sync to iCloud automatically. Data restores when you reinstall.")
                 .font(QSFont.monoLight(size: 11))
                 .foregroundStyle(QSColor.onSurfaceMuted)
                 .padding(.leading, 4)
         }
+    }
+
+    private var syncStatusLabel: String {
+        guard icloudAvailable else { return "No Account" }
+        guard let status = syncMonitor.lastStatus else { return "Waiting…" }
+        return status.succeeded ? "Active" : "Failed"
     }
 
     // MARK: - About
