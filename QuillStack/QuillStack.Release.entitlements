@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.com.quillstack.app</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
+	</array>
+	<!-- TestFlight and App Store builds must use the production APS environment. -->
+	<key>aps-environment</key>
+	<string>production</string>
+	<!--
+	  Archived builds must be told to target the Production CloudKit environment.
+	  Without this an archive can still talk to Development, so TestFlight would
+	  read a database that real users never write to.
+	-->
+	<key>com.apple.developer.icloud-container-environment</key>
+	<string>Production</string>
+</dict>
+</plist>

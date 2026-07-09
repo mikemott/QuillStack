@@ -109,7 +109,6 @@
 		7BDD1012BB13C6FEEFD5AD9A /* CaptureImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImage.swift; sourceTree = "<group>"; };
 		7E04295D9BFF151B35D4EDF0 /* StorageRecoveryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageRecoveryUITests.swift; sourceTree = "<group>"; };
 		817E6AAE6434F0F869ED3954 /* QuillStack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QuillStack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuillStack.entitlements; sourceTree = "<group>"; };
 		830DBB50D82C00865610C70E /* ActionIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionIcon.swift; sourceTree = "<group>"; };
 		83C0D238F4C235D80F4AB568 /* OnDeviceEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceEnrichmentService.swift; sourceTree = "<group>"; };
 		84704540B805D88979BF52CD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
@@ -242,7 +241,6 @@
 			children = (
 				3FB76058408D13419B7BE321 /* Assets.xcassets */,
 				2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */,
-				82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */,
 				1259D777AD7D35451FCEDC2A /* App */,
 				E846F93AD9E4D1ECB67861D1 /* Models */,
 				3EECED0CADFB246418452A4C /* Resources */,
@@ -406,7 +404,14 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					02B2FAA4FE826727BB4A1349 = {
+						DevelopmentTeam = HZQB6JS358;
+					};
+					538F8570D1E027322DE80B8A = {
+						DevelopmentTeam = HZQB6JS358;
+					};
 					E42AB247E38CBD58E3C8FB84 = {
+						DevelopmentTeam = HZQB6JS358;
 						TestTargetID = 02B2FAA4FE826727BB4A1349;
 					};
 				};
@@ -561,7 +566,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
+				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
@@ -629,6 +634,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -693,6 +699,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HZQB6JS358;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -720,7 +727,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.entitlements;
+				CODE_SIGN_ENTITLEMENTS = QuillStack/QuillStack.Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = NO;
