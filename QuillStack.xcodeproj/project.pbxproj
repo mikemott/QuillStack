@@ -32,6 +32,7 @@
 		7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD81AE056AC7E1A2498C619A /* Enrichment.swift */; };
 		83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */; };
 		8A989F59144140D70E913B56 /* IBMPlexSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2A151C6C1C1BE00FD00702BB /* IBMPlexSans-Light.ttf */; };
+		8BB740333D6FE66CB1E84023 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */; };
 		8BD6A5DB3408C33B0A7A7614 /* CaptureFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E54C5FE42B060A37AC0D3EA /* CaptureFlowView.swift */; };
 		93150BFD7F960AF463D425F7 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023FCC5789353D9A25A446B3 /* Extensions.swift */; };
 		93B5D3BA7FBC716CDA95890B /* CaptureDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C8847CCF72D440E5D1258E3 /* CaptureDetailView.swift */; };
@@ -79,6 +80,7 @@
 		1D2F1835E2C617011D7AFF64 /* CaptureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCard.swift; sourceTree = "<group>"; };
 		24F4D271DC1243947BE92062 /* ContactExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactExtraction.swift; sourceTree = "<group>"; };
 		2A151C6C1C1BE00FD00702BB /* IBMPlexSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Light.ttf"; sourceTree = "<group>"; };
+		2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		316694A14067DD5476FC5F8B /* EventExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventExtraction.swift; sourceTree = "<group>"; };
 		3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoActionView.swift; sourceTree = "<group>"; };
 		3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptPreviewSheet.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				3FB76058408D13419B7BE321 /* Assets.xcassets */,
+				2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */,
 				82554B68A8D4B7351B5E70C9 /* QuillStack.entitlements */,
 				1259D777AD7D35451FCEDC2A /* App */,
 				E846F93AD9E4D1ECB67861D1 /* Models */,
@@ -428,6 +431,7 @@
 				8A989F59144140D70E913B56 /* IBMPlexSans-Light.ttf in Resources */,
 				E24B9BFBABD48CE54562CBFC /* IBMPlexSans-Medium.ttf in Resources */,
 				6031DF40116E06AB7F5BF168 /* IBMPlexSans-Regular.ttf in Resources */,
+				8BB740333D6FE66CB1E84023 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -810,7 +814,7 @@
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.0.0;
+				minimumVersion = 8.58.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

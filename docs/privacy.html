@@ -42,7 +42,7 @@
       <li><strong>Enrichment</strong> — titles, suggested tags, and quick actions — is produced by a model running on your device. Nothing about enrichment leaves your phone.</li>
       <li><strong>SwiftData</strong> (Apple’s on-device database) stores captures, tags, and relationships.</li>
       <li><strong>Local file storage</strong> holds original images and thumbnails.</li>
-      <li><strong>UserDefaults</strong> holds non-sensitive preferences (Obsidian vault path, toggles); the <strong>iOS Keychain</strong> holds any API keys you enter.</li>
+      <li><strong>UserDefaults</strong> holds non-sensitive preferences (Obsidian vault bookmark, toggles). The app has no API keys to store — OCR and enrichment run entirely on-device.</li>
     </ul>
     <p>We do not operate any server that stores — or ever receives — your notes or images.</p>
 
@@ -63,7 +63,7 @@
     <h3>Crash diagnostics (Sentry)</h3>
     <ul>
       <li><strong>What it does:</strong> reports crashes, errors, and performance samples so we can fix bugs.</li>
-      <li><strong>Data sent:</strong> stack traces, device model, OS version, app version, breadcrumbs (in-app navigation events), and non-sensitive diagnostic context. <strong>Your captured images, OCR text, tags, and notes are never sent. Screenshots are not attached.</strong></li>
+      <li><strong>Data sent:</strong> stack traces, device model, OS version, app version, breadcrumbs (in-app navigation events carrying only counts and fixed codes), and non-sensitive diagnostic context. <strong>Your captured images, OCR text, tag names, and notes are never sent. Screenshots are not attached.</strong></li>
       <li><strong>Identifier:</strong> a random Sentry-generated installation ID that we cannot link to your Apple ID or name.</li>
       <li><strong>Their privacy policy:</strong> <a href="https://sentry.io/privacy/">sentry.io/privacy</a></li>
       <li><strong>How to turn it off:</strong> see “Your rights” below.</li>
@@ -100,8 +100,7 @@
 
     <h2>Data security</h2>
     <ul>
-      <li>API keys entered in the app are stored in the iOS Keychain with hardware-backed encryption.</li>
-      <li>The SwiftData store uses iOS file protection.</li>
+      <li>The SwiftData store uses iOS file protection (<code>NSFileProtectionCompleteUntilFirstUserAuthentication</code>, the system default).</li>
       <li>Crash diagnostics are sent to Sentry over HTTPS. Arbitrary loads are disabled (<code>NSAllowsArbitraryLoads = false</code>).</li>
       <li>We do not operate a server that ingests your notes or images.</li>
     </ul>

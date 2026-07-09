@@ -144,7 +144,7 @@ struct CaptureFlowView: View {
     private func finishCapture(_ capture: Capture) {
         capture.tags = selectedTags
         CrashReporting.captureStarted(pageCount: capture.pageCount)
-        CrashReporting.tagsSelected(selectedTags.map(\.name))
+        CrashReporting.tagsSelected(count: selectedTags.count)
         try? modelContext.save()
 
         // OCR fires now with tag context
