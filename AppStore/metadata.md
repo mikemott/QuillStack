@@ -34,7 +34,7 @@ Point QuillStack at your Obsidian vault path. Captures export as markdown with i
 Sign in to iCloud and your captures and tags sync across your iPhone and iPad automatically via CloudKit. Reinstall the app, sign in, and your timeline comes back.
 
 **YOUR DATA STAYS ON YOUR DEVICE**
-Captured images, recognized text, enrichment output, and tags are processed and stored on your device (and, optionally, in your own iCloud). Your content never leaves your device unless you choose to sync via iCloud or export to Obsidian. The only data the app sends off-device is anonymous crash diagnostics via Sentry — never your images, text, or notes. Full detail: quillstack.io/privacy.html.
+Captured images, recognized text, enrichment output, and tags are processed and stored on your device (and, optionally, in your own iCloud). Your content never leaves your device unless you choose to sync via iCloud or export to Obsidian. The only data the app sends off-device is pseudonymous crash diagnostics via Sentry — never your images, text, or notes. Full detail: quillstack.io/privacy.html.
 
 **BUILT FOR IOS 26**
 Native SwiftUI, SwiftData persistence, minimum iOS 26.
@@ -128,7 +128,7 @@ Declare the following in App Store Connect. These MUST match `AppStore/privacy-p
 
 ### Data Collected — Linked to User: NO — Used for Tracking: NO
 
-The only data transmitted off the device is anonymous diagnostics.
+The only data transmitted off the device is pseudonymous diagnostics.
 
 | Data Type | Purpose | Source |
 |-----------|---------|--------|
@@ -151,7 +151,7 @@ Photos or Videos (captured images), User Content (recognized text, tags, notes),
 
 Use App Store Connect → App Information → Review Notes.
 
-> QuillStack captures images (receipts, tickets, notes). Text recognition runs entirely on-device using Apple's Vision framework, and an on-device model suggests tags and quick actions — no image or recognized text is uploaded to any server. No account is required; sign-in is optional via iCloud. There are no in-app purchases. Sentry is used only for anonymous crash and performance reporting — no screenshots or capture content is attached.
+> QuillStack captures images (receipts, tickets, notes). Text recognition runs entirely on-device using Apple's Vision framework, and an on-device model suggests tags and quick actions — no image or recognized text is uploaded to any server. No account is required; sign-in is optional via iCloud. There are no in-app purchases. Sentry is used only for pseudonymous crash and performance reporting — no screenshots or capture content is attached.
 >
 > Test flow: Launch → tap capture → scan any document (a receipt is a good test) → hold to save → view the timeline → tap a capture → see enrichment (title, tags, quick actions). Obsidian export requires a vault path in Settings; iCloud sync requires the reviewer's iCloud account to be signed in on the test device.
 

@@ -15,7 +15,7 @@ Fast image capture app for real-world information — receipts, posters, tickets
 
 - **Capture** — date, extractedTitle, ocrText, location, tags, images
 - **CaptureImage** — imageData, thumbnailData, pageIndex, ocrText (for stacks)
-- **Tag** — name, colorHex (8 defaults seeded on first launch)
+- **Tag** — name, colorHex (seeded on first launch from `Tag.defaults`)
 
 ## Key Files
 
@@ -32,7 +32,7 @@ Fast image capture app for real-world information — receipts, posters, tickets
 - **Monochrome UI, colorful data** — only tags bring color (via colored chips and thumbnail borders)
 - **One-handed capture** — camera → tag → done in under 3 seconds
 - **Tag-only organization** — no folders, no note types. Tags are the sole organizing concept
-- **Discourage tag sprawl** — ship with 10 curated defaults, make creating new tags deliberate
+- **Discourage tag sprawl** — ship with a curated set of defaults (`Tag.defaults`), make creating new tags deliberate
 
 ## Build & Project Generation
 

@@ -59,8 +59,10 @@ jobs:
           echo "🔨 Verifying project builds..."
           set -o pipefail
 
-          # Run build and capture output
-          if xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build 2>&1 | tee build.log; then
+          # No -destination: the runner ships the iphonesimulator SDK but not the
+          # iOS 26 *runtime*, so destination resolution fails even though a
+          # build needs no runtime. Building against the SDK alone is sufficient.
+          if xcodebuild -project QuillStack.xcodeproj -scheme QuillStack -sdk iphonesimulator build 2>&1 | tee build.log; then
             echo "✅ Build succeeded"
           else
             echo "❌ Build failed"
