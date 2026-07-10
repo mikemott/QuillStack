@@ -114,15 +114,7 @@ actor VisionOCRService {
     /// - Returns: Cleaned and corrected text, or nil if refinement fails
     private func refineOCRText(_ rawText: String) async -> String? {
         let prompt = """
-        The following text was extracted from an image using OCR and may contain errors. Please correct it by:
-
-        1. Fixing spacing issues (missing or extra spaces between words)
-        2. Correcting common OCR character mistakes (O/0, I/l/1, S/5, etc.)
-        3. Adding appropriate punctuation where clearly missing
-        4. Preserving the original structure and line breaks
-        5. NOT adding any content that wasn't in the original
-
-        Return only the corrected text, no explanations or commentary.
+        Correct the following OCR text by fixing spacing issues, character recognition errors (O/0, I/l/1, S/5), and adding missing punctuation. Preserve the original structure and line breaks. Do not add content that wasn't in the original.
 
         ---
         \(String(rawText.prefix(2000)))
@@ -131,8 +123,14 @@ actor VisionOCRService {
 
         do {
             let session = LanguageModelSession()
-            let response = try await session.respond(to: prompt)
-            let refined = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+            let response = try await session.respond(to: prompt, generating: RefinedText.self)
+            let refined = response.content.text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !refined.isEmpty else {
+                logger.warning("OCR refinement returned empty text")
+                return nil
+            }
+
             logger.info("OCR refinement: \(rawText.count) chars → \(refined.count) chars")
             return refined
         } catch {
@@ -269,6 +267,12 @@ enum VisionOCRError: Error, LocalizedError {
 }
 
 // MARK: - Extraction Models
+
+@Generable(description: "Refined OCR text with corrections")
+private struct RefinedText {
+    @Guide(description: "The corrected text with spacing, character, and punctuation fixes applied")
+    var text: String
+}
 
 @Generable(description: "Contact information extracted from text")
 private struct ExtractedContact {
