@@ -113,10 +113,16 @@ actor VisionOCRService {
     /// - Parameter rawText: Text directly from Vision OCR
     /// - Returns: Cleaned and corrected text, or nil if refinement fails
     private func refineOCRText(_ rawText: String) async -> String? {
-        logger.info("OCR refinement starting: \(rawText.count) chars input")
-
         let prompt = """
-        Correct the following OCR text by fixing spacing issues, character recognition errors (O/0, I/l/1, S/5), and adding missing punctuation. Preserve the original structure and line breaks. Do not add content that wasn't in the original.
+        The following text was extracted from an image using OCR and may contain errors. Please correct it by:
+
+        1. Fixing spacing issues (missing or extra spaces between words)
+        2. Correcting common OCR character mistakes (O/0, I/l/1, S/5, etc.)
+        3. Adding appropriate punctuation where clearly missing
+        4. Preserving the original structure and line breaks
+        5. NOT adding any content that wasn't in the original
+
+        Return only the corrected text, no explanations or commentary.
 
         ---
         \(String(rawText.prefix(2000)))
@@ -125,21 +131,12 @@ actor VisionOCRService {
 
         do {
             let session = LanguageModelSession()
-            logger.info("Calling LanguageModelSession.respond...")
             let response = try await session.respond(to: prompt)
-            logger.info("Got response, content type: \(type(of: response.content))")
-
             let refined = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            guard !refined.isEmpty else {
-                logger.warning("OCR refinement returned empty text")
-                return nil
-            }
-
-            logger.info("OCR refinement succeeded: \(rawText.count) chars → \(refined.count) chars")
+            logger.info("OCR refinement: \(rawText.count) chars → \(refined.count) chars")
             return refined
         } catch {
-            logger.error("OCR refinement failed: \(error.localizedDescription)")
+            logger.warning("OCR refinement failed: \(error.localizedDescription)")
             return nil
         }
     }
