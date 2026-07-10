@@ -71,12 +71,14 @@ private func parseDate(_ string: String?) -> Date? {
     guard let string, !string.isEmpty else { return nil }
     let iso = ISO8601DateFormatter()
     iso.formatOptions = [.withFullDate]
+    iso.timeZone = TimeZone.current
     if let d = iso.date(from: string) { return d }
 
     // Formats with explicit year
     for fmt in ["yyyy-MM-dd", "MM/dd/yyyy", "M/d/yyyy", "MMM d, yyyy", "MMMM d, yyyy", "dd/MM/yyyy"] {
         let df = DateFormatter()
         df.locale = Locale(identifier: "en_US_POSIX")
+        df.timeZone = TimeZone.current
         df.dateFormat = fmt
         if let d = df.date(from: string) { return d }
     }
@@ -86,6 +88,7 @@ private func parseDate(_ string: String?) -> Date? {
     for fmt in ["MMM d", "MMMM d", "M/d", "MM/dd", "d MMM", "d MMMM"] {
         let df = DateFormatter()
         df.locale = Locale(identifier: "en_US_POSIX")
+        df.timeZone = TimeZone.current
         df.dateFormat = fmt
         // DateFormatter defaults missing year to 2000; replace with current year
         if let d = df.date(from: string) {
