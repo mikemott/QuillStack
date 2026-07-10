@@ -113,6 +113,8 @@ actor VisionOCRService {
     /// - Parameter rawText: Text directly from Vision OCR
     /// - Returns: Cleaned and corrected text, or nil if refinement fails
     private func refineOCRText(_ rawText: String) async -> String? {
+        logger.info("OCR refinement starting: \(rawText.count) chars input")
+
         let prompt = """
         Correct the following OCR text by fixing spacing issues, character recognition errors (O/0, I/l/1, S/5), and adding missing punctuation. Preserve the original structure and line breaks. Do not add content that wasn't in the original.
 
@@ -123,18 +125,21 @@ actor VisionOCRService {
 
         do {
             let session = LanguageModelSession()
-            let response = try await session.respond(to: prompt, generating: RefinedText.self)
-            let refined = response.content.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            logger.info("Calling LanguageModelSession.respond...")
+            let response = try await session.respond(to: prompt)
+            logger.info("Got response, content type: \(type(of: response.content))")
+
+            let refined = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 
             guard !refined.isEmpty else {
                 logger.warning("OCR refinement returned empty text")
                 return nil
             }
 
-            logger.info("OCR refinement: \(rawText.count) chars → \(refined.count) chars")
+            logger.info("OCR refinement succeeded: \(rawText.count) chars → \(refined.count) chars")
             return refined
         } catch {
-            logger.warning("OCR refinement failed: \(error.localizedDescription)")
+            logger.error("OCR refinement failed: \(error.localizedDescription)")
             return nil
         }
     }
@@ -267,12 +272,6 @@ enum VisionOCRError: Error, LocalizedError {
 }
 
 // MARK: - Extraction Models
-
-@Generable(description: "Refined OCR text with corrections")
-private struct RefinedText {
-    @Guide(description: "The corrected text with spacing, character, and punctuation fixes applied")
-    var text: String
-}
 
 @Generable(description: "Contact information extracted from text")
 private struct ExtractedContact {
