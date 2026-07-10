@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy — QuillStack</title>
-  <meta name="description" content="Everything you capture is processed and stored on your device. Your content never leaves unless you choose iCloud sync or Obsidian export.">
+  <meta name="description" content="Everything you capture is processed and stored on your device. Your content never leaves unless you choose Obsidian export.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -33,7 +33,7 @@
 
     <h2>Overview</h2>
     <p>QuillStack (“the App”) is a fast image-capture tool for receipts, tickets, posters, and notes. This Privacy Policy explains what data the app handles, where it goes, and what stays on your device.</p>
-    <div class="callout"><strong>Short version:</strong> Everything you capture — images, extracted text, tags, and enrichment — is processed and stored <strong>entirely on your device</strong>. Your content never leaves your device unless you choose to sync it to your personal iCloud or export it to Obsidian. The only data the app sends off-device is pseudonymous crash diagnostics — tied to a random installation ID, never to you — which never include your images, text, or notes.</div>
+    <div class="callout"><strong>Short version:</strong> Everything you capture — images, extracted text, tags, and enrichment — is processed and stored <strong>entirely on your device</strong>. Your content never leaves your device unless you choose to export it to Obsidian. The only data the app sends off-device is pseudonymous crash diagnostics — tied to a random installation ID, never to you — which never include your images, text, or notes.</div>
 
     <h2>What stays on your device</h2>
     <p>Your captures and everything derived from them are created, processed, and stored locally:</p>
@@ -47,15 +47,11 @@
     <p>We do not operate any server that stores — or ever receives — your notes or images.</p>
 
     <h2>What can leave your device — and only if you choose</h2>
-    <p>There are exactly three ways any data leaves your device. The first two are entirely your choice and move only the data you direct; the third is limited, pseudonymous diagnostics that never contain your content.</p>
+    <p>There are exactly two ways any data leaves your device. The first is entirely your choice and moves only the data you direct; the second is limited, pseudonymous diagnostics that never contain your content.</p>
     <ul>
-      <li><strong>iCloud sync (optional, off unless you enable it):</strong> your captures and tags sync across your Apple devices through <strong>your own</strong> iCloud account.</li>
       <li><strong>Obsidian export (optional, only when you configure a vault):</strong> selected captures are written as local markdown files to a folder path you specify. Nothing is sent over the network.</li>
       <li><strong>Pseudonymous crash diagnostics (Sentry):</strong> if the app crashes or errors, a diagnostic report is sent so we can fix the bug. It contains no images, no OCR text, and no notes — see below.</li>
     </ul>
-
-    <h3>iCloud sync</h3>
-    <p>If you are signed in to iCloud and iCloud Drive is enabled, QuillStack syncs your captures and tags across your Apple devices via <strong>CloudKit</strong> in your personal iCloud account. Apple manages this sync end-to-end; we have no access to your iCloud data. You can turn it off in iOS Settings → Apple ID → iCloud → QuillStack.</p>
 
     <h3>Obsidian export</h3>
     <p>When you set an Obsidian vault path, exported captures are written as markdown files (with images attached, and optional OCR text) to that local folder. This is a local file operation — no data is transmitted over the network.</p>
@@ -80,7 +76,7 @@
         <tr><td>Performance Data</td><td>Yes, via Sentry</td><td>App Functionality (diagnostics)</td><td>No</td><td>No</td></tr>
       </tbody>
     </table>
-    <p><strong>Not collected</strong> — stays on your device (and, if you enable it, your iCloud): captured images and videos, extracted text (OCR), tags and notes (User Content), coarse location, contacts, identifiers, search and browsing history, purchase history, financial info, health &amp; fitness, and sensitive info.</p>
+    <p><strong>Not collected</strong> — stays on your device: captured images and videos, extracted text (OCR), tags and notes (User Content), coarse location, contacts, identifiers, search and browsing history, purchase history, financial info, health &amp; fitness, and sensitive info.</p>
 
     <h2>Device permissions</h2>
     <p>These permissions are used entirely on your device; granting them does not send data to us.</p>
@@ -111,8 +107,8 @@
     <h2>Your rights</h2>
     <p>Because QuillStack processes your data on your device and does not operate a server that stores it:</p>
     <ul>
-      <li><strong>Access:</strong> your data is on your device (and, optionally, your iCloud).</li>
-      <li><strong>Deletion:</strong> deleting the app removes local data. iCloud data can be removed via iOS Settings → Apple ID → iCloud → Manage Storage → QuillStack. To request deletion of any Sentry-side crash reports tied to your installation ID, email us.</li>
+      <li><strong>Access:</strong> your data is on your device.</li>
+      <li><strong>Deletion:</strong> deleting the app removes all local data. To request deletion of any Sentry-side crash reports tied to your installation ID, email us.</li>
       <li><strong>Portability:</strong> use the Obsidian export to write your notes to markdown files you own.</li>
       <li><strong>Opt-out of diagnostics:</strong> Sentry honors your iOS system-level setting at Settings → Privacy &amp; Security → Analytics &amp; Improvements → Share with App Developers. Turning it off stops non-crash telemetry. To also block crash reports, revoke network access to the app via iOS Screen Time or a network profile.</li>
     </ul>
