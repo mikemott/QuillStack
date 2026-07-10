@@ -20,7 +20,6 @@
 		443EBF80BC71F519C000AECF /* OCRFailureUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08DF3578B850EDEE14BDBFD9 /* OCRFailureUITests.swift */; };
 		467CFA561DFF4886DCCBEE48 /* CaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537015B16D0EED6B6DBAB9A6 /* CaptureProcessor.swift */; };
 		48DAD0B56F467A9C5B7DEC6A /* ObsidianExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22F4E5D3D42DED782BA191 /* ObsidianExporterTests.swift */; };
-		4A3C84EC9820B8ADD1E62E5A /* TodoActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */; };
 		4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84704540B805D88979BF52CD /* Typography.swift */; };
 		50C2AF91CE131807998DEE51 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF1A4950689E86FEDAA8FF4 /* Capture.swift */; };
 		55932922712289AB36418C79 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AB099BAAA9ED35A206FDE2 /* ContentView.swift */; };
@@ -30,7 +29,6 @@
 		672977EFA98918FDBD45BA64 /* QuillStackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6499B4EDA579471C027B8B /* QuillStackApp.swift */; };
 		6D7C5DF56898D0641C871CB7 /* EnrichmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27989E6270109F7FFBD2EAF /* EnrichmentTests.swift */; };
 		74CFA93B5B14CAA49F511DC7 /* ContactActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4326D65CD0927EFFD223CB42 /* ContactActionView.swift */; };
-		78B6D218E8A7A47B2CE2B0E0 /* TodoExtraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */; };
 		7D712EB29B747417C5122CC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FB76058408D13419B7BE321 /* Assets.xcassets */; };
 		7D89E6482CB2B9F6321F6842 /* Enrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD81AE056AC7E1A2498C619A /* Enrichment.swift */; };
 		83703AD68F449D52E83020B1 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC0291B035CF50B52D65464 /* DocumentScannerView.swift */; };
@@ -89,7 +87,6 @@
 		2A151C6C1C1BE00FD00702BB /* IBMPlexSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Light.ttf"; sourceTree = "<group>"; };
 		2AE00E011597807C677D8713 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		316694A14067DD5476FC5F8B /* EventExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventExtraction.swift; sourceTree = "<group>"; };
-		3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoActionView.swift; sourceTree = "<group>"; };
 		3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptPreviewSheet.swift; sourceTree = "<group>"; };
 		3D41AB88F26A245C79AAC7FC /* TagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
 		3E02039CCDB58AA737CF6A1E /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
@@ -120,7 +117,6 @@
 		A958B641DDBAE7634C36E276 /* ObsidianExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObsidianExporter.swift; sourceTree = "<group>"; };
 		B1503BFC0BE5D604DE3AC87E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B4823E20FD700284A0FA6844 /* QuillStackUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoExtraction.swift; sourceTree = "<group>"; };
 		B9333277D1C3BEECE28F3FB3 /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		BA5F5C260D760F3B6700AC13 /* QuillStackTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QuillStackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE6DD8C80E9AA138C4F0460C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
@@ -269,7 +265,6 @@
 				4326D65CD0927EFFD223CB42 /* ContactActionView.swift */,
 				78DF9BEE4F2F7F4D360A6506 /* EventActionView.swift */,
 				3C9E21760DD9B99FA2BA8EDF /* ReceiptPreviewSheet.swift */,
-				3465ED0BC45DE9AAD66816BE /* TodoActionView.swift */,
 			);
 			path = Actions;
 			sourceTree = "<group>";
@@ -318,7 +313,6 @@
 				316694A14067DD5476FC5F8B /* EventExtraction.swift */,
 				5BC672610E74311F8BA9D7D1 /* ReceiptExtraction.swift */,
 				BE6DD8C80E9AA138C4F0460C /* Tag.swift */,
-				B8BCEAD0BA296BA2BD48C9AE /* TodoExtraction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -509,8 +503,6 @@
 				F930A0A4D7F23F26B4E273CF /* Tag.swift in Sources */,
 				18B99221501B9088B896EB31 /* TagChip.swift in Sources */,
 				A9B1556579EF797738966EE2 /* TagPickerView.swift in Sources */,
-				4A3C84EC9820B8ADD1E62E5A /* TodoActionView.swift in Sources */,
-				78B6D218E8A7A47B2CE2B0E0 /* TodoExtraction.swift in Sources */,
 				4E80AE8FCB0678F3020169EB /* Typography.swift in Sources */,
 				C389A75F1281C857033AF94D /* VisionOCRService.swift in Sources */,
 			);

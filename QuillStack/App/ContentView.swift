@@ -16,7 +16,6 @@ struct ContentView: View {
     @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
     @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
     @State private var receiptForAction: IdentifiableWrapper<(ReceiptExtraction, Capture)>?
-    @State private var todoForAction: TodoExtraction?
     @FocusState private var searchFocused: Bool
 
     private var filteredCaptures: [Capture] {
@@ -178,11 +177,6 @@ struct ContentView: View {
                 }, onDismiss: {
                     receiptForAction = nil
                 })
-            }
-            .sheet(item: $todoForAction) { todo in
-                TodoActionView(extraction: todo, eventStore: eventStore) {
-                    todoForAction = nil
-                }
             }
         }
         .preferredColorScheme(.dark)
@@ -429,8 +423,6 @@ struct ContentView: View {
             if let receipt = capture.enrichment?.receipt {
                 receiptForAction = IdentifiableWrapper((receipt, capture))
             }
-        case "To-Do":
-            todoForAction = capture.enrichment?.todo
         default: break
         }
     }

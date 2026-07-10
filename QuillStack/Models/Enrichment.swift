@@ -83,11 +83,9 @@ struct EnrichedCapture: Codable, Sendable {
     var contact: ContactExtraction?
     var event: EventExtraction?
     var receipt: ReceiptExtraction?
-    var todo: TodoExtraction?
 
     init(title: String, summary: String, text: String, tags: [String], aiTags: [String],
-         contact: ContactExtraction? = nil, event: EventExtraction? = nil, receipt: ReceiptExtraction? = nil,
-         todo: TodoExtraction? = nil) {
+         contact: ContactExtraction? = nil, event: EventExtraction? = nil, receipt: ReceiptExtraction? = nil) {
         self.title = title
         self.summary = summary
         self.text = text
@@ -96,7 +94,6 @@ struct EnrichedCapture: Codable, Sendable {
         self.contact = contact
         self.event = event
         self.receipt = receipt
-        self.todo = todo
     }
 
     init(from decoder: Decoder) throws {
@@ -109,6 +106,5 @@ struct EnrichedCapture: Codable, Sendable {
         contact = try container.decodeIfPresent(ContactExtraction.self, forKey: .contact)
         event = try container.decodeIfPresent(EventExtraction.self, forKey: .event)
         receipt = try container.decodeIfPresent(ReceiptExtraction.self, forKey: .receipt)
-        todo = try container.decodeIfPresent(TodoExtraction.self, forKey: .todo)
     }
 }

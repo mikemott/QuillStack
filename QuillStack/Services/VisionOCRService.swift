@@ -17,7 +17,6 @@ actor VisionOCRService {
         let contact: ContactExtraction?
         let event: EventExtraction?
         let receipt: ReceiptExtraction?
-        let todo: TodoExtraction?
     }
 
     // MARK: - Public API
@@ -25,7 +24,7 @@ actor VisionOCRService {
     /// Performs on-device OCR and optional structured extraction based on selected tags.
     /// - Parameters:
     ///   - imageData: Raw image data to process
-    ///   - tagNames: Set of tag names that trigger structured extraction (Contact, Event, Receipt, To-Do)
+    ///   - tagNames: Set of tag names that trigger structured extraction (Contact, Event, Receipt)
     /// - Returns: OCRResult containing recognized text and any extracted structured data
     /// - Throws: VisionOCRError if image processing or text recognition fails
     func recognizeText(from imageData: Data, tagNames: Set<String> = []) async throws -> OCRResult {
@@ -37,22 +36,25 @@ actor VisionOCRService {
             throw VisionOCRError.imageEncodingFailed
         }
 
-        let text = try await performOCR(on: cgImage)
+        let rawText = try await performOCR(on: cgImage)
 
-        guard !text.isEmpty else {
+        guard !rawText.isEmpty else {
             throw VisionOCRError.emptyResponse
         }
 
+        // Refine OCR text using on-device LLM to fix common OCR issues
+        let refinedText = await refineOCRText(rawText)
+        let text = refinedText ?? rawText // Fall back to raw text if refinement fails
+
         // Check if any tags need structured extraction
-        let extractionTags = tagNames.intersection(["Contact", "Event", "Receipt", "To-Do"])
+        let extractionTags = tagNames.intersection(["Contact", "Event", "Receipt"])
 
         var contact: ContactExtraction?
         var event: EventExtraction?
         var receipt: ReceiptExtraction?
-        var todo: TodoExtraction?
 
         if !extractionTags.isEmpty {
-            // Perform on-device structured extraction
+            // Perform on-device structured extraction using refined text
             if extractionTags.contains("Contact") {
                 contact = await extractContact(from: text)
             }
@@ -62,13 +64,10 @@ actor VisionOCRService {
             if extractionTags.contains("Receipt") {
                 receipt = await extractReceipt(from: text)
             }
-            if extractionTags.contains("To-Do") {
-                todo = await extractTodo(from: text)
-            }
         }
 
-        logger.info("OCR complete: \(text.count) chars, contact=\(contact != nil), event=\(event != nil), receipt=\(receipt != nil), todo=\(todo != nil)")
-        return OCRResult(text: text, contact: contact, event: event, receipt: receipt, todo: todo)
+        logger.info("OCR complete: \(text.count) chars, refined=\(refinedText != nil), contact=\(contact != nil), event=\(event != nil), receipt=\(receipt != nil)")
+        return OCRResult(text: text, contact: contact, event: event, receipt: receipt)
     }
 
     // MARK: - Vision OCR
@@ -107,6 +106,41 @@ actor VisionOCRService {
             } catch {
                 continuation.resume(throwing: error)
             }
+        }
+    }
+
+    /// Refines raw OCR text using on-device LLM to correct common OCR errors.
+    /// - Parameter rawText: Text directly from Vision OCR
+    /// - Returns: Cleaned and corrected text, or nil if refinement fails
+    private func refineOCRText(_ rawText: String) async -> String? {
+        logger.info("OCR refinement starting: \(rawText.count) chars input")
+
+        let prompt = """
+        Correct the following OCR text by fixing spacing issues, character recognition errors (O/0, I/l/1, S/5), and adding missing punctuation. Preserve the original structure and line breaks. Do not add content that wasn't in the original.
+
+        ---
+        \(String(rawText.prefix(2000)))
+        ---
+        """
+
+        do {
+            let session = LanguageModelSession()
+            logger.info("Calling LanguageModelSession.respond...")
+            let response = try await session.respond(to: prompt)
+            logger.info("Got response, content type: \(type(of: response.content))")
+
+            let refined = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !refined.isEmpty else {
+                logger.warning("OCR refinement returned empty text")
+                return nil
+            }
+
+            logger.info("OCR refinement succeeded: \(rawText.count) chars → \(refined.count) chars")
+            return refined
+        } catch {
+            logger.error("OCR refinement failed: \(error.localizedDescription)")
+            return nil
         }
     }
 
@@ -151,8 +185,11 @@ actor VisionOCRService {
     /// - Parameter text: OCR text to analyze
     /// - Returns: EventExtraction if successful, nil if extraction fails
     private func extractEvent(from text: String) async -> EventExtraction? {
+        let currentYear = Calendar.current.component(.year, from: Date())
         let prompt = """
         Extract event information from the following text. Only include fields that are clearly visible.
+
+        IMPORTANT: When parsing dates, if no year is specified, use \(currentYear) as the year. Be precise with day and month values.
 
         ---
         \(String(text.prefix(2000)))
@@ -205,8 +242,7 @@ actor VisionOCRService {
                 vendor: r.vendor,
                 total: r.total,
                 date: r.date,
-                currency: r.currency,
-                items: r.items?.map { ReceiptItem(name: $0.name, quantity: $0.quantity, price: $0.price) }
+                currency: r.currency
             )
         } catch {
             logger.warning("Receipt extraction failed: \(error.localizedDescription)")
@@ -214,34 +250,6 @@ actor VisionOCRService {
         }
     }
 
-    /// Extracts to-do items from OCR text using on-device AI.
-    /// - Parameter text: OCR text to analyze
-    /// - Returns: TodoExtraction if successful, nil if extraction fails
-    private func extractTodo(from text: String) async -> TodoExtraction? {
-        let prompt = """
-        Extract to-do items from the following text. Each task as a separate entry.
-
-        ---
-        \(String(text.prefix(2000)))
-        ---
-        """
-
-        do {
-            let session = LanguageModelSession()
-            let response = try await session.respond(
-                to: prompt,
-                generating: ExtractedTodo.self
-            )
-            let items = response.content.items?.map {
-                TodoItem(title: $0.title, dueDate: $0.dueDate, priority: $0.priority, notes: $0.notes)
-            }
-            logger.info("Todo extraction: \(items?.count ?? 0) items")
-            return TodoExtraction(items: items)
-        } catch {
-            logger.warning("Todo extraction failed: \(error.localizedDescription)")
-            return nil
-        }
-    }
 }
 
 // MARK: - Errors
@@ -294,7 +302,7 @@ private struct ExtractedEvent {
     @Guide(description: "Event title")
     var title: String?
 
-    @Guide(description: "Date in ISO 8601 format")
+    @Guide(description: "Date in ISO 8601 format (YYYY-MM-DD). If year is missing from source text, use current year.")
     var date: String?
 
     @Guide(description: "Start time")
@@ -323,40 +331,5 @@ private struct ExtractedReceipt {
 
     @Guide(description: "Currency code (USD, EUR, etc.)")
     var currency: String?
-
-    @Guide(description: "Line items on the receipt")
-    var items: [ExtractedReceiptItem]?
 }
 
-@Generable(description: "Receipt line item")
-private struct ExtractedReceiptItem {
-    @Guide(description: "Item name")
-    var name: String?
-
-    @Guide(description: "Quantity")
-    var quantity: Int?
-
-    @Guide(description: "Price")
-    var price: String?
-}
-
-@Generable(description: "To-do items extracted from text")
-private struct ExtractedTodo {
-    @Guide(description: "List of tasks")
-    var items: [ExtractedTodoItem]?
-}
-
-@Generable(description: "A single to-do item")
-private struct ExtractedTodoItem {
-    @Guide(description: "Task description")
-    var title: String?
-
-    @Guide(description: "Due date in ISO 8601 if visible")
-    var dueDate: String?
-
-    @Guide(description: "Priority: high, medium, or low if indicated")
-    var priority: String?
-
-    @Guide(description: "Additional context")
-    var notes: String?
-}

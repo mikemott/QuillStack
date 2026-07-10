@@ -40,17 +40,11 @@ struct OCRResponseParsingTests {
 
         var receipt: ReceiptExtraction?
         if let r = parsed["receipt"] as? [String: Any] {
-            let items = (r["items"] as? [[String: Any]])?.map { item in
-                ReceiptItem(
-                    name: item["name"] as? String,
-                    quantity: item["quantity"] as? Int,
-                    price: item["price"] as? String
-                )
-            }
             receipt = ReceiptExtraction(
-                vendor: r["vendor"] as? String, total: r["total"] as? String,
-                date: r["date"] as? String, currency: r["currency"] as? String,
-                items: items
+                vendor: r["vendor"] as? String,
+                total: r["total"] as? String,
+                date: r["date"] as? String,
+                currency: r["currency"] as? String
             )
         }
 
@@ -156,8 +150,8 @@ struct OCRResponseParsingTests {
 
     // MARK: - Receipt parsing from Ollama
 
-    @Test("Parses receipt with items array")
-    func receiptWithItems() throws {
+    @Test("Parses receipt with all fields")
+    func receiptWithAllFields() throws {
         let result = try #require(parseOllamaResponse("""
         {
             "text": "Total $42.50",
@@ -167,29 +161,25 @@ struct OCRResponseParsingTests {
                 "vendor": "Target",
                 "total": "42.50",
                 "currency": "USD",
-                "date": "2026-03-24",
-                "items": [
-                    {"name": "Shirt", "quantity": 1, "price": "29.99"},
-                    {"name": "Socks", "quantity": 3, "price": "4.17"}
-                ]
+                "date": "2026-03-24"
             }
         }
         """))
         let receipt = try #require(result.receipt)
         #expect(receipt.vendor == "Target")
         #expect(receipt.total == "42.50")
-        #expect(receipt.items?.count == 2)
-        #expect(receipt.items?[1].quantity == 3)
+        #expect(receipt.currency == "USD")
+        #expect(receipt.date == "2026-03-24")
     }
 
-    @Test("Receipt with no items array")
-    func receiptNoItems() throws {
+    @Test("Receipt with minimal fields")
+    func receiptMinimal() throws {
         let result = try #require(parseOllamaResponse("""
         {"text": "t", "tags": [], "title": "R", "receipt": {"vendor": "Cafe", "total": "5.00"}}
         """))
         let receipt = try #require(result.receipt)
         #expect(receipt.vendor == "Cafe")
-        #expect(receipt.items == nil)
+        #expect(receipt.total == "5.00")
     }
 
     // MARK: - Malformed / adversarial responses

@@ -169,8 +169,8 @@ struct EnrichedCaptureTests {
 
     // MARK: - Receipt extraction
 
-    @Test("Decodes receipt with line items")
-    func receiptWithItems() throws {
+    @Test("Decodes receipt with basic fields")
+    func receiptWithBasicFields() throws {
         let json = """
         {
             "title": "Grocery Receipt",
@@ -182,11 +182,7 @@ struct EnrichedCaptureTests {
                 "vendor": "Whole Foods",
                 "total": "42.50",
                 "date": "2026-03-24",
-                "currency": "USD",
-                "items": [
-                    {"name": "Milk", "quantity": 1, "price": "3.99"},
-                    {"name": "Bread", "quantity": 2, "price": "5.49"}
-                ]
+                "currency": "USD"
             }
         }
         """
@@ -195,13 +191,11 @@ struct EnrichedCaptureTests {
         #expect(receipt.vendor == "Whole Foods")
         #expect(receipt.total == "42.50")
         #expect(receipt.currency == "USD")
-        #expect(receipt.items?.count == 2)
-        #expect(receipt.items?[0].name == "Milk")
-        #expect(receipt.items?[1].quantity == 2)
+        #expect(receipt.date == "2026-03-24")
     }
 
-    @Test("Decodes receipt with no items")
-    func receiptNoItems() throws {
+    @Test("Decodes receipt with minimal fields")
+    func receiptMinimalFields() throws {
         let json = """
         {
             "title": "Receipt",
@@ -218,7 +212,7 @@ struct EnrichedCaptureTests {
         let enrichment = try JSONDecoder().decode(EnrichedCapture.self, from: Data(json.utf8))
         let receipt = try #require(enrichment.receipt)
         #expect(receipt.vendor == "Coffee Shop")
-        #expect(receipt.items == nil)
+        #expect(receipt.total == "10.00")
     }
 
     // MARK: - Encode/decode roundtrip

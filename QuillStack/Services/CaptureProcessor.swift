@@ -91,7 +91,6 @@ actor CaptureProcessor {
                 var firstContact: ContactExtraction?
                 var firstEvent: EventExtraction?
                 var firstReceipt: ReceiptExtraction?
-                var firstTodo: TodoExtraction?
 
                 for data in imageData {
                     let result = try await visionService.recognizeText(from: data, tagNames: tagNames)
@@ -99,7 +98,6 @@ actor CaptureProcessor {
                     if firstContact == nil { firstContact = result.contact }
                     if firstEvent == nil { firstEvent = result.event }
                     if firstReceipt == nil { firstReceipt = result.receipt }
-                    if firstTodo == nil { firstTodo = result.todo }
                 }
 
                 let description = allText.joined(separator: "\n\n---\n\n")
@@ -119,8 +117,7 @@ actor CaptureProcessor {
                     aiTags: aiTags,
                     contact: firstContact,
                     event: firstEvent,
-                    receipt: firstReceipt,
-                    todo: firstTodo
+                    receipt: firstReceipt
                 )
                 let enrichmentData = try? Self.enrichmentEncoder.encode(enrichment)
 

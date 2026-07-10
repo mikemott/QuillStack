@@ -16,7 +16,6 @@ struct CaptureDetailView: View {
     @State private var contactForAction: IdentifiableWrapper<ContactExtraction>?
     @State private var eventForAction: IdentifiableWrapper<EventExtraction>?
     @State private var receiptForAction: IdentifiableWrapper<ReceiptExtraction>?
-    @State private var todoForAction: TodoExtraction?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -103,11 +102,6 @@ struct CaptureDetailView: View {
             }, onDismiss: {
                 receiptForAction = nil
             })
-        }
-        .sheet(item: $todoForAction) { todo in
-            TodoActionView(extraction: todo, eventStore: eventStore) {
-                todoForAction = nil
-            }
         }
         .onAppear {
             selectedTags = capture.tags ?? []
@@ -385,8 +379,6 @@ struct CaptureDetailView: View {
             if let receipt = capture.enrichment?.receipt {
                 receiptForAction = IdentifiableWrapper(receipt)
             }
-        case "To-Do":
-            todoForAction = capture.enrichment?.todo
         default: break
         }
     }

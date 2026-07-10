@@ -45,9 +45,6 @@ struct ActionIconStack: View {
         if let tag = tagsByName["Receipt"], enrichment?.receipt != nil {
             actions.append(("doc.text", "Receipt", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
         }
-        if let tag = tagsByName["To-Do"], enrichment?.todo != nil {
-            actions.append(("checklist", "To-Do", Color(hex: tag.colorHex), tag.usesLightText ? .white : Color(hex: "#1a1c1c")))
-        }
         return actions
     }
 

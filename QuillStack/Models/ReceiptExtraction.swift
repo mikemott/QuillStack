@@ -5,11 +5,4 @@ struct ReceiptExtraction: Codable, Sendable {
     var total: String?
     var date: String?
     var currency: String?
-    var items: [ReceiptItem]?
-}
-
-struct ReceiptItem: Codable, Sendable {
-    var name: String?
-    var quantity: Int?
-    var price: String?
 }

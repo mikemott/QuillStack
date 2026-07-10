@@ -10,7 +10,6 @@ struct ReceiptPreviewSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // Header fields
                     VStack(spacing: 0) {
                         if let vendor = receipt.vendor {
                             fieldRow("Vendor", value: vendor)
@@ -24,39 +23,6 @@ struct ReceiptPreviewSheet: View {
                     }
                     .background(QSSurface.container)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                    // Line items
-                    if let items = receipt.items, !items.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("ITEMS")
-                                .font(QSFont.sectionHeader)
-                                .tracking(2)
-                                .foregroundStyle(QSColor.onSurfaceMuted)
-
-                            VStack(spacing: 0) {
-                                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
-                                    HStack {
-                                        Text(item.name ?? "Unknown item")
-                                            .font(QSFont.sans(size: 15))
-                                            .foregroundStyle(QSColor.onSurface)
-                                        if let qty = item.quantity, qty > 1 {
-                                            Text("×\(qty)")
-                                                .font(QSFont.mono(size: 13))
-                                                .foregroundStyle(QSColor.onSurfaceMuted)
-                                        }
-                                        Spacer()
-                                        Text(item.price ?? "")
-                                            .font(QSFont.mono(size: 13))
-                                            .foregroundStyle(QSColor.onSurfaceVariant)
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
-                                }
-                            }
-                            .background(QSSurface.container)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        }
-                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 24)
